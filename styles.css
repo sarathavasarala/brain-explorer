@@ -28,7 +28,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 .app {
   display: grid;
-  grid-template-columns: 288px minmax(0, 1fr) 468px;
+  grid-template-columns: 288px minmax(0, 1fr) 540px;
   height: 100vh;
 }
 
@@ -95,9 +95,9 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .item-name { font-size: 13.5px; font-weight: 500; letter-spacing: -0.005em; }
 .item-sub {
   font-size: 12px; color: var(--ink-3); line-height: 1.35; margin-top: 2px;
-  display: -webkit-box; -webkit-line-clamp: 1; -webkit-box-orient: vertical; overflow: hidden;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
 }
-.item.is-on .item-sub, .item:hover .item-sub { -webkit-line-clamp: 3; color: var(--ink-2); }
+.item.is-on .item-sub { color: var(--ink-2); }
 
 .plist { list-style: none; margin: 10px 0 0; padding: 0; }
 .pitem { display: flex; gap: 12px; padding: 12px 10px; border-radius: 10px; transition: background 0.2s; }

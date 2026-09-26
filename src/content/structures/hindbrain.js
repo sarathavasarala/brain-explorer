@@ -73,15 +73,51 @@ export default [
     view: 'left',
     slice: true,
     tagline: 'Reflex hub for eyes and ears, and home of the dopamine cells.',
+    analogy: 'A night watchman who turns your head toward sudden sounds and sights before you decide to look.',
     levels: {
-      connects: {
-        connections: [
-          { id: 'thalamus', dir: 'out' },
-          { id: 'pons', dir: 'both' },
-          { id: 'amygdala', dir: 'in' },
+      where: {
+        text: 'The midbrain is the top inch of the brainstem, sitting just below the {{thalamus}} and above the {{pons}}. It is short, about as long as the top joint of your thumb, and shaped like a stubby tube. A narrow fluid channel runs down its middle.',
+        bullets: [
+          'The roof has four small bumps (the colliculi): two for vision, two for hearing.',
+          'Tucked inside its base is the {{substantia-nigra}}, a dark stripe of [[dopamine]] cells.',
+          'All signals between the forebrain and the lower brainstem pass through or past it.',
         ],
       },
-      cells: { diagram: 'neuromodulator', synapse: 'dopamine' },
+      does: {
+        text: 'The midbrain runs fast reflexes you do not choose. When something flashes at the edge of vision or a twig snaps behind you, it turns your eyes and head toward it. A second job happens quietly in the background. Its dopamine cells send a steady signal that keeps body movement smooth and easy to start.\n\nThink of clapping loudly behind a friend. They flinch and turn before they recognise the sound. That first turn is the midbrain.',
+        bullets: [
+          'Visual orienting: moves the eyes and head toward sudden movement or light.',
+          'Auditory orienting: turns you toward unexpected sounds.',
+          'Movement support: dopamine from the substantia nigra helps the {{striatum}} pick and start actions.',
+          'Alertness and pain: nearby clusters adjust wakefulness and damp down pain.',
+        ],
+      },
+      connects: {
+        text: 'Alarm input arrives from the {{amygdala}} when something might matter. The midbrain adds its reflex and passes the news upward to the {{thalamus}}, which wakes up the cortex. It also trades signals down with the {{pons}} to coordinate the eyes, head and body.',
+        connections: [
+          { id: 'thalamus', dir: 'out', label: 'Alert signals passed up toward the cortex' },
+          { id: 'pons', dir: 'both', label: 'Eye and body signals shared down the brainstem' },
+          { id: 'amygdala', dir: 'in', label: 'Alarm input when something feels threatening' },
+        ],
+      },
+      cells: {
+        text: 'Most midbrain cells are ordinary relay [[neuron|neurons]] that use [[glutamate]] and pass messages quickly. The famous exception is the dopamine cluster in the {{substantia-nigra}}. Like the broadcast diagram shows, a few thousand of these cells grow hugely branched [[axon|axons]] that reach the whole {{striatum}} and change how it responds.',
+        diagram: 'neuromodulator',
+        synapse: 'dopamine',
+        bullets: [
+          'The dark colour of the substantia nigra comes from pigment inside its dopamine cells.',
+          'Losing these cells slows movement. When about half are gone, the signs of Parkinson\'s appear.',
+        ],
+      },
+    },
+    tryIt: 'Look at one corner of the room, then flick your eyes to the opposite corner without moving your head. That quick jump (a saccade) is steered through the midbrain.',
+    breaks: {
+      text: 'Damage here is rare but serious, because so many cables pass through such a small space.',
+      bullets: [
+        'Loss of dopamine cells causes Parkinson\'s: slow movement, stiffness and a resting tremor.',
+        'Damage to the eye reflex bumps causes double vision or trouble looking up and down.',
+        'A stroke here can affect the eyes, the body and wakefulness all at once.',
+      ],
     },
   },
   {
@@ -92,15 +128,51 @@ export default [
     shape: { type: 'tube', path: [[0, -0.2, -0.155], [0, -0.3, -0.175], [0, -0.4, -0.215]], radius: [[0, 0.095], [0.5, 0.13], [1, 0.095]], count: 2200, pattern: 'rings', fill: 0.14 },
     view: 'left',
     tagline: 'A bridge carrying signals between the cortex and the cerebellum.',
+    analogy: 'A busy interchange where every lane from the cortex gets copied and sent south to the cerebellum.',
     levels: {
-      connects: {
-        connections: [
-          { id: 'motor-cortex', dir: 'in' },
-          { id: 'cerebellum', dir: 'out' },
-          { id: 'medulla', dir: 'both' },
+      where: {
+        text: 'The pons is the rounded bulge on the front of the brainstem, between the {{midbrain}} above and the {{medulla}} below. It sits just in front of the {{cerebellum}}. The name means bridge in Latin, and that is what it looks like, a thick bundle of fibres wrapping around the front.',
+        bullets: [
+          'About 2 to 3 cm tall, the most prominent part of the brainstem from the front.',
+          'Its front is mostly [[white matter]]: crossing fibres heading to the cerebellum.',
+          'Inside are scattered clusters of relay [[neuron|neurons]] (the pontine nuclei) plus sleep and face-movement centres.',
         ],
       },
-      cells: { diagram: 'neuromodulator', synapse: 'noradrenaline' },
+      does: {
+        text: 'The pons copies movement plans from the {{motor-cortex}} and hands them to the {{cerebellum}} so it can check and smooth them. It also helps control side to side eye movements, sleep (especially dream sleep) and face sensation and chewing. If the cortex is the office writing the plan, the pons is the mailroom that makes sure the cerebellum gets its copy.',
+        bullets: [
+          'Relay to cerebellum: forwards a copy of cortical plans for correction.',
+          'Eye control: helps move both eyes sideways together.',
+          'Sleep and arousal: hosts cells that switch dream sleep on and off.',
+          'Face and mouth: carries signals for chewing, swallowing and face feeling.',
+        ],
+      },
+      connects: {
+        text: 'Plans flow in from the {{motor-cortex}} and out to the {{cerebellum}}, which is the pons\'s main job. It also talks both ways with the {{medulla}} to share breathing, sleep and heartbeat duties.',
+        connections: [
+          { id: 'motor-cortex', dir: 'in', label: 'A copy of each movement plan from the cortex' },
+          { id: 'cerebellum', dir: 'out', label: 'Plans forwarded for smoothing and timing' },
+          { id: 'medulla', dir: 'both', label: 'Breathing, sleep and heart signals shared' },
+        ],
+      },
+      cells: {
+        text: 'The pons is mostly crossing [[axon|axons]] wrapped in [[myelin]], which is why it looks pale and bulging. Scattered among them are relay cells that use [[glutamate]] to pass the cortical copy onward. A small blue-tinged cluster (the locus coeruleus) works like the broadcast diagram, spraying noradrenaline across the brain to raise alertness.',
+        diagram: 'neuromodulator',
+        synapse: 'noradrenaline',
+        bullets: [
+          'The locus coeruleus holds only about 30,000 cells, yet reaches almost the whole brain.',
+          'It goes quiet during dream sleep and fires in bursts when something surprising happens.',
+        ],
+      },
+    },
+    tryIt: 'Hold a finger up and look at it, then look at the far wall, then back. The clean sideways jump your eyes make travels through circuits in the pons.',
+    breaks: {
+      text: 'Because the pons packs movement, feeling and alertness fibres into a small space, damage here has wide effects.',
+      bullets: [
+        'A stroke can cause "locked-in" syndrome: fully awake but unable to move except the eyes.',
+        'Damage to eye circuits causes double vision or eyes that do not move together.',
+        'Interrupted sleep circuits lead to very broken sleep or loss of dream sleep.',
+      ],
     },
   },
   {
@@ -111,16 +183,52 @@ export default [
     shape: { type: 'tube', path: [[0, -0.4, -0.23], [0, -0.52, -0.27], [0, -0.64, -0.3]], radius: [[0, 0.085], [1, 0.058]], count: 1700, pattern: 'fibers', fill: 0.14 },
     view: 'left',
     tagline: 'Keeps you alive on autopilot: breathing, heart rate, swallowing.',
+    analogy: 'The building manager in the basement who keeps the power, water and air running while everyone upstairs works.',
     levels: {
-      connects: {
-        connections: [
-          { id: 'spinal-cord', dir: 'both' },
-          { id: 'hypothalamus', dir: 'in' },
-          { id: 'cerebellum', dir: 'both' },
-          { id: 'pons', dir: 'both' },
+      where: {
+        text: 'The medulla is the lowest part of the brain, where the brain narrows into the {{spinal-cord}}. It sits just below the {{pons}} and in front of the {{cerebellum}}. About 3 cm long, it looks like a slightly swollen stalk. Almost everything going between brain and body passes through it.',
+        bullets: [
+          'The pyramids on its front are crossing motor fibres: left brain controls right body here.',
+          'Olives on its sides hold relay cells for the cerebellum.',
+          'Inside are tiny control centres for breathing, heart rate and blood pressure.',
         ],
       },
-      cells: { diagram: 'neuromodulator', synapse: 'serotonin' },
+      does: {
+        text: 'The medulla runs the jobs you cannot pause. It sets your breathing rate, steadies blood pressure and heart rate, and coordinates swallowing, coughing and vomiting. It does this using sensors in your blood and body, adjusting second by second without asking you.\n\nYou notice it when you hold your breath. Rising carbon dioxide nags you until the medulla forces a breath in.',
+        bullets: [
+          'Breathing: speeds up or slows down breaths based on blood chemistry.',
+          'Heart and vessels: fine tunes heart rate and blood pressure.',
+          'Swallow and cough: runs the throat sequence so food goes down the right tube.',
+          'Relay: passes touch and movement signals between body and brain.',
+        ],
+      },
+      connects: {
+        text: 'Orders about body state arrive from the {{hypothalamus}}. The medulla acts on them and trades signals both ways with the {{spinal-cord}} below and the {{pons}} above. It also swaps balance and body feedback with the {{cerebellum}} to keep posture steady.',
+        connections: [
+          { id: 'spinal-cord', dir: 'both', label: 'Body signals up, orders down' },
+          { id: 'hypothalamus', dir: 'in', label: 'Body-state orders such as hunger or heat' },
+          { id: 'cerebellum', dir: 'both', label: 'Balance and posture feedback exchanged' },
+          { id: 'pons', dir: 'both', label: 'Breathing and heart rhythms coordinated' },
+        ],
+      },
+      cells: {
+        text: 'The medulla mixes big [[white matter]] highways with small [[grey matter]] control clusters. Many clusters spray serotonin widely, as the broadcast diagram shows, to set sleep, mood and pain levels. Its rhythm-generating cells fire on their own, like a slow pacemaker, and excite motor [[neuron|neurons]] with [[glutamate]].',
+        diagram: 'neuromodulator',
+        synapse: 'serotonin',
+        bullets: [
+          'Breathing pacemaker cells keep firing even in a dish, with no input at all.',
+          'Opiate painkillers act partly here, which is why overdoses slow breathing dangerously.',
+        ],
+      },
+    },
+    tryIt: 'Swallow now and notice you cannot breathe at the same moment. That brief switch, breathing paused while the throat closes, is the medulla running the sequence.',
+    breaks: {
+      text: 'Damage here can be life threatening, because breathing and blood pressure control live here.',
+      bullets: [
+        'A stroke can cause trouble swallowing, slurred speech and dizziness.',
+        'Injury high on the neck or medulla can stop breathing and need a ventilator.',
+        'Long term high blood pressure and sleep apnoea both involve these control loops going wrong.',
+      ],
     },
   },
   {
@@ -131,15 +239,51 @@ export default [
     shape: { type: 'tube', path: [[0, -0.64, -0.3], [0, -0.82, -0.33], [0, -1.02, -0.35]], radius: [[0, 0.058], [1, 0.045]], count: 1300, pattern: 'fibers', fill: 0.12 },
     view: 'left',
     tagline: 'The main cable between brain and body.',
+    analogy: 'A motorway with local slip roads: through traffic to the brain, plus quick local exits for reflexes.',
     levels: {
-      connects: {
-        connections: [
-          { id: 'motor-cortex', dir: 'in' },
-          { id: 'somatosensory-cortex', dir: 'out' },
-          { id: 'cerebellum', dir: 'out' },
+      where: {
+        text: 'The spinal cord runs from the {{medulla}} down inside your backbone, about 45 cm long in an adult and roughly as thick as your little finger. Nerves branch off at each vertebra to serve one strip of the body. Inside, butterfly shaped [[grey matter]] sits in the middle with [[white matter]] highways around it.',
+        bullets: [
+          '31 pairs of spinal nerves leave along its length, one pair per backbone level.',
+          'The top carries signals for the arms, the middle for the trunk, the bottom for the legs.',
+          'It ends around waist height. Below that, loose nerve roots (the cauda equina) continue down.',
         ],
       },
-      cells: { diagram: 'reflex-arc', synapse: 'acetylcholine' },
+      does: {
+        text: 'The spinal cord carries orders down from the {{motor-cortex}} and touch signals up to the {{somatosensory-cortex}}. It also handles quick reflexes on its own. Touch something hot and the hand pulls back before the feeling even reaches your brain.\n\nThat split is the point. Fast local loops protect you, while slower copies keep the brain informed.',
+        bullets: [
+          'Downward traffic: movement commands from the brain to muscles.',
+          'Upward traffic: touch, pain, temperature and body position to the brain.',
+          'Reflexes: local loops that pull away from pain or steady the knee jerk.',
+          'Automatic routines: helps run walking rhythm and bladder control.',
+        ],
+      },
+      connects: {
+        text: 'Movement plans arrive from the {{motor-cortex}} and travel down to muscles. Touch and position signals head the other way to the {{somatosensory-cortex}}. A copy of both streams goes to the {{cerebellum}} so it can fine tune movement.',
+        connections: [
+          { id: 'motor-cortex', dir: 'in', label: 'Movement orders travelling down to muscles' },
+          { id: 'somatosensory-cortex', dir: 'out', label: 'Touch and body signals travelling up' },
+          { id: 'cerebellum', dir: 'out', label: 'Copies sent for balance correction' },
+        ],
+      },
+      cells: {
+        text: 'A reflex arc, like the diagram shows, needs only three cells: a sensory [[neuron]], a relay [[interneuron]], and a motor neuron that uses acetylcholine to contract muscle. Signals between vertebrae use [[glutamate]] to excite the next cell. Brain orders ride down fast, [[myelin]] wrapped highways on the outside.',
+        diagram: 'reflex-arc',
+        synapse: 'acetylcholine',
+        bullets: [
+          'A knee jerk reflex uses just two cells and takes about 30 milliseconds.',
+          'Motor neurons in the cord are among the longest cells in your body, up to a metre long.',
+        ],
+      },
+    },
+    tryIt: 'Rest a hand near the edge of a table and have a friend tap just below your kneecap with the side of their hand while your leg dangles. The small kick that follows is a spinal reflex, no brain needed.',
+    breaks: {
+      text: 'Because everything passes through this one cable, injuries have effects below the injury level only.',
+      bullets: [
+        'A neck injury can paralyse arms and legs (tetraplegia). A lower injury affects the legs only (paraplegia).',
+        'Damaged touch highways cause numbness, tingling or chronic pain.',
+        'Shingles, slipped discs and motor neuron disease all show up first as spinal nerve symptoms.',
+      ],
     },
   },
 ];

@@ -27,7 +27,7 @@ export function renderSidebar(el, { tab, selected, query }) {
       const kids = inGroup.filter((c) => c.parent === s.id);
       const show = match(s) || kids.some(match);
       if (show) {
-        rows.push(`<li><a href="#/s/${s.id}" class="item depth-${depth} ${selected === s.id ? 'is-on' : ''}" data-id="${s.id}" style="--c:${s.color}">
+        rows.push(`<li><a href="#/s/${s.id}" class="item depth-${depth} ${selected === s.id ? 'is-on' : ''}" data-id="${s.id}" style="--c:${s.color}" title="${esc(s.tagline || '')}">
           <i class="dot"></i><span class="item-text"><span class="item-name">${esc(s.name)}</span><span class="item-sub">${esc(s.tagline || '')}</span></span>
         </a></li>`);
       }
