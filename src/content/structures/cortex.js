@@ -186,7 +186,7 @@ export default [
     parent: 'temporal-lobe',
     group: 'cortex',
     color: '#5ce1e6',
-    shape: { type: 'cortex', test: (p) => p.lobe === 'temporal' && p.y > -0.075 && p.z > -0.14 && p.z < 0.12 },
+    shape: { type: 'cortex', test: (p) => p.lobe === 'temporal' && p.y > -0.1 && p.z > -0.14 && p.z < 0.12 },
     view: 'left',
     tagline: 'The first stop in the cortex for sound.',
     levels: {
