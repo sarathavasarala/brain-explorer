@@ -479,4 +479,116 @@ export default [
       ],
     },
   },
+  {
+    id: 'vta',
+    name: 'Ventral tegmental area',
+    group: 'deep',
+    color: '#ffb703',
+    shape: { type: 'ellipsoid', center: [0.03, -0.13, -0.09], radii: [0.024, 0.016, 0.032], count: 500, mirror: true, fill: 1 },
+    view: 'left',
+    tagline: 'Supplies the dopamine that drives desire, curiosity and learning.',
+    analogy: 'The fuel injector that squirts motivation into the brain whenever a goal seems reachable.',
+    levels: {
+      where: {
+        text: 'The ventral tegmental area (VTA) is a tiny cluster of cells in the {{midbrain}}, sitting just medial to the {{substantia-nigra}}. Although small enough to fit on the tip of a pencil, its branches reach right across the front half of the brain.',
+        bullets: [
+          'Nested close to the midline in the floor of the midbrain.',
+          'Made of around 40,000 dopamine-producing neurons in humans.',
+          'Sits right next to the substantia nigra but serves motivation rather than movement.',
+        ],
+      },
+      does: {
+        text: 'The VTA creates the dopamine burst behind desire and anticipation. It fires when something good happens unexpectedly, or when you spot a hint that reward is on the way. That chemical pulse tells your thoughts to pay attention and remember what led here.\n\nHearing your phone chime with a message notification is the VTA in miniature. The burst of curiosity arrives before you even read the screen.',
+        bullets: [
+          'Reward prediction: fires when an outcome beats expectations.',
+          'Motivation engine: turns vague wants into energized pursuit.',
+          'Curiosity and exploration: encourages you to investigate novel sights and ideas.',
+          'Habit reinforcement: stamps memories in the hippocampus with emotional importance.',
+        ],
+      },
+      connects: {
+        text: 'Its main branches go up to the {{striatum}} for reward pursuit, the {{prefrontal-cortex}} for planning, and the {{amygdala}} for emotional weight.',
+        connections: [
+          { id: 'striatum', dir: 'out', label: 'Dopamine sent to the reward center' },
+          { id: 'prefrontal-cortex', dir: 'out', label: 'Motivation relayed to executive planning' },
+          { id: 'amygdala', dir: 'out', label: 'Emotional value added to experiences' },
+          { id: 'hippocampus', dir: 'out', label: 'Memories marked for long term keeping' },
+        ],
+      },
+      cells: {
+        text: 'VTA neurons are neuromodulators with enormous branching trees, as the broadcast diagram shows. They release [[dopamine]] across wide areas, changing how sensitive other synapses are to [[glutamate]]. When an expected reward goes missing, these cells temporarily go quiet.',
+        diagram: 'neuromodulator',
+        synapse: 'dopamine',
+        bullets: [
+          'A single VTA dopamine cell can form over 100,000 synaptic contacts.',
+          'Addictive substances hijack this exact system by prolonging the dopamine surge.',
+        ],
+      },
+    },
+    tryIt: 'Recall the anticipation you felt while unboxing a gift or waiting in line for favourite food. That heightened focus and forward tilt is VTA dopamine.',
+    breaks: {
+      text: 'Disruptions in this circuit alter drive, mood, and belief in what is worth doing.',
+      bullets: [
+        'Anhedonia: losing the ability to feel pleasure or anticipation, common in severe depression.',
+        'Addiction: repeated surges re-wire the circuit until cravings overpower conscious goals.',
+        'Overactivity is linked to the false importance assigned to coincidences in psychosis.',
+      ],
+    },
+  },
+  {
+    id: 'basal-forebrain',
+    name: 'Basal forebrain',
+    group: 'deep',
+    color: '#10b981',
+    shape: { type: 'ellipsoid', center: [0.08, -0.06, 0.08], radii: [0.035, 0.022, 0.038], count: 650, mirror: true, fill: 1 },
+    view: 'left-front',
+    tagline: 'Bathes the cortex in acetylcholine to sharpen attention and seal in memories.',
+    analogy: 'A stage spotlight operator who turns up brightness on what matters so you can focus.',
+    levels: {
+      where: {
+        text: 'The basal forebrain is a cluster of structures tucked below the {{striatum}} and just in front of the {{hypothalamus}}. It contains the nucleus basalis of Meynert, the brain\'s major acetylcholine manufacturing plant for the entire outer cortex.',
+        bullets: [
+          'Located near the base of the front of the brain, under the basal ganglia.',
+          'Sends direct fibres to all four lobes of the cerebral cortex.',
+          'Among the first areas to suffer cell loss in Alzheimer\'s disease.',
+        ],
+      },
+      does: {
+        text: 'The basal forebrain decides when the cortex should pay sharp attention. When something demands focus, it floods the cortex with acetylcholine, quietening background chatter and boosting sensory input. It acts like a focus dial for your thoughts.\n\nSearching for your lost keys in a messy room is this system at work: it keeps your eyes looking and your mind from drifting.',
+        bullets: [
+          'Selective attention: turns up signal-to-noise ratio in sensory areas.',
+          'Neuroplasticity: tells cortical circuits that right now is worth learning.',
+          'Arousal and waking: helps transition from groggy sleep to alert wakefulness.',
+          'Working memory: supports holding several numbers or names in mind.',
+        ],
+      },
+      connects: {
+        text: 'It sends widespread projections up to the {{frontal-lobe}} for attention, the {{temporal-lobe}} for recognition, and the {{hippocampus}} for storing new facts.',
+        connections: [
+          { id: 'frontal-lobe', dir: 'out', label: 'Acetylcholine sent to boost executive focus' },
+          { id: 'hippocampus', dir: 'out', label: 'Rhythm and memory storage signals' },
+          { id: 'temporal-lobe', dir: 'out', label: 'Sensory sharpening sent to language and recognition' },
+          { id: 'hypothalamus', dir: 'in', label: 'Sleep-wake status and body rhythms received' },
+        ],
+      },
+      cells: {
+        text: 'Large cholinergic neurons send sprawling axons that release [[acetylcholine]] across cortical layers. As shown in the broadcast diagram, this does not carry an image or word itself, but changes how receptive cortical cells are to incoming [[glutamate]].',
+        diagram: 'neuromodulator',
+        synapse: 'acetylcholine',
+        bullets: [
+          'These cells fire in bursts locked to moments of surprise and intense curiosity.',
+          'Loss of up to 90 percent of these neurons is a primary cause of memory loss in dementia.',
+        ],
+      },
+    },
+    tryIt: 'Count backwards from 100 by sevens (100, 93, 86...). The effortful mental grip keeping you on track is fueled by acetylcholine from the basal forebrain.',
+    breaks: {
+      text: 'When these cells degenerate, the cortex loses its focus and ability to store new days.',
+      bullets: [
+        'Alzheimer\'s disease: earliest memory decline correlates directly with cell death here.',
+        'Delirium and confusion: triggered when medicines block acetylcholine receptors.',
+        'Chronic brain fog and daytime drowsiness when this wakefulness system falters.',
+      ],
+    },
+  },
 ];

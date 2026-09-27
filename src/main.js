@@ -2,19 +2,24 @@ import { structures, byId, groups, levels, pathways, anchors, validate, sourceOf
 import { createBrainScene } from './scene/brain-scene.js';
 import { renderSidebar } from './ui/sidebar.js';
 import { renderStructure, renderPathway, renderHome } from './ui/explainer.js';
+import { renderAsk } from './ui/ask.js';
+import { renderLibraryShell, renderLibraryBody } from './ui/library.js';
+import { ask, cached, normalise } from './services/ask.js';
 import { findTerm, esc } from './ui/format.js';
 import { icon } from './ui/icons.js';
 
 const $ = (sel) => document.querySelector(sel);
+const appEl = $('.app');
 const listEl = $('#list');
 const explainerEl = $('#explainer');
+const libraryEl = $('#library');
 const hoverEl = $('#hover-label');
 const tipEl = $('#tip');
 
 const problems = validate();
 if (problems.length) console.warn(`[brain] ${problems.length} content problem(s):\n` + problems.join('\n'));
 
-const state = { tab: 'structures', query: '', route: { type: 'home' }, playing: false, flown: '' };
+const state = { query: '', libQuery: '', route: { type: 'home' }, playing: false, flown: '' };
 let timer = null;
 
 // ---------------------------------------------------------------- scene
@@ -37,6 +42,9 @@ const scene = createBrainScene($('#brain'), {
 });
 
 // ---------------------------------------------------------------- routing
+// #/            Parts home         #/s/<id>/<level>  a part
+// #/pathways    pathway library    #/p/<id>/<step>   a pathway tour
+// #/ask         Ask intro          #/ask/<question>  a sketch
 function parseHash() {
   const [type, id, extra] = location.hash.replace(/^#\/?/, '').split('/');
   if (type === 's' && byId.has(id)) {
@@ -46,7 +54,28 @@ function parseHash() {
     const p = pathways.find((q) => q.id === id);
     return { type: 'p', id, step: Math.min(Math.max(parseInt(extra, 10) || 0, 0), p.steps.length - 1) };
   }
+  if (type === 'pathways') return { type: 'library' };
+  if (type === 'ask') {
+    let q = '';
+    try { q = normalise(decodeURIComponent(id || '')); } catch { q = ''; }
+    return { type: 'ask', query: q };
+  }
   return { type: 'home' };
+}
+
+const MODE = { home: 'parts', s: 'parts', library: 'library', p: 'tour', ask: 'ask' };
+const NAV = { parts: 'parts', library: 'pathways', tour: 'pathways', ask: 'ask' };
+
+function setMode(type) {
+  const mode = MODE[type];
+  appEl.classList.remove('mode-parts', 'mode-library', 'mode-tour', 'mode-ask');
+  appEl.classList.add(`mode-${mode}`);
+  document.querySelectorAll('[data-mode]').forEach((a) => {
+    const on = a.dataset.mode === NAV[mode];
+    a.classList.toggle('is-on', on);
+    if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
+  });
+  libraryEl.hidden = mode !== 'library';
 }
 
 function arcFor(from, c) {
@@ -60,16 +89,32 @@ function fly(ids, view, key) {
   scene.flyTo(ids, view);
 }
 
+function clearScene(key) {
+  scene.focus([]);
+  scene.setArcs([]);
+  scene.forceSlice(false);
+  fly([], 'left', key);
+}
+
+function showSketch(r, key) {
+  const parts = (r.parts || []).filter((p) => byId.has(p.id));
+  scene.paintSketch(parts);
+  const cut = parts.filter((p) => p.role === 'cut_off').map((p) => p.id);
+  scene.setArcs(cut.slice(1).map((id) => ({ from: cut[0], to: id, active: false })));
+  const sliced = parts.find((p) => byId.get(p.id).slice);
+  scene.forceSlice(!!sliced);
+  const view = byId.get((sliced || parts[0])?.id)?.view || 'left';
+  fly(parts.map((p) => p.id), view, key);
+}
+
 function apply() {
   const prev = state.route;
   const r = (state.route = parseHash());
   if (r.type !== 'p') stopPlay();
+  setMode(r.type);
 
   if (r.type === 'home') {
-    scene.focus([]);
-    scene.setArcs([]);
-    scene.forceSlice(false);
-    fly([], 'left', 'home');
+    clearScene('home');
     explainerEl.innerHTML = renderHome();
   } else if (r.type === 's') {
     const s = byId.get(r.id);
@@ -83,7 +128,13 @@ function apply() {
     else fly([s.id], s.view, `${s.id}`);
     explainerEl.innerHTML = renderStructure(s, r.level, sourceOf.get(s.id));
     if (prev.type !== 's' || prev.id !== r.id) explainerEl.scrollTop = 0;
-  } else {
+  } else if (r.type === 'library') {
+    clearScene('library');
+    if (prev.type !== 'library') {
+      libraryEl.querySelector('#lib-body').innerHTML = renderLibraryBody(state.libQuery);
+      libraryEl.scrollTop = 0;
+    }
+  } else if (r.type === 'p') {
     const p = pathways.find((q) => q.id === r.id);
     const st = p.steps[r.step];
     const past = p.steps.slice(0, r.step);
@@ -98,23 +149,37 @@ function apply() {
     fly(frame, st.view || 'left', `${p.id}:${r.step}`);
     explainerEl.innerHTML = renderPathway(p, r.step, state.playing);
     if (prev.type !== 'p' || prev.id !== r.id) explainerEl.scrollTop = 0;
-    if (r.type === 'p' && state.tab !== 'pathways') setTab('pathways', false);
+  } else if (r.type === 'ask') {
+    applyAsk(r);
   }
-  if (r.type === 's' && state.tab !== 'structures') setTab('structures', false);
-  drawSidebar();
+  if (r.type === 'home' || r.type === 's') drawSidebar();
+}
+
+function applyAsk(r) {
+  const key = `ask:${r.query.toLowerCase()}`;
+  if (!r.query) {
+    clearScene('ask');
+    explainerEl.innerHTML = renderAsk();
+    return;
+  }
+  const hit = cached(r.query);
+  if (hit) {
+    explainerEl.innerHTML = renderAsk({ query: r.query, result: hit });
+    if (hit.status === 'ok') showSketch(hit, key); else clearScene(key);
+    return;
+  }
+  clearScene(key);
+  explainerEl.innerHTML = renderAsk({ query: r.query, loading: true });
+  ask(r.query).then((res) => {
+    if (state.route.type !== 'ask' || state.route.query !== r.query) return;
+    explainerEl.innerHTML = renderAsk({ query: r.query, result: res });
+    if (res.status === 'ok') { state.flown = ''; showSketch(res, key); }
+  });
 }
 
 function drawSidebar() {
-  const sel = state.route.type === 'home' ? null : state.route.id;
-  renderSidebar(listEl, { tab: state.tab, selected: sel, query: state.query });
+  renderSidebar(listEl, { selected: state.route.type === 's' ? state.route.id : null, query: state.query });
   listEl.querySelector('.is-on')?.scrollIntoView({ block: 'nearest' });
-}
-
-function setTab(tab, redraw = true) {
-  state.tab = tab;
-  document.querySelectorAll('[data-tab]').forEach((b) => b.classList.toggle('is-on', b.dataset.tab === tab));
-  $('#search').placeholder = tab === 'pathways' ? 'Search pathways' : 'Search parts of the brain';
-  if (redraw) drawSidebar();
 }
 
 // ---------------------------------------------------------------- pathway player
@@ -147,8 +212,32 @@ function togglePlay() {
 // ---------------------------------------------------------------- events
 window.addEventListener('hashchange', apply);
 
-document.querySelectorAll('[data-tab]').forEach((b) => b.addEventListener('click', () => setTab(b.dataset.tab)));
 $('#search').addEventListener('input', (e) => { state.query = e.target.value; drawSidebar(); });
+$('#search').addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  const first = listEl.querySelector('.item');
+  if (first) location.hash = first.getAttribute('href');
+});
+
+libraryEl.innerHTML = renderLibraryShell();
+libraryEl.querySelector('.lib-search-icon').innerHTML = icon('search', 16);
+$('#lib-search').addEventListener('input', (e) => {
+  state.libQuery = e.target.value;
+  $('#lib-body').innerHTML = renderLibraryBody(state.libQuery);
+});
+$('#lib-search').addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  const first = libraryEl.querySelector('.lib-item');
+  if (first) location.hash = first.getAttribute('href');
+});
+
+explainerEl.addEventListener('submit', (e) => {
+  const f = e.target.closest('[data-ask]');
+  if (!f) return;
+  e.preventDefault();
+  const q = normalise(f.elements.q.value);
+  if (q) location.hash = `#/ask/${encodeURIComponent(q)}`;
+});
 
 explainerEl.addEventListener('click', (e) => {
   const rung = e.target.closest('.rung');
@@ -194,7 +283,12 @@ function syncToolbar() {
 }
 toolbar.addEventListener('click', (e) => {
   const t = e.target.closest('[data-tool]')?.dataset.tool;
-  if (t === 'reset') { state.flown = ''; if (location.hash && location.hash !== '#/') location.hash = '#/'; else apply(); }
+  if (t === 'reset') {
+    state.flown = '';
+    const type = state.route.type;
+    if ((type === 'home' || type === 's') && location.hash && location.hash !== '#/') location.hash = '#/';
+    else apply();
+  }
   if (t === 'slice') scene.setSlice(!scene.slice);
   if (t === 'spin') scene.setSpin(!scene.spin);
   syncToolbar();
@@ -215,7 +309,7 @@ function orderedIds() {
 window.addEventListener('keydown', (e) => {
   if (e.target.matches('input, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
   const r = state.route;
-  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+  if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && ['home', 's', 'p'].includes(r.type)) {
     e.preventDefault();
     const d = e.key === 'ArrowDown' ? 1 : -1;
     if (r.type === 'p') { stopPlay(); stepTo(r.step + d); return; }
@@ -230,10 +324,13 @@ window.addEventListener('keydown', (e) => {
     const n = Math.min(Math.max(i + (e.key === 'ArrowRight' ? 1 : -1), 0), levels.length - 1);
     location.hash = `#/s/${r.id}/${levels[n].id}`;
   }
-  if (e.key === 'Escape') location.hash = '#/';
+  if (e.key === 'Escape') {
+    if (r.type === 'p') location.hash = '#/pathways';
+    else if (r.type === 'ask' && r.query) location.hash = '#/ask';
+    else if (r.type !== 'home') location.hash = '#/';
+  }
   if (e.key === ' ' && r.type === 'p') { e.preventDefault(); togglePlay(); }
 });
 
-setTab('structures', false);
 apply();
 syncToolbar();

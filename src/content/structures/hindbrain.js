@@ -286,4 +286,117 @@ export default [
       ],
     },
   },
+  {
+    id: 'raphe-nuclei',
+    name: 'Raphe nuclei',
+    group: 'hindbrain',
+    color: '#00f5d4',
+    shape: { type: 'ellipsoid', center: [0.0, -0.22, -0.2], radii: [0.018, 0.07, 0.024], count: 650, pattern: 'fine', fill: 0.8 },
+    view: 'medial',
+    slice: true,
+    tagline: 'The brainstem seam that produces serotonin to steady mood and sleep.',
+    analogy: 'A climate control thermostat that maintains emotional warmth and keeps sleep cycles on track.',
+    levels: {
+      where: {
+        text: 'The raphe nuclei are a narrow chain of neuron clusters running right down the midline seam of the brainstem, from the {{midbrain}} down through the {{pons}} and {{medulla}}. "Raphe" means seam in Greek, describing how they sit like stitches joining the two halves.',
+        bullets: [
+          'Forms a midline column inside the core of the brainstem.',
+          'Upper clusters project upward into the forebrain; lower clusters project down the spinal cord.',
+          'The principal source of serotonin for the central nervous system.',
+        ],
+      },
+      does: {
+        text: 'The raphe nuclei release [[serotonin]] across almost the entire brain. Serotonin acts as an emotional shock absorber: it promotes patience, buffers against chronic stress, and regulates your body clock and appetite.\n\nWaking up refreshed on a sunny morning and feeling steady through daily hassles reflects healthy raphe serotonin tone.',
+        bullets: [
+          'Mood stabilization: dampens catastrophic reactions to negative events.',
+          'Sleep regulation: triggers tiredness in the evening and regulates dream sleep.',
+          'Impulse control: helps delay immediate gratification for longer term goals.',
+          'Pain gating: descending projections quiet pain signals in the spinal cord.',
+        ],
+      },
+      connects: {
+        text: 'Ascending fibres travel to the {{prefrontal-cortex}} for mood balance, the {{amygdala}} to soothe anxiety, and the {{hypothalamus}} to tune sleep. Descending fibres run down to the {{spinal-cord}} to gate pain.',
+        connections: [
+          { id: 'prefrontal-cortex', dir: 'out', label: 'Mood and patience regulation' },
+          { id: 'amygdala', dir: 'out', label: 'Fear dampening and emotional soothing' },
+          { id: 'hypothalamus', dir: 'out', label: 'Circadian rhythm and sleep-wake tuning' },
+          { id: 'spinal-cord', dir: 'out', label: 'Pain threshold modulation sent down' },
+        ],
+      },
+      cells: {
+        text: 'Raphe neurons fire with a slow, regular pacemaker beat during wakefulness. Their sprawling branches release [[serotonin]], which binds to over a dozen different [[receptor]] types across target areas, as pictured in the broadcast diagram.',
+        diagram: 'neuromodulator',
+        synapse: 'serotonin',
+        bullets: [
+          'Antidepressant medicines (SSRIs) slow down the removal of serotonin released by these cells.',
+          'Psychedelic compounds act primarily by stimulating 5-HT2A serotonin receptors in the cortex.',
+        ],
+      },
+    },
+    tryIt: 'Take three deep, slow belly breaths with long exhalations. The calm settling over your chest and thoughts is your parasympathetic system and raphe nuclei bringing down nervous tension.',
+    breaks: {
+      text: 'Depleted serotonin or damaged raphe circuits severely disrupt emotional balance and sleep.',
+      bullets: [
+        'Depression and anxiety: linked to reduced serotonin signaling and impaired receptor sensitivity.',
+        'Insomnia: disruptions in nighttime serotonin release scramble melatonin production and sleep cycles.',
+        'Serotonin syndrome: life-threatening toxicity caused by accidental overdoses of serotonergic drugs.',
+      ],
+    },
+  },
+  {
+    id: 'locus-coeruleus',
+    name: 'Locus coeruleus',
+    group: 'hindbrain',
+    color: '#ff5722',
+    shape: { type: 'ellipsoid', center: [0.035, -0.2, -0.21], radii: [0.016, 0.02, 0.022], count: 450, mirror: true, fill: 1 },
+    view: 'left-back',
+    tagline: 'The brain\'s alert tower that floods the circuits with noradrenaline during urgency.',
+    analogy: 'A watchtower sentry who fires a flare when something unexpected happens, putting the whole city on alert.',
+    levels: {
+      where: {
+        text: 'The locus coeruleus ("blue spot") is a tiny pair of nuclei in the upper {{pons}}, on the floor of the fourth ventricle. Its bluish hue under a microscope comes from melanin granules formed as a byproduct of noradrenaline synthesis.',
+        bullets: [
+          'Contains only around 30,000 to 50,000 neurons in the human brain.',
+          'Despite its miniature size, its axons touch almost every corner of the cortex, cerebellum and cord.',
+          'Sits near the back wall of the brainstem, right above the sensory trigeminal nuclei.',
+        ],
+      },
+      does: {
+        text: 'The locus coeruleus governs your level of arousal. When life is quiet, it ticks over at a steady background rate. When something sudden or dangerous occurs, it fires a burst of [[noradrenaline]] that heightens sensory perception, quickens reaction times, and mobilizes emergency focus.\n\nJumping when you hear a sudden loud crash behind you is an instant locus coeruleus spike.',
+        bullets: [
+          'Vigilance and alertness: sets the overall brain waking state from drowsy to wired.',
+          'Signal amplification: increases sensory clarity by silencing irrelevant cortical noise.',
+          'Stress response: prepares the mind and body for rapid fight-or-flight action.',
+          'Memory consolidation: ensures terrifying or critical events are remembered vividly.',
+        ],
+      },
+      connects: {
+        text: 'It broadcasts alarm signals up to the {{thalamus}} and {{amygdala}} for threat processing, to the {{prefrontal-cortex}} for urgent decision-making, and back to the {{cerebellum}} for fast motor readiness.',
+        connections: [
+          { id: 'thalamus', dir: 'out', label: 'Sensory gating turned up to maximum sensitivity' },
+          { id: 'amygdala', dir: 'out', label: 'Threat assessment boosted during danger' },
+          { id: 'prefrontal-cortex', dir: 'out', label: 'Alertness and working memory focused on survival' },
+          { id: 'cerebellum', dir: 'out', label: 'Motor circuits primed for sudden movement' },
+        ],
+      },
+      cells: {
+        text: 'Locus coeruleus neurons have the most extensively branched axons in the brain, as shown in the neuromodulator broadcast diagram. A single neuron can innervate both the front of the cortex and the spinal cord, synchronizing the entire nervous system with [[noradrenaline]].',
+        diagram: 'neuromodulator',
+        synapse: 'noradrenaline',
+        bullets: [
+          'They fire fastest during intense stress, slow down during calm waking, and stop firing completely in REM sleep.',
+          'Degeneration of locus coeruleus cells is an early hallmark of both Alzheimer\'s and Parkinson\'s disease.',
+        ],
+      },
+    },
+    tryIt: 'Splash cold water on your face. The sudden jolt of alertness and crisp visual clarity is noradrenaline flooding your cortex from the locus coeruleus.',
+    breaks: {
+      text: 'Imbalances in noradrenaline cause either chronic panic or debilitating exhaustion.',
+      bullets: [
+        'PTSD and panic disorder: a hyper-reactive locus coeruleus triggers fight-or-flight false alarms.',
+        'ADHD: insufficient tonic noradrenaline leaves the prefrontal cortex easily distracted.',
+        'Burnout and apathy: chronic stress exhausts noradrenergic reserve, producing deep mental fatigue.',
+      ],
+    },
+  },
 ];

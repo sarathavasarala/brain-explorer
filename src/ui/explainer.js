@@ -109,11 +109,31 @@ export function renderStructure(s, levelId, source) {
   </article>`;
 }
 
+export function routeStrip(p) {
+  let prev = null;
+  return `<span class="route" aria-hidden="true">${p.steps.map((st) => {
+    const c = colorOf(st.focus?.[0]);
+    const dot = `<i style="--c:${c};--p:${prev || c}"></i>`;
+    prev = c;
+    return dot;
+  }).join('')}</span>`;
+}
+
+export function nextPathway(p) {
+  const same = pathways.filter((q) => q.category === p.category);
+  const i = same.indexOf(p);
+  if (i < same.length - 1) return same[i + 1];
+  const j = pathways.indexOf(p);
+  return pathways[(j + 1) % pathways.length];
+}
+
 export function renderPathway(p, step, playing) {
   const st = p.steps[step];
   const accent = colorOf(st.focus?.[0]);
+  const last = step === p.steps.length - 1;
+  const up = last ? nextPathway(p) : null;
   return `<article class="ex ex-path" style="--accent:${accent}">
-    <nav class="crumbs"><span>Pathway</span><span class="sep">/</span><span>${p.steps.length} steps</span></nav>
+    <nav class="crumbs"><a class="back" href="#/pathways">${icon('prev', 15)}All pathways</a><span class="sep">/</span><span>${p.steps.length} steps</span></nav>
     <h1 class="ex-title">${esc(p.name)}</h1>
     <p class="tagline">${fmt(p.tagline || '')}</p>
     ${p.summary ? paragraphs(p.summary) : todo(`src/content/pathways/index.js → ${p.id}.summary`)}
@@ -136,6 +156,12 @@ export function renderPathway(p, step, playing) {
           </div>` : ''}
         </li>`).join('')}
     </ol>
+    ${up ? `<a class="upnext" href="#/p/${up.id}" style="--c:${colorOf(up.steps[0]?.focus?.[0])}">
+      <span class="upnext-lead"><span>Up next</span>${icon('next', 16)}</span>
+      <span class="upnext-name">${esc(up.name)}</span>
+      <span class="upnext-tag">${fmt(up.tagline || '')}</span>
+      ${routeStrip(up)}
+    </a>` : ''}
   </article>`;
 }
 
@@ -154,7 +180,9 @@ export function renderHome() {
     <h3 class="home-h">Good places to start</h3>
     <div class="chips">${starts.map((id) => { const s = byId.get(id); return `<a class="chip" href="#/s/${id}" style="--c:${s.color}"><i></i>${esc(s.name)}</a>`; }).join('')}</div>
     <h3 class="home-h">Or follow a pathway</h3>
-    <div class="chips">${pathways.slice(0, 3).map((p) => `<a class="chip chip-path" href="#/p/${p.id}">${icon('pathway', 14)}${esc(p.name)}</a>`).join('')}</div>
+    <div class="chips">${pathways.slice(0, 3).map((p) => `<a class="chip chip-path" href="#/p/${p.id}">${icon('pathway', 14)}${esc(p.name)}</a>`).join('')}<a class="chip chip-path" href="#/pathways">See all ${pathways.length}</a></div>
+    <h3 class="home-h">Or ask about something else</h3>
+    <div class="chips"><a class="chip chip-path" href="#/ask">What happens in the brain when…</a></div>
     <p class="controls-hint">Drag to rotate · scroll to zoom · right-drag to pan · <kbd>↑</kbd><kbd>↓</kbd> move through parts · <kbd>←</kbd><kbd>→</kbd> change level</p>
   </article>`;
 }

@@ -4,9 +4,9 @@ This is written for the next model picking up the project. Read it top to bottom
 
 ## What this is
 
-A no-build web app. Left: list of brain parts and guided pathways. Centre: a rotatable 3D holographic brain made of glowing points (Three.js 0.160 from a CDN via importmap). Right: an explainer with four zoom levels (Where it is / What it does / How it connects / Down to cells), plus "Try it" and "When it goes wrong".
+A no-build web app with three modes in a top bar: Parts, Pathways and Ask. In Parts mode the left sidebar lists brain parts. Pathways opens a full-width library; picking one starts a tour with no sidebar. Ask is a question screen that lights up the parts involved. Centre: a rotatable 3D holographic brain made of glowing points (Three.js 0.160 from a CDN via importmap). Right: an explainer with four zoom levels (Where it is / What it does / How it connects / Down to cells), plus "Try it" and "When it goes wrong".
 
-Run it: `cd ~/Desktop/Projects/brain-explorer && npm start`, then open http://localhost:5173. Check content with `npm run validate`.
+Run it: `cd ~/Desktop/Projects/brain-explorer && npm start`, then open http://localhost:5173. Ask needs `TYPESAFE_API_KEY` in `.env` (see README). Check content with `npm run validate`.
 
 The user is a beginner in neuroscience. Keep all text plain. The user dislikes em dashes, hype words and polished "AI" phrasing.
 
@@ -16,16 +16,18 @@ The user is a beginner in neuroscience. Keep all text plain. The user dislikes e
 |---|---|
 | `index.html` | Layout shell, importmap, fonts. The first child of `<body>` is a design-direction comment. Leave it in place. |
 | `styles.css` | All styling. Dark theme; `--accent` is set to the selected structure's colour. |
-| `src/main.js` | Hash routing (`#/s/<id>/<level>`, `#/p/<id>/<step>`, `#/`), wires the sidebar, explainer, scene and toolbar. Keyboard: arrows, Esc, Space. |
+| `server.py` | Static server (app files only, localhost only) and the `/api/ask` proxy that holds the API key. |
+| `src/main.js` | Hash routing (`#/`, `#/s/<id>/<level>`, `#/pathways`, `#/p/<id>/<step>`, `#/ask/<q>`), sets the mode class on `.app`, wires the sidebar, library, explainer, scene and toolbar. Keyboard: arrows, Esc, Space. |
 | `src/scene/brain-scene.js` | The 3D engine: point shader, bloom, focus/highlight, arcs, picking, camera flights, slice. |
 | `src/scene/shapes.js` | Point-cloud generators (`cortex`, `ellipsoid`, `tube`, `band`, `parts`, `custom`) and brain constants. |
 | `src/scene/noise.js` | Seeded random and Perlin noise. |
 | `src/content/structures/*.js` | One object per brain part: shape, colour, camera view, connections, text. |
-| `src/content/pathways/index.js` | Guided tours: steps with focus, route, view. |
+| `src/content/pathways/index.js` | Guided tours: steps with focus, route, view, category. Sections live in `pathways/groups.js`. |
+| `src/content/ask-presets.js` | Saved Ask answers checked by hand. Drop wrong answers rather than editing them. |
 | `src/content/diagrams/index.js` | Circuit diagrams for the "Down to cells" level. |
 | `src/content/synapses.js`, `glossary/index.js`, `levels.js`, `groups.js`, `anchors.js` | Supporting data. |
 | `src/content/index.js` | Merges everything and exports `validate()`. |
-| `src/ui/*.js` | Explainer, sidebar, SVG diagrams, text markup, icons. |
+| `src/ui/*.js` | Explainer, sidebar, library, Ask screen, SVG diagrams, text markup, icons. |
 | `tools/validate.mjs` | Lists missing text and broken references. |
 
 Coordinates: +x is the person's LEFT, +y is up, +z is the front. The brain is about 1.7 units long front to back. The default camera looks at the left side of the head (front on screen-left).
@@ -33,7 +35,7 @@ Coordinates: +x is the person's LEFT, +y is up, +z is the front. The brain is ab
 ## Current state
 
 - Everything renders with no console errors, as of the last browser check.
-- All 27 structures and 6 pathways exist with shapes, colours, connections and taglines.
+- All 31 structures and 11 pathways exist with shapes, colours, connections and taglines.
 - Only the **cerebellum** has full text. Everything else shows a dashed "Not written yet" box that names the file and field to fill in. Content writing is covered by `CONTENT_PROMPT.md`.
 
 ## Pending tasks, in priority order

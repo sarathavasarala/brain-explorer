@@ -1,22 +1,10 @@
-import { structures, groups, pathways } from '../content/index.js';
+import { structures, groups } from '../content/index.js';
 import { esc } from './format.js';
-import { icon } from './icons.js';
 
-export function renderSidebar(el, { tab, selected, query }) {
+// The Parts list. Pathways and Ask have their own screens.
+export function renderSidebar(el, { selected, query }) {
   const q = (query || '').trim().toLowerCase();
   const match = (s) => !q || s.name.toLowerCase().includes(q) || (s.tagline || '').toLowerCase().includes(q);
-
-  if (tab === 'pathways') {
-    const list = pathways.filter((p) => !q || p.name.toLowerCase().includes(q));
-    el.innerHTML = list.length
-      ? `<ul class="plist">${list.map((p) => `
-        <li><a href="#/p/${p.id}" class="pitem ${selected === p.id ? 'is-on' : ''}">
-          <span class="pitem-icon">${icon('pathway', 16)}</span>
-          <span class="pitem-text"><span class="pitem-name">${esc(p.name)}</span><span class="pitem-sub">${esc(p.tagline || '')} · ${p.steps.length} steps</span></span>
-        </a></li>`).join('')}</ul>`
-      : `<p class="empty">No pathway matches “${esc(query)}”.</p>`;
-    return;
-  }
 
   const html = [];
   for (const g of groups) {

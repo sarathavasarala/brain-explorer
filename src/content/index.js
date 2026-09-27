@@ -8,7 +8,9 @@ import anchors from './anchors.js';
 import synapses from './synapses.js';
 import diagrams from './diagrams/index.js';
 import pathways from './pathways/index.js';
+import pathwayGroups from './pathways/groups.js';
 import glossary from './glossary/index.js';
+import askPresets from './ask-presets.js';
 
 const files = {
   'src/content/structures/cortex.js': cortex,
@@ -18,7 +20,7 @@ const files = {
 export const structures = Object.values(files).flat();
 // Which file each structure lives in, so the UI can point at where to add missing text.
 export const sourceOf = new Map(Object.entries(files).flatMap(([f, list]) => list.map((s) => [s.id, f])));
-export { groups, levels, anchors, synapses, diagrams, pathways, glossary };
+export { groups, levels, anchors, synapses, diagrams, pathways, pathwayGroups, glossary, askPresets };
 
 export const byId = new Map(structures.map((s) => [s.id, s]));
 export const anchorById = new Map(anchors.map((a) => [a.id, a]));
@@ -77,6 +79,7 @@ export function validate() {
     }
   }
   for (const p of pathways) {
+    if (!pathwayGroups.some((g) => g.id === p.category)) problems.push(`pathway "${p.id}": unknown category "${p.category}"`);
     p.steps.forEach((st, i) => {
       const w = `pathway "${p.id}" step ${i + 1}`;
       for (const id of st.focus || []) if (!known(id)) problems.push(`${w}: unknown focus "${id}"`);
@@ -86,6 +89,11 @@ export function validate() {
       }
       scanText(w, st.text);
     });
+  }
+  for (const a of askPresets) {
+    for (const part of a.result?.parts || []) {
+      if (!byId.has(part.id)) problems.push(`ask preset "${a.query}": unknown part "${part.id}"`);
+    }
   }
   return problems;
 }

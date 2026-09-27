@@ -1,6 +1,6 @@
 # Brain Explorer
 
-An interactive 3D atlas of the human brain. Pick a part, see it light up inside a glowing point-cloud brain, and read what it does in plain language. Guided pathways walk you through seeing, moving, remembering, and fear.
+An interactive 3D atlas of the human brain. Pick a part, see it light up inside a glowing point-cloud brain, and read what it does in plain language. Pathways walk you through what happens when you see, move, remember or get scared. Ask lets you type something like "you have a panic attack" and lights up the parts most involved.
 
 ![Brain Explorer showing the cerebellum highlighted in 3D with its explainer](screenshot.png)
 
@@ -13,11 +13,15 @@ cd ~/Desktop/Projects/brain-explorer
 npm start
 ```
 
-Then open http://localhost:5173. If that port is busy, serve another one directly:
+Then open http://localhost:5173. `npm start` runs `server.py`, which serves the app on 127.0.0.1 only and falls back to 5174 if 5173 is busy. Set `PORT=5199 npm start` to pick another port.
+
+Ask needs an API key for typed questions. Put it in a `.env` file at the project root (it is gitignored):
 
 ```sh
-python3 -m http.server 5174
+TYPESAFE_API_KEY=your-key-here
 ```
+
+The key stays on the server. The browser only talks to `/api/ask`, which refuses requests from other sites. Without a key, or with any plain static server, everything works except typed questions. The saved examples on the Ask screen still work.
 
 Check content with:
 
@@ -27,11 +31,12 @@ npm run validate
 
 ## What is inside
 
-- 27 structures with shapes, colours, camera views, connections, and beginner-level text
-- 6 guided pathways (seeing, moving, remembering, fear, hearing a sentence, catching a ball)
+- 31 structures with shapes, colours, camera views, connections, and beginner-level text
+- 11 pathways in three groups: how you do things, brain chemicals and brain networks
+- Ask: type a feeling, condition or activity and get a short sketch of the parts involved
 - 4 zoom levels per structure: where it is, what it does, how it connects, down to cells
 - Cell circuit diagrams, animated synapses, and hover glossary definitions
-- Hash routing (`#/s/<id>/<level>`, `#/p/<id>/<step>`, `#/`). Keyboard: arrows, Esc, Space.
+- Three modes in the top bar. Parts: `#/`, `#/s/<id>/<level>`. Pathways: `#/pathways`, `#/p/<id>/<step>`. Ask: `#/ask`, `#/ask/<question>`. Keyboard: arrows, Esc (goes back one level), Space.
 
 Shapes are simplified for explanation, not an anatomical atlas. Coordinates: +x is the person's left, +y is up, +z is the front. The brain is about 1.7 units long front to back.
 
@@ -41,16 +46,20 @@ Shapes are simplified for explanation, not an anatomical atlas. Coordinates: +x 
 |---|---|
 | `index.html` | Layout shell, importmap, fonts |
 | `styles.css` | All styling (dark theme, per-structure accent colour) |
-| `src/main.js` | Hash routing, wires sidebar, explainer, scene, toolbar |
+| `server.py` | Static server plus the `/api/ask` proxy that holds the API key |
+| `src/main.js` | Hash routing, modes, wires sidebar, library, explainer, scene, toolbar |
 | `src/scene/brain-scene.js` | 3D engine: point shader, bloom, focus/highlight, arcs, picking, camera flights, slice |
 | `src/scene/shapes.js` | Point-cloud generators (`cortex`, `ellipsoid`, `tube`, `band`, `parts`, `custom`) |
 | `src/scene/noise.js` | Seeded random and Perlin noise |
 | `src/content/structures/*.js` | One object per brain part: shape, colour, camera view, connections, text |
-| `src/content/pathways/index.js` | Guided tours: steps with focus, route, view |
+| `src/content/pathways/index.js` | Guided tours: steps with focus, route, view, plus a `category` |
+| `src/content/pathways/groups.js` | The sections of the pathway library |
+| `src/content/ask-presets.js` | Saved Ask answers, checked by hand, that load without the server |
+| `src/services/ask.js` | Browser side of Ask: saved answers first, then `/api/ask` |
 | `src/content/diagrams/index.js` | Circuit diagrams for the "Down to cells" level |
 | `src/content/synapses.js`, `glossary/index.js`, `levels.js`, `groups.js`, `anchors.js` | Supporting data |
 | `src/content/index.js` | Merges everything, exports `validate()` |
-| `src/ui/*.js` | Explainer, sidebar, SVG diagrams, text markup, icons |
+| `src/ui/*.js` | Explainer, sidebar (Parts), library (Pathways), Ask screen, SVG diagrams, text markup, icons |
 | `tools/validate.mjs` | Lists missing text and broken references |
 
 ## Adding content
@@ -64,7 +73,11 @@ Keep all text beginner-level: short sentences, concrete everyday examples, no em
 - `mirror: true` duplicates the shape on both sides.
 - `pattern` can be `gyri`, `fine`, `folia`, `rings`, `fibers`, or `cross`.
 
-**Pathway:** add to `src/content/pathways/index.js`. Each step has `title`, `focus: [ids]`, `route: [[from, to], ...]`, optional `view` and `slice`. Add `summary` plus a 2 to 4 sentence `text` per step that follows the previous one like a story.
+**Pathway:** add to `src/content/pathways/index.js` with a `category` from `pathways/groups.js`. Each step has `title`, `focus: [ids]`, `route: [[from, to], ...]`, optional `view` and `slice`. Add `summary` plus a 2 to 4 sentence `text` per step that follows the previous one like a story.
+
+**Ask example:** run `npm start`, ask the question, and check the answer against a textbook account. If any part or role is wrong, drop it rather than editing the answer. Otherwise copy the parts into `src/content/ask-presets.js`.
+
+**Ask details:** Ask answers come from Jev, a structured classification model from TypeSafe. `server.py` asks it whether the question is about the brain, then asks for each part whether it is involved and how. Only parts it is very confident about are shown, at most five. The Ask screen mentions Jev once, in a single line under the examples. Keep it that way.
 
 **Diagram:** add to `src/content/diagrams/index.js` (neurons with kind and position, links typed `excite`/`inhibit`/`modulate`, optional bands). Reference it from a structure's `levels.cells.diagram`.
 

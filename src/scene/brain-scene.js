@@ -91,7 +91,7 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
 
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.75, 0.22, 0.12);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.72, 0.20, 0.26);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
 
@@ -381,6 +381,57 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
     }
   }
 
+  // Ask sketches: light each part by how it is involved.
+  // Busier parts glow and fire, quieter ones glow faintly, parts losing cells barely show.
+  const ROLE_LOOK = {
+    more_active: { cortex: 1, deep: 0.9, activity: 1 },
+    typical: { cortex: 0.8, deep: 0.72, activity: 0.5 },
+    involved: { cortex: 0.8, deep: 0.72, activity: 0.5 },
+    cut_off: { cortex: 0.7, deep: 0.62, activity: 0.3 },
+    less_active: { cortex: 0.42, deep: 0.34, activity: 0 },
+    losing_cells: { cortex: 0.26, deep: 0.2, activity: 0 },
+  };
+  function paintSketch(parts = []) {
+    const looks = new Map(parts.filter((p) => recs.has(p.id)).map((p) => [p.id, ROLE_LOOK[p.role] || ROLE_LOOK.involved]));
+    focusIds = [...looks.keys()];
+    const any = focusIds.length > 0;
+
+    aHiPrev.array.set(aHi.array);
+    aHiColorPrev.array.set(aHiColor.array);
+    aHi.array.fill(0);
+    aHiColor.array.set(cBase);
+    let cortexActivity = 0, cortexFocus = false;
+    for (const [id, look] of looks) {
+      const r = recs.get(id);
+      if (r.kind !== 'region') continue;
+      cortexFocus = true;
+      cortexActivity = Math.max(cortexActivity, look.activity);
+      for (let i = 0; i < nC; i++) {
+        if (!r.mask[i] || aHi.array[i] >= look.cortex) continue;
+        aHi.array[i] = look.cortex;
+        aHiColor.array[i * 3] = r.color.r; aHiColor.array[i * 3 + 1] = r.color.g; aHiColor.array[i * 3 + 2] = r.color.b;
+      }
+    }
+    aHi.needsUpdate = aHiPrev.needsUpdate = aHiColor.needsUpdate = aHiColorPrev.needsUpdate = true;
+    cortexMat.uniforms.uMix.value = 0;
+    cortexRec.base = !any ? 0.42 : cortexFocus ? 0.13 : 0.12;
+    cortexRec.hi = 1;
+    cortexRec.activity = cortexActivity;
+
+    for (const r of deepRecs) {
+      const look = looks.get(r.id);
+      r.base = !any ? 0.4 : 0.1;
+      r.hi = look ? look.deep : 0;
+      r.activity = look ? look.activity : 0;
+    }
+    for (const r of anchorRecs) {
+      const look = looks.get(r.id);
+      r.base = 0;
+      r.hi = look ? Math.min(1.1, look.deep * 1.4) : 0;
+      if (r.hi > 0) r.obj.visible = true;
+    }
+  }
+
   // ------------------------------------------------------------ camera
   let flight = null;
   function flyTo(ids = [], view) {
@@ -571,6 +622,7 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
 
   return {
     focus,
+    paintSketch,
     flyTo,
     setArcs,
     has: (id) => recs.has(id),

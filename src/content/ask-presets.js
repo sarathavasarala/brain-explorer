@@ -1,0 +1,15 @@
+// Saved Ask answers. Each one came from the live model through server.py and was
+// kept only after a check against standard textbook accounts; answers that were
+// contested or partly wrong were dropped rather than edited. They show instantly
+// and work without the local server. To add one, ask it with `npm start`, check
+// the answer, and copy the parts in here.
+export default [
+  {"label": "you have a panic attack", "query": "you have a panic attack", "result": {"status": "ok", "kind": "condition", "messenger": null, "parts": [{"id": "amygdala", "role": "more_active"}, {"id": "locus-coeruleus", "role": "more_active"}, {"id": "insula", "role": "more_active"}, {"id": "hypothalamus", "role": "more_active"}, {"id": "medulla", "role": "more_active"}]}},
+  {"label": "you have Parkinson's disease", "query": "you have Parkinson's disease", "result": {"status": "ok", "kind": "condition", "messenger": "dopamine", "parts": [{"id": "substantia-nigra", "role": "losing_cells"}, {"id": "globus-pallidus", "role": "more_active"}, {"id": "locus-coeruleus", "role": "losing_cells"}, {"id": "striatum", "role": "involved"}]}},
+  {"label": "you have Capgras delusion", "query": "you have Capgras delusion", "result": {"status": "ok", "kind": "condition", "messenger": null, "parts": [{"id": "temporal-lobe", "role": "cut_off"}, {"id": "amygdala", "role": "cut_off"}]}},
+  {"label": "you feel thirsty", "query": "you feel thirsty", "result": {"status": "ok", "kind": "state", "messenger": null, "parts": [{"id": "hypothalamus", "role": "typical"}, {"id": "insula", "role": "typical"}]}},
+  {"label": "you fall asleep", "query": "you fall asleep", "result": {"status": "ok", "kind": "state", "messenger": null, "parts": [{"id": "locus-coeruleus", "role": "less_active"}, {"id": "prefrontal-cortex", "role": "less_active"}, {"id": "basal-forebrain", "role": "less_active"}, {"id": "hypothalamus", "role": "typical"}, {"id": "auditory-cortex", "role": "less_active"}]}},
+  {"label": "you have Huntington's disease", "query": "you have Huntington's disease", "result": {"status": "ok", "kind": "condition", "messenger": "gaba", "parts": [{"id": "striatum", "role": "losing_cells"}, {"id": "globus-pallidus", "role": "involved"}]}},
+  {"label": "you are addicted to nicotine", "query": "you are addicted to nicotine", "result": {"status": "ok", "kind": "condition", "messenger": "dopamine", "parts": [{"id": "prefrontal-cortex", "role": "less_active"}, {"id": "striatum", "role": "more_active"}, {"id": "vta", "role": "more_active"}]}},
+  {"label": "you feel déjà vu", "query": "you feel déjà vu", "result": {"status": "ok", "kind": "state", "messenger": null, "parts": [{"id": "hippocampus", "role": "involved"}, {"id": "temporal-lobe", "role": "involved"}]}},
+];

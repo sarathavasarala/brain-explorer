@@ -5,6 +5,7 @@
 export default [
   {
     id: 'seeing',
+    category: 'function',
     name: 'Seeing: from eye to meaning',
     tagline: 'Light becomes edges, then objects and places.',
     summary: 'Seeing happens in stages. The eyes catch light, the {{thalamus}} sorts it, and the {{visual-cortex}} reads edges and motion. From there the brain splits the work: where things are, and what they are.',
@@ -18,6 +19,7 @@ export default [
   },
   {
     id: 'moving',
+    category: 'function',
     name: 'Moving: deciding to reach',
     tagline: 'From an intention to a muscle twitch.',
     summary: 'A reach starts as a goal and ends as muscle. In between, the {{striatum}} picks the action, the {{thalamus}} releases it, and the {{motor-cortex}} sends it down through the brainstem to the hand. The {{cerebellum}} checks the flight.',
@@ -33,6 +35,7 @@ export default [
   },
   {
     id: 'remembering',
+    category: 'function',
     name: 'Remembering: making a memory',
     tagline: 'How an experience becomes something you can recall.',
     summary: 'A memory starts spread across the {{cortex}} and gets bound in the {{hippocampus}}. Feeling from the {{amygdala}} adds weight, a loop through the body clocks it, and over time the {{cortex}} keeps it alone.',
@@ -46,6 +49,7 @@ export default [
   },
   {
     id: 'fear',
+    category: 'function',
     name: 'Fear: the snake on the path',
     tagline: 'Why you jump before you know why.',
     summary: 'Fear runs on two roads. A fast rough sketch from the {{thalamus}} to the {{amygdala}} moves the body first. A slower detailed check through the {{visual-cortex}} follows, and the {{prefrontal-cortex}} calms things when it was only a stick.',
@@ -59,6 +63,7 @@ export default [
   },
   {
     id: 'hearing-speech',
+    category: 'function',
     name: 'Hearing a sentence and replying',
     tagline: 'Sound becomes words, and words become speech.',
     summary: 'Speech is a relay across the left side. Sound climbs through the {{thalamus}} to the {{auditory-cortex}}, gains meaning in {{wernickes-area}}, gets built into a reply in {{brocas-area}}, and leaves through the {{motor-cortex}}.',
@@ -73,6 +78,7 @@ export default [
   },
   {
     id: 'catch',
+    category: 'function',
     name: 'Catching a ball',
     tagline: 'Half a second, a dozen brain areas.',
     summary: 'Catching looks simple and uses almost the whole brain. The {{visual-cortex}} sees the ball, the {{posterior-parietal}} predicts its flight, the {{motor-cortex}} orders the reach, and the {{cerebellum}} trims the error mid flight.',
@@ -82,6 +88,73 @@ export default [
       { title: 'Plan the reach', focus: ['motor-cortex'], route: [['posterior-parietal', 'motor-cortex']], text: 'The target reaches the {{motor-cortex}}, which fires the shoulder, elbow and finger sequence. The plan includes when to close, not just where to go. Too early or late and the ball bounces off.' },
       { title: 'Command to the arm', focus: ['spinal-cord', 'hand'], route: [['motor-cortex', 'spinal-cord'], ['spinal-cord', 'hand']], view: 'left', text: 'Orders rush down to the {{spinal-cord}} and out to arm and hand muscles. The hand opens to ball size on the way. Touch will report the catch a moment later through the {{somatosensory-cortex}}.' },
       { title: 'Fine-tuning mid-flight', focus: ['cerebellum'], route: [['motor-cortex', 'pons'], ['pons', 'cerebellum'], ['cerebellum', 'thalamus'], ['thalamus', 'motor-cortex']], view: 'left-back', text: 'As the ball curves, a copy of the plan sent via the {{pons}} lets the {{cerebellum}} spot the miss early. Corrections loop up through the {{thalamus}} back to the {{motor-cortex}}. The hand shifts and the catch looks easy.' },
+    ],
+  },
+  {
+    id: 'dopamine-pathways',
+    category: 'chemistry',
+    name: 'Dopamine: drive, habits and reward',
+    tagline: 'Why you want things, and how wanting becomes a habit.',
+    summary: 'Dopamine is less about pleasure than about wanting and prediction. Two small groups of cells in the midbrain make it. The {{substantia-nigra}} supplies the circuits that start movement. The {{vta}} supplies the {{striatum}} and {{prefrontal-cortex}}, where it drives motivation.',
+    steps: [
+      { title: 'A hint of reward', focus: ['vta'], route: [], view: 'left', text: 'Something hints that a good thing is coming, like the smell of coffee or a message notification. Cells in the {{vta}} fire a short burst of [[dopamine]]. They fire hardest when the hint is a surprise.' },
+      { title: 'Wanting, in the striatum', focus: ['striatum'], route: [['vta', 'striatum']], view: 'left', text: 'The dopamine reaches the {{striatum}}. It marks the cue as worth chasing, and you feel it as a pull toward the thing. A passing thought becomes an urge.' },
+      { title: 'Keeping the goal in mind', focus: ['prefrontal-cortex'], route: [['vta', 'prefrontal-cortex']], view: 'left-front', text: 'Another branch from the {{vta}} reaches the {{prefrontal-cortex}}. Here dopamine helps hold the goal in working memory and tunes out distractions while you work out how to get it.' },
+      { title: 'Reaching for it', focus: ['substantia-nigra', 'striatum', 'motor-cortex'], route: [['substantia-nigra', 'striatum'], ['striatum', 'globus-pallidus'], ['globus-pallidus', 'thalamus'], ['thalamus', 'motor-cortex']], view: 'left', text: 'To act, the movement loop needs dopamine from the {{substantia-nigra}}. It helps lift the brake in the {{globus-pallidus}}, the {{thalamus}} passes the go signal to the cortex, and your hand reaches out. This is the supply that fails in Parkinson\'s disease.' },
+      { title: 'Learning for next time', focus: ['hippocampus', 'amygdala'], route: [['vta', 'hippocampus'], ['vta', 'amygdala']], view: 'left', text: 'The {{hippocampus}} and {{amygdala}} store where it happened and how good it felt. If the reward beat your prediction, the links that led there get stronger. Next time the cue pulls a little harder and the habit starts sooner.' },
+    ],
+  },
+  {
+    id: 'serotonin-pathways',
+    category: 'chemistry',
+    name: 'Serotonin: mood, resilience and sleep',
+    tagline: 'A slow, steady signal from the brainstem that shapes mood and sleep.',
+    summary: 'Serotonin is made by a thin strip of cells, the {{raphe-nuclei}}, running down the middle of the brainstem. Their fibres branch to almost every part of the brain and spinal cord. Its effects are broad and slow, and scientists still argue about exactly what it does for mood.',
+    steps: [
+      { title: 'A steady pulse in the brainstem', focus: ['raphe-nuclei'], route: [], view: 'medial', slice: true, text: 'The {{raphe-nuclei}} fire slowly and regularly while you are awake. They make [[serotonin]] from tryptophan, an amino acid you get from food.' },
+      { title: 'Tuning the amygdala', focus: ['amygdala'], route: [['raphe-nuclei', 'amygdala']], view: 'left', slice: true, text: 'Fibres reach the {{amygdala}}. Serotonin changes how easily it reacts, which is one reason serotonin is linked to anxiety and to how well people cope with stress.' },
+      { title: 'Patience in the frontal cortex', focus: ['prefrontal-cortex', 'cingulate-cortex'], route: [['raphe-nuclei', 'prefrontal-cortex'], ['raphe-nuclei', 'cingulate-cortex']], view: 'left-front', text: 'Other fibres reach the {{prefrontal-cortex}} and {{cingulate-cortex}}. Here serotonin is linked to patience and to switching away from a strategy that is not working. Low serotonin in animals makes them more impulsive.' },
+      { title: 'Sleep and appetite', focus: ['hypothalamus'], route: [['raphe-nuclei', 'hypothalamus']], view: 'medial', slice: true, text: 'Serotonin also reaches the {{hypothalamus}}, which runs appetite, body temperature and the sleep-wake cycle. The raphe cells go almost silent during dreaming sleep.' },
+      { title: 'Turning down pain', focus: ['spinal-cord'], route: [['raphe-nuclei', 'spinal-cord']], view: 'left', text: 'One branch runs down the {{spinal-cord}}. There serotonin can turn down pain signals on their way up to the brain.' },
+    ],
+  },
+  {
+    id: 'noradrenaline-pathways',
+    category: 'chemistry',
+    name: 'Noradrenaline: the alert system',
+    tagline: 'How a sudden surprise snaps you to attention.',
+    summary: 'The {{locus-coeruleus}} is a tiny cluster of cells in the brainstem, about fifty thousand on each side. It sends [[noradrenaline]] to nearly the whole brain and sets how alert you are, from drowsy to on edge.',
+    steps: [
+      { title: 'A burst from the blue spot', focus: ['locus-coeruleus'], route: [], view: 'left-back', text: 'A sudden bang breaks the quiet. The {{locus-coeruleus}} fires a burst within a fraction of a second and releases [[noradrenaline]] across the brain.' },
+      { title: 'Sharper senses', focus: ['thalamus'], route: [['locus-coeruleus', 'thalamus']], view: 'left', text: 'In the {{thalamus}} and sensory cortex, noradrenaline makes cells respond more strongly to what matters and less to background noise. The sound you just heard stands out.' },
+      { title: 'Attention snaps into place', focus: ['prefrontal-cortex', 'posterior-parietal'], route: [['locus-coeruleus', 'prefrontal-cortex'], ['locus-coeruleus', 'posterior-parietal']], view: 'left-front', text: 'In the {{prefrontal-cortex}} and {{posterior-parietal}}, it pulls attention onto the surprise. Your mind stops wandering. Too much of it, as under heavy stress, makes clear thinking harder.' },
+      { title: 'Ready to move', focus: ['cerebellum', 'spinal-cord'], route: [['locus-coeruleus', 'cerebellum'], ['locus-coeruleus', 'spinal-cord']], view: 'left-back', text: 'Fibres to the {{cerebellum}} and {{spinal-cord}} raise muscle tone and speed up reflexes, so you are ready to move.' },
+    ],
+  },
+  {
+    id: 'acetylcholine-pathways',
+    category: 'chemistry',
+    name: 'Acetylcholine: attention and memory',
+    tagline: 'Helping you pay attention and remember what you learned.',
+    summary: '[[acetylcholine]] is the messenger that tells your muscles to contract. Inside the brain it has a different job. Cells in the {{basal-forebrain}} send it across the cortex and to the {{hippocampus}}, where it helps with attention and learning. These cells are among the first lost in Alzheimer\'s disease.',
+    steps: [
+      { title: 'Something worth learning', focus: ['basal-forebrain'], route: [], view: 'left-front', text: 'You sit down to learn something new, a tune or a puzzle. Cells in the {{basal-forebrain}} become more active when something needs attention.' },
+      { title: 'Boosting what comes in', focus: ['frontal-lobe', 'parietal-lobe'], route: [['basal-forebrain', 'frontal-lobe'], ['basal-forebrain', 'parietal-lobe']], view: 'left', text: 'Their fibres release [[acetylcholine]] across the {{frontal-lobe}} and {{parietal-lobe}}. It boosts the signals coming in from the senses relative to the brain\'s own chatter, so what you are looking at gets more weight.' },
+      { title: 'Laying down new memories', focus: ['hippocampus'], route: [['basal-forebrain', 'hippocampus']], view: 'medial', slice: true, text: 'In the {{hippocampus}}, acetylcholine helps set the theta rhythm and makes synapses easier to strengthen. This favours taking in new memories. Drugs that block it make it hard to learn new things.' },
+      { title: 'Linking to what you know', focus: ['temporal-lobe'], route: [['basal-forebrain', 'temporal-lobe']], view: 'left', text: 'Fibres also reach the {{temporal-lobe}}, where knowledge about names, faces and words is stored. Acetylcholine here helps new facts link up with what you already know.' },
+    ],
+  },
+  {
+    id: 'default-mode-network',
+    category: 'network',
+    name: 'Default mode: the wandering mind',
+    tagline: 'What your brain does when you are doing nothing in particular.',
+    summary: 'Some brain areas get more active when you stop focusing on the outside world. Together they are called the default mode network. They are busy when you daydream, remember your past, picture the future or think about other people.',
+    steps: [
+      { title: 'Looking away from the world', focus: ['prefrontal-cortex'], route: [], view: 'left-front', text: 'You put your phone down and stare out of the window. Areas that handle outside tasks quieten, and the inner part of the {{prefrontal-cortex}} gets busier. It is active when you think about yourself.' },
+      { title: 'Past and future', focus: ['hippocampus', 'cingulate-cortex'], route: [['prefrontal-cortex', 'cingulate-cortex'], ['cingulate-cortex', 'hippocampus']], view: 'medial', slice: true, text: 'The back of the {{cingulate-cortex}} and the {{hippocampus}} join in. You drift to a memory from years ago, or rehearse a conversation you have not had yet.' },
+      { title: 'Thinking about other people', focus: ['temporal-lobe', 'posterior-parietal'], route: [['cingulate-cortex', 'temporal-lobe'], ['temporal-lobe', 'posterior-parietal']], view: 'left', text: 'Parts of the {{temporal-lobe}} and {{posterior-parietal}} cortex come in too. They are active when you think about what someone else knows, wants or feels.' },
+      { title: 'Back to the task', focus: ['insula'], route: [['insula', 'prefrontal-cortex']], view: 'left', text: 'Someone calls your name. The {{insula}} flags it as important, the default mode network quietens, and the areas for focused tasks take over again.' },
     ],
   },
 ];

@@ -26,23 +26,24 @@
     FORM: User-pinned (reference image: glowing wireframe brain). No seed roll.
     FINISH: unreviewed and undocumented is unfinished; this build ends with the finish review, the verdict, DESIGN.md, and every shipping raster carrying its provenance
   -->
-  <div class="app">
-    <aside class="sidebar">
-      <header class="brand">
+  <div class="app mode-parts">
+    <header class="topbar">
+      <a class="brand" href="#/">
         <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
           <circle cx="11" cy="13" r="7.5" fill="none" stroke="#d36bff" stroke-width="1.4" />
           <circle cx="20" cy="13" r="7.5" fill="none" stroke="#6f86ff" stroke-width="1.4" />
           <circle cx="18" cy="23" r="4.5" fill="none" stroke="#f5b83d" stroke-width="1.4" />
         </svg>
-        <div>
-          <div class="brand-name">Brain Explorer</div>
-          <div class="brand-sub">An interactive atlas</div>
-        </div>
-      </header>
-      <div class="tabs" role="tablist">
-        <button data-tab="structures" class="is-on" role="tab">Parts</button>
-        <button data-tab="pathways" role="tab">Pathways</button>
-      </div>
+        <span class="brand-name">Brain Explorer</span>
+      </a>
+      <nav class="modes" aria-label="Sections">
+        <a data-mode="parts" href="#/">Parts</a>
+        <a data-mode="pathways" href="#/pathways">Pathways</a>
+        <a data-mode="ask" href="#/ask">Ask</a>
+      </nav>
+    </header>
+
+    <aside class="sidebar">
       <label class="search">
         <span id="search-icon"></span>
         <input id="search" type="search" placeholder="Search parts of the brain" autocomplete="off" />
@@ -56,6 +57,7 @@
       <div id="hover-label" class="hover-label"></div>
       <div id="toolbar" class="toolbar"></div>
       <p class="stage-note">Shapes are simplified for explanation, not an anatomical atlas.</p>
+      <div id="library" class="library" hidden></div>
     </main>
 
     <section id="explainer" class="explainer"></section>
