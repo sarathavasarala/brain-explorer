@@ -83,6 +83,28 @@ function arcFor(from, c) {
   return { from: incoming ? c.id : from, to: incoming ? from : c.id, flow: c.dir === 'both' ? 'both' : 'forward' };
 }
 
+function routeEndpoints(route = []) {
+  const ids = [];
+  for (const r of route) {
+    if (Array.isArray(r)) {
+      if (typeof r[0] === 'string') ids.push(r[0]);
+      if (typeof r[1] === 'string') ids.push(r[1]);
+    } else if (r && typeof r === 'object') {
+      if (r.from) ids.push(r.from);
+      if (r.to) ids.push(r.to);
+    }
+  }
+  return ids;
+}
+
+function normalizeArc(r, active) {
+  if (Array.isArray(r)) {
+    const [from, to, opts] = r;
+    return { from, to, active, flow: opts?.flow || 'forward', speed: opts?.speed, lift: opts?.lift };
+  }
+  return { ...r, active };
+}
+
 function fly(ids, view, key) {
   if (state.flown === key) return;
   state.flown = key;
@@ -138,14 +160,16 @@ function apply() {
     const p = pathways.find((q) => q.id === r.id);
     const st = p.steps[r.step];
     const past = p.steps.slice(0, r.step);
-    const context = [...new Set([...past.flatMap((x) => [...(x.focus || []), ...(x.route || []).flat()]), ...(st.route || []).flat()])];
-    scene.focus(st.focus || [], { context, activity: true });
+    const pastIds = past.flatMap((x) => [...(x.focus || []), ...routeEndpoints(x.route)]);
+    const currentIds = [...(st.focus || []), ...routeEndpoints(st.route)];
+    const context = [...new Set([...pastIds, ...currentIds])];
+    scene.focus(st.focus || [], { context, activity: true, ambient: true });
     scene.setArcs([
-      ...past.flatMap((x) => (x.route || []).map(([a, b]) => ({ from: a, to: b, active: false }))),
-      ...(st.route || []).map(([a, b]) => ({ from: a, to: b })),
+      ...past.flatMap((x) => (x.route || []).map((arc) => normalizeArc(arc, 'ambient'))),
+      ...(st.route || []).map((arc) => normalizeArc(arc, true)),
     ]);
     scene.forceSlice(!!st.slice);
-    const frame = [...new Set([...(st.focus || []), ...(st.route || []).flat()])];
+    const frame = [...new Set(currentIds)];
     fly(frame, st.view || 'left', `${p.id}:${r.step}`);
     explainerEl.innerHTML = renderPathway(p, r.step, state.playing);
     if (prev.type !== 'p' || prev.id !== r.id) explainerEl.scrollTop = 0;

@@ -134,12 +134,25 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background: radial-gradient(ellipse 70% 65% at 50% 48%, transparent 55%, rgba(2, 3, 7, 0.75) 100%);
 }
 .labels { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
-.orient-label, .anchor-label {
+.orient-label {
   position: absolute; left: 0; top: 0; white-space: nowrap;
   font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
   color: rgba(190, 200, 255, 0.4); transition: opacity 0.4s;
 }
-.anchor-label { color: var(--ink); letter-spacing: 0.02em; text-transform: none; font-size: 12px; text-shadow: 0 1px 8px #000; }
+.anchor-label {
+  position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none;
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 5px 11px 5px 9px; border-radius: 999px;
+  background: rgba(10, 12, 22, 0.88); border: 1px solid var(--line-2);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.65);
+  font-size: 12px; font-weight: 500; color: #fff; white-space: nowrap;
+  letter-spacing: -0.01em; text-transform: none;
+  transition: opacity 0.3s var(--ease);
+}
+.anchor-label i {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--c, #fff); box-shadow: 0 0 8px var(--c, #fff); flex: none;
+}
 
 .hover-label {
   position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none;
@@ -308,6 +321,7 @@ strong { font-weight: 500; color: #fff; }
 .chip {
   display: inline-flex; align-items: center; gap: 7px;
   padding: 6px 12px 6px 10px; border-radius: 999px; font-size: 12.5px; font-weight: 500;
+  color: var(--ink);
   background: color-mix(in oklab, var(--c, var(--accent)) 10%, transparent);
   border: 1px solid color-mix(in oklab, var(--c, var(--accent)) 25%, transparent);
   transition: background 0.2s;
@@ -338,7 +352,7 @@ kbd {
 
 /* pathway */
 .player {
-  display: flex; align-items: center; gap: 6px; margin: 22px 0 16px;
+  display: flex; align-items: center; gap: 6px; margin: 16px 0 16px;
   padding: 6px; border-radius: 14px; background: rgba(190, 200, 255, 0.04);
 }
 .pl-btn {
@@ -361,8 +375,12 @@ kbd {
   font-size: 11.5px; font-weight: 600; color: var(--ink-3); border: 1px solid var(--line-2);
   font-variant-numeric: tabular-nums;
 }
-.step.is-done .step-n { color: var(--ink-2); border-color: color-mix(in oklab, var(--accent) 40%, transparent); }
-.step.is-on .step-n { color: #fff; background: color-mix(in oklab, var(--accent) 45%, transparent); border-color: var(--accent); }
+.step.is-done .step-n {
+  color: var(--ink); background: color-mix(in oklab, var(--accent) 14%, transparent);
+  border-color: color-mix(in oklab, var(--accent) 45%, transparent);
+}
+.step.is-on .step-n { color: #fff; background: color-mix(in oklab, var(--accent) 45%, transparent); border-color: var(--accent); box-shadow: 0 0 8px color-mix(in oklab, var(--accent) 40%, transparent); }
+
 .step-title { font-size: 14.5px; font-weight: 500; color: var(--ink-2); }
 .step.is-on .step-title { color: var(--ink); font-weight: 600; }
 .step-head:hover .step-title { color: var(--ink); }

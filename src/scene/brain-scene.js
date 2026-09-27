@@ -279,11 +279,13 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
       const ca = recs.get(item.from).color, cb = recs.get(item.to).color;
       const N = 80;
       const pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
+      const isAmbient = item.active === 'ambient';
+      const isOff = item.active === false;
+      const k = isOff ? 0.14 : (isAmbient ? 0.26 : 0.48);
       for (let i = 0; i < N; i++) {
         const t = i / (N - 1), p = curve.getPoint(t);
         pos.set([p.x, p.y, p.z], i * 3);
         const c = ca.clone().lerp(cb, t);
-        const k = item.active === false ? 0.18 : 0.45;
         col.set([c.r * k, c.g * k, c.b * k], i * 3);
       }
       const g = new THREE.BufferGeometry();
@@ -292,20 +294,24 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
       const line = new THREE.Line(g, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false }));
       arcGroup.add(line);
       const flow = item.flow || 'forward';
-      const dots = item.active === false || flow === 'none' ? 0 : 9;
-      const arc = { curve, flow, start: dotPos.length / 3, dots, ca, cb, speed: item.speed || 0.32 };
-      for (let i = 0; i < dots; i++) { dotPos.push(0, 0, 0); dotCol.push(ca.r, ca.g, ca.b); dotSize.push(i === 0 ? 1.3 : 0.9); }
+      const dots = isOff || flow === 'none' ? 0 : (isAmbient ? 3 : 9);
+      const defaultSpeed = isAmbient ? 0.16 : 0.32;
+      const arc = { curve, flow, start: dotPos.length / 3, dots, ca, cb, speed: item.speed || defaultSpeed, isAmbient };
+      for (let i = 0; i < dots; i++) {
+        dotPos.push(0, 0, 0);
+        const dim = isAmbient ? 0.65 : 1.0;
+        dotCol.push(ca.r * dim, ca.g * dim, ca.b * dim);
+        dotSize.push(isAmbient ? 0.75 : (i === 0 ? 1.3 : 0.9));
+      }
       arcs.push(arc);
     }
     if (dotPos.length) {
-      const n = dotSize.length;
       const cols = new Float32Array(dotCol);
       arcDots = new THREE.Points(makeGeometry(new Float32Array(dotPos), new Float32Array(dotSize), cols, cols.slice()), arcDotMat);
       arcDots.frustumCulled = false;
       arcDots.geometry.getAttribute('position').setUsage(THREE.DynamicDrawUsage);
       scene.add(arcDots);
       arcDotMat.uniforms.uHi.value = 0;
-      void n;
     }
   }
 
@@ -322,7 +328,8 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
         const p = arc.curve.getPoint(t);
         pos.setXYZ(arc.start + i, p.x, p.y, p.z);
         tmp.copy(arc.ca).lerp(arc.cb, t);
-        col.setXYZ(arc.start + i, tmp.r, tmp.g, tmp.b);
+        const dim = arc.isAmbient ? 0.65 : 1.0;
+        col.setXYZ(arc.start + i, tmp.r * dim, tmp.g * dim, tmp.b * dim);
       }
     }
     pos.needsUpdate = true;
@@ -339,7 +346,7 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
   let focusIds = [];
   let hoverId = null;
 
-  function focus(ids = [], { context = [], activity = false } = {}) {
+  function focus(ids = [], { context = [], activity = false, ambient = true } = {}) {
     focusIds = ids.filter((id) => recs.has(id));
     const ctx = context.filter((id) => recs.has(id) && !focusIds.includes(id));
     const any = focusIds.length > 0;
@@ -359,24 +366,26 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
         aHiColor.array[i * 3] = r.color.r; aHiColor.array[i * 3 + 1] = r.color.g; aHiColor.array[i * 3 + 2] = r.color.b;
       }
     };
-    for (const id of ctx) paint(id, 0.32);
+    for (const id of ctx) paint(id, 0.35);
     for (const id of focusIds) { if (recs.get(id).kind === 'region') cortexFocus = true; paint(id, 1); }
     aHi.needsUpdate = aHiPrev.needsUpdate = aHiColor.needsUpdate = aHiColorPrev.needsUpdate = true;
     cortexMat.uniforms.uMix.value = 0;
     cortexRec.base = !any ? 0.42 : cortexFocus ? 0.13 : 0.12;
     cortexRec.hi = 1;
-    cortexRec.activity = activity && cortexFocus ? 1 : 0;
+    const hasCortexCtx = ctx.some((id) => recs.get(id)?.kind === 'region');
+    cortexRec.activity = activity && (cortexFocus || (ambient && hasCortexCtx)) ? 1 : 0;
 
     for (const r of deepRecs) {
       const f = focusIds.includes(r.id), c = ctx.includes(r.id);
       r.base = !any ? 0.4 : 0.1;
-      r.hi = f ? 0.72 : c ? 0.3 : 0;
-      r.activity = f && activity ? 1 : 0;
+      r.hi = f ? 0.72 : c ? 0.35 : 0;
+      r.activity = f && activity ? 1 : (c && activity && ambient ? 0.35 : 0);
     }
     for (const r of anchorRecs) {
       const f = focusIds.includes(r.id), c = ctx.includes(r.id);
       r.base = 0;
       r.hi = f ? 1.1 : c ? 0.5 : 0;
+      r.activity = f && activity ? 1 : (c && activity && ambient ? 0.35 : 0);
       if (r.hi > 0) r.obj.visible = true;
     }
   }
@@ -537,7 +546,8 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
   const anchorLabels = anchorRecs.map((r) => {
     const el = document.createElement('div');
     el.className = 'anchor-label';
-    el.textContent = r.anchor.name;
+    el.style.setProperty('--c', r.anchor.color || '#fff');
+    el.innerHTML = `<i></i><span>${r.anchor.name}</span>`;
     labelsEl?.appendChild(el);
     return { r, el };
   });
@@ -553,8 +563,9 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
     }
     for (const { r, el } of anchorLabels) {
       tmpV.copy(r.center).project(camera);
-      el.style.transform = `translate(${((tmpV.x + 1) / 2) * w}px, ${((1 - tmpV.y) / 2) * h + 14}px) translate(-50%, 0)`;
-      el.style.opacity = r.hi > 0.05 ? String(Math.min(1, r.hi)) : '0';
+      const vis = tmpV.z < 1;
+      el.style.transform = `translate(${((tmpV.x + 1) / 2) * w}px, ${((1 - tmpV.y) / 2) * h + 30}px) translate(-50%, 0)`;
+      el.style.opacity = vis && r.hi > 0.05 ? String(Math.min(1, r.hi)) : '0';
     }
   }
 

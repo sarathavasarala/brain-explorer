@@ -30,7 +30,7 @@ export default [
       { title: 'Commands leave the cortex', focus: ['motor-cortex'], route: [['thalamus', 'motor-cortex']], text: 'Populations in the {{motor-cortex}} contribute to the direction, force and timing of the reach. Large [[pyramidal cell|pyramidal cells]] send descending signals, which brainstem and spinal circuits combine with other inputs before muscles contract.' },
       { title: 'Down the brainstem', focus: ['midbrain', 'pons', 'medulla'], route: [['motor-cortex', 'midbrain'], ['midbrain', 'medulla']], view: 'left', text: 'Orders travel down through the {{midbrain}}, past the {{pons}} (which copies them for the {{cerebellum}}) and through the {{medulla}}. Most fibres cross sides here, so the left brain drives the right hand.' },
       { title: 'Out to the muscles', focus: ['spinal-cord', 'hand'], route: [['medulla', 'spinal-cord'], ['spinal-cord', 'hand']], view: 'left', text: 'In the {{spinal-cord}}, upper orders meet motor [[neuron|neurons]] that use acetylcholine to contract muscles. Fingers close around the mug. Touch signals start the return trip up to the {{somatosensory-cortex}} to confirm the grip.' },
-      { title: 'The cerebellum corrects', focus: ['cerebellum'], route: [['motor-cortex', 'pons'], ['pons', 'cerebellum'], ['cerebellum', 'thalamus']], view: 'left-back', text: 'While the hand moves, a copy sent via the {{pons}} reaches the {{cerebellum}}. It compares plan with feedback from muscles and eyes, then sends corrections up through the {{thalamus}} to the {{motor-cortex}}. The reach lands smooth instead of jerky.' },
+      { title: 'The cerebellum corrects', focus: ['cerebellum'], route: [['motor-cortex', 'pons'], ['pons', 'cerebellum'], ['cerebellum', 'thalamus'], ['thalamus', 'motor-cortex']], view: 'left-back', text: 'While the hand moves, a copy sent via the {{pons}} reaches the {{cerebellum}}. It compares plan with feedback from muscles and eyes, then sends corrections up through the {{thalamus}} to the {{motor-cortex}}. The reach lands smooth instead of jerky.' },
     ],
   },
   {
@@ -38,7 +38,7 @@ export default [
     category: 'function',
     name: 'Remembering: making a memory',
     tagline: 'How an experience becomes something you can recall.',
-    summary: 'An experience activates patterns across the {{cortex}}, while the {{hippocampus}} helps bind their relationships. Emotion can alter what is remembered, and later replay helps reorganise the memory across hippocampal and cortical networks.',
+    summary: 'An experience activates patterns across the [[cortex]], while the {{hippocampus}} helps bind their relationships. Emotion can alter what is remembered, and later replay helps reorganise the memory across hippocampal and cortical networks.',
     steps: [
       { title: 'An experience in the cortex', focus: ['temporal-lobe', 'parietal-lobe'], route: [], text: 'Meeting a friend in a cafe wakes the {{temporal-lobe}} (faces, words) and the {{parietal-lobe}} (where you sat, the reach for the cup). At first the pieces live apart. Nothing yet ties them into one recallable event.' },
       { title: 'Bound together in the hippocampus', focus: ['hippocampus'], route: [['temporal-lobe', 'hippocampus'], ['parietal-lobe', 'hippocampus']], text: 'Both streams flow into the {{hippocampus}}. Its looped wiring binds who, what and where into one pattern, so later one cue can bring back the rest. This binding is why picturing the cafe can return the whole chat.' },
@@ -65,15 +65,51 @@ export default [
     id: 'hearing-speech',
     category: 'function',
     name: 'Hearing a sentence and replying',
-    tagline: 'Sound becomes words, and words become speech.',
-    summary: 'Hearing and replying recruits an overlapping language network. Sound reaches the {{auditory-cortex}}, temporal and parietal regions help connect it with words and meaning, and frontal and motor regions help prepare the reply. The classic Broca-to-Wernicke relay is a useful history lesson, not a complete map.',
+    tagline: 'A voice reaches your ears. A reply leaves your mouth.',
+    summary: 'Follow the main stops as you hear a question and answer it. The brain regions work together, even though we are visiting them one at a time. Sound moves from the ear through the brainstem and {{thalamus}} to the {{auditory-cortex}}. From there, temporal, parietal and frontal networks exchange information in parallel as meaning is grasped and speech is prepared, rather than passing a finished parcel down a single assembly line.',
     steps: [
-      { title: 'Sound reaches the inner ear', focus: ['ear'], route: [], text: 'A friend asks a question. Sound waves shake the inner ear, where tiny hair cells turn vibration into signals. Pitch and timing are already sorted before the brain gets them.' },
-      { title: 'Up through the thalamus', focus: ['thalamus'], route: [['ear', 'thalamus']], text: 'The signals climb to the {{thalamus}}, which filters the voice from background noise. The cleaned stream is sent on to the {{auditory-cortex}}. Without this gate, a cafe would drown the words.' },
-      { title: 'Heard in the auditory cortex', focus: ['auditory-cortex'], route: [['thalamus', 'auditory-cortex']], text: 'The {{auditory-cortex}} splits the stream into pitch, rhythm and syllable gaps. At this point it is still sound, not yet meaning. A cough and a word look similar here.' },
-      { title: 'Words connect with meaning', focus: ['wernickes-area'], route: [['auditory-cortex', 'wernickes-area']], text: 'Temporal and parietal language regions, including {{wernickes-area}} as traditionally defined, connect speech sounds with words, concepts and sentence context. Damage across this wider network can impair understanding and make fluent speech hard to follow.' },
-      { title: 'A reply takes shape', focus: ['brocas-area'], route: [['wernickes-area', 'brocas-area']], text: 'Frontal language regions, including {{brocas-area}}, help select and sequence speech sounds and handle demanding grammar. They exchange information with temporal and parietal areas through several pathways while a reply such as "yes, with milk please" takes shape.' },
-      { title: 'Spoken aloud', focus: ['motor-cortex'], route: [['brocas-area', 'motor-cortex']], text: 'The plan goes to the mouth zone of the {{motor-cortex}}. Lips, tongue, jaw and breath move in fast sequence. Sound leaves, crosses the room, and starts the whole relay in reverse for your friend.' },
+      {
+        title: 'Sound reaches the inner ear',
+        focus: ['ear'],
+        route: [],
+        text: 'A friend asks a question. Sound vibrates your eardrum, and tiny bones carry that vibration into the fluid-filled cochlea. Hair cells there turn the movement into nerve signals. Different parts of the cochlea respond best to different pitches, while the timing of nerve activity carries more detail about the sound.'
+      },
+      {
+        title: 'Signals meet in the brainstem',
+        focus: ['pons', 'midbrain'],
+        route: [['ear', 'pons'], ['pons', 'midbrain']],
+        text: 'The signals first reach the cochlear nuclei near the {{pons}}, then travel along several routes. One group of brainstem cells compares sound arriving at your two ears, helping you tell where the voice is coming from. Higher up, the inferior colliculus in the {{midbrain}} brings together information about the sound before it travels onward.'
+      },
+      {
+        title: 'Sound reaches the thalamus',
+        focus: ['thalamus'],
+        route: [['midbrain', 'thalamus']],
+        text: 'The hearing-related part of the {{thalamus}} sharpens and routes sound signals on their way to the {{auditory-cortex}}. Rather than a simple one-way depot, this relay constantly receives feedback from the cortex itself, helping tune your attention to your friend\'s voice amidst surrounding cafe noise.'
+      },
+      {
+        title: 'Patterns form in auditory cortex',
+        focus: ['auditory-cortex'],
+        route: [['thalamus', 'auditory-cortex']],
+        text: 'The {{auditory-cortex}} tracks acoustic features such as pitch, rhythm and quick changes in sound. Processing does not wait for a neat border between sound and meaning. Speech-sensitive networks across the temporal lobe progressively match these patterns with familiar words while staying in dialogue with frontal areas.'
+      },
+      {
+        title: 'Words connect with meaning',
+        focus: ['wernickes-area'],
+        route: [['auditory-cortex', 'wernickes-area']],
+        text: 'Across temporal and parietal regions, the sounds you hear connect with words, ideas and the rest of the sentence. {{wernickes-area}} is a traditional name for part of this territory, but understanding language is the collective work of a wider network. These regions stay continuously engaged, linking what you hear to the speech you might prepare.'
+      },
+      {
+        title: 'A reply takes shape',
+        focus: ['brocas-area'],
+        route: [['wernickes-area', 'brocas-area', { flow: 'both' }]],
+        text: 'Frontal language regions, including {{brocas-area}}, help shape a response and organize it for speech. They work in continuous two-way exchange with temporal and parietal regions as you choose words and prepare to say something like "Yes, with milk, please." This is an ongoing conversation between regions, not a message passed along a single wire.'
+      },
+      {
+        title: 'Spoken aloud and heard',
+        focus: ['motor-cortex'],
+        route: [['brocas-area', 'motor-cortex'], ['motor-cortex', 'auditory-cortex']],
+        text: 'The mouth and face region of the {{motor-cortex}} helps send commands that move your jaw, lips and tongue while breathing muscles make sound. As you speak, signals also loop back to your own {{auditory-cortex}} to monitor and tune your pronunciation in real time, while the sound crossing the room begins the hearing pathway in your friend.'
+      },
     ],
   },
   {
@@ -136,7 +172,7 @@ export default [
     category: 'chemistry',
     name: 'Acetylcholine: attention and memory',
     tagline: 'Helping you pay attention and remember what you learned.',
-    summary: '[[acetylcholine]] carries the signal from motor neurons to skeletal muscles. Inside the brain it has other jobs. Cells in the {{basal-forebrain}} send it across the cortex and to the {{hippocampus}}, where it helps tune attention and learning. These cells degenerate in Alzheimer\'s disease alongside early changes in connected memory circuits.',
+    summary: '[[acetylcholine]] carries the signal from motor neurons to skeletal muscles. Inside the brain, cells in the {{basal-forebrain}} send it across the cortex and to the {{hippocampus}} to tune attention and learning. Separate brainstem clusters also release it to regulate arousal and sleep. The forebrain supply degenerates early in Alzheimer\'s disease.',
     steps: [
       { title: 'Something worth learning', focus: ['basal-forebrain'], route: [], view: 'left-front', text: 'You sit down to learn something new, a tune or a puzzle. Cells in the {{basal-forebrain}} become more active when something needs attention.' },
       { title: 'Boosting what comes in', focus: ['frontal-lobe', 'parietal-lobe'], route: [['basal-forebrain', 'frontal-lobe'], ['basal-forebrain', 'parietal-lobe']], view: 'left', text: 'Their fibres release [[acetylcholine]] across the {{frontal-lobe}} and {{parietal-lobe}}. It boosts the signals coming in from the senses relative to the brain\'s own chatter, so what you are looking at gets more weight.' },

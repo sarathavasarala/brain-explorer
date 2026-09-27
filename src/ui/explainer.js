@@ -167,6 +167,9 @@ export function renderPathway(p, step, playing) {
 
 export function renderHome() {
   const starts = ['cerebellum', 'hippocampus', 'prefrontal-cortex', 'amygdala'].filter((id) => byId.has(id));
+  const featuredPathways = ['seeing', 'hearing-speech', 'moving']
+    .map((id) => pathways.find((p) => p.id === id))
+    .filter(Boolean);
   return `<article class="ex ex-home" style="--accent:#c77dff">
     <h1 class="ex-title">A map of the brain</h1>
     <p class="tagline">Pick any part on the left, or click something glowing in the model.</p>
@@ -180,7 +183,7 @@ export function renderHome() {
     <h3 class="home-h">Good places to start</h3>
     <div class="chips">${starts.map((id) => { const s = byId.get(id); return `<a class="chip" href="#/s/${id}" style="--c:${s.color}"><i></i>${esc(s.name)}</a>`; }).join('')}</div>
     <h3 class="home-h">Or follow a pathway</h3>
-    <div class="chips">${pathways.slice(0, 3).map((p) => `<a class="chip chip-path" href="#/p/${p.id}">${icon('pathway', 14)}${esc(p.name)}</a>`).join('')}<a class="chip chip-path" href="#/pathways">See all ${pathways.length}</a></div>
+    <div class="chips">${featuredPathways.map((p) => `<a class="chip chip-path" href="#/p/${p.id}">${icon('pathway', 14)}${esc(p.name)}</a>`).join('')}<a class="chip chip-path" href="#/pathways">See all ${pathways.length}</a></div>
     <h3 class="home-h">Or ask about something else</h3>
     <div class="chips"><a class="chip chip-path" href="#/ask">What happens in the brain when…</a></div>
     <p class="controls-hint">Drag to rotate · scroll to zoom · right-drag to pan · <kbd>↑</kbd><kbd>↓</kbd> move through parts · <kbd>←</kbd><kbd>→</kbd> change level</p>
