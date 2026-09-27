@@ -38,7 +38,7 @@ export default [
         bullets: [
           'Goals and plans: holds intentions while you work toward them.',
           'Decisions: weighs options with help from the {{striatum}}.',
-          'Movement orders: issues the final "go" through the {{motor-cortex}}.',
+          'Movement: works with motor networks to turn plans into descending commands.',
           'Self control: stops or delays actions that do not fit the goal.',
         ],
       },
@@ -82,7 +82,7 @@ export default [
     analogy: 'A patient coach who holds the game plan up while the crowd shouts.',
     levels: {
       where: {
-        text: 'The prefrontal [[cortex]] is the very front of the {{frontal-lobe}}, behind your forehead. It is the largest part of the frontal lobe in humans, much bigger than in other animals. It sits far from the senses, so it deals in plans rather than raw sights or sounds.',
+        text: 'The prefrontal [[cortex]] is the very front of the {{frontal-lobe}}, behind your forehead. It is especially extensive and richly connected in humans, although other primates also have a large prefrontal cortex. Its distance from the primary senses suits it to combining information for plans rather than reading raw sights or sounds.',
         bullets: [
           'Frontmost patch of [[cortex]], ahead of the {{motor-cortex}}.',
           'Three faces: outer (plans), middle (memory), lower (feelings and rules).',
@@ -136,7 +136,7 @@ export default [
     color: '#ff4f7b',
     shape: { type: 'cortex', test: (p) => p.lobe === 'frontal' && p.z < p.central + 0.085 && p.y > -0.02 },
     view: 'left',
-    tagline: 'Sends the final "go" signal to your muscles.',
+    tagline: 'Shapes voluntary movement commands sent toward the spinal cord.',
     analogy: 'A piano keyboard for the body, with more keys for the fingers and lips than the back.',
     levels: {
       where: {
@@ -148,9 +148,9 @@ export default [
         ],
       },
       does: {
-        text: 'This strip issues movement orders. When you reach for a cup, its [[pyramidal cell|pyramidal cells]] fire the pattern for shoulder, elbow and fingers in order. It does not plan the reach, it sends it.\n\nCatching your keys shows the split. The {{posterior-parietal}} aims, the {{motor-cortex}} throws the switch.',
+        text: 'This strip helps turn a planned action into descending movement signals. When you reach for a cup, populations of its [[pyramidal cell|pyramidal cells]] contribute to the direction, force and timing of several joints at once. It works with premotor areas, the brainstem and the spinal cord rather than acting as a single final switch.\n\nCatching your keys shows the teamwork. The {{posterior-parietal}} helps locate the target while the {{motor-cortex}} helps shape the reach.',
         bullets: [
-          'Orders: fires the sequence that contracts muscles.',
+          'Descending signals: helps recruit the muscles needed for an action.',
           'Force and direction: sets how hard and where to push.',
           'Skill storage: with practice, patterns here run faster and cleaner.',
           'Talk and face: lower end drives lips, tongue and jaw.',
@@ -175,7 +175,7 @@ export default [
         ],
       },
     },
-    tryIt: 'Tap each fingertip to your thumb in turn, faster and faster. The clean ordering you feel is this strip firing finger zones in sequence.',
+    tryIt: 'Tap each fingertip to your thumb in turn, faster and faster. Motor cortex activity helps shape the changing force and timing, alongside premotor, cerebellar and spinal circuits.',
     breaks: {
       text: 'Damage weakens or clumsies the opposite side of the body, face included.',
       bullets: [
@@ -196,11 +196,11 @@ export default [
       test: (p) => p.side === 'left' && p.lobe === 'frontal' && !p.medial && p.z > 0.16 && p.z < 0.42 && p.y > -0.1 && p.y < 0.13 && p.ax > 0.3,
     },
     view: 'left',
-    tagline: 'Turns thoughts into spoken sentences.',
-    analogy: 'A careful builder who turns a pile of words into a sentence that stands up.',
+    tagline: 'Helps plan speech, grammar and demanding language sequences.',
+    analogy: 'One workshop in a larger language network, especially busy when speech needs careful assembly.',
     levels: {
       where: {
-        text: 'Broca\'s area sits low on the left {{frontal-lobe}}, just above the temple and in front of the face zone of the {{motor-cortex}}. It is usually on the left only, even in many left handed people. It lies near areas that move the lips and tongue.',
+        text: 'Broca\'s area is the traditional name for patches low on the left {{frontal-lobe}}, just above the temple and in front of the face zone of the {{motor-cortex}}. Language is left dominant in most people, including many left handed people, but it depends on a wider network across both hemispheres. These frontal patches lie near areas that help control the lips and tongue.',
         bullets: [
           'A patch a few centimetres across on the left side.',
           'Next to face and mouth motor zones, ready to speak.',
@@ -208,7 +208,7 @@ export default [
         ],
       },
       does: {
-        text: 'Broca\'s area assembles speech. It takes the meaning you want and orders the words and grammar so others can follow. It also helps with sign language and complex hand sequences.\n\nSaying "the dog I saw yesterday was huge" without pausing to plan each word is this area sequencing smoothly.',
+        text: 'These frontal language regions help plan speech sounds and handle demanding grammar and sequence structure. They work with temporal and parietal regions that represent words and meanings, rather than receiving a finished thought from a single comprehension centre. They also respond during sign language and some complex action sequences.\n\nSaying "the dog I saw yesterday was huge" without pausing to plan each word recruits this wider network.',
         bullets: [
           'Word order: puts words into grammar that makes sense.',
           'Speech plan: strings mouth movements into fluent phrases.',
@@ -217,7 +217,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Meaning arrives both ways from {{wernickes-area}} through a long fibre bundle. The finished speech plan goes out to the {{motor-cortex}} mouth zone to be spoken.',
+        text: 'Several fibre pathways link these frontal regions with temporal and parietal language areas, including {{wernickes-area}} as traditionally defined. Speech plans interact with the {{motor-cortex}} mouth zone and other motor regions before words are spoken.',
         connections: [
           { id: 'wernickes-area', dir: 'both', label: 'Meanings traded to build sentences' },
           { id: 'motor-cortex', dir: 'out', label: 'Speech plan sent to mouth muscles' },
@@ -235,7 +235,7 @@ export default [
     },
     tryIt: 'Say "the big brown bag" three times fast, then say it with "yesterday" tucked in: "yesterday\'s big brown bag". The extra planning load you feel is this area working.',
     breaks: {
-      text: 'Damage leaves understanding mostly intact but makes speech short and effortful.',
+        text: 'Damage across the surrounding frontal language network can make speech short and effortful. Damage limited to the classic Broca\'s area does not always produce the full syndrome.',
       bullets: [
         'Broca\'s aphasia: few words, missing grammar, but the meaning is clear.',
         'Frustration is common because people know what they want to say.',
@@ -539,7 +539,7 @@ export default [
     analogy: 'A translator who turns sounds and letters back into meaning.',
     levels: {
       where: {
-        text: 'Wernicke\'s area sits at the back of the left {{temporal-lobe}}, where sound and vision meet. It lies just behind the {{auditory-cortex}} and below the {{posterior-parietal}}. Most people use the left side for this job.',
+        text: 'Wernicke\'s area is a traditional label for part of the back left {{temporal-lobe}}, near the junction with parietal cortex. Modern studies find that understanding words and sentences depends on a broader network across temporal, parietal and frontal regions, with contributions from both hemispheres.',
         bullets: [
           'Back left patch where temporal meets parietal.',
           'Between hearing below and reading vision behind.',
@@ -547,7 +547,7 @@ export default [
         ],
       },
       does: {
-        text: 'It links word forms to meanings. Hearing "keys" wakes the idea of keys, the look of them and where you leave them. Reading uses the same hub, reached through vision instead of hearing.\n\nNodding along to "please grab the blue mug" without thinking shows it. Sounds became objects and actions instantly.',
+        text: 'This region contributes to linking speech sounds with words and sentence context. Hearing "keys" also activates other temporal and parietal areas that represent its sound, appearance and use. Reading overlaps with parts of this system but also recruits specialised visual and language pathways.\n\nUnderstanding "please grab the blue mug" is therefore a network achievement, not the work of one comprehension centre.',
         bullets: [
           'Speech understanding: maps heard words onto ideas.',
           'Reading support: links seen words to the same ideas.',
@@ -556,7 +556,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Decoded sound arrives from the {{auditory-cortex}} and seen words from the {{visual-cortex}}. Meanings are traded both ways with {{brocas-area}} so understanding can become speech.',
+        text: 'Sound information arrives from the {{auditory-cortex}}, while reading reaches the language network through visual and temporal pathways. Multiple routes connect this region with {{brocas-area}} and other frontal, temporal and parietal areas.',
         connections: [
           { id: 'auditory-cortex', dir: 'in', label: 'Heard words arriving for meaning' },
           { id: 'brocas-area', dir: 'both', label: 'Meanings traded to build replies' },
@@ -575,7 +575,7 @@ export default [
     },
     tryIt: 'Listen to a sentence in a language you half know and catch the one word you recognise. The pop of meaning among noise is this area matching sound to memory.',
     breaks: {
-      text: 'Damage leaves speech fluent but empty, because words lose their anchors.',
+        text: 'Large injuries around the back left temporal language network can impair comprehension and produce fluent but hard to follow speech. The classic syndrome usually reflects damage beyond one small patch.',
       bullets: [
         'Wernicke\'s aphasia: fluent speech that makes little sense, with poor understanding.',
         'Trouble naming everyday things, though they can still be used.',
@@ -596,7 +596,7 @@ export default [
     analogy: 'A darkroom that develops the raw film from the eyes into pictures.',
     levels: {
       where: {
-        text: 'The occipital lobe is the back tip of each [[hemisphere]], tucked under the skull behind the {{parietal-lobe}} and {{temporal-lobe}} and above the {{cerebellum}}. It is the smallest [[lobe]] but holds the whole {{visual-cortex}}. The left half handles the right side of sight, and vice versa.',
+        text: 'The occipital lobe is the back tip of each [[hemisphere]], tucked under the skull behind the {{parietal-lobe}} and {{temporal-lobe}} and above the {{cerebellum}}. It contains primary visual cortex and several early visual areas. Later visual processing continues into temporal and parietal cortex. The left half handles the right side of sight, and vice versa.',
         bullets: [
           'Back pole of the brain, about a fist sized sheet per side.',
           'Folded around a deep groove (the calcarine [[sulcus]]).',

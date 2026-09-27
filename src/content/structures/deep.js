@@ -15,7 +15,7 @@ export default [
     analogy: 'An airport hub where every incoming flight is sorted and sent on to the right city.',
     levels: {
       where: {
-        text: 'The thalamus sits deep in the middle of the brain, one oval lump on each side, just above the {{midbrain}} and below the {{corpus-callosum}}. Each is about the size of a walnut. Almost every signal heading to the [[cortex]] stops here first.',
+        text: 'The thalamus sits deep in the middle of the brain, one oval lump on each side, just above the {{midbrain}} and below the {{corpus-callosum}}. Each is about the size of a walnut. Most sensory signals heading to the [[cortex]] relay here, with smell as the main exception. The thalamus also participates in movement, attention and communication between cortical areas.',
         bullets: [
           'Two thumb sized ovals joined by a small bridge across the middle.',
           'Made of many small clusters (nucleus clusters), one per sense or job.',
@@ -23,7 +23,7 @@ export default [
         ],
       },
       does: {
-        text: 'The thalamus decides what gets through to conscious thought. It passes on touch, sight and sound, and filters out the rest, like the hum of a fridge you stop noticing. It also keeps the cortex awake and in sync, passing messages back and forth with the {{prefrontal-cortex}}.\n\nCatching your keys is a good example. Touch, sight and sound arrive here first, get sorted, then go to the right cortical areas at the same time.',
+        text: 'The thalamus relays and reshapes touch, sight and sound while attention and cortical feedback alter how strongly those signals pass. It does not decide consciousness by itself, but thalamic activity helps keep the cortex awake and coordinated.\n\nCatching your keys is a good example. Visual, touch and sound pathways use different thalamic nuclei before reaching their cortical targets.',
         bullets: [
           'Sensory relay: forwards touch, vision and hearing to their cortical areas.',
           'Attention filter: turns the volume up or down on what matters.',
@@ -81,7 +81,7 @@ export default [
         ],
       },
       does: {
-        text: 'The hypothalamus keeps your insides steady. Hungry, thirsty, too hot, too cold, sleepy or stressed are all its calls. It also starts puberty, birth and nursing through hormones.\n\nThink of finishing a run on a hot day. You are sweaty, thirsty and breathing hard. The hypothalamus ordered all three responses.',
+        text: 'The hypothalamus helps keep your internal state steady. Hunger, thirst, temperature, daily rhythms and many hormone responses all involve its circuits. It also helps coordinate puberty, birth and nursing through hormones.\n\nAfter a run on a hot day, the hypothalamus contributes to sweating and thirst. Faster breathing is coordinated mainly by brainstem respiratory circuits, with input from the body and the rest of the brain.',
         bullets: [
           'Hunger and thirst: tells you to eat or drink, and what to crave.',
           'Temperature and water: sweats, shivers and saves water as needed.',
@@ -157,7 +157,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Plans flow in from the {{prefrontal-cortex}} and {{motor-cortex}}. A [[dopamine]] teaching signal arrives from the {{substantia-nigra}}. The verdict goes out to the {{globus-pallidus}}, which carries it toward the muscles.',
+        text: 'Plans flow in from the {{prefrontal-cortex}} and {{motor-cortex}}. [[Dopamine]] from the {{substantia-nigra}} changes how striatal pathways learn and respond. Inhibitory output then reaches the {{globus-pallidus}} and substantia nigra reticulata, influencing movement through thalamic and brainstem loops rather than carrying an order directly to muscles.',
         connections: [
           { id: 'prefrontal-cortex', dir: 'in', label: 'Goals and plans arriving for review' },
           { id: 'motor-cortex', dir: 'in', label: 'Movement options arriving for choice' },
@@ -171,7 +171,7 @@ export default [
         synapse: 'dopamine',
         bullets: [
           'About 95 percent of striatum cells are this one type, an unusual uniformity.',
-          'Addictive drugs flood this area with dopamine, which is why habits form fast around them.',
+          'Many addictive drugs raise dopamine signalling here, directly or indirectly, strengthening learning about drug-related cues and actions.',
         ],
       },
     },
@@ -253,7 +253,7 @@ export default [
     color: '#ffcf5c',
     shape: { type: 'ellipsoid', center: [0.07, -0.14, -0.1], radii: [0.04, 0.014, 0.05], count: 700, mirror: true, fill: 1 },
     view: 'left',
-    tagline: 'Makes the dopamine that keeps movement smooth.',
+    tagline: 'Uses dopamine and inhibitory output to tune movement circuits.',
     analogy: 'A watering can that sprinkles dopamine over the movement circuits to keep them willing to move.',
     levels: {
       where: {
@@ -265,11 +265,11 @@ export default [
         ],
       },
       does: {
-        text: 'The nigra supplies [[dopamine]] that tells the movement circuits a reward was better than expected. That signal teaches the {{striatum}} which actions are worth repeating. It also sets the background willingness to move. Low dopamine and everything feels effortful, as if walking through sand.\n\nSipping coffee when tired shows a small piece of it. The lift you feel partly reflects dopamine nudging the movement system awake.',
+        text: 'Dopamine neurons in the substantia nigra pars compacta tune how the {{striatum}} selects and learns actions. A neighbouring part, the pars reticulata, sends inhibitory output from the basal ganglia. When nigral dopamine is badly depleted, movements become slower and harder to start, as in Parkinson\'s disease.',
         bullets: [
-          'Reward signal: marks actions that turned out well.',
-          'Go versus stop: boosts the "go" path, calms the "stop" path.',
-          'Habit ink: helps write repeated good actions into routine.',
+          'Learning signal: helps update the value of actions and outcomes.',
+          'Pathway tuning: affects direct and indirect striatal pathways differently.',
+          'Movement vigour: helps scale how readily and forcefully actions are performed.',
           'Eye moves too: a nearby part guides quick eye jumps.',
         ],
       },
@@ -286,16 +286,16 @@ export default [
         diagram: 'basal-ganglia',
         synapse: 'dopamine',
         bullets: [
-          'Humans have only about 400,000 of these cells, yet they shape all habits.',
-          'They fire in short bursts for surprise rewards, and pause when an expected reward fails.',
+          'Humans have only several hundred thousand dopamine neurons in the substantia nigra on both sides combined.',
+          'Their activity reflects movement as well as learning about outcomes and cues.',
         ],
       },
     },
-    tryIt: 'Think of a time a text brought unexpectedly good news. That brief lift and urge to act is dopamine, much of it first made here, doing its job.',
+    tryIt: 'Think of how an unexpectedly good result changes what you try next time. Dopamine signals from the substantia nigra are one part of how movement circuits update action values, but the feeling itself comes from a wider network.',
     breaks: {
       text: 'These cells die slowly with age, and faster in disease. Movement and mood both suffer.',
       bullets: [
-        'Parkinson\'s begins when roughly half are lost: slow, stiff, trembling movement.',
+        'Parkinson\'s motor signs emerge after substantial cell and striatal dopamine loss, producing slow movement, stiffness and sometimes tremor.',
         'Too much dopamine signalling is linked to the false alarms of psychosis.',
         'Some Parkinson\'s drugs mimic dopamine but can cause impulsive habits like gambling.',
       ],
@@ -321,7 +321,7 @@ export default [
         bullets: [
           'A curved tube with a toothlike ridge (the dentate gyrus) along its edge.',
           'Tightly linked to the nearby entorhinal [[cortex]], its main doorway (the entorhinal cortex).',
-          'One of the few places where new [[neuron|neurons]] keep being born in adults.',
+          'New neuron birth in the adult human dentate gyrus remains actively debated.',
         ],
       },
       does: {
@@ -343,12 +343,12 @@ export default [
         ],
       },
       cells: {
-        text: 'Information makes a one way trip through three relays, as the loop diagram shows: entorhinal [[cortex]] to dentate gyrus to CA3 to CA1, then back out. CA3 cells excite each other with [[glutamate]], so a small cue can reawaken the whole pattern. Those [[synapse|synapses]] strengthen quickly, which is the physical trace of a new memory.',
+        text: 'A well studied route runs from entorhinal [[cortex]] through dentate gyrus, CA3 and CA1, then back toward cortex. It is not the only route, and signals also travel through recurrent and parallel connections. CA3 cells excite one another with [[glutamate]], which may help a partial cue reactivate a stored pattern. Lasting changes at these and other [[synapse|synapses]] are one part of how memories are represented.',
         diagram: 'hippocampal-loop',
         synapse: 'glutamate',
         bullets: [
-          'So called place cells fire only when you are in one favourite spot.',
-          'New dentate cells are born daily, and exercise and sleep help them survive.',
+          'Place cells become active in particular locations or situations, and their firing fields can change with context.',
+          'Adult hippocampal neurogenesis is clear in many animals, but its extent and function in adult humans remain unsettled.',
         ],
       },
     },
@@ -356,9 +356,9 @@ export default [
     breaks: {
       text: 'When the hippocampus fails, new memories stop sticking even though old ones and skills remain.',
       bullets: [
-        'Alzheimer\'s hits here first: recent events vanish while childhood stays.',
+        'Alzheimer\'s affects entorhinal and hippocampal memory circuits early, so recent learning often suffers first.',
         'A brief loss of blood or oxygen can wipe out hours around the event.',
-        'Chronic stress shrinks it, and treating depression can help it regrow.',
+        'Long-term stress and depression are associated with smaller hippocampal volume, but the causes and reversibility vary between people.',
       ],
     },
   },
@@ -400,11 +400,11 @@ export default [
         ],
       },
       cells: {
-        text: 'The fear circuit diagram shows the logic. A fast [[excitatory]] route from the {{thalamus}} hits the amygdala directly, while a slower route goes via sensory [[cortex]] with more detail. {{prefrontal-cortex}} input excites local calming cells that hush the alarm with [[GABA]] once the danger passes.',
+        text: 'Sensory information can reach the amygdala through both thalamic and cortical routes, but the old picture of one fast unconscious road and one slow conscious road is too simple, especially in humans. Frontal, hippocampal and local [[GABA]] circuits all help update or reduce a threat response when the situation proves safe.',
         diagram: 'fear-circuit',
         synapse: 'glutamate',
         bullets: [
-          'Its fear learning needs only one trial, unlike most learning which needs repeats.',
+          'Some strong threat associations form after one event, while others develop or fade across repeated experiences.',
           'Calming cells can be strengthened by therapy, which is partly how exposure therapy works.',
         ],
       },
@@ -443,7 +443,7 @@ export default [
         ],
       },
       does: {
-        text: 'The callosum shares work between hemispheres. Language mostly on the left and space mostly on the right still need each other to read aloud or catch a ball. It passes the summary across in milliseconds.\n\nNaming an object you hold behind your back shows it. Touch on the right goes left, then crosses to language on the left so you can say its name.',
+        text: 'The callosum shares information between hemispheres. Language is usually weighted toward the left and spatial attention toward the right, but both tasks use networks on both sides. Signals cross in milliseconds.\n\nA classic split-brain test uses an object placed in the left hand without sight. Touch first reaches the right hemisphere, then normally crosses the callosum to left-sided language areas so the object can be named.',
         bullets: [
           'Sharing: sends a summary of each side to the other.',
           'Teamwork: lets language and space systems combine.',
@@ -486,33 +486,33 @@ export default [
     color: '#ffb703',
     shape: { type: 'ellipsoid', center: [0.03, -0.13, -0.09], radii: [0.024, 0.016, 0.032], count: 500, mirror: true, fill: 1 },
     view: 'left',
-    tagline: 'Supplies the dopamine that drives desire, curiosity and learning.',
-    analogy: 'The fuel injector that squirts motivation into the brain whenever a goal seems reachable.',
+    tagline: 'Sends learning and motivation signals through several dopamine pathways.',
+    analogy: 'A prediction updater that helps the brain revise what is worth pursuing.',
     levels: {
       where: {
         text: 'The ventral tegmental area (VTA) is a tiny cluster of cells in the {{midbrain}}, sitting just medial to the {{substantia-nigra}}. Although small enough to fit on the tip of a pencil, its branches reach right across the front half of the brain.',
         bullets: [
           'Nested close to the midline in the floor of the midbrain.',
-          'Made of around 40,000 dopamine-producing neurons in humans.',
-          'Sits right next to the substantia nigra but serves motivation rather than movement.',
+          'Contains dopamine, GABA and glutamate neurons rather than one uniform cell type.',
+          'Sits next to the substantia nigra, with overlapping roles in motivation, learning and movement.',
         ],
       },
       does: {
-        text: 'The VTA creates the dopamine burst behind desire and anticipation. It fires when something good happens unexpectedly, or when you spot a hint that reward is on the way. That chemical pulse tells your thoughts to pay attention and remember what led here.\n\nHearing your phone chime with a message notification is the VTA in miniature. The burst of curiosity arrives before you even read the screen.',
+        text: 'Many VTA dopamine neurons change their firing when an outcome is better or worse than expected. As learning develops, responses can shift toward cues that predict an outcome. These signals help update motivation, attention and memory, but VTA neurons are diverse and no single burst equals a feeling.\n\nA notification can become compelling after repeated learning. VTA dopamine may contribute to that learned pull alongside cortical, striatal and emotional circuits.',
         bullets: [
-          'Reward prediction: fires when an outcome beats expectations.',
-          'Motivation engine: turns vague wants into energized pursuit.',
-          'Curiosity and exploration: encourages you to investigate novel sights and ideas.',
-          'Habit reinforcement: stamps memories in the hippocampus with emotional importance.',
+          'Prediction updates: many dopamine cells respond when outcomes differ from expectations.',
+          'Motivation: changes how much effort a goal seems worth.',
+          'Learning: helps cues and actions gain or lose value.',
+          'Memory modulation: influences hippocampal and amygdala plasticity.',
         ],
       },
       connects: {
         text: 'Its main branches go up to the {{striatum}} for reward pursuit, the {{prefrontal-cortex}} for planning, and the {{amygdala}} for emotional weight.',
         connections: [
-          { id: 'striatum', dir: 'out', label: 'Dopamine sent to the reward center' },
-          { id: 'prefrontal-cortex', dir: 'out', label: 'Motivation relayed to executive planning' },
-          { id: 'amygdala', dir: 'out', label: 'Emotional value added to experiences' },
-          { id: 'hippocampus', dir: 'out', label: 'Memories marked for long term keeping' },
+          { id: 'striatum', dir: 'out', label: 'Learning and motivation signals sent to striatum' },
+          { id: 'prefrontal-cortex', dir: 'out', label: 'Dopamine tunes working memory and planning' },
+          { id: 'amygdala', dir: 'out', label: 'Dopamine influences emotional learning' },
+          { id: 'hippocampus', dir: 'out', label: 'Dopamine influences memory formation' },
         ],
       },
       cells: {
@@ -520,12 +520,12 @@ export default [
         diagram: 'neuromodulator',
         synapse: 'dopamine',
         bullets: [
-          'A single VTA dopamine cell can form over 100,000 synaptic contacts.',
-          'Addictive substances hijack this exact system by prolonging the dopamine surge.',
+          'Individual dopamine neurons can influence many thousands of targets through widely branching axons.',
+          'Addictive substances alter this learning system through several mechanisms, many of which increase dopamine signalling.',
         ],
       },
     },
-    tryIt: 'Recall the anticipation you felt while unboxing a gift or waiting in line for favourite food. That heightened focus and forward tilt is VTA dopamine.',
+    tryIt: 'Notice how a reliable cue, such as the smell of a favourite food, changes what you expect and do next. VTA dopamine helps update such predictions, but the conscious feeling of anticipation uses a wider network.',
     breaks: {
       text: 'Disruptions in this circuit alter drive, mood, and belief in what is worth doing.',
       bullets: [
@@ -542,7 +542,7 @@ export default [
     color: '#10b981',
     shape: { type: 'ellipsoid', center: [0.08, -0.06, 0.08], radii: [0.035, 0.022, 0.038], count: 650, mirror: true, fill: 1 },
     view: 'left-front',
-    tagline: 'Bathes the cortex in acetylcholine to sharpen attention and seal in memories.',
+    tagline: 'Sends acetylcholine widely to tune attention, learning and wakefulness.',
     analogy: 'A stage spotlight operator who turns up brightness on what matters so you can focus.',
     levels: {
       where: {
@@ -550,11 +550,11 @@ export default [
         bullets: [
           'Located near the base of the front of the brain, under the basal ganglia.',
           'Sends direct fibres to all four lobes of the cerebral cortex.',
-          'Among the first areas to suffer cell loss in Alzheimer\'s disease.',
+          'Degenerates early in Alzheimer\'s disease alongside connected memory regions.',
         ],
       },
       does: {
-        text: 'The basal forebrain decides when the cortex should pay sharp attention. When something demands focus, it floods the cortex with acetylcholine, quietening background chatter and boosting sensory input. It acts like a focus dial for your thoughts.\n\nSearching for your lost keys in a messy room is this system at work: it keeps your eyes looking and your mind from drifting.',
+        text: 'Basal-forebrain acetylcholine changes how cortical circuits respond during attention, learning and waking. Depending on the receptor and circuit, it can strengthen selected inputs and alter local activity rather than simply turning all cortex up.\n\nSearching for lost keys recruits a broad attention network, with this system helping sensory evidence gain weight as you look.',
         bullets: [
           'Selective attention: turns up signal-to-noise ratio in sensory areas.',
           'Neuroplasticity: tells cortical circuits that right now is worth learning.',
@@ -577,15 +577,15 @@ export default [
         synapse: 'acetylcholine',
         bullets: [
           'These cells fire in bursts locked to moments of surprise and intense curiosity.',
-          'Loss of up to 90 percent of these neurons is a primary cause of memory loss in dementia.',
+          'These neurons degenerate in Alzheimer\'s disease, contributing to problems with attention and memory without being the sole cause.',
         ],
       },
     },
-    tryIt: 'Count backwards from 100 by sevens (100, 93, 86...). The effortful mental grip keeping you on track is fueled by acetylcholine from the basal forebrain.',
+    tryIt: 'Count backwards from 100 by sevens (100, 93, 86...). Sustained attention recruits a broad network, with basal-forebrain acetylcholine helping tune how strongly cortical signals are processed.',
     breaks: {
       text: 'When these cells degenerate, the cortex loses its focus and ability to store new days.',
       bullets: [
-        'Alzheimer\'s disease: earliest memory decline correlates directly with cell death here.',
+        'Alzheimer\'s disease: degeneration here accompanies early changes in connected entorhinal and hippocampal memory circuits.',
         'Delirium and confusion: triggered when medicines block acetylcholine receptors.',
         'Chronic brain fog and daytime drowsiness when this wakefulness system falters.',
       ],

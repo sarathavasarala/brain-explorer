@@ -26,7 +26,7 @@ export default [
         ],
       },
       does: {
-        text: 'The cerebellum does not start movements. The {{motor-cortex|motor cortex}} does that. Instead it compares the command that was sent with feedback from your muscles, joints and eyes, and quietly corrects the movement while it happens. It also learns from mistakes, which is why practice makes a skill automatic.',
+        text: 'The cerebellum helps prepare, time and adjust movements rather than acting as their sole starting point. It combines copies of motor plans with feedback from muscles, joints and eyes, then helps reduce errors while movement unfolds. It also learns from repeated errors, which is one reason practice makes a skill smoother.',
         bullets: [
           'Balance and posture: keeps you upright without you thinking about it.',
           'Timing and coordination: lets several joints move together, as in reaching or walking.',
@@ -106,7 +106,7 @@ export default [
         synapse: 'dopamine',
         bullets: [
           'The dark colour of the substantia nigra comes from pigment inside its dopamine cells.',
-          'Losing these cells slows movement. When about half are gone, the signs of Parkinson\'s appear.',
+          'Parkinson\'s motor signs usually appear only after substantial loss of these cells and their striatal dopamine supply.',
         ],
       },
     },
@@ -160,7 +160,7 @@ export default [
         diagram: 'neuromodulator',
         synapse: 'noradrenaline',
         bullets: [
-          'The locus coeruleus holds only about 30,000 cells, yet reaches almost the whole brain.',
+          'The two locus coeruleus nuclei together contain only tens of thousands of neurons, yet their axons reach most of the brain.',
           'It goes quiet during dream sleep and fires in bursts when something surprising happens.',
         ],
       },
@@ -278,11 +278,11 @@ export default [
     },
     tryIt: 'Rest a hand near the edge of a table and have a friend tap just below your kneecap with the side of their hand while your leg dangles. The small kick that follows is a spinal reflex, no brain needed.',
     breaks: {
-      text: 'Because everything passes through this one cable, injuries have effects below the injury level only.',
+      text: 'A spinal-cord injury can disrupt movement, sensation and automatic body functions below the injury. Damage at the injured segment can also affect nearby nerves and muscles.',
       bullets: [
         'A neck injury can paralyse arms and legs (tetraplegia). A lower injury affects the legs only (paraplegia).',
         'Damaged touch highways cause numbness, tingling or chronic pain.',
-        'Shingles, slipped discs and motor neuron disease all show up first as spinal nerve symptoms.',
+        'Disc disease can compress nerve roots, while motor neuron diseases can damage cells in the cord as well as other motor pathways.',
       ],
     },
   },
@@ -294,8 +294,8 @@ export default [
     shape: { type: 'ellipsoid', center: [0.0, -0.22, -0.2], radii: [0.018, 0.07, 0.024], count: 650, pattern: 'fine', fill: 0.8 },
     view: 'medial',
     slice: true,
-    tagline: 'The brainstem seam that produces serotonin to steady mood and sleep.',
-    analogy: 'A climate control thermostat that maintains emotional warmth and keeps sleep cycles on track.',
+    tagline: 'Brainstem nuclei that send serotonin through widespread circuits.',
+    analogy: 'A set of tuning controls whose effects depend on the receptor and circuit receiving the signal.',
     levels: {
       where: {
         text: 'The raphe nuclei are a narrow chain of neuron clusters running right down the midline seam of the brainstem, from the {{midbrain}} down through the {{pons}} and {{medulla}}. "Raphe" means seam in Greek, describing how they sit like stitches joining the two halves.',
@@ -306,21 +306,21 @@ export default [
         ],
       },
       does: {
-        text: 'The raphe nuclei release [[serotonin]] across almost the entire brain. Serotonin acts as an emotional shock absorber: it promotes patience, buffers against chronic stress, and regulates your body clock and appetite.\n\nWaking up refreshed on a sunny morning and feeling steady through daily hassles reflects healthy raphe serotonin tone.',
+        text: 'The raphe nuclei release [[serotonin]] into widespread brain and spinal circuits. Its effects vary with receptor type and location, influencing sleep and waking, appetite, patience, learning, pain and mood. There is no single serotonin level that directly determines whether someone feels happy or depressed.',
         bullets: [
-          'Mood stabilization: dampens catastrophic reactions to negative events.',
-          'Sleep regulation: triggers tiredness in the evening and regulates dream sleep.',
-          'Impulse control: helps delay immediate gratification for longer term goals.',
+          'Mood and learning: changes how emotional outcomes shape behaviour.',
+          'Sleep and waking: raphe activity varies across wake, non-REM and REM sleep.',
+          'Impulse control: contributes to waiting and behavioural flexibility in some tasks.',
           'Pain gating: descending projections quiet pain signals in the spinal cord.',
         ],
       },
       connects: {
-        text: 'Ascending fibres travel to the {{prefrontal-cortex}} for mood balance, the {{amygdala}} to soothe anxiety, and the {{hypothalamus}} to tune sleep. Descending fibres run down to the {{spinal-cord}} to gate pain.',
+        text: 'Ascending fibres reach the {{prefrontal-cortex}}, {{amygdala}} and {{hypothalamus}}, where their effects depend on local receptors and activity. Descending fibres run to the {{spinal-cord}} and can either reduce or facilitate pain in different conditions.',
         connections: [
-          { id: 'prefrontal-cortex', dir: 'out', label: 'Mood and patience regulation' },
-          { id: 'amygdala', dir: 'out', label: 'Fear dampening and emotional soothing' },
+          { id: 'prefrontal-cortex', dir: 'out', label: 'Behaviour and learning tuned by serotonin' },
+          { id: 'amygdala', dir: 'out', label: 'Emotional responses modulated by serotonin' },
           { id: 'hypothalamus', dir: 'out', label: 'Circadian rhythm and sleep-wake tuning' },
-          { id: 'spinal-cord', dir: 'out', label: 'Pain threshold modulation sent down' },
+          { id: 'spinal-cord', dir: 'out', label: 'Pain processing modulated from above' },
         ],
       },
       cells: {
@@ -333,12 +333,12 @@ export default [
         ],
       },
     },
-    tryIt: 'Take three deep, slow belly breaths with long exhalations. The calm settling over your chest and thoughts is your parasympathetic system and raphe nuclei bringing down nervous tension.',
+    tryIt: 'Take three slow breaths with longer exhalations and notice any change in tension. Breathing can alter autonomic and attention networks, but the feeling cannot be assigned to serotonin or the raphe nuclei alone.',
     breaks: {
-      text: 'Depleted serotonin or damaged raphe circuits severely disrupt emotional balance and sleep.',
+      text: 'Raphe damage and altered serotonin signalling can affect sleep, pain and behaviour, but common mood disorders cannot be reduced to a simple serotonin shortage.',
       bullets: [
-        'Depression and anxiety: linked to reduced serotonin signaling and impaired receptor sensitivity.',
-        'Insomnia: disruptions in nighttime serotonin release scramble melatonin production and sleep cycles.',
+        'Depression and anxiety involve many interacting systems. Serotonin treatments can help some people without proving a single chemical deficit.',
+        'Sleep disorders can involve raphe circuits alongside many other brainstem, hypothalamic and cortical systems.',
         'Serotonin syndrome: life-threatening toxicity caused by accidental overdoses of serotonergic drugs.',
       ],
     },
@@ -350,7 +350,7 @@ export default [
     color: '#ff5722',
     shape: { type: 'ellipsoid', center: [0.035, -0.2, -0.21], radii: [0.016, 0.02, 0.022], count: 450, mirror: true, fill: 1 },
     view: 'left-back',
-    tagline: 'The brain\'s alert tower that floods the circuits with noradrenaline during urgency.',
+    tagline: 'A small noradrenaline system that retunes alertness and attention.',
     analogy: 'A watchtower sentry who fires a flare when something unexpected happens, putting the whole city on alert.',
     levels: {
       where: {
@@ -362,40 +362,40 @@ export default [
         ],
       },
       does: {
-        text: 'The locus coeruleus governs your level of arousal. When life is quiet, it ticks over at a steady background rate. When something sudden or dangerous occurs, it fires a burst of [[noradrenaline]] that heightens sensory perception, quickens reaction times, and mobilizes emergency focus.\n\nJumping when you hear a sudden loud crash behind you is an instant locus coeruleus spike.',
+        text: 'The locus coeruleus helps tune arousal and attention. Its background firing changes with waking state, while brief responses often follow surprising or behaviourally important events. [[Noradrenaline]] can alter sensory processing and the balance between focused work and scanning for new information.\n\nA sudden crash recruits this system together with sensory, autonomic and motor circuits.',
         bullets: [
-          'Vigilance and alertness: sets the overall brain waking state from drowsy to wired.',
-          'Signal amplification: increases sensory clarity by silencing irrelevant cortical noise.',
-          'Stress response: prepares the mind and body for rapid fight-or-flight action.',
-          'Memory consolidation: ensures terrifying or critical events are remembered vividly.',
+          'Vigilance and alertness: contributes to changes from drowsy to highly alert.',
+          'Adaptive gain: changes how strongly neural circuits respond to competing inputs.',
+          'Uncertainty: responds when events suggest that current expectations need updating.',
+          'Memory modulation: can strengthen learning about important events.',
         ],
       },
       connects: {
         text: 'It broadcasts alarm signals up to the {{thalamus}} and {{amygdala}} for threat processing, to the {{prefrontal-cortex}} for urgent decision-making, and back to the {{cerebellum}} for fast motor readiness.',
         connections: [
-          { id: 'thalamus', dir: 'out', label: 'Sensory gating turned up to maximum sensitivity' },
-          { id: 'amygdala', dir: 'out', label: 'Threat assessment boosted during danger' },
-          { id: 'prefrontal-cortex', dir: 'out', label: 'Alertness and working memory focused on survival' },
-          { id: 'cerebellum', dir: 'out', label: 'Motor circuits primed for sudden movement' },
+          { id: 'thalamus', dir: 'out', label: 'Sensory relay responses retuned' },
+          { id: 'amygdala', dir: 'out', label: 'Emotional learning and arousal modulated' },
+          { id: 'prefrontal-cortex', dir: 'out', label: 'Attention and working memory retuned' },
+          { id: 'cerebellum', dir: 'out', label: 'Movement and learning circuits modulated' },
         ],
       },
       cells: {
-        text: 'Locus coeruleus neurons have the most extensively branched axons in the brain, as shown in the neuromodulator broadcast diagram. A single neuron can innervate both the front of the cortex and the spinal cord, synchronizing the entire nervous system with [[noradrenaline]].',
+        text: 'Locus coeruleus neurons have extremely branched axons, as shown in the neuromodulator broadcast diagram. Different cells project to overlapping sets of cortical, cerebellar, brainstem and spinal targets, allowing [[noradrenaline]] to coordinate broad but not uniform changes.',
         diagram: 'neuromodulator',
         synapse: 'noradrenaline',
         bullets: [
-          'They fire fastest during intense stress, slow down during calm waking, and stop firing completely in REM sleep.',
-          'Degeneration of locus coeruleus cells is an early hallmark of both Alzheimer\'s and Parkinson\'s disease.',
+          'Their firing varies with arousal and events, and becomes very low during REM sleep.',
+          'Locus coeruleus degeneration occurs early in Alzheimer\'s disease and is also found in Parkinson\'s disease.',
         ],
       },
     },
-    tryIt: 'Splash cold water on your face. The sudden jolt of alertness and crisp visual clarity is noradrenaline flooding your cortex from the locus coeruleus.',
+    tryIt: 'Notice how a sudden sound interrupts a wandering thought. Locus-coeruleus noradrenaline helps retune attention during surprise, alongside sensory, autonomic and cortical networks.',
     breaks: {
-      text: 'Imbalances in noradrenaline cause either chronic panic or debilitating exhaustion.',
+      text: 'Changes in this system are associated with several disorders, but they are not a single cause of panic, ADHD or fatigue.',
       bullets: [
-        'PTSD and panic disorder: a hyper-reactive locus coeruleus triggers fight-or-flight false alarms.',
-        'ADHD: insufficient tonic noradrenaline leaves the prefrontal cortex easily distracted.',
-        'Burnout and apathy: chronic stress exhausts noradrenergic reserve, producing deep mental fatigue.',
+        'PTSD and panic disorder can involve altered noradrenergic arousal alongside wider fear and stress networks.',
+        'ADHD medicines can act on noradrenaline and dopamine, but the condition is not a simple shortage of either.',
+        'Stress and fatigue change locus coeruleus activity, without evidence for a finite noradrenaline reserve being exhausted.',
       ],
     },
   },

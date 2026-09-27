@@ -102,7 +102,7 @@ export default {
 
   'hippocampal-loop': {
     title: 'The hippocampal loop',
-    caption: 'Information from the cortex makes a one-way trip through three relays before heading back out. CA3 cells are wired to each other, which lets a small cue bring back a whole memory.',
+    caption: 'This simplified route follows three major relays, but the hippocampus also contains parallel and recurrent connections. CA3 cells connect strongly with one another, which may help a partial cue reactivate a stored pattern.',
     nodes: [
       { id: 'ec', kind: 'region', label: 'Entorhinal cortex', x: 14, y: 20 },
       { id: 'dg', kind: 'granule', label: 'Dentate gyrus', x: 32, y: 70 },
@@ -121,7 +121,7 @@ export default {
 
   'fear-circuit': {
     title: 'The fear circuit',
-    caption: 'A fast, rough route from the thalamus lets the amygdala react before you know what you saw. A slower route through the cortex adds detail, and the prefrontal cortex can calm things down.',
+    caption: 'Sensory information reaches the amygdala through thalamic and cortical routes that interact. Frontal and local inhibitory circuits help update the response when more context becomes available.',
     nodes: [
       { id: 'in', kind: 'input', label: 'Sight or sound', x: 8, y: 50 },
       { id: 'th', kind: 'region', label: 'Thalamus', x: 26, y: 50 },
