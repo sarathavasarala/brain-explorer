@@ -598,213 +598,205 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     }
   }
 
-  function leftCenterOf(id) {
+  // The visible half. With the slice on, the camera looks at the cut face of the right half (x < 0),
+  // which is the classic textbook sagittal view of these pathways. Without it, the left half (x > 0).
+  const visibleSide = () => (userSlice || forcedSlice ? -1 : 1);
+
+  function sideCenterOf(id, s) {
     const r = recs.get(id);
     if (!r) return null;
-    if (r.kind === 'region') return r.center.clone();
-    if (r.kind === 'deep') {
-      const posAttr = r.obj.geometry.getAttribute('position');
-      let count = 0;
-      const c = new THREE.Vector3();
-      for (let i = 0; i < posAttr.count; i++) {
-        if (posAttr.getX(i) >= 0.01) {
-          c.x += posAttr.getX(i);
-          c.y += posAttr.getY(i);
-          c.z += posAttr.getZ(i);
-          count++;
-        }
-      }
-      if (count > 0) return c.divideScalar(count);
-    }
-    return r.center.clone();
-  }
-
-  function samplePoints(id, n, rnd) {
-    const r = recs.get(id);
-    if (!r) return [BRAIN_CENTER.clone()];
+    if (r.kind === 'anchor') return r.center.clone();
     const pts = [];
     if (r.kind === 'region') {
-      const candidates = [];
-      for (let i = 0; i < nC; i++) {
-        if (r.mask[i] && cx.positions[i * 3] > 0.01) candidates.push(i);
-      }
-      const list = candidates.length ? candidates : [];
-      if (!list.length) {
-        for (let i = 0; i < nC; i++) if (r.mask[i]) list.push(i);
-      }
-      if (!list.length) return [r.center.clone()];
-      for (let k = 0; k < n; k++) {
-        const idx = list[Math.floor(rnd() * list.length)];
-        pts.push(new THREE.Vector3(cx.positions[idx * 3], cx.positions[idx * 3 + 1], cx.positions[idx * 3 + 2]));
-      }
-    } else if (r.kind === 'deep') {
-      const posAttr = r.obj.geometry.getAttribute('position');
-      const total = posAttr.count;
-      const candidates = [];
-      for (let i = 0; i < total; i++) {
-        if (posAttr.getX(i) > 0.01) candidates.push(i);
-      }
-      const list = candidates.length ? candidates : [];
-      if (!list.length) {
-        for (let i = 0; i < total; i++) if (posAttr.getX(i) >= 0) list.push(i);
-      }
-      if (!list.length) {
-        for (let i = 0; i < total; i++) list.push(i);
-      }
-      if (!list.length) return [r.center.clone()];
-      for (let k = 0; k < n; k++) {
-        const idx = list[Math.floor(rnd() * list.length)];
-        pts.push(new THREE.Vector3(posAttr.getX(idx), posAttr.getY(idx), posAttr.getZ(idx)));
-      }
-    } else if (r.kind === 'anchor') {
-      for (let k = 0; k < n; k++) {
-        pts.push(r.center.clone().add(new THREE.Vector3(
-          (rnd() - 0.5) * 0.03,
-          (rnd() - 0.5) * 0.03,
-          (rnd() - 0.5) * 0.03
-        )));
-      }
-    } else {
-      pts.push(r.center.clone());
+      for (let i = 0; i < nC; i++) if (r.mask[i]) pts.push(i * 3);
+      return centroidOf(cx.positions, pts, s, r.center);
     }
-    return pts;
+    const pos = r.obj.geometry.getAttribute('position').array;
+    for (let i = 0; i < pos.length; i += 3) pts.push(i);
+    return centroidOf(pos, pts, s, r.center);
+  }
+
+  function centroidOf(arr, idxs, s, fallback) {
+    const c = new THREE.Vector3();
+    let n = 0;
+    for (const i of idxs) if (arr[i] * s > 0.004) { c.x += arr[i]; c.y += arr[i + 1]; c.z += arr[i + 2]; n++; }
+    if (!n) for (const i of idxs) if (Math.abs(arr[i]) < 0.03) { c.x += arr[i]; c.y += arr[i + 1]; c.z += arr[i + 2]; n++; }
+    if (!n) return fallback.clone();
+    c.divideScalar(n);
+    return c;
+  }
+
+  // Points inside a target where fibres can end, on the visible side and close to the midline
+  // when sliced (so they land on the cut face you are looking at, not the far outer surface).
+  function sidePoints(id, n, rnd, s) {
+    const r = recs.get(id);
+    if (!r) return [];
+    const sliced = s < 0;
+    let arr, idxs = [];
+    if (r.kind === 'region') {
+      arr = cx.positions;
+      for (let i = 0; i < nC; i++) if (r.mask[i]) idxs.push(i * 3);
+    } else if (r.kind === 'deep') {
+      arr = r.obj.geometry.getAttribute('position').array;
+      for (let i = 0; i < arr.length; i += 3) idxs.push(i);
+    } else {
+      const out = [];
+      for (let k = 0; k < n; k++) out.push(r.center.clone().add(randomOffset(rnd, 0.015)));
+      return out;
+    }
+    const tiers = [
+      (i) => arr[i] * s > 0.004 && (!sliced || r.kind !== 'region' || Math.abs(arr[i]) < 0.22),
+      (i) => arr[i] * s > 0.004,
+      () => true,
+    ];
+    let list = [];
+    for (const t of tiers) { list = idxs.filter(t); if (list.length >= 8) break; }
+    if (!list.length) return [r.center.clone()];
+    const out = [];
+    for (let k = 0; k < n; k++) {
+      const i = list[Math.floor(rnd() * list.length)];
+      out.push(new THREE.Vector3(arr[i], arr[i + 1], arr[i + 2]));
+    }
+    return out;
   }
 
   function randomOffset(rnd, maxDist) {
-    return new THREE.Vector3(
-      (rnd() - 0.5) * 2 * maxDist,
-      (rnd() - 0.5) * 2 * maxDist,
-      (rnd() - 0.5) * 2 * maxDist
-    );
+    return new THREE.Vector3((rnd() - 0.5) * 2 * maxDist, (rnd() - 0.5) * 2 * maxDist, (rnd() - 0.5) * 2 * maxDist);
   }
 
-  function buildTree(fromId, toId, { branches = 16, color, state, rnd }) {
-    const a = leftCenterOf(fromId) || BRAIN_CENTER.clone();
-    const b = leftCenterOf(toId) || BRAIN_CENTER.clone();
-    const trunk = buildArc(a, b, 0.55);
-    const split = trunk.getPoint(0.72);
-    const ends = samplePoints(toId, branches, rnd);
-    const paths = ends.map((e) => {
-      const mid = split.clone().lerp(e, 0.5).add(randomOffset(rnd, 0.04));
-      const branch = new THREE.QuadraticBezierCurve3(split, mid, e);
-      const path = new THREE.CurvePath();
-      path.add(new SubCurve(trunk, 0, 0.72));
-      path.add(branch);
-      return { path, branch, end: e };
-    });
-    return { fromId, toId, trunk, paths, split, ends, state, color };
+  // An axon arbour: one trunk leaves the source, splits into a few primary branches,
+  // and each primary splits into fine twigs that end inside the target.
+  const TRUNK_SPLIT = 0.6;
+  function buildTree(fromId, toId, { branches, rnd, s }) {
+    const a = sideCenterOf(fromId, s) || BRAIN_CENTER.clone();
+    const b = sideCenterOf(toId, s) || BRAIN_CENTER.clone();
+    const trunk = buildArc(a, b, 0.4);
+    const split = trunk.getPoint(TRUNK_SPLIT);
+    const ends = sidePoints(toId, branches, rnd, s);
+
+    const k = Math.max(2, Math.min(4, Math.round(ends.length / 4)));
+    const seeds = [ends[0]];
+    while (seeds.length < k) {
+      let best = null, bestD = -1;
+      for (const e of ends) {
+        const d = Math.min(...seeds.map((q) => q.distanceTo(e)));
+        if (d > bestD) { bestD = d; best = e; }
+      }
+      seeds.push(best);
+    }
+    const groups = seeds.map(() => []);
+    for (const e of ends) {
+      let gi = 0, gd = Infinity;
+      seeds.forEach((q, i) => { const d = q.distanceTo(e); if (d < gd) { gd = d; gi = i; } });
+      groups[gi].push(e);
+    }
+
+    const trunkPart = new SubCurve(trunk, 0, TRUNK_SPLIT);
+    const primaries = [], twigs = [], paths = [];
+    for (const g of groups) {
+      if (!g.length) continue;
+      const c = g.reduce((acc, e) => acc.add(e), new THREE.Vector3()).divideScalar(g.length);
+      const sub = split.clone().lerp(c, 0.5).add(randomOffset(rnd, 0.02));
+      const primary = new THREE.QuadraticBezierCurve3(split, split.clone().lerp(sub, 0.5).add(randomOffset(rnd, 0.015)), sub);
+      primaries.push(primary);
+      for (const e of g) {
+        const twig = new THREE.QuadraticBezierCurve3(sub, sub.clone().lerp(e, 0.5).add(randomOffset(rnd, 0.025)), e);
+        twigs.push(twig);
+        const path = new THREE.CurvePath();
+        path.add(trunkPart); path.add(primary); path.add(twig);
+        paths.push({ path, end: e });
+      }
+    }
+    return { fromId, toId, trunk, trunkPart, primaries, twigs, paths, ends, source: a };
   }
 
   const treeGroup = new THREE.Group();
   scene.add(treeGroup);
 
-  const treeFibersMat = makeMaterial(5);
-  treeFibersMat.uniforms.uBase.value = 1.0;
-  treeFibersMat.uniforms.uHi.value = 0;
+  const treeGlowMat = makeMaterial(6);
+  treeGlowMat.uniforms.uBase.value = 1.0;
+  treeGlowMat.uniforms.uHi.value = 0;
 
-  const treePulsesMat = makeMaterial(7);
-  treePulsesMat.uniforms.uBase.value = 1.35;
+  const treePulsesMat = makeMaterial(9);
+  treePulsesMat.uniforms.uBase.value = 1.5;
   treePulsesMat.uniforms.uHi.value = 0;
 
-  const treeSparklesMat = makeMaterial(9);
-  treeSparklesMat.uniforms.uBase.value = 1.5;
+  const treeSparklesMat = makeMaterial(10);
+  treeSparklesMat.uniforms.uBase.value = 1.6;
   treeSparklesMat.uniforms.uHi.value = 0;
 
-  let treeFibers = null;
-  let treePulses = null;
-  let treeSparkles = null;
+  const treeLineMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false });
+
+  let treeLines = null, treeGlow = null, treePulses = null, treeSparkles = null;
   let activePulses = [];
   let tractLabels = [];
   let isLensActive = false;
+  let lensSources = [];
 
   function clearTrees() {
     treeGroup.clear();
-    if (treeFibers) { treeFibers.geometry.dispose(); treeFibers = null; }
-    if (treePulses) { treePulses.geometry.dispose(); treePulses = null; }
-    if (treeSparkles) { treeSparkles.geometry.dispose(); treeSparkles = null; }
+    for (const o of [treeLines, treeGlow, treePulses, treeSparkles]) o?.geometry.dispose();
+    treeLines = treeGlow = treePulses = treeSparkles = null;
     activePulses = [];
     for (const item of tractLabels) item.el.remove();
     tractLabels = [];
   }
 
+  const PULSE_SPEED = 0.11;
   function updateTreePulses(time) {
     if (!treePulses || !activePulses.length) return;
     const posAttr = treePulses.geometry.getAttribute('position');
-    const colAttr = treePulses.geometry.getAttribute('aColor');
     const sizeAttr = treePulses.geometry.getAttribute('aSize');
-    const sparkSizeAttr = treeSparkles?.geometry.getAttribute('aSize');
-    const sparkColAttr = treeSparkles?.geometry.getAttribute('aColor');
-
+    const sparkSize = treeSparkles?.geometry.getAttribute('aSize');
     for (let i = 0; i < activePulses.length; i++) {
       const p = activePulses[i];
-      const t = (time * 0.09 + p.offset) % 1;
+      const t = (time * PULSE_SPEED + p.offset) % 1;
       const pt = p.path.getPoint(t);
       posAttr.setXYZ(i, pt.x, pt.y, pt.z);
-      const isAmb = p.treeState === 'ambient';
-      const dim = isAmb ? 0.35 : 1.0;
-      colAttr.setXYZ(i, p.color.r * dim, p.color.g * dim, p.color.b * dim);
-      sizeAttr.setX(i, isAmb ? 0.85 : 1.3);
-
-      if (sparkSizeAttr) {
-        if (t > 0.95 && !isAmb) {
-          const s = Math.sin(((t - 0.95) / 0.05) * Math.PI);
-          sparkSizeAttr.setX(i, 0.4 + s * 1.4);
-          if (sparkColAttr) {
-            sparkColAttr.setXYZ(i, Math.min(1, p.color.r * (1 + s)), Math.min(1, p.color.g * (1 + s)), Math.min(1, p.color.b * (1 + s)));
-          }
-        } else {
-          sparkSizeAttr.setX(i, 0.0);
-        }
+      // Fade in as it leaves the source, fade out as it releases at the tip.
+      const env = Math.min(1, t / 0.08) * Math.min(1, (1 - t) / 0.06);
+      sizeAttr.setX(i, 1.5 * env);
+      if (sparkSize) {
+        const s = t > 0.9 ? Math.sin(((t - 0.9) / 0.1) * Math.PI) : 0;
+        sparkSize.setX(i, s * 1.8);
       }
     }
-    posAttr.needsUpdate = true;
-    colAttr.needsUpdate = true;
-    sizeAttr.needsUpdate = true;
-    if (sparkSizeAttr) sparkSizeAttr.needsUpdate = true;
-    if (sparkColAttr) sparkColAttr.needsUpdate = true;
+    posAttr.needsUpdate = sizeAttr.needsUpdate = true;
+    if (sparkSize) sparkSize.needsUpdate = true;
   }
 
   function paintLens(colorHex, sources = [], density = {}, isLocalOrFast = false) {
     isLensActive = true;
+    lensSources = sources.filter((id) => recs.has(id));
     const lensColor = new THREE.Color(colorHex);
     focusIds = [...sources];
 
-    // Cross-fade cortex highlight mask
     aHiPrev.array.set(aHi.array);
     aHiColorPrev.array.set(aHiColor.array);
     aHi.array.fill(0);
     aHiColor.array.set(cBase);
 
+    // Receptor glow stays soft so the fibres remain the brightest thing on screen.
+    const glow = (d) => (isLocalOrFast ? 0.25 + 0.6 * d : 0.1 + 0.35 * d);
+    const paintRegion = (r, val) => {
+      for (let i = 0; i < nC; i++) {
+        if (!r.mask[i] || aHi.array[i] >= val) continue;
+        aHi.array[i] = val;
+        aHiColor.array[i * 3] = lensColor.r; aHiColor.array[i * 3 + 1] = lensColor.g; aHiColor.array[i * 3 + 2] = lensColor.b;
+      }
+    };
     for (const [id, d] of Object.entries(density)) {
       const r = recs.get(id);
-      if (r?.kind === 'region') {
-        const val = 0.25 + 0.75 * Math.max(0, Math.min(1, d));
-        for (let i = 0; i < nC; i++) {
-          if (!r.mask[i] || aHi.array[i] >= val) continue;
-          aHi.array[i] = val;
-          aHiColor.array[i * 3] = lensColor.r;
-          aHiColor.array[i * 3 + 1] = lensColor.g;
-          aHiColor.array[i * 3 + 2] = lensColor.b;
-        }
-      }
+      if (r?.kind === 'region') paintRegion(r, glow(Math.max(0, Math.min(1, d))));
     }
-
     for (const id of sources) {
       const r = recs.get(id);
-      if (r?.kind === 'region') {
-        for (let i = 0; i < nC; i++) {
-          if (!r.mask[i]) continue;
-          aHi.array[i] = 1.0;
-          aHiColor.array[i * 3] = lensColor.r;
-          aHiColor.array[i * 3 + 1] = lensColor.g;
-          aHiColor.array[i * 3 + 2] = lensColor.b;
-        }
-      }
+      if (r?.kind === 'region') paintRegion(r, 1);
     }
 
     aHi.needsUpdate = aHiPrev.needsUpdate = aHiColor.needsUpdate = aHiColorPrev.needsUpdate = true;
     cortexMat.uniforms.uMix.value = 0;
-    cortexRec.base = 0.08;
+    cortexRec.base = 0.1;
     cortexRec.hi = 1.0;
     cortexRec.activity = isLocalOrFast ? 0.6 : (sources.some((id) => recs.get(id)?.kind === 'region') ? 1.0 : 0.0);
 
@@ -817,42 +809,29 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
 
       const isSource = sources.includes(r.id);
       const d = density[r.id];
-      const isTarget = d !== undefined;
-
+      if (isSource || d !== undefined) {
+        curHi.array.set(tintArray(r.obj.geometry.getAttribute('position').count, colorHex, 0.06));
+        curHi.needsUpdate = true;
+      }
       if (isSource) {
-        const cols = tintArray(r.obj.geometry.getAttribute('position').count, colorHex, 0.06);
-        curHi.array.set(cols);
-        curHi.needsUpdate = true;
-        r.base = 0.12;
-        r.hi = 1.0;
-        r.activity = 1.0;
-      } else if (isTarget) {
-        const cols = tintArray(r.obj.geometry.getAttribute('position').count, colorHex, 0.06);
-        curHi.array.set(cols);
-        curHi.needsUpdate = true;
-        r.base = 0.07;
-        r.hi = 0.2 + 0.6 * Math.max(0, Math.min(1, d));
-        r.activity = isLocalOrFast ? 0.6 : 0.0;
+        r.base = 0.1; r.hi = 1.25; r.activity = 1.0;
+      } else if (d !== undefined) {
+        r.base = 0.05; r.hi = glow(Math.max(0, Math.min(1, d))); r.activity = isLocalOrFast ? 0.6 : 0.0;
       } else {
-        r.base = 0.07;
-        r.hi = 0.0;
-        r.activity = 0.0;
+        r.base = 0.08; r.hi = 0; r.activity = 0;
       }
     }
 
     for (const r of anchorRecs) {
-      r.base = 0;
-      r.hi = 0;
-      r.activity = 0;
-      r.obj.visible = false;
+      r.base = 0; r.hi = 0; r.activity = 0; r.obj.visible = false;
     }
-
     applySlice();
   }
 
   function restoreLens() {
     if (!isLensActive) return;
     isLensActive = false;
+    lensSources = [];
     clearTrees();
 
     for (const r of deepRecs) {
@@ -864,9 +843,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
         curHi.needsUpdate = prevHi.needsUpdate = true;
       }
       r.mat.uniforms.uMix.value = 1;
-      r.base = 0.4;
-      r.hi = 0;
-      r.activity = 0;
+      r.base = 0.4; r.hi = 0; r.activity = 0;
     }
 
     aHiPrev.array.set(aHi.array);
@@ -875,145 +852,115 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     aHiColor.array.set(cBase);
     aHi.needsUpdate = aHiPrev.needsUpdate = aHiColor.needsUpdate = aHiColorPrev.needsUpdate = true;
     cortexMat.uniforms.uMix.value = 0;
-    cortexRec.base = 0.42;
-    cortexRec.hi = 0;
-    cortexRec.activity = 0;
+    cortexRec.base = 0.42; cortexRec.hi = 0; cortexRec.activity = 0;
     focusIds = [];
-
     applySlice();
   }
 
+  // Brightness of each fibre level, per tract state. 'off' tracts are not drawn at all.
+  const FIBRE = { on: { trunk: 0.95, primary: 0.75, twig: 0.5, glow: 0.55 }, ambient: { trunk: 0.16, primary: 0.12, twig: 0.08, glow: 0.08 } };
+
+  let lastChemConfig = null, lastChemSide = 0;
   function showChemical(config) {
-    if (!config) {
-      restoreLens();
-      return;
-    }
+    lastChemConfig = config;
+    lastChemSide = visibleSide();
+    if (!config) { restoreLens(); return; }
     const { color, sources = [], density = {}, tracts = [], group } = config;
     const isLocalOrFast = group === 'fast' || (tracts.length > 0 && tracts.every((t) => t.local));
 
     paintLens(color, sources, density, isLocalOrFast);
     clearTrees();
+    if (isLocalOrFast || !tracts.length) return;
 
-    if (!isLocalOrFast && tracts.length) {
-      const rnd = mulberry32(42);
-      const lensColor = new THREE.Color(color);
-      const trees = [];
-      let targetCount = 0;
-      for (const t of tracts) {
-        if (t.local) continue;
-        const targets = Array.isArray(t.to) ? t.to : [t.to];
-        targetCount += targets.length;
-      }
-      const branchesPerTree = Math.min(16, Math.max(6, Math.floor((10000 - targetCount * 140) / Math.max(1, targetCount * 22))));
+    const s = lastChemSide;
+    const rnd = mulberry32(42);
+    const lensColor = new THREE.Color(color);
+    const linePos = [], lineCol = [];
+    const glowPos = [], glowCol = [], glowSize = [];
+    const pulsePos = [], pulseCol = [], pulseSize = [];
+    const sparkPos = [], sparkCol = [], sparkSize = [];
 
-      for (const t of tracts) {
-        if (t.local) continue;
-        const targets = Array.isArray(t.to) ? t.to : [t.to];
-        const tractColor = t.color ? new THREE.Color(t.color) : lensColor;
-        for (const toId of targets) {
-          if (!recs.has(t.from) || !recs.has(toId)) continue;
-          const tree = buildTree(t.from, toId, {
-            branches: branchesPerTree,
-            color: tractColor,
-            state: t.state || 'ambient',
-            rnd,
-          });
-          tree.tract = t;
-          trees.push(tree);
+    const addCurve = (curve, n, k, c, jitter = 0) => {
+      let prev = null;
+      for (let i = 0; i <= n; i++) {
+        const p = curve.getPoint(i / n);
+        if (jitter) p.add(randomOffset(rnd, jitter));
+        if (prev) {
+          linePos.push(prev.x, prev.y, prev.z, p.x, p.y, p.z);
+          lineCol.push(c.r * k, c.g * k, c.b * k, c.r * k, c.g * k, c.b * k);
         }
+        prev = p;
       }
+    };
+    const addGlow = (curve, n, k, c, size) => {
+      for (let i = 0; i <= n; i++) {
+        const p = curve.getPoint(i / n);
+        glowPos.push(p.x, p.y, p.z);
+        glowCol.push(c.r * k, c.g * k, c.b * k);
+        glowSize.push(size * (0.8 + rnd() * 0.4));
+      }
+    };
 
-      const fiberPos = [], fiberCol = [], fiberSize = [];
-      const pulsePos = [], pulseCol = [], pulseSize = [];
-      const sparkPos = [], sparkCol = [], sparkSize = [];
-      const labelDone = new Set();
+    for (const t of tracts) {
+      if (t.local || t.state === 'off' || !recs.has(t.from)) continue;
+      const look = FIBRE[t.state] || FIBRE.ambient;
+      const c = t.color ? new THREE.Color(t.color) : lensColor;
+      const targets = (Array.isArray(t.to) ? t.to : [t.to]).filter((id) => recs.has(id));
+      const branches = Math.max(6, Math.min(12, Math.round(24 / Math.max(1, targets.length))));
+      const tractEnds = [];
+      for (const toId of targets) {
+        const tree = buildTree(t.from, toId, { branches, rnd, s });
+        // The trunk is a bundle of a few strands, so it reads as a thick nerve leaving the source.
+        for (let b = 0; b < 4; b++) addCurve(tree.trunkPart, 40, look.trunk * (b ? 0.6 : 1), c, b ? 0.004 : 0);
+        for (const pc of tree.primaries) addCurve(pc, 16, look.primary, c);
+        for (const tw of tree.twigs) addCurve(tw, 14, look.twig, c);
+        addGlow(tree.trunkPart, 48, look.glow, c, 0.9);
+        for (const pc of tree.primaries) addGlow(pc, 10, look.glow * 0.8, c, 0.7);
+        for (const tw of tree.twigs) addGlow(tw, 8, look.glow * 0.6, c, 0.5);
+        tractEnds.push(...tree.ends);
 
-      for (const tree of trees) {
-        const k = tree.state === 'on' ? 0.35 : tree.state === 'ambient' ? 0.15 : 0;
-        for (let i = 0; i < 140; i++) {
-          const pt = tree.trunk.getPoint((i / 139) * 0.72);
-          fiberPos.push(pt.x, pt.y, pt.z);
-          fiberCol.push(tree.color.r * k, tree.color.g * k, tree.color.b * k);
-          fiberSize.push(0.25 + rnd() * 0.2);
-        }
-        for (const p of tree.paths) {
-          for (let j = 1; j <= 22; j++) {
-            const pt = p.branch.getPoint(j / 22);
-            fiberPos.push(pt.x, pt.y, pt.z);
-            fiberCol.push(tree.color.r * k, tree.color.g * k, tree.color.b * k);
-            fiberSize.push(0.25 + rnd() * 0.2);
-          }
-          if (tree.state !== 'off') {
-            activePulses.push({
-              path: p.path,
-              offset: rnd(),
-              treeState: tree.state,
-              color: tree.color,
-              end: p.end,
-            });
-            pulsePos.push(0, 0, 0);
-            pulseCol.push(tree.color.r, tree.color.g, tree.color.b);
-            pulseSize.push(1);
-
-            sparkPos.push(p.end.x, p.end.y, p.end.z);
-            sparkCol.push(tree.color.r, tree.color.g, tree.color.b);
-            sparkSize.push(0);
+        if (t.state === 'on') {
+          for (const p of tree.paths) {
+            for (let q = 0; q < 2; q++) {
+              activePulses.push({ path: p.path, offset: rnd() });
+              pulsePos.push(0, 0, 0); pulseCol.push(c.r, c.g, c.b); pulseSize.push(0);
+              sparkPos.push(p.end.x, p.end.y, p.end.z); sparkCol.push(c.r, c.g, c.b); sparkSize.push(0);
+            }
           }
         }
-
-        if (tree.state === 'on' && tree.tract && !labelDone.has(tree.tract.id)) {
-          labelDone.add(tree.tract.id);
-          const midPos = tree.trunk.getPoint(0.36);
-          const el = document.createElement('div');
-          el.className = 'anchor-label tract-label';
-          el.style.setProperty('--c', color);
-          el.innerHTML = `<i></i><span>${tree.tract.name || tree.tract.label || tree.tract.id}</span>`;
-          labelsEl?.appendChild(el);
-          tractLabels.push({ el, pos: midPos });
-        }
       }
 
-      if (fiberPos.length) {
-        const gFibers = makeGeometry(
-          new Float32Array(fiberPos),
-          new Float32Array(fiberSize),
-          new Float32Array(fiberCol),
-          new Float32Array(fiberCol)
-        );
-        treeFibers = new THREE.Points(gFibers, treeFibersMat);
-        treeFibers.frustumCulled = false;
-        treeGroup.add(treeFibers);
-      }
-
-      if (pulsePos.length) {
-        const gPulses = makeGeometry(
-          new Float32Array(pulsePos),
-          new Float32Array(pulseSize),
-          new Float32Array(pulseCol),
-          new Float32Array(pulseCol)
-        );
-        gPulses.getAttribute('position').setUsage(THREE.DynamicDrawUsage);
-        gPulses.getAttribute('aColor').setUsage(THREE.DynamicDrawUsage);
-        gPulses.getAttribute('aSize').setUsage(THREE.DynamicDrawUsage);
-        treePulses = new THREE.Points(gPulses, treePulsesMat);
-        treePulses.frustumCulled = false;
-        treeGroup.add(treePulses);
-      }
-
-      if (sparkPos.length) {
-        const gSparkles = makeGeometry(
-          new Float32Array(sparkPos),
-          new Float32Array(sparkSize),
-          new Float32Array(sparkCol),
-          new Float32Array(sparkCol)
-        );
-        gSparkles.getAttribute('aSize').setUsage(THREE.DynamicDrawUsage);
-        gSparkles.getAttribute('aColor').setUsage(THREE.DynamicDrawUsage);
-        treeSparkles = new THREE.Points(gSparkles, treeSparklesMat);
-        treeSparkles.frustumCulled = false;
-        treeGroup.add(treeSparkles);
+      if (t.state === 'on' && tractEnds.length && labelsEl) {
+        const pos = tractEnds.reduce((acc, e) => acc.add(e), new THREE.Vector3()).divideScalar(tractEnds.length);
+        const el = document.createElement('div');
+        el.className = 'anchor-label tract-label';
+        el.style.setProperty('--c', color);
+        el.innerHTML = `<i></i><span>${t.name || t.label || t.id}</span>`;
+        labelsEl.appendChild(el);
+        tractLabels.push({ el, pos });
       }
     }
+
+    if (linePos.length) {
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.Float32BufferAttribute(linePos, 3));
+      g.setAttribute('color', new THREE.Float32BufferAttribute(lineCol, 3));
+      treeLines = new THREE.LineSegments(g, treeLineMat);
+      treeLines.frustumCulled = false;
+      treeGroup.add(treeLines);
+    }
+    const addPoints = (pos, size, col, mat, dynamic) => {
+      if (!pos.length) return null;
+      const g = makeGeometry(new Float32Array(pos), new Float32Array(size), new Float32Array(col), new Float32Array(col));
+      if (dynamic) for (const a of ['position', 'aSize']) g.getAttribute(a).setUsage(THREE.DynamicDrawUsage);
+      const o = new THREE.Points(g, mat);
+      o.frustumCulled = false;
+      treeGroup.add(o);
+      return o;
+    };
+    treeGlow = addPoints(glowPos, glowSize, glowCol, treeGlowMat, false);
+    treePulses = addPoints(pulsePos, pulseSize, pulseCol, treePulsesMat, true);
+    treeSparkles = addPoints(sparkPos, sparkSize, sparkCol, treeSparklesMat, true);
   }
 
   // ------------------------------------------------------------ camera
@@ -1161,16 +1108,9 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   let userSlice = false, forcedSlice = false;
   function applySlice() {
     const v = userSlice || forcedSlice ? 1 : 0;
-    if (isLensActive) {
-      cortexMat.uniforms.uClip.value = v;
-      deepRecs.forEach((r) => { r.mat.uniforms.uClip.value = 0; });
-      anchorRecs.forEach((r) => { r.mat.uniforms.uClip.value = 0; });
-      treeFibersMat.uniforms.uClip.value = 0;
-      treePulsesMat.uniforms.uClip.value = 0;
-      treeSparklesMat.uniforms.uClip.value = 0;
-    } else {
-      materials.forEach((m) => { m.uniforms.uClip.value = v; });
-    }
+    materials.forEach((m) => { m.uniforms.uClip.value = v; });
+    // Fibre trees are built on the visible half, so rebuild them if the slice flips sides.
+    if (isLensActive && lastChemConfig && lastChemSide !== visibleSide()) showChemical(lastChemConfig);
   }
 
   // ------------------------------------------------------------ picking
@@ -1268,13 +1208,20 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       el.style.transform = `translate(${((tmpV.x + 1) / 2) * w}px, ${((1 - tmpV.y) / 2) * h + 30}px) translate(-50%, 0)`;
       el.style.opacity = vis && !activeCellObj && r.hi > 0.05 ? String(Math.min(1, r.hi)) : '0';
     }
-    for (const { pos, el } of tractLabels) {
-      tmpV.copy(pos).project(camera);
-      const vis = tmpV.z < 1;
-      const lx = ((tmpV.x + 1) / 2) * w;
-      const ly = ((1 - tmpV.y) / 2) * h;
-      el.style.transform = `translate(${lx}px, ${ly}px) translate(-50%, -50%)`;
-      el.style.opacity = vis && !activeCellObj ? '1' : '0';
+    // Tract labels sit over their targets. Push apart any that would overlap.
+    const placed = tractLabels.map((t) => {
+      tmpV.copy(t.pos).project(camera);
+      return { ...t, vis: tmpV.z < 1, x: ((tmpV.x + 1) / 2) * w, y: ((1 - tmpV.y) / 2) * h - 18, hw: (t.el.offsetWidth || 120) / 2 };
+    }).sort((a, b) => a.y - b.y);
+    for (let i = 1; i < placed.length; i++) {
+      for (let j = 0; j < i; j++) {
+        const a = placed[j], b = placed[i];
+        if (Math.abs(a.x - b.x) < a.hw + b.hw + 6 && b.y - a.y < 28) b.y = a.y + 28;
+      }
+    }
+    for (const t of placed) {
+      t.el.style.transform = `translate(${t.x}px, ${t.y}px) translate(-50%, -50%)`;
+      t.el.style.opacity = t.vis && !activeCellObj ? '1' : '0';
     }
     for (const { pos, el } of cellLandmarkLabels) {
       tmpV.copy(pos).project(camera);
@@ -1350,7 +1297,8 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     approach(cortexMat.uniforms.uActivity, cortexRec.activity, k);
     for (const r of [...deepRecs, ...anchorRecs]) {
       approach(r.mat.uniforms.uBase, r.base, k);
-      approach(r.mat.uniforms.uHi, r.hi, k);
+      const beat = isLensActive && lensSources.includes(r.id) ? 0.3 * Math.sin(time * 2.4) : 0;
+      approach(r.mat.uniforms.uHi, r.hi + beat, k);
       approach(r.mat.uniforms.uActivity, r.activity, k);
       approach(r.mat.uniforms.uMix, 1, 1 - Math.exp(-dt * 4));
       approach(r.mat.uniforms.uHover, hoverId === r.id && !focusIds.includes(r.id) ? 0.35 : 0, 1 - Math.exp(-dt * 10));

@@ -207,7 +207,7 @@ function apply() {
     const tractList = (chem.tracts || []).map((t) => {
       let state = 'ambient';
       if (r.tab === 'tracts') {
-        if (r.sub) state = (t.id === r.sub ? 'on' : 'ambient');
+        if (r.sub) state = (t.id === r.sub ? 'on' : 'off');
         else state = 'on';
       } else if (r.tab === 'overview') {
         state = 'on';
@@ -224,6 +224,10 @@ function apply() {
       };
     });
 
+    // Slice first: the fibre trees are built on whichever half is visible.
+    scene.forceSlice(chem.group === 'modulator');
+    scene.setSpin(false);
+    syncToolbar();
     scene.showChemical({
       color: chem.color,
       sources: chem.madeIn || [],
@@ -232,20 +236,19 @@ function apply() {
       group: chem.group,
     });
     scene.setArcs([]);
-
-    scene.forceSlice(chem.group === 'modulator');
+    const chemView = chem.group === 'modulator' ? 'medial' : 'left';
 
     if (r.tab === 'tracts' && r.sub) {
       const activeTract = (chem.tracts || []).find((t) => t.id === r.sub);
       const targets = activeTract ? [activeTract.from, ...(activeTract.to || [])] : (chem.madeIn || []);
-      fly(targets, 'left', `chem:${chem.id}:${r.sub}`);
+      fly(targets, chemView, `chem:${chem.id}:${r.sub}`);
     } else if (r.tab === 'tracts' || r.tab === 'overview') {
       const allTargets = [...(chem.madeIn || [])];
       for (const t of chem.tracts || []) {
         if (t.from) allTargets.push(t.from);
         for (const tid of (t.to || [])) allTargets.push(tid);
       }
-      fly([...new Set(allTargets)], 'left', `chem:${chem.id}:all`);
+      fly([...new Set(allTargets)], chemView, `chem:${chem.id}:all`);
     } else {
       if (!state.flown.startsWith(`chem:${chem.id}`)) {
         const allTargets = [...(chem.madeIn || [])];
@@ -253,7 +256,7 @@ function apply() {
           if (t.from) allTargets.push(t.from);
           for (const tid of (t.to || [])) allTargets.push(tid);
         }
-        fly([...new Set(allTargets)], 'left', `chem:${chem.id}:all`);
+        fly([...new Set(allTargets)], chemView, `chem:${chem.id}:all`);
       }
     }
 
@@ -277,6 +280,8 @@ function apply() {
       scene.forceSlice(false);
       fly(cell.where, 'left', `cell:${cell.id}:lives`);
     } else {
+      scene.setSpin(false);
+      syncToolbar();
       scene.showCell(cell, { fire: r.tab === 'fires' || cellFireActive });
     }
     explainerEl.innerHTML = renderCell(cell, r.tab, cellFireActive);
@@ -489,9 +494,7 @@ toolbar.addEventListener('click', (e) => {
   if (t === 'reset') {
     state.flown = '';
     const type = state.route.type;
-    if (type === 'chem') location.hash = '#/chem';
-    else if (type === 'cell') location.hash = '#/cell';
-    else if ((type === 'home' || type === 's') && location.hash && location.hash !== '#/') location.hash = '#/';
+    if ((type === 'home' || type === 's') && location.hash && location.hash !== '#/') location.hash = '#/';
     else apply();
   }
   if (t === 'slice') scene.setSlice(!scene.slice);
