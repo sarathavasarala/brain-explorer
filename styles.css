@@ -350,6 +350,11 @@ strong { font-weight: 500; color: #fff; }
   transition: text-decoration-color 0.2s;
 }
 .xref:hover { text-decoration-color: var(--c, var(--accent)); }
+.xref.term {
+  text-decoration-style: dotted;
+  text-underline-offset: 3.5px;
+  cursor: pointer;
+}
 
 .todo {
   font-family: var(--display) !important; font-size: 13px !important; line-height: 1.5 !important;
@@ -462,11 +467,11 @@ kbd {
 
 /* tooltip */
 .tip {
-  position: fixed; left: 0; top: 0; z-index: 20; max-width: 290px; pointer-events: none;
-  padding: 11px 14px; border-radius: 12px;
+  position: fixed; left: 0; top: 0; z-index: 20; max-width: 350px; pointer-events: none;
+  padding: 12px 15px; border-radius: 12px;
   background: #121628; border: 1px solid var(--line-2);
   box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-  font-size: 13px; line-height: 1.5; color: var(--ink-2);
+  font-size: 13px; line-height: 1.55; color: var(--ink-2);
   opacity: 0; transition: opacity 0.15s;
 }
 .tip.is-on { opacity: 1; }

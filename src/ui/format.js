@@ -7,8 +7,15 @@ import { glossary, resolveRef } from '../content/index.js';
 const lookup = new Map(Object.entries(glossary).map(([k, v]) => [k.toLowerCase(), { term: k, def: v }]));
 
 export function findTerm(t) {
+  if (!t) return undefined;
   const k = t.toLowerCase().trim();
-  return lookup.get(k) || lookup.get(k.replace(/s$/, '')) || lookup.get(k.replace(/es$/, ''));
+  const unhyphen = k.replace(/-/g, ' ');
+  return lookup.get(k)
+    || lookup.get(unhyphen)
+    || lookup.get(k.replace(/s$/, ''))
+    || lookup.get(unhyphen.replace(/s$/, ''))
+    || lookup.get(k.replace(/es$/, ''))
+    || lookup.get(unhyphen.replace(/es$/, ''));
 }
 
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -29,9 +36,12 @@ export function fmt(text = '') {
   });
   out = out.replace(/\{\{([^}]+)\}\}/g, (_, inner) => {
     const [id, shown] = inner.split('|');
-    const ref = resolveRef(id.trim());
+    const rawId = id.trim();
+    const ref = resolveRef(rawId);
     if (!ref) return shown || id;
-    return `<a class="xref xref-${ref.kind}" href="${ref.href}" style="--c:${ref.color}">${shown || ref.name}</a>`;
+    const g = findTerm(ref.name) || findTerm(ref.id) || findTerm(rawId);
+    const termAttr = g ? ` class="term xref xref-${ref.kind}" data-term="${esc(g.term)}"` : ` class="xref xref-${ref.kind}"`;
+    return `<a${termAttr} href="${ref.href}" style="--c:${ref.color}">${shown || ref.name}</a>`;
   });
   return out;
 }
