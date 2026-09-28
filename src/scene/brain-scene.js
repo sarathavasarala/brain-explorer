@@ -1082,6 +1082,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     }
 
     if (isLensActive) restoreLens();
+    setHover(null, 0, 0);
     const same = activeCellObj && activeCellEntry?.id === cellEntry.id;
     const at = !same && from && zoomPointOf(from);
     brainGlobalTarget = at ? 1.0 : 0.0;
