@@ -1029,8 +1029,51 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     }
   }
 
-  function showCell(cellEntry, { fire = false } = {}) {
+  // Zoom between a brain part and a cell. 'in': fly into the part, then the brain fades and the
+  // cell grows out of that spot. 'out': the cell shrinks back into the part as the brain returns.
+  let zoom = null;
+  const ZOOM_IN_FLY = 0.8, ZOOM_GROW = 1.0, ZOOM_OUT = 0.8;
+  const ORIGIN = new THREE.Vector3();
+
+  function zoomPointOf(id) {
+    const r = recs.get(id);
+    if (!r) return null;
+    return sideCenterOf(id, visibleSide()) || r.center.clone();
+  }
+
+  function stepZoom(dt) {
+    if (!zoom) return;
+    zoom.t += dt;
+    const o = zoom.cell.obj;
+    if (zoom.dir === 'in') {
+      if (zoom.stage === 'fly' && zoom.t >= ZOOM_IN_FLY) {
+        zoom.stage = 'grow'; zoom.t = 0;
+        brainGlobalTarget = 0.0;
+        o.visible = true;
+        flyToTarget(ORIGIN, 2.85, 'front', ZOOM_GROW);
+      }
+      if (zoom.stage === 'grow') {
+        const e = easeOutExpo(Math.min(zoom.t / ZOOM_GROW, 1));
+        o.position.lerpVectors(zoom.at, ORIGIN, e);
+        o.scale.setScalar(0.03 + 0.97 * e);
+        if (zoom.t >= ZOOM_GROW) { o.position.set(0, 0, 0); o.scale.setScalar(1); zoom = null; }
+      }
+    } else {
+      const e = Math.min(zoom.t / ZOOM_OUT, 1);
+      const q = e * e;
+      o.position.lerpVectors(ORIGIN, zoom.at, q);
+      o.scale.setScalar(1 - 0.97 * q);
+      zoom.cell.mat.uniforms.uGlobal.value = 1 - q;
+      if (e >= 1) { o.visible = false; o.position.set(0, 0, 0); o.scale.setScalar(1); zoom = null; }
+    }
+  }
+
+  function showCell(cellEntry, { fire = false, from = null, to = null } = {}) {
     if (!cellEntry) {
+      const leaving = activeCellObj;
+      const at = to && zoomPointOf(to);
+      if (leaving && at) zoom = { dir: 'out', t: 0, cell: leaving, at };
+      else if (zoom?.dir === 'in') { zoom.cell.obj.position.set(0, 0, 0); zoom.cell.obj.scale.setScalar(1); zoom = null; }
       activeCellEntry = null;
       activeCellObj = null;
       brainGlobalTarget = 1.0;
@@ -1039,7 +1082,9 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     }
 
     if (isLensActive) restoreLens();
-    brainGlobalTarget = 0.0;
+    const same = activeCellObj && activeCellEntry?.id === cellEntry.id;
+    const at = !same && from && zoomPointOf(from);
+    brainGlobalTarget = at ? 1.0 : 0.0;
     activeCellEntry = cellEntry;
 
     let cached = cellCache.get(cellEntry.id);
@@ -1096,10 +1141,25 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       cached.mat.uniforms.uTx.value.set(txColor);
     }
     activeCellObj = cached;
-
-    flyToTarget(new THREE.Vector3(0, 0, 0), 2.85, 'front');
     controls.autoRotate = false;
     setupCellLabels(cellEntry, cached.landmarks);
+    if (same) return;
+
+    if (at) {
+      // Light the part and fly into it first; stepZoom() takes over from there.
+      focus([from], { activity: true });
+      cached.obj.visible = false;
+      cached.obj.position.copy(at);
+      cached.obj.scale.setScalar(0.03);
+      const view = recs.get(from)?.structure?.view || 'left';
+      flyToTarget(at, 0.7, view, ZOOM_IN_FLY);
+      zoom = { dir: 'in', stage: 'fly', t: 0, cell: cached, at };
+    } else {
+      zoom = null;
+      cached.obj.position.set(0, 0, 0);
+      cached.obj.scale.setScalar(1);
+      flyToTarget(ORIGIN, 2.85, 'front');
+    }
   }
 
   function setCellFire(on) {
@@ -1214,7 +1274,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     }
     // Tract labels sit just above their targets; cell labels sit on their landmark.
     spreadLabels(tractLabels, w, h, -18, !activeCellObj);
-    spreadLabels(cellLandmarkLabels, w, h, 0, !!activeCellObj);
+    spreadLabels(cellLandmarkLabels, w, h, 0, !!activeCellObj && !zoom);
   }
 
   // Project labels to the screen and push down any that would overlap an earlier one.
@@ -1277,6 +1337,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       pendingPick = null;
     }
 
+    stepZoom(dt);
     brainGlobalCurrent += (brainGlobalTarget - brainGlobalCurrent) * (1 - Math.exp(-dt * 4));
     for (const m of brainMaterials) {
       m.uniforms.uGlobal.value = brainGlobalCurrent;
@@ -1286,7 +1347,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
         c.mat.uniforms.uGlobal.value += (1.0 - c.mat.uniforms.uGlobal.value) * (1 - Math.exp(-dt * 5));
         c.mat.uniforms.uTime.value = time;
         c.mat.uniforms.uPhase.value = (time / 3.0) % 1.0;
-      } else {
+      } else if (zoom?.dir !== 'out' || zoom.cell !== c) {
         c.mat.uniforms.uGlobal.value += (0.0 - c.mat.uniforms.uGlobal.value) * (1 - Math.exp(-dt * 5));
         if (c.mat.uniforms.uGlobal.value < 0.01) c.obj.visible = false;
       }

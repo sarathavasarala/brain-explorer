@@ -178,7 +178,14 @@ function apply() {
   }
 
   if (r.type !== 'cell' || r.tab === 'lives') {
-    scene.showCell(null);
+    // Leaving a cell for its home in the brain (or for the part you came from): shrink back into it.
+    let to = null;
+    if (prev.type === 'cell' && prev.tab !== 'lives') {
+      const leaving = cellById.get(prev.id);
+      if (r.type === 's' && leaving?.where?.includes(r.id)) to = r.id;
+      else if (r.type === 'cell' && r.id === prev.id) to = leaving?.where?.[0];
+    }
+    scene.showCell(null, { to });
   }
   if (r.type !== 'cell' || prev.id !== r.id) {
     cellFireActive = (r.type === 'cell' && r.tab === 'fires');
@@ -282,7 +289,11 @@ function apply() {
     } else {
       scene.setSpin(false);
       syncToolbar();
-      scene.showCell(cell, { fire: r.tab === 'fires' || cellFireActive });
+      // Arriving from a part (or from this cell's "where it lives" view): zoom in from that part.
+      let from = null;
+      if (prev.type === 's' && cell.where?.includes(prev.id)) from = prev.id;
+      else if (prev.type === 'cell' && prev.id === cell.id && prev.tab === 'lives') from = cell.where?.[0];
+      scene.showCell(cell, { fire: r.tab === 'fires' || cellFireActive, from });
     }
     explainerEl.innerHTML = renderCell(cell, r.tab, cellFireActive);
     if (prev.type !== 'cell' || prev.id !== r.id) explainerEl.scrollTop = 0;
