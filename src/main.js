@@ -615,6 +615,7 @@ explainerEl.addEventListener('click', (e) => {
 
 // Glossary tooltips
 function showTip(el) {
+  if (!tipEl || !el) return;
   const g = findTerm(el.dataset.term);
   if (!g) return;
   const title = g.term.charAt(0).toUpperCase() + g.term.slice(1);
@@ -628,10 +629,26 @@ function showTip(el) {
   const top = above > 8 ? above : Math.min(window.innerHeight - h - 12, r.bottom + 10);
   tipEl.style.transform = `translate(${left}px, ${top}px)`;
 }
-document.addEventListener('mouseover', (e) => { const t = e.target.closest('.term'); if (t) showTip(t); });
-document.addEventListener('mouseout', (e) => { if (e.target.closest('.term')) tipEl.classList.remove('is-on'); });
-document.addEventListener('focusin', (e) => { const t = e.target.closest('.term'); if (t) showTip(t); });
-document.addEventListener('focusout', () => tipEl.classList.remove('is-on'));
+document.addEventListener('mouseover', (e) => {
+  const t = e.target.closest('.term');
+  if (t) showTip(t);
+});
+document.addEventListener('mouseout', (e) => {
+  const t = e.target.closest('.term');
+  if (t && !t.contains(e.relatedTarget)) {
+    tipEl.classList.remove('is-on');
+  }
+});
+document.addEventListener('focusin', (e) => {
+  const t = e.target.closest('.term');
+  if (t) showTip(t);
+});
+document.addEventListener('focusout', (e) => {
+  const t = e.target.closest('.term');
+  if (t && !t.contains(e.relatedTarget)) {
+    tipEl.classList.remove('is-on');
+  }
+});
 window.addEventListener('scroll', () => tipEl.classList.remove('is-on'), { passive: true });
 explainerEl.addEventListener('scroll', () => tipEl.classList.remove('is-on'), { passive: true });
 

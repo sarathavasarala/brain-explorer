@@ -212,6 +212,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # 127.0.0.1 still sends its own name in the Host header.
         return (self.headers.get('Host') or '').split(':')[0] in ('localhost', '127.0.0.1')
 
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
+        super().end_headers()
+
     def send_head(self):
         # Serve the app and nothing else: no .env, .git, server.py or tools.
         path = urllib.parse.unquote(urllib.parse.urlparse(self.path).path)

@@ -351,9 +351,14 @@ strong { font-weight: 500; color: #fff; }
 }
 .xref:hover { text-decoration-color: var(--c, var(--accent)); }
 .xref.term {
-  text-decoration-style: dotted;
-  text-underline-offset: 3.5px;
-  cursor: pointer;
+  text-decoration: underline dotted;
+  text-decoration-color: color-mix(in oklab, var(--c, var(--accent)) 65%, white);
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1.5px;
+  cursor: help;
+}
+.xref.term:hover {
+  text-decoration-color: var(--c, var(--accent));
 }
 
 .todo {
