@@ -1,0 +1,135 @@
+export default [
+  {
+    id: 'astrocyte',
+    name: 'Astrocyte',
+    group: 'glia',
+    color: '#2dd4bf',
+    tagline: 'The star-shaped guardians feeding neurons, buffering ions, and sculpting synapses.',
+    analogy: 'The city utility workers maintaining power lines, water pipes, and clean streets so downtown offices can run smoothly.',
+    transmitter: null,
+    where: ['prefrontal-cortex', 'hippocampus', 'cerebellum'],
+    size: 'About 10 to 20 micrometres (0.015 mm) across the cell body',
+    morph: { style: 'astrocyte', seed: 111 },
+    landmarks: ['soma', 'processes', 'vessel'],
+    shape: {
+      text: 'Astrocytes are bushy, star-shaped glial cells that fill the spaces between [[neuron|neurons]] across the whole brain. A central cell body sends out dozens of primary branches that divide into hundreds of thousands of sponge-like leaflets. Specialized end-feet completely wrap blood vessels, helping maintain the blood-brain barrier and regulating local blood flow to hungry neural circuits.',
+      bullets: [
+        'Star-shaped branching tree ending in hundreds of thousands of fine, cloud-like leaflet processes.',
+        'Each astrocyte maintains an exclusive spatial territory that encompasses tens of thousands of [[synapses]].',
+        'Vascular end-feet wrap tightly around capillaries to support the blood-brain barrier.',
+        'Interconnected into a vast collaborative network through microscopic gap junction pores.',
+      ],
+    },
+    fires: {
+      text: 'Astrocytes do not fire electrical action potentials. Instead, they communicate and coordinate support using slow waves of intracellular calcium. When neighboring [[neuron|neurons]] fire intensely, astrocytes detect the chemical spillover and trigger calcium waves that dilate nearby blood vessels and increase sugar delivery.',
+      steps: [
+        '1. Active neurons release [[glutamate]] and energy molecules like ATP into the synaptic gap.',
+        '2. Astrocytic surface [[receptors]] detect these chemical messengers.',
+        '3. Calcium releases from internal storage chambers, spreading through the cell as a slow chemical wave.',
+        '4. The astrocyte releases signaling molecules that dilate adjacent blood vessels, delivering fresh oxygen and glucose.',
+      ],
+    },
+    chem: {
+      text: 'Astrocytes express specialized transporter proteins (EAAT1 and EAAT2) that clear excess [[glutamate]] from the synaptic cleft within milliseconds, converting it safely into glutamine. They also sponge up excess potassium ions to keep neural membranes stable and ready to fire.',
+      receptors: ['mGluR', 'GABA-B'],
+      modulatedBy: ['noradrenaline', 'glutamate'],
+    },
+    breaks: {
+      text: 'When astrocytes fail, the brain loses its chemical garbage collection and ionic stability, causing toxic neurotransmitter buildup.',
+      bullets: [
+        'Failure of astrocytic glutamate cleanup causes excitotoxicity, allowing excess glutamate to overstimulate and kill neurons in stroke.',
+        'Disruption of astrocytic end-feet weakens the blood-brain barrier, allowing harmful bloodstream molecules into brain tissue.',
+        'Reactive astrogliosis forms a dense physical scar after spinal injury, which walls off damage but prevents axon regrowth.',
+      ],
+    },
+  },
+  {
+    id: 'oligodendrocyte',
+    name: 'Oligodendrocyte',
+    group: 'glia',
+    color: '#38bdf8',
+    tagline: 'The living insulators wrapping central axons in high-speed myelin sheaths.',
+    analogy: 'Industrial cable wrappers insulating high-voltage lines in protective, low-loss coating to speed up signal transmission.',
+    transmitter: null,
+    where: ['corpus-callosum', 'spinal-cord'],
+    size: 'About 10 to 15 micrometres (0.012 mm) across the cell body',
+    morph: { style: 'oligodendrocyte', seed: 121 },
+    landmarks: ['soma', 'processes', 'myelin'],
+    shape: {
+      text: 'Oligodendrocytes are the specialized myelin-producing glia of the central nervous system, heavily populating white matter tracts like the {{corpus-callosum}}. A compact cell body extends dozens of slender arms toward neighboring [[axon|axons]]. Each arm flattens into a broad sheet and wraps around an axon up to one hundred times, creating an insulated spiral sheath of [[myelin]].',
+      bullets: [
+        'Small rounded cell body with dense cytoplasm and slender radiating arms.',
+        'A single oligodendrocyte extends 20 to 50 processes, myelinating segments on dozens of different axons.',
+        'Wraps axons in multilayered sheets of fatty membrane that form the brain\'s [[white matter]].',
+        'Leaves small unmyelinated gaps called nodes of Ranvier, where sodium channels concentrate to boost signal speed.',
+      ],
+    },
+    fires: {
+      text: 'Oligodendrocytes do not produce electrical spikes. Instead, they sense electrical traffic passing through the axons they wrap. When an [[axon]] fires frequently during practice or learning, oligodendrocytes respond by thickening the myelin sheath and feeding the hard-working axon energy-rich fuel molecules.',
+      steps: [
+        '1. An axon fires repeated high-frequency action potentials during learning or motor practice.',
+        '2. Potassium ions and [[glutamate]] leaking from active axons stimulate oligodendrocyte [[receptors]].',
+        '3. The oligodendrocyte ramps up protein and lipid production, adding layers to thicken the [[myelin]] sheath.',
+        '4. Specialized transporter pores pump lactate and pyruvate straight into the axon interior to fuel its energy demands.',
+      ],
+    },
+    chem: {
+      text: 'Oligodendrocyte myelin is made of 70 to 80 percent lipids, rich in cholesterol, galactocerebrosides, and myelin basic protein. They express AMPA and NMDA [[receptors]] that monitor axonal [[glutamate]] release, which can make them sensitive to excitotoxic injury when blood flow drops.',
+      receptors: ['AMPA', 'NMDA', 'GABA-A'],
+      modulatedBy: ['glutamate', 'acetylcholine'],
+    },
+    breaks: {
+      text: 'Loss or destruction of oligodendrocytes strips axons of their protective insulation, causing electrical signals to slow down or fail completely.',
+      bullets: [
+        'Multiple sclerosis is an autoimmune condition where immune cells attack oligodendrocytes and myelin, causing vision loss, weakness, and numbness.',
+        'Leukodystrophies are inherited genetic disorders that impair myelin production, leading to progressive loss of neurological function in children.',
+        'Damage to oligodendrocytes from reduced blood flow causes white matter disease and cognitive slowing in older adults.',
+      ],
+    },
+    diagram: 'callosal-fibres',
+  },
+  {
+    id: 'microglia',
+    name: 'Microglia',
+    group: 'glia',
+    color: '#34d399',
+    tagline: 'The mobile immune sentinels and synaptic sculptors of the central nervous system.',
+    analogy: 'Vigilant park rangers patrolling the forest trail, clearing away fallen branches, pruning overgrown bushes, and sounding the alarm at any sign of fire.',
+    transmitter: null,
+    where: ['prefrontal-cortex', 'striatum', 'spinal-cord'],
+    size: 'About 5 to 10 micrometres (0.008 mm) across the cell body',
+    morph: { style: 'microglia', seed: 131 },
+    landmarks: ['soma', 'processes'],
+    shape: {
+      text: 'Microglia are the resident immune cells and housekeepers of the brain. Unlike other brain cells that arise from neural tissue, microglia originate from early embryonic immune cells and migrate into the brain before birth. In their resting state, they feature a small cell body with delicate, branching arms that constantly reach out and retract to scan every corner of their local neighborhood.',
+      bullets: [
+        'Small oval cell body anchored in place while its branching arms stay in continuous motion.',
+        'Delicate branch tips extend and retract rapidly, surveying the entire brain tissue every few hours.',
+        'Transforms within minutes into an amoeba-like scavenger cell upon detecting injury or infection.',
+        'Engulfs dead cellular debris, clears dangerous protein clumps, and prunes away weak [[synapses]].',
+      ],
+    },
+    fires: {
+      text: 'Microglia do not fire action potentials. They maintain an active chemical surveillance watch. When a neighboring [[neuron]] suffers injury or distress, it leaks energy molecules like ATP into the surrounding fluid. Microglia detect this chemical beacon within seconds, extending their branches toward the source to shield the tissue and clear debris.',
+      steps: [
+        '1. Healthy neurons display chemical safety signals to inform microglia that the circuit is sound.',
+        '2. Cellular injury or infection causes sudden leakage of ATP into the extracellular fluid.',
+        '3. Microglial surface [[receptors]] lock onto the ATP gradient and direct rapid branch growth toward the injury.',
+        '4. The microglia engulf damaged cellular material and prune away weak, unused [[synapses]] to keep circuits clean.',
+      ],
+    },
+    chem: {
+      text: 'Microglia are guided by purinergic [[receptors]] (P2Y12) that detect extracellular ATP, immune pattern recognition [[receptors]] that spot bacterial molecules, and complement [[receptors]] that identify weak [[synapses]] tagged for pruning during learning and development.',
+      receptors: ['P2Y12', 'TLR4', 'CR3'],
+      modulatedBy: ['noradrenaline'],
+    },
+    breaks: {
+      text: 'Chronic, uncontrolled microglial activation triggers destructive inflammation and unintended destruction of healthy brain wiring.',
+      bullets: [
+        'Excessive microglial pruning of healthy [[synapses]] in Alzheimer disease accelerates cognitive decline and memory loss.',
+        'Chronic neuroinflammation driven by overactive microglia contributes to ongoing dopamine cell death in Parkinson disease.',
+        'Impaired synaptic pruning by microglia during early childhood development is linked to atypical brain wiring in neurodevelopmental conditions.',
+      ],
+    },
+  },
+];

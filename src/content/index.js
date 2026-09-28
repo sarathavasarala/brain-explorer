@@ -160,5 +160,37 @@ export function validate() {
     }
     scanDeep(w, c);
   }
+
+  const cellIds = new Set();
+  const morphStyles = new Set([
+    'pyramidal', 'stellate', 'purkinje', 'granule', 'basket',
+    'chandelier', 'msn', 'dopamine', 'motor', 'relay',
+    'astrocyte', 'oligodendrocyte', 'microglia',
+  ]);
+
+  for (const c of cells) {
+    const w = `cell "${c.id}"`;
+    if (cellIds.has(c.id)) problems.push(`${w}: duplicate id`);
+    cellIds.add(c.id);
+    if (!c.name) problems.push(`${w}: missing name`);
+    if (!cellGroups.some((g) => g.id === c.group)) problems.push(`${w}: unknown group "${c.group}"`);
+    if (c.transmitter !== null && c.transmitter !== undefined && !chemicals.some((ch) => ch.id === c.transmitter)) {
+      problems.push(`${w}: unknown transmitter "${c.transmitter}"`);
+    }
+    for (const whereId of c.where || []) {
+      if (!known(whereId)) problems.push(`${w}: unknown where structure "${whereId}"`);
+    }
+    if (!c.morph?.style || !morphStyles.has(c.morph.style)) {
+      problems.push(`${w}: unknown morph style "${c.morph?.style}"`);
+    }
+    for (const mod of c.chem?.modulatedBy || []) {
+      if (!chemicals.some((ch) => ch.id === mod)) problems.push(`${w}: unknown modulatedBy chemical "${mod}"`);
+    }
+    if (c.diagram && !diagrams[c.diagram]) {
+      problems.push(`${w}: unknown diagram "${c.diagram}"`);
+    }
+    scanDeep(w, c);
+  }
+
   return problems;
 }

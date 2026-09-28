@@ -5,6 +5,7 @@ import { renderStructure, renderPathway, renderHome } from './ui/explainer.js';
 import { renderAsk } from './ui/ask.js';
 import { renderLibraryShell, renderLibraryBody } from './ui/library.js';
 import { renderChemHome, renderChem } from './ui/chem.js';
+import { renderCellHome, renderCell } from './ui/cell.js';
 import { setStepperStage, toggleStepperPlay, stopStepperPlay, renderSynapseStepper } from './ui/synapse-stepper.js';
 import { ask, cached, normalise } from './services/ask.js';
 import { findTerm, esc } from './ui/format.js';
@@ -24,11 +25,13 @@ if (problems.length) console.warn(`[brain] ${problems.length} content problem(s)
 
 const state = { query: '', libQuery: '', dict: 'parts', route: { type: 'home' }, playing: false, flown: '' };
 let timer = null;
+let cellFireActive = false;
 
 // ---------------------------------------------------------------- scene
 const scene = createBrainScene($('#brain'), {
   structures,
   anchors,
+  chemicals,
   labelsEl: $('#labels'),
   onHover(id, x, y) {
     const s = byId.get(id) || anchors.find((a) => a.id === id);
@@ -174,6 +177,23 @@ function apply() {
     if (lensLegendEl) lensLegendEl.hidden = true;
   }
 
+  if (r.type !== 'cell' || r.tab === 'lives') {
+    scene.showCell(null);
+  }
+  if (r.type !== 'cell' || prev.id !== r.id) {
+    cellFireActive = (r.type === 'cell' && r.tab === 'fires');
+  }
+
+  const stageNoteEl = $('.stage-note');
+  if (stageNoteEl) {
+    if (r.type === 'cell') {
+      const cell = cellById.get(r.id);
+      stageNoteEl.textContent = cell?.size ? `${cell.size}. Procedural morphology.` : 'Shapes are simplified for explanation, not an anatomical atlas.';
+    } else {
+      stageNoteEl.textContent = 'Shapes are simplified for explanation, not an anatomical atlas.';
+    }
+  }
+
   if (r.type === 'home') {
     clearScene('home');
     explainerEl.innerHTML = renderHome();
@@ -246,10 +266,21 @@ function apply() {
     if (prev.type !== 'chem' || prev.id !== r.id) explainerEl.scrollTop = 0;
   } else if (r.type === 'cellhome') {
     clearScene('cellhome');
-    explainerEl.innerHTML = renderCellHomePlaceholder();
+    explainerEl.innerHTML = renderCellHome();
   } else if (r.type === 'cell') {
-    clearScene(r.id);
-    explainerEl.innerHTML = renderCellPlaceholder(r);
+    const cell = cellById.get(r.id);
+    if (!cell) { location.hash = '#/cell'; return; }
+    if (r.tab === 'lives') {
+      scene.showCell(null);
+      scene.focus(cell.where, { activity: true });
+      scene.setArcs([]);
+      scene.forceSlice(false);
+      fly(cell.where, 'left', `cell:${cell.id}:lives`);
+    } else {
+      scene.showCell(cell, { fire: r.tab === 'fires' || cellFireActive });
+    }
+    explainerEl.innerHTML = renderCell(cell, r.tab, cellFireActive);
+    if (prev.type !== 'cell' || prev.id !== r.id) explainerEl.scrollTop = 0;
   } else if (r.type === 's') {
     const s = byId.get(r.id);
     const lv = levels.find((l) => l.id === r.level);
@@ -313,32 +344,6 @@ function applyAsk(r) {
   });
 }
 
-function renderCellHomePlaceholder() {
-  return `<article class="ex">
-    <header class="ex-head">
-      <span class="crumbs">Atlas / Cells</span>
-      <h1 class="ex-title">Brain Cells</h1>
-      <p class="tagline">The individual neurons and glia that build brain circuits.</p>
-    </header>
-    <div class="level">
-      <p>Cell directory coming soon. You will be able to explore 3D neuron morphologies, glia, and cell firing mechanisms.</p>
-    </div>
-  </article>`;
-}
-
-function renderCellPlaceholder(r) {
-  const cell = cellById.get(r.id);
-  return `<article class="ex">
-    <header class="ex-head">
-      <span class="crumbs">Atlas / Cells</span>
-      <h1 class="ex-title">${esc(cell?.name || r.id)}</h1>
-      <p class="tagline">${esc(cell?.tagline || 'Cell details coming soon.')}</p>
-    </header>
-    <div class="level">
-      <p>Interactive 3D cell morphologies and firing animations coming in Phase 4.</p>
-    </div>
-  </article>`;
-}
 
 function drawSidebar() {
   const selected = state.route.type === 's' ? state.route.id
@@ -438,6 +443,15 @@ explainerEl.addEventListener('click', (e) => {
         stepperEl.outerHTML = renderSynapseStepper(chem, { stage: nextStage, drugId: state.route.sub });
       }
     });
+    return;
+  }
+  if (act === 'cell-fire' && state.route.type === 'cell') {
+    cellFireActive = !cellFireActive;
+    scene.setCellFire(cellFireActive);
+    const cell = cellById.get(state.route.id);
+    if (cell) {
+      explainerEl.innerHTML = renderCell(cell, state.route.tab, cellFireActive);
+    }
     return;
   }
 });

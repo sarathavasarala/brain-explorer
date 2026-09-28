@@ -1,4 +1,4 @@
-import { structures, byId, groups, levels, diagrams, synapses, pathways, anchorById } from '../content/index.js';
+import { structures, byId, groups, levels, diagrams, synapses, pathways, anchorById, cells } from '../content/index.js';
 import { fmt, paragraphs, esc } from './format.js';
 import { renderCircuit, renderSynapse, LINK_COLORS } from './diagrams.js';
 import { icon } from './icons.js';
@@ -70,7 +70,16 @@ export function renderStructure(s, levelId, source) {
   let body = L.text ? paragraphs(L.text) : todo(`${file} → ${s.id}.levels.${level.id}.text`);
   body += bullets(L.bullets);
   if (level.id === 'connects') body += connectionRows(s);
-  if (level.id === 'cells') body += cellsFigure(L);
+  if (level.id === 'cells') {
+    const residentCells = cells.filter((c) => c.where?.includes(s.id));
+    if (residentCells.length) {
+      body += `<div class="cell-zoom-row" style="margin: 16px 0 20px;">
+        <h3 style="font-size:12.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-2); margin-bottom:8px;">Zoom into a cell</h3>
+        <div class="chips">${residentCells.map((c) => `<a class="chip" href="#/cell/${c.id}/shape" style="--c:${c.color}"><i class="dot"></i>${esc(c.name)}</a>`).join('')}</div>
+      </div>`;
+    }
+    body += cellsFigure(L);
+  }
   if (level.id === 'where' && kids.length) {
     body += `<div class="kids"><h3>Areas inside</h3><div class="chips">${kids.map((k) => `<a class="chip" href="#/s/${k.id}/${level.id}" style="--c:${k.color}"><i></i>${esc(k.name)}</a>`).join('')}</div></div>`;
   }

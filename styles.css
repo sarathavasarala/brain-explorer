@@ -609,6 +609,22 @@ kbd {
 .tract-card { transition: border-color 0.2s, background 0.2s; }
 .tract-card.is-on { border-color: var(--accent); background: rgba(190, 200, 255, 0.05); }
 
+.cell-zoom-row {
+  margin: 18px 0 22px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(190, 200, 255, 0.03);
+  border: 1px solid var(--line);
+}
+.cell-zoom-row h3 {
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-2);
+  margin: 0 0 10px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .app { transition: none; }
   .ex, .library, .ask-part { animation: none; }

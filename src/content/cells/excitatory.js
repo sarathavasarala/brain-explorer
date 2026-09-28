@@ -1,0 +1,137 @@
+export default [
+  {
+    id: 'pyramidal',
+    name: 'Pyramidal cell',
+    group: 'excitatory',
+    color: '#ffcf6b',
+    tagline: 'The primary computing and projection neuron of the cerebral cortex and hippocampus.',
+    analogy: 'The master architect of the cerebral cortex, gathering thousands of local clues to draft a single outgoing command.',
+    transmitter: 'glutamate',
+    where: ['prefrontal-cortex', 'motor-cortex', 'hippocampus'],
+    size: 'About 20 micrometres (0.02 mm) across the cell body',
+    morph: { style: 'pyramidal', seed: 11 },
+    landmarks: ['soma', 'dendrites', 'spines', 'axon', 'terminals'],
+    shape: {
+      text: 'A pyramid-shaped cell body points its apex toward the surface of the [[cortex]]. A tall apical [[dendrite]] extends upward toward layer 1 to collect feedback, while a skirt of basal dendrites spreads outward around the base. Tens of thousands of dendritic spines stud these branches, capturing incoming [[glutamate]] signals. A single long [[axon]] emerges from the base to carry outgoing pulses across the {{corpus-callosum}} or down toward the {{spinal-cord}}.',
+      bullets: [
+        'Triangular cell body with its apex oriented toward the brain surface.',
+        'Prominent apical dendrite climbs vertically and fans into a delicate tuft in upper cortical layers.',
+        'Basal dendrites radiate horizontally to sample local circuit activity.',
+        'Covered in up to 30,000 dendritic spines that host [[excitatory]] [[synapses]].',
+      ],
+    },
+    fires: {
+      text: 'Pyramidal cells integrate thousands of tiny electrical inputs arriving across their dendritic branches. When incoming positive charge depolarizes the cell body past its firing threshold, a sharp [[action potential]] erupts at the axon initial segment and travels at high speed to distant targets.',
+      steps: [
+        '1. [[Glutamate]] released from upstream axons binds to AMPA and NMDA [[receptors]] on dendritic spines.',
+        '2. Sodium and calcium ions rush inward, creating localized electrical currents along the dendritic branches.',
+        '3. These positive charges converge and summate at the axon initial segment near the base of the cell body.',
+        '4. When the voltage crosses threshold (around minus 50 millivolts), voltage-gated sodium channels open rapidly to fire an [[action potential]].',
+      ],
+    },
+    chem: {
+      text: 'Pyramidal cells release [[glutamate]] at their [[axon]] terminals to excite their targets. They receive extensive modulation from [[dopamine]], [[acetylcholine]], [[noradrenaline]], and [[serotonin]], which fine-tune their responsiveness, signal-to-noise ratio, and capacity to store new memories.',
+      receptors: ['AMPA', 'NMDA', 'mGluR'],
+      modulatedBy: ['dopamine', 'acetylcholine', 'noradrenaline', 'serotonin'],
+    },
+    breaks: {
+      text: 'Because pyramidal cells form the main communication highway of the [[cortex]], their dysfunction or loss severely impairs cognition, motor control, and memory formation.',
+      bullets: [
+        'Loss of large pyramidal cells in the {{motor-cortex}} (Betz cells) leads to muscle weakness and spastic paralysis in amyotrophic lateral sclerosis.',
+        'Degeneration of CA1 pyramidal cells in the {{hippocampus}} produces severe amnesia, rendering the brain unable to form new episodic memories.',
+        'Excessive, uncontrolled firing across pyramidal cell networks triggers epileptic seizures.',
+      ],
+    },
+    diagram: 'cortical-column',
+  },
+  {
+    id: 'granule',
+    name: 'Granule cell',
+    group: 'excitatory',
+    color: '#fbbf24',
+    tagline: 'The tiny, densely packed census takers of the cerebellum and hippocampus.',
+    analogy: 'Turnstile counters at a stadium gate, splitting massive incoming crowds into precise, manageable streams.',
+    transmitter: 'glutamate',
+    where: ['cerebellum', 'hippocampus'],
+    size: 'About 5 to 10 micrometres (0.01 mm) across the cell body',
+    morph: { style: 'granule', seed: 23 },
+    landmarks: ['soma', 'dendrites', 'axon', 'terminals'],
+    shape: {
+      text: 'Granule cells are among the smallest and most numerous [[neuron|neurons]] in the human brain. Each tiny round cell body sprouts three to five short, claw-like [[dendrite|dendrites]] that receive sensory and motor messages. In the {{cerebellum}}, its slender [[axon]] travels upward into the outer layer, where it splits into a T-junction to run horizontally for several millimetres as a parallel fibre, passing through thousands of [[Purkinje cell|Purkinje cells]].',
+      bullets: [
+        'Tiny spherical cell body measuring roughly 0.01 mm across.',
+        'Three to five short dendrites ending in claw-like tips inside synaptic glomeruli.',
+        'Cerebellar axon ascends vertically before splitting into a long horizontal parallel fibre.',
+        'Hippocampal granule axons in the dentate gyrus form mossy fibres projecting to CA3 pyramidal cells.',
+      ],
+    },
+    fires: {
+      text: 'Granule cells maintain a quiet baseline due to strong [[inhibitory]] braking from neighboring cells. When an incoming sensory or motor signal breaks through this filter, the cell fires rapid bursts of action potentials along its parallel fibres, distributing precise timing signals to thousands of target cells at once.',
+      steps: [
+        '1. Mossy fibre terminals deliver [[glutamate]] into the cerebellar glomerulus.',
+        '2. High-affinity AMPA and NMDA [[receptors]] on the claw dendrites depolarize the tiny cell body.',
+        '3. Tonic [[GABA]] inhibition sets a strict threshold, preventing background noise from triggering spikes.',
+        '4. Strong inputs overcome the brake, firing rapid action potentials that race down the parallel fibre.',
+      ],
+    },
+    chem: {
+      text: 'Granule cells use [[glutamate]] to excite [[Purkinje cell|Purkinje cells]], basket cells, and stellate cells. Their firing sensitivity is closely tuned by [[GABA]] released by Golgi cells, which sets the resting background resistance of the membrane.',
+      receptors: ['AMPA', 'NMDA', 'GABA-A'],
+      modulatedBy: ['gaba', 'serotonin', 'noradrenaline'],
+    },
+    breaks: {
+      text: 'Loss or malfunction of granule cells impairs the brain\'s ability to separate similar patterns and coordinate smooth movement.',
+      bullets: [
+        'Degeneration of cerebellar granule cells leads to [[ataxia]], making movements unsteady, clumsy, and poorly timed.',
+        'Impaired neurogenesis of granule cells in the {{hippocampus}} reduces the ability to distinguish between similar memories.',
+        'Toxins such as methylmercury selectively accumulate in granule cell layers, causing profound motor incoordination.',
+      ],
+    },
+    diagram: 'cerebellar-circuit',
+  },
+  {
+    id: 'thalamic-relay',
+    name: 'Thalamic relay neuron',
+    group: 'excitatory',
+    color: '#eab308',
+    tagline: 'The central sensory gatekeeper routing sight, sound, and touch up to the cortex.',
+    analogy: 'The switchboard operator of the conscious mind, deciding which sensory calls get connected to the cortex.',
+    transmitter: 'glutamate',
+    where: ['thalamus'],
+    size: 'About 20 to 30 micrometres (0.025 mm) across the cell body',
+    morph: { style: 'relay', seed: 37 },
+    landmarks: ['soma', 'dendrites', 'axon', 'terminals'],
+    shape: {
+      text: 'Thalamic relay neurons are bushy, multipolar cells nestled within the specific sensory nuclei of the {{thalamus}}. Their radiating [[dendrite|dendrites]] form a dense spherical bush that receives sensory signals from the body and feedback from the [[cortex]]. A long, insulated [[axon]] travels upward through the white matter to deliver sensory information to layer 4 of sensory and motor regions.',
+      bullets: [
+        'Rounded cell body with a dense, bush-like thicket of dendrites radiating in all directions.',
+        'Dendritic branches possess complex appendages that receive primary sensory inputs.',
+        'Long axon travels straight upward to branch extensively within layer 4 of the [[cortex]].',
+        'Sends collateral branches to inhibitory reticular neurons on the outer surface of the {{thalamus}}.',
+      ],
+    },
+    fires: {
+      text: 'Thalamic relay cells switch between two entirely different firing patterns. During wakefulness, they fire in a steady tonic mode that faithfully passes every sensory detail to the [[cortex]]. During deep sleep, they switch to rhythmic burst firing, closing the sensory gate so the sleeping brain can rest undisturbed.',
+      steps: [
+        '1. In wakefulness, arousal chemicals depolarize the resting membrane toward minus 60 millivolts.',
+        '2. Incoming sensory pulses release [[glutamate]], exciting AMPA [[receptors]] on relay dendrites.',
+        '3. The relay cell fires individual, high-fidelity action potentials matching the incoming stimulus.',
+        '4. When hyperpolarized during sleep, low-threshold calcium channels open to fire rhythmic bursts that disconnect sensory input.',
+      ],
+    },
+    chem: {
+      text: 'Relay neurons release [[glutamate]] at their cortical terminals to drive sensory perception. They receive inhibitory [[GABA]] signals from the thalamic reticular [[nucleus]] and are strongly modulated by [[acetylcholine]], [[noradrenaline]], and [[serotonin]] from the brainstem.',
+      receptors: ['AMPA', 'NMDA', 'GABA-A', 'GABA-B'],
+      modulatedBy: ['acetylcholine', 'noradrenaline', 'serotonin', 'gaba'],
+    },
+    breaks: {
+      text: 'Disruptions in thalamic relay cells disconnect sensory perception from conscious awareness or create chronic phantom sensations.',
+      bullets: [
+        'Strokes in the {{thalamus}} damaging sensory relay cells produce severe, unprovoked central pain syndromes.',
+        'Abnormal rhythmic burst firing in thalamic loops generates absence seizures, causing brief lapses in consciousness.',
+        'Bilateral damage to thalamic relay nuclei leads to profound sensory loss and coma.',
+      ],
+    },
+    diagram: 'thalamic-relay',
+  },
+];

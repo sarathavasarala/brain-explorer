@@ -6,6 +6,7 @@ import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js'
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { cortex, cortexPoint, buildShape, ellipsoid } from './shapes.js';
 import { mulberry32 } from './noise.js';
+import { buildCell } from './neuron.js';
 
 // Base tint of each cortical lobe when nothing is selected (index matches LOBES in shapes.js).
 const LOBE_TINT = ['#c14ef0', '#5f78ff', '#9868ff', '#b15ae8'];
@@ -23,6 +24,18 @@ const VIEWS = {
   'left-back': [1, 0.2, -0.6],
 };
 
+const LANDMARK_NAMES = {
+  soma: 'Cell body',
+  dendrites: 'Dendrites',
+  spines: 'Spines',
+  axon: 'Axon',
+  terminals: 'Terminals',
+  myelin: 'Myelin sheath',
+  node: 'Node of Ranvier',
+  vessel: 'Blood vessel',
+  processes: 'Processes',
+};
+
 const vertexShader = /* glsl */ `
   attribute float aSize;
   attribute float aRand;
@@ -31,7 +44,7 @@ const vertexShader = /* glsl */ `
   attribute vec3 aColor;
   attribute vec3 aHiColor;
   attribute vec3 aHiColorPrev;
-  uniform float uTime, uPixel, uScale, uBase, uHi, uMix, uHiSize, uClip, uActivity, uHover;
+  uniform float uTime, uPixel, uScale, uBase, uHi, uMix, uHiSize, uClip, uActivity, uHover, uGlobal;
   varying vec3 vColor;
   varying float vAlpha;
   void main() {
@@ -50,11 +63,132 @@ const vertexShader = /* glsl */ `
     }
     float b = (uBase + hi + uHover) * twinkle + wave * 1.6;
     vColor = col;
-    vAlpha = b * mix(0.5, 1.0, aSize);
+    vAlpha = b * mix(0.5, 1.0, aSize) * uGlobal;
     if (uClip > 0.5 && world.x > 0.004) vAlpha = 0.0;
     vAlpha *= smoothstep(0.35, 1.1, -mv.z);
     gl_PointSize = min(uScale * aSize * (1.0 + clamp(hi, 0.0, 1.0) * uHiSize + wave * 0.8) * uPixel / -mv.z, 26.0 * uPixel);
     gl_Position = projectionMatrix * mv;
+  }
+`;
+
+const cellVertexShader = /* glsl */ `
+  attribute float aSize;
+  attribute float aRand;
+  attribute float aPart;
+  attribute float aDist;
+  uniform float uTime, uPixel, uScale, uPhase, uFire, uNodes, uGlobal, uIsMicroglia;
+  uniform vec3 uBaseColor;
+  uniform vec3 uTx;
+  varying vec3 vColor;
+  varying float vAlpha;
+
+  void main() {
+    vec3 pos = position;
+    if (uIsMicroglia > 0.5 && aPart > 0.5 && aPart < 1.5) {
+      pos.x += sin(uTime * 2.0 + aRand * 6.0) * 0.004;
+      pos.y += cos(uTime * 1.8 + aRand * 6.0) * 0.004;
+    }
+    vec4 world = modelMatrix * vec4(pos, 1.0);
+    vec4 mv = viewMatrix * world;
+
+    vec3 axonCol = mix(uBaseColor, vec3(0.4, 0.7, 1.0), 0.45);
+    vec3 termCol = uTx;
+    vec3 myelinCol = vec3(0.85, 0.9, 0.95);
+    vec3 contextCol = vec3(0.35, 0.4, 0.5);
+
+    vec3 col = uBaseColor;
+    float baseBrightness = 0.55;
+
+    if (aPart < 0.5) {
+      col = uBaseColor;
+      baseBrightness = 0.75;
+    } else if (aPart < 1.5) {
+      col = uBaseColor;
+      baseBrightness = 0.58;
+    } else if (aPart < 2.5) {
+      col = axonCol;
+      baseBrightness = 0.52;
+    } else if (aPart < 3.5) {
+      col = termCol;
+      baseBrightness = 0.68;
+    } else if (aPart < 4.5) {
+      col = mix(uBaseColor, vec3(1.0, 1.0, 0.8), 0.25);
+      baseBrightness = 0.62;
+    } else if (aPart < 5.5) {
+      col = myelinCol;
+      baseBrightness = 0.42;
+    } else {
+      col = contextCol;
+      baseBrightness = 0.18;
+    }
+
+    float glow = 0.0;
+    vec3 glowCol = vec3(1.0);
+
+    if (uFire > 0.5) {
+      if (uPhase < 0.40) {
+        if (abs(aPart - 1.0) < 0.2 || abs(aPart - 4.0) < 0.2) {
+          float blink = step(0.982, fract(sin(aRand * 91.0 + floor(uTime * 6.0)) * 43758.5453));
+          float inwardFront = uPhase / 0.40;
+          float waveDist = abs((1.0 - aDist) - inwardFront);
+          float wave = smoothstep(0.08, 0.0, waveDist);
+          glow = max(blink * 1.5, wave * 1.4);
+          glowCol = mix(vec3(1.0, 0.95, 0.7), uBaseColor, 0.3);
+        }
+      } else if (uPhase < 0.50) {
+        if (aPart < 0.5) {
+          float p = (uPhase - 0.40) / 0.10;
+          float pulse = sin(p * 3.14159);
+          glow = pulse * 1.8;
+          glowCol = vec3(1.0, 1.0, 0.9);
+        }
+      } else if (uPhase < 0.92) {
+        if (abs(aPart - 2.0) < 0.2 || abs(aPart - 5.0) < 0.2) {
+          float front = (uPhase - 0.50) / 0.42;
+          if (uNodes > 0.0) {
+            front = floor(front * uNodes) / uNodes;
+          }
+          float spikeDist = abs(aDist - front);
+          float spike = smoothstep(0.06, 0.0, spikeDist);
+          glow = spike * 2.2;
+          glowCol = vec3(0.9, 1.0, 1.0);
+        }
+      } else {
+        if (abs(aPart - 3.0) < 0.2) {
+          float p = (uPhase - 0.92) / 0.08;
+          float pulse = sin(p * 3.14159);
+          glow = pulse * 2.5;
+          glowCol = uTx;
+        }
+      }
+    }
+
+    col = mix(col, glowCol, clamp(glow, 0.0, 1.0));
+    float brightness = (baseBrightness + glow * 1.5) * (0.85 + 0.15 * sin(uTime * 1.8 + aRand * 30.0));
+    if (aPart > 5.5) {
+      brightness = 0.18;
+    }
+
+    vColor = col;
+    vAlpha = brightness * mix(0.6, 1.0, aSize) * uGlobal;
+    vAlpha *= smoothstep(0.2, 0.8, -mv.z);
+
+    float pointSize = uScale * aSize * (1.0 + glow * 0.8) * uPixel / -mv.z;
+    gl_PointSize = clamp(pointSize, 1.0, 32.0 * uPixel);
+    gl_Position = projectionMatrix * mv;
+  }
+`;
+
+const cellFragmentShader = /* glsl */ `
+  varying vec3 vColor;
+  varying float vAlpha;
+  void main() {
+    if (vAlpha < 0.004) discard;
+    float d = length(gl_PointCoord - 0.5);
+    if (d > 0.5) discard;
+    float a = smoothstep(0.5, 0.0, d);
+    a *= a;
+    gl_FragColor = vec4(vColor * a * vAlpha, 1.0);
   }
 `;
 
@@ -73,11 +207,13 @@ const fragmentShader = /* glsl */ `
 
 const easeOutExpo = (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
-export function createBrainScene(canvas, { structures, anchors = [], labelsEl, onHover, onPick }) {
+export function createBrainScene(canvas, { structures, anchors = [], chemicals = [], labelsEl, onHover, onPick }) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
   const pixel = Math.min(window.devicePixelRatio, 2);
   renderer.setPixelRatio(pixel);
   renderer.setClearColor(0x04050a, 1);
+
+  const chemicalColors = new Map((chemicals || []).map((c) => [c.id, c.color]));
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(36, 1, 0.01, 60);
@@ -97,17 +233,19 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
   composer.addPass(new OutputPass());
 
   const materials = [];
-  function makeMaterial(scale = 7) {
+  const brainMaterials = [];
+  function makeMaterial(scale = 7, isBrain = true) {
     const m = new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 }, uPixel: { value: pixel }, uScale: { value: scale },
         uBase: { value: 0 }, uHi: { value: 0 }, uMix: { value: 1 }, uHiSize: { value: 0.55 },
-        uClip: { value: 0 }, uActivity: { value: 0 }, uHover: { value: 0 },
+        uClip: { value: 0 }, uActivity: { value: 0 }, uHover: { value: 0 }, uGlobal: { value: 1.0 },
       },
       vertexShader, fragmentShader,
       transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending,
     });
     materials.push(m);
+    if (isBrain) brainMaterials.push(m);
     return m;
   }
 
@@ -240,7 +378,7 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
       s[i] = Math.random() * 0.6 + 0.2;
     }
     const cols = tintArray(n, '#7a86c8', 0.3);
-    const mat = makeMaterial(6);
+    const mat = makeMaterial(6, false);
     mat.uniforms.uBase.value = 0.18;
     const dust = new THREE.Points(makeGeometry(p, s, cols, cols.slice()), mat);
     dust.userData.dust = true;
@@ -903,6 +1041,122 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
     };
   }
 
+  function flyToTarget(center, dist, view = 'front', dur = 1.25) {
+    const v = Array.isArray(view) ? view : VIEWS[view] || VIEWS.front;
+    const dir = new THREE.Vector3(...v).normalize();
+    flight = {
+      t: 0, dur,
+      fromPos: camera.position.clone(), fromTarget: controls.target.clone(),
+      toPos: center.clone().add(dir.multiplyScalar(dist)), toTarget: center.clone(),
+    };
+  }
+
+  // ------------------------------------------------------------ 3D cells
+  let brainGlobalTarget = 1.0;
+  let brainGlobalCurrent = 1.0;
+  let activeCellObj = null;
+  let activeCellEntry = null;
+  const cellCache = new Map();
+  let cellLandmarkLabels = [];
+
+  function clearCellLabels() {
+    for (const { el } of cellLandmarkLabels) {
+      el.remove();
+    }
+    cellLandmarkLabels = [];
+  }
+
+  function setupCellLabels(cellEntry, landmarks) {
+    clearCellLabels();
+    if (!labelsEl || !cellEntry.landmarks) return;
+    for (const key of cellEntry.landmarks) {
+      const p = landmarks[key];
+      if (!p) continue;
+      const el = document.createElement('div');
+      el.className = 'anchor-label';
+      el.style.setProperty('--c', cellEntry.color || '#fff');
+      const name = LANDMARK_NAMES[key] || key;
+      el.innerHTML = `<i></i><span>${name}</span>`;
+      labelsEl.appendChild(el);
+      cellLandmarkLabels.push({ pos: new THREE.Vector3(...p), el });
+    }
+  }
+
+  function showCell(cellEntry, { fire = false } = {}) {
+    if (!cellEntry) {
+      activeCellEntry = null;
+      activeCellObj = null;
+      brainGlobalTarget = 1.0;
+      clearCellLabels();
+      return;
+    }
+
+    if (isLensActive) restoreLens();
+    brainGlobalTarget = 0.0;
+    activeCellEntry = cellEntry;
+
+    let cached = cellCache.get(cellEntry.id);
+    if (!cached) {
+      const morph = buildCell({ style: cellEntry.morph.style, seed: cellEntry.morph.seed || 7 });
+      const geo = new THREE.BufferGeometry();
+      const n = morph.sizes.length;
+      const rand = new Float32Array(n);
+      for (let i = 0; i < n; i++) rand[i] = Math.random();
+      geo.setAttribute('position', new THREE.BufferAttribute(morph.positions, 3));
+      geo.setAttribute('aSize', new THREE.BufferAttribute(morph.sizes, 1));
+      geo.setAttribute('aRand', new THREE.BufferAttribute(rand, 1));
+      geo.setAttribute('aPart', new THREE.BufferAttribute(morph.part, 1));
+      geo.setAttribute('aDist', new THREE.BufferAttribute(morph.dist, 1));
+      geo.computeBoundingSphere();
+
+      const txColor = cellEntry.transmitter ? (chemicalColors.get(cellEntry.transmitter) || '#ffcf6b') : '#ffffff';
+      const mat = new THREE.ShaderMaterial({
+        uniforms: {
+          uTime: { value: 0 },
+          uPixel: { value: pixel },
+          uScale: { value: 7.5 },
+          uPhase: { value: 0 },
+          uFire: { value: fire ? 1.0 : 0.0 },
+          uNodes: { value: morph.nodes || 0 },
+          uGlobal: { value: 0.0 },
+          uIsMicroglia: { value: cellEntry.morph.style === 'microglia' ? 1.0 : 0.0 },
+          uBaseColor: { value: new THREE.Color(cellEntry.color) },
+          uTx: { value: new THREE.Color(txColor) },
+        },
+        vertexShader: cellVertexShader,
+        fragmentShader: cellFragmentShader,
+        transparent: true,
+        depthWrite: false,
+        depthTest: false,
+        blending: THREE.AdditiveBlending,
+      });
+      const obj = new THREE.Points(geo, mat);
+      obj.frustumCulled = false;
+      scene.add(obj);
+      cached = { obj, mat, landmarks: morph.landmarks, nodes: morph.nodes };
+      cellCache.set(cellEntry.id, cached);
+    }
+
+    cached.obj.visible = true;
+    cached.mat.uniforms.uFire.value = fire ? 1.0 : 0.0;
+    cached.mat.uniforms.uBaseColor.value.set(cellEntry.color);
+    if (cellEntry.transmitter) {
+      const txColor = chemicalColors.get(cellEntry.transmitter) || '#ffcf6b';
+      cached.mat.uniforms.uTx.value.set(txColor);
+    }
+    activeCellObj = cached;
+
+    flyToTarget(new THREE.Vector3(0, 0, 0), 2.6, 'front');
+    controls.autoRotate = false;
+    setupCellLabels(cellEntry, cached.landmarks);
+  }
+
+  function setCellFire(on) {
+    if (activeCellObj) {
+      activeCellObj.mat.uniforms.uFire.value = on ? 1.0 : 0.0;
+    }
+  }
+
   // ------------------------------------------------------------ slicing
   let userSlice = false, forcedSlice = false;
   function applySlice() {
@@ -927,6 +1181,7 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
   let lastHover = null;
 
   function pick(clientX, clientY) {
+    if (activeCellObj) return null;
     const rect = canvas.getBoundingClientRect();
     mouse.set(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
     raycaster.setFromCamera(mouse, camera);
@@ -1005,13 +1260,13 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
       const lx = THREE.MathUtils.clamp(((tmpV.x + 1) / 2) * w, 44, w - 44);
       const ly = THREE.MathUtils.clamp(((1 - tmpV.y) / 2) * h, 24, h - 24);
       o.el.style.transform = `translate(${lx}px, ${ly}px) translate(-50%, -50%)`;
-      o.el.style.opacity = vis ? '' : '0';
+      o.el.style.opacity = vis && !activeCellObj ? '' : '0';
     }
     for (const { r, el } of anchorLabels) {
       tmpV.copy(r.center).project(camera);
       const vis = tmpV.z < 1;
       el.style.transform = `translate(${((tmpV.x + 1) / 2) * w}px, ${((1 - tmpV.y) / 2) * h + 30}px) translate(-50%, 0)`;
-      el.style.opacity = vis && r.hi > 0.05 ? String(Math.min(1, r.hi)) : '0';
+      el.style.opacity = vis && !activeCellObj && r.hi > 0.05 ? String(Math.min(1, r.hi)) : '0';
     }
     for (const { pos, el } of tractLabels) {
       tmpV.copy(pos).project(camera);
@@ -1019,7 +1274,15 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
       const lx = ((tmpV.x + 1) / 2) * w;
       const ly = ((1 - tmpV.y) / 2) * h;
       el.style.transform = `translate(${lx}px, ${ly}px) translate(-50%, -50%)`;
-      el.style.opacity = vis ? '1' : '0';
+      el.style.opacity = vis && !activeCellObj ? '1' : '0';
+    }
+    for (const { pos, el } of cellLandmarkLabels) {
+      tmpV.copy(pos).project(camera);
+      const vis = tmpV.z < 1;
+      const lx = ((tmpV.x + 1) / 2) * w;
+      const ly = ((1 - tmpV.y) / 2) * h;
+      el.style.transform = `translate(${lx}px, ${ly}px) translate(-50%, -50%)`;
+      el.style.opacity = vis && activeCellObj ? '1' : '0';
     }
   }
 
@@ -1065,6 +1328,21 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
       pendingPick = null;
     }
 
+    brainGlobalCurrent += (brainGlobalTarget - brainGlobalCurrent) * (1 - Math.exp(-dt * 4));
+    for (const m of brainMaterials) {
+      m.uniforms.uGlobal.value = brainGlobalCurrent;
+    }
+    for (const [id, c] of cellCache) {
+      if (c === activeCellObj) {
+        c.mat.uniforms.uGlobal.value += (1.0 - c.mat.uniforms.uGlobal.value) * (1 - Math.exp(-dt * 5));
+        c.mat.uniforms.uTime.value = time;
+        c.mat.uniforms.uPhase.value = (time / 3.0) % 1.0;
+      } else {
+        c.mat.uniforms.uGlobal.value += (0.0 - c.mat.uniforms.uGlobal.value) * (1 - Math.exp(-dt * 5));
+        if (c.mat.uniforms.uGlobal.value < 0.01) c.obj.visible = false;
+      }
+    }
+
     materials.forEach((m) => { m.uniforms.uTime.value = time; });
     approach(cortexMat.uniforms.uBase, cortexRec.base, k);
     approach(cortexMat.uniforms.uHi, cortexRec.hi, k);
@@ -1093,6 +1371,8 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
     flyTo,
     setArcs,
     showChemical,
+    showCell,
+    setCellFire,
     has: (id) => recs.has(id),
     reset() {
       if (isLensActive) restoreLens();
