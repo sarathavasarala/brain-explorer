@@ -1,103 +1,156 @@
 # Brain Explorer
 
-An interactive 3D atlas of the human brain. Pick a part, see it light up inside a glowing point-cloud brain, and read what it does in plain language. Pathways walk you through what happens when you see, move, remember or get scared. Ask lets you type something like "you have a panic attack" and lights up the parts most involved.
+> The human brain as a dynamic canvas for thought, feeling, and action.
+
+Brain Explorer is an interactive 3D atlas designed for curious adults and learners who want to understand the mind without drowning in sterile textbook jargon.
 
 ![Brain Explorer showing the cerebellum highlighted in 3D with its explainer](screenshot.png)
 
-## Run it
+---
 
-No build step, no framework. Plain ES modules with Three.js 0.160 from a CDN (via importmap), so you need internet access for the 3D engine.
+## The Vision: The Brain as an Explanatory Canvas
+
+Most neuroscience resources present the nervous system as a frozen anatomical catalogue. But the brain is not an inert museum specimen. It is an active organ of experience, constantly orchestrating thought, emotion, and movement across vastly different physical scales.
+
+Brain Explorer treats the brain as an interactive visual canvas where explanations can be painted directly onto neural circuits. Instead of forcing you to stay at one layer of description, it lets you fluidly jump across levels of abstraction:
+
+- **The Anatomical Canvas**: See lobes, deep nuclei, and brainstem waypoints light up within a responsive 3D point cloud.
+- **The Chemical Currents**: Paint the brain with receptor density glows, trace ascending dopamine and serotonin projection fibres, and follow body-wide endocrine hormone axes linking brain commands to the heart, stomach, and adrenal glands.
+- **The Cellular World**: Step down from whole-brain anatomy straight into microscopic morphology. Watch procedural 3D models of pyramidal cells, Purkinje fans, fast-spiking basket cells, and star-shaped astrocytes fire electrical action potentials and propagate calcium waves in real time.
+- **The Human Experience**: Explore how physical circuits translate into everyday living. Tap your fingers, drop your keys, feel the alertness of unexpected surprise, or ask natural questions like *"what happens during a panic attack?"* to watch participating circuits illuminate together.
+
+---
+
+## Exploring Across Scales
+
+### 1. Brain Parts (34 Structures)
+Every structure features an explainer with a four-level zoom ladder:
+1. **Where**: Spatial orientation, physical neighbours, and boundaries.
+2. **Does**: Real-world job with a concrete, physical analogy.
+3. **Connects**: Animated 3D input and output arcs showing who talks to whom.
+4. **Cells**: Microscopic circuit architecture, synaptic mechanisms, and cell types.
+
+### 2. Neurochemistry (17 Messengers)
+Spans fast neurotransmitters, neuromodulators, and circulating endocrine hormones:
+- **Fast Amino Acids** (Glutamate, GABA): Millisecond excitation and inhibition.
+- **Neuromodulators** (Dopamine, Serotonin, Noradrenaline, Acetylcholine): Volume-broadcast networks tuning mood, vigilance, and focus.
+- **Endocrine Hormones** (Cortisol, Adrenaline, Oxytocin, Vasopressin, Melatonin, Thyroid hormone, Leptin, Ghrelin, Growth hormone, Sex hormones, Prolactin): Multi-organ axes connecting the hypothalamus and pituitary down to visceral organs.
+- **Interactive Synapse View**: Step through vesicle loading, exocytosis, receptor binding, and clearance, with toggles for common medications.
+
+### 3. Cells & Morphology (13 Types)
+Procedurally generated 3D cells spanning excitatory neurons, inhibitory interneurons, projection cells, and glia:
+- **Excitatory**: Pyramidal neurons, cerebellar/hippocampal granule cells, thalamic relay neurons.
+- **Inhibitory**: Purkinje cells, stellate cells, fast-spiking basket cells, axo-axonic chandelier cells, striatal medium spiny neurons.
+- **Modulatory & Output**: Midbrain dopamine neurons, somatic motor neurons.
+- **Glia**: Astrocytes (blood-brain barrier, glutamate clearance), oligodendrocytes (saltatory myelin), and microglia (synaptic pruning, immune surveillance).
+- **Firing Sequencer**: An interactive step-through showing ion channel openings, voltage thresholds, and transmitter release.
+
+### 4. Guided Pathways (11 Tours)
+Narrative multi-step tours through brain systems:
+- **Actions**: How you see an object, reach for a cup, react to fear, or form a lasting memory.
+- **Chemicals**: The dopamine reward loop, serotonin mood regulation, and noradrenaline alert broadcasting.
+- **Networks**: Default mode wandering, executive attention control, and salience switching.
+
+### 5. Ask Mode
+Type a feeling, condition, or daily action (e.g., *"why does coffee wake me up?"*, *"panic attack"*, *"jet lag"*). The application queries structured classification models to spotlight which brain regions, chemicals, and circuits take part.
+
+---
+
+## Quickstart
+
+Brain Explorer uses a zero-build, native ES module architecture. There is no bundler, no transpiler, and no framework overhead. Everything runs directly in the browser via Three.js import maps.
 
 ```sh
-cd ~/Desktop/Projects/brain-explorer
+# Clone and enter the repository
+git clone https://github.com/sarathavasarala/brain-explorer.git
+cd brain-explorer
+
+# Start the local server
 npm start
 ```
 
-Then open http://localhost:5173. `npm start` runs `server.py`, which serves the app on 127.0.0.1 only and falls back to 5174 if 5173 is busy. Set `PORT=5199 npm start` to pick another port.
+Open `http://localhost:5173` in your browser (falls back to `5174` if busy). Set `PORT=5199 npm start` to pick another port.
 
-Ask needs an API key for typed questions. Put it in a `.env` file at the project root (it is gitignored):
+### Ask Mode Setup (Optional)
+The Ask interface includes hand-verified preset queries that work offline. For dynamic typed questions, place your TypeSafe Jev API key in a `.env` file at the root:
 
 ```sh
-TYPESAFE_API_KEY=your-key-here
+TYPESAFE_API_KEY=your-api-key-here
 ```
 
-The key stays on the server. The browser only talks to `/api/ask`, which refuses requests from other sites. Without a key, or with any plain static server, everything works except typed questions. The saved examples on the Ask screen still work.
+`server.py` securely proxies queries to `/api/ask` and never exposes the key to client browsers.
 
-Check content with:
+### Content Validation
+Run the built-in integrity checker to verify all cross-references, glossary terms, pathways, and diagrams:
 
 ```sh
 npm run validate
 ```
 
-## What is inside
+---
 
-- 34 structures with shapes, colours, camera views, connections, and beginner-level text
-- 17 chemicals across fast transmitters, neuromodulators, and body-wide hormones with 3D fibre trees, density glow, receptor profiles, and interactive synapse and chain views
-- 13 cell types across neurons and glia with 3D procedural morphologies, real-time firing animations, and zoom transitions
-- 11 pathways in three groups: how you do things, brain chemicals and brain networks
-- Ask: type a feeling, condition or activity and get a short sketch of the parts involved
-- 4 zoom levels per structure: where it is, what it does, how it connects, down to cells
-- Global search across parts, chemicals, and cells from the unified search bar
-- Modes in the top bar:
-  - Parts: `#/`, `#/s/<id>/<level>`
-  - Chemicals: `#/chem`, `#/chem/<id>/<tab>`
-  - Cells: `#/cell`, `#/cell/<id>/<tab>`
-  - Pathways: `#/pathways`, `#/p/<id>/<step>`
-  - Ask: `#/ask`, `#/ask/<question>`
-  - Keyboard: arrows, Esc (steps back one level), Space
+## Navigation & Shortcuts
 
-Shapes are simplified for explanation, not an anatomical atlas. Coordinates: +x is the person's left, +y is up, +z is the front. The brain is about 1.7 units long front to back.
-
-## File map
-
-| File | What it does |
+| Route | Description |
 |---|---|
-| `index.html` | Layout shell, importmap, fonts |
-| `styles.css` | All styling (dark holographic theme, per-part accent colour, badges, steppers) |
-| `server.py` | Static server plus the `/api/ask` proxy that holds the API key |
-| `src/main.js` | Hash routing, modes, wires sidebar, library, explainer, scene, toolbar |
-| `src/scene/brain-scene.js` | 3D engine: point shaders, bloom, focus/highlight, arcs, picking, chemical lens, cell view, body view |
-| `src/scene/neuron.js` | Procedural 3D cell morphologies (pyramidal, Purkinje, motor, astrocyte, microglia, etc.) |
-| `src/scene/shapes.js` | Point-cloud generators (`cortex`, `ellipsoid`, `tube`, `band`, `parts`, `custom`) |
-| `src/scene/noise.js` | Seeded random and Perlin noise |
-| `src/content/structures/*.js` | One object per brain part: shape, colour, camera view, connections, text |
-| `src/content/chemicals/*.js` | Chemical dictionary: fast transmitters, neuromodulators, and body hormones |
-| `src/content/cells/*.js` | Cell dictionary: excitatory, inhibitory, neuromodulatory, and glial types |
-| `src/content/pathways/index.js` | Guided tours: steps with focus, route, view, plus a `category` |
-| `src/content/pathways/groups.js` | The sections of the pathway library |
-| `src/content/ask-presets.js` | Saved Ask answers, checked by hand, that load without the server |
-| `src/services/ask.js` | Browser side of Ask: saved answers first, then `/api/ask` |
-| `src/content/diagrams/index.js` | Circuit diagrams for the "Down to cells" level |
-| `src/content/synapses.js`, `glossary/index.js`, `levels.js`, `groups.js`, `anchors.js` | Supporting data |
-| `src/content/index.js` | Merges everything, exports `validate()` |
-| `src/ui/*.js` | Explainer, sidebar, chem/cell explainers, synapse stepper, library, Ask screen, SVG diagrams |
-| `tools/validate.mjs` | Lists missing text and broken references across parts, chemicals, cells, pathways |
+| `#/` | Whole brain overview (lateral view) |
+| `#/s/<structure-id>/<level>` | Focus structure at level (`where`, `does`, `connects`, `cells`) |
+| `#/chem/<chem-id>/<tab>` | Chemical lens (`overview`, `tracts`, `synapse`, `medicine`, `axis`) |
+| `#/cell/<cell-id>/<tab>` | 3D cell view (`shape`, `fires`, `lives`, `chem`) |
+| `#/pathways` or `#/p/<id>/<step>` | Guided pathway tours |
+| `#/ask` or `#/ask/<query>` | Question interface and circuit highlighter |
 
-## Adding content
+**Keyboard Controls:**
+- `ArrowRight` / `ArrowLeft`: Navigate between zoom levels, tabs, or tour steps.
+- `ArrowUp` / `ArrowDown`: Step to previous or next item in the active category.
+- `Escape`: Step back one level or return to whole-brain home.
+- `Space`: Advance to next step in active guided tour.
 
-Keep all text beginner-level: short sentences, concrete everyday examples, no em dashes, no hype words. See `CONTENT_PROMPT.md` for the full writing guide.
+---
 
-**Structure:** add an object to one of `src/content/structures/*.js`. Required: `id`, `name`, `group`, `color`, `shape`, `view`, `tagline`, `levels.connects.connections`, `levels.cells.diagram`, `synapse`. Optional: `parent` (nests it in the list), `slice: true` (auto-slices the brain when selected), plus all the text fields.
+## Project Structure
 
-- Cortical areas use `shape: { type: 'cortex', test: (p) => ... }`, where `p` has `x, y, z, ax` (abs x), `side`, `lobe`, `medial`, `central`.
-- Deep parts use `ellipsoid` / `tube` / `band`, or `parts: [...]` to combine several.
-- `mirror: true` duplicates the shape on both sides.
-- `pattern` can be `gyri`, `fine`, `folia`, `rings`, `fibers`, or `cross`.
+```
+brain-explorer/
+├── index.html                  # Layout shell, Three.js CDN importmap, typography
+├── styles.css                  # Single stylesheet: dark holographic theme, micro-animations
+├── server.py                   # Python standard library static server and /api/ask proxy
+├── package.json                # npm start & npm run validate scripts
+├── tools/
+│   └── validate.mjs            # Integrity and completeness validator
+└── src/
+    ├── main.js                 # Hash router, state store, keyboard navigation
+    ├── scene/
+    │   ├── brain-scene.js      # 3D engine: point cloud shaders, bloom, camera, slice plane, body view
+    │   ├── neuron.js           # Procedural 3D cell morphologies & firing animations
+    │   ├── shapes.js           # Point-cloud generators (cortex gyri, ellipsoids, tubes, bands)
+    │   └── noise.js            # Seeded random and 3D Perlin noise
+    ├── content/
+    │   ├── index.js            # Unified export & reference validation
+    │   ├── structures/         # Cortical lobes, deep nuclei, hindbrain structures
+    │   ├── chemicals/          # Fast transmitters, neuromodulators, hormones
+    │   ├── cells/              # Excitatory, inhibitory, modulatory, and glial types
+    │   ├── pathways/           # Step-by-step guided tours and neural routes
+    │   ├── diagrams/           # Microcircuit SVG diagrams with animated impulses
+    │   ├── synapses.js         # Synaptic vesicle and receptor mechanism schemas
+    │   ├── anchors.js          # Sensory endpoints and body organ anchors
+    │   └── glossary/           # Definitions for [[term]] hover markup
+    └── ui/
+        ├── explainer.js        # Right card: 4-level zoom ladder, try-it, breaks
+        ├── sidebar.js          # Unified search and Parts/Chemicals/Cells lists
+        ├── chem.js             # Chemical explainer, fibre tracts, hormone axes
+        ├── cell.js             # Cell explainer, morphology specs, firing sequencer
+        ├── synapse-stepper.js  # Interactive synapse mechanism with drug toggles
+        └── ask.js              # Ask query bar and spotlight cards
+```
 
-**Chemical / Hormone:** add an object to `src/content/chemicals/fast.js`, `modulators.js`, or `hormones.js`. Required: `id`, `name`, `group`, `color`, `tagline`, `analogy`, `overview`, `density`, `receptors`, `life`, `breaks`, `tryIt`. Modulators include `tracts`. Hormones include `axis`, `feedback`, `timescale`.
+---
 
-**Cell:** add an object to `src/content/cells/index.js`. Required: `id`, `name`, `group`, `color`, `tagline`, `analogy`, `transmitter`, `where`, `size`, `morph` (style and seed), `landmarks`, `shape`, `fires`, `chem`, `breaks`.
+## Content Principles
 
-**Pathway:** add to `src/content/pathways/index.js` with a `category` from `pathways/groups.js`. Each step has `title`, `focus: [ids]`, `route: [[from, to], ...]`, optional `view` and `slice`. Add `summary` plus a 2 to 4 sentence `text` per step that follows the previous one like a story.
-
-**Ask example:** run `npm start`, ask the question, and check the answer against a textbook account. If any part or role is wrong, drop it rather than editing the answer. Otherwise copy the parts into `src/content/ask-presets.js`.
-
-**Ask details:** Ask answers come from Jev, a structured classification model from TypeSafe. `server.py` asks it whether the question is about the brain, then asks for each part whether it is involved and how. Only parts it is very confident about are shown, at most five. The Ask screen mentions Jev once, in a single line under the examples. Keep it that way.
-
-**Diagram:** add to `src/content/diagrams/index.js` (neurons with kind and position, links typed `excite`/`inhibit`/`modulate`, optional bands). Reference it from a structure's `levels.cells.diagram`.
-
-**Glossary term:** add a key to `src/content/glossary/index.js`, then use `[[term]]` in text. Link structures with `{{id}}`.
-
-**Zoom level:** edit `src/content/levels.js`. The explainer reads `levels[id].text` and `bullets` generically. Scene mode per level is `focus`, `activity`, or `wiring`.
-
-Always run `npm run validate` afterwards.
+All written content adheres to strict editorial rules:
+1. **Beginner-Friendly Tone**: Plain, conversational, and grounded. Explain mechanisms using tangible physical analogies.
+2. **Estimated Figures**: Use "about" or "roughly" instead of false precision.
+3. **No Em Dashes**: Never use the em dash character. Always use commas, periods, or parentheses.
+4. **No Filler or Hype Words**: Never use words like "fascinating", "incredible", "remarkable", "delve", "intricate", or "vital".
+5. **Interactive Try-It**: Every structure and chemical includes a tangible physical or mental exercise the user can perform immediately.
