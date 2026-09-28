@@ -1,5 +1,5 @@
-// Chemical UI: Overview, Pathways (tracts), Synapse (stepper), and Medicine (drugs & disorders).
-import { chemicals, chemicalGroups, byId } from '../content/index.js';
+// Chemical UI: Overview, Pathways (tracts), The Chain (axis), Synapse (stepper), and Medicine (drugs & disorders).
+import { chemicals, chemicalGroups, byId, anchorById } from '../content/index.js';
 import { getChemTabs } from '../content/chem-tabs.js';
 import { fmt, paragraphs, esc } from './format.js';
 import { renderLadder } from './ladder.js';
@@ -15,9 +15,13 @@ function bullets(list) {
 function partChips(ids = []) {
   if (!ids.length) return '';
   return `<span class="chips">${ids.map((id) => {
-    const s = byId.get(id);
+    const s = byId.get(id) || anchorById.get(id);
     if (!s) return `<span class="chip">${esc(id)}</span>`;
-    return `<a class="chip" href="#/s/${s.id}" style="--c:${s.color}"><i class="dot"></i>${esc(s.name)}</a>`;
+    const isStructure = byId.has(id);
+    if (isStructure) {
+      return `<a class="chip" href="#/s/${s.id}" style="--c:${s.color}"><i class="dot"></i>${esc(s.name)}</a>`;
+    }
+    return `<span class="chip" style="--c:${s.color || '#fff'}"><i class="dot"></i>${esc(s.name)}</span>`;
   }).join('')}</span>`;
 }
 
@@ -47,11 +51,11 @@ export function renderChemHome() {
               <span class="group-sub">${esc(g.blurb || '')}</span>
             </h2>
             <div class="chips">
-              ${list.length ? list.map((c) => `
+              ${list.map((c) => `
                 <a class="chip" href="#/chem/${c.id}" style="--c:${c.color}">
                   <i class="dot"></i>${esc(c.name)}
                 </a>
-              `).join('') : '<span class="empty">Hormone directory coming in Phase 5.</span>'}
+              `).join('')}
             </div>
           </section>`;
         }).join('')}
@@ -89,6 +93,12 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
             <div class="meta-row">
               <a class="chip chip-path" href="#/p/${chem.pathwayId}/0">
                 ${icon('pathway', 14)} Take the guided tour: ${esc(chem.name)} pathways &rarr;
+              </a>
+            </div>` : ''}
+          ${chem.group === 'hormone' ? `
+            <div class="meta-row">
+              <a class="chip chip-path" href="#/chem/${chem.id}/axis">
+                ${icon('pathway', 14)} Explore the hormone chain &rarr;
               </a>
             </div>` : ''}
         </div>
@@ -138,6 +148,63 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
             </div>`;
           }).join('')}
         </div>
+      </div>
+    `;
+  } else if (activeTab === 'axis') {
+    const axis = chem.axis || [];
+    const feedback = chem.feedback || [];
+    const subIdx = (sub != null && sub !== '') ? parseInt(sub, 10) : null;
+    body = `
+      <div class="level">
+        <p class="section-lead">
+          The hormonal chain of command connecting the brain to distant body glands through the bloodstream.
+        </p>
+        ${chem.timescale ? `
+          <div class="axis-timescale">
+            <span class="meta-label">Timescale:</span> <span class="axis-time-val">${esc(chem.timescale)}</span>
+          </div>` : ''}
+        ${subIdx != null ? `<div class="tract-all-link"><a class="xref" href="#/chem/${chem.id}/axis">&larr; Show complete chain</a></div>` : ''}
+        <div class="axis-chain">
+          <ol class="axis-steps">
+            ${axis.map((step, sIdx) => {
+              const on = subIdx === sIdx;
+              return `
+                <li class="axis-card fig ${on ? 'is-on' : ''}" data-step="${sIdx}">
+                  <div class="axis-card-head">
+                    <span class="axis-step-num">Step ${sIdx + 1}</span>
+                    <a href="#/chem/${chem.id}/axis/${sIdx}" class="fig-title axis-title">
+                      ${esc(step.carries || 'Signal')}
+                    </a>
+                    ${!on ? `<a href="#/chem/${chem.id}/axis/${sIdx}" class="xref axis-act">Highlight</a>` : ''}
+                  </div>
+                  <div class="tract-route">
+                    ${partChips([step.from])}
+                    <span class="tract-arrow">&rarr;</span>
+                    ${partChips([step.to])}
+                    <span class="axis-via">via ${esc(step.via || 'blood')}</span>
+                  </div>
+                  <p class="axis-text">${fmt(step.text)}</p>
+                </li>
+              `;
+            }).join('')}
+          </ol>
+        </div>
+        ${feedback.length ? `
+          <div class="feedback-section">
+            <h3 class="fig-title">Feedback Control</h3>
+            ${feedback.map((fb) => `
+              <div class="fig feedback-card">
+                <div class="tract-route">
+                  ${partChips([fb.from])}
+                  <span class="tract-arrow">&rarr;</span>
+                  ${partChips(fb.to)}
+                  <span class="feedback-badge">Negative Feedback</span>
+                </div>
+                <p class="feedback-text">${fmt(fb.text)}</p>
+              </div>
+            `).join('')}
+          </div>
+        ` : ''}
       </div>
     `;
   } else if (activeTab === 'synapse') {

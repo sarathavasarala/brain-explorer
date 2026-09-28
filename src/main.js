@@ -197,13 +197,14 @@ function normalizeArc(r, active) {
   return { ...r, active };
 }
 
-function fly(ids, view, key) {
+function fly(ids, view, key, opts) {
   if (state.flown === key) return;
   state.flown = key;
-  scene.flyTo(ids, view);
+  scene.flyTo(ids, view, opts);
 }
 
 function clearScene(key) {
+  scene.setBody(false);
   scene.focus([]);
   scene.setArcs([]);
   scene.forceSlice(false);
@@ -229,6 +230,7 @@ function apply() {
   setMode(r.type);
 
   if (r.type !== 'chem') {
+    scene.setBody(false);
     scene.showChemical(null);
     if (lensLegendEl) lensLegendEl.hidden = true;
   }
@@ -253,6 +255,8 @@ function apply() {
     if (r.type === 'cell') {
       const cell = cellById.get(r.id);
       stageNoteEl.textContent = cell?.size ? `${cell.size}. Procedural morphology.` : 'Shapes are simplified for explanation, not an anatomical atlas.';
+    } else if (r.type === 'chem' && chemById.get(r.id)?.group === 'hormone') {
+      stageNoteEl.textContent = 'Body view is schematic and compressed, not to anatomical scale.';
     } else {
       stageNoteEl.textContent = 'Shapes are simplified for explanation, not an anatomical atlas.';
     }
@@ -268,71 +272,136 @@ function apply() {
     const chem = chemById.get(r.id);
     if (!chem) { location.hash = '#/chem'; return; }
 
-    const tractList = (chem.tracts || []).map((t) => {
-      let state = 'ambient';
-      if (r.tab === 'tracts') {
-        if (r.sub) state = (t.id === r.sub ? 'on' : 'off');
-        else state = 'on';
-      } else if (r.tab === 'overview') {
-        state = 'on';
+    if (chem.group === 'hormone') {
+      scene.setBody(true);
+      scene.forceSlice(false);
+      scene.setSpin(false);
+      syncToolbar();
+
+      const subIdx = (r.sub != null && r.sub !== '') ? parseInt(r.sub, 10) : null;
+      const hormoneArcs = [];
+      const axis = chem.axis || [];
+      const feedback = chem.feedback || [];
+      const allEndpoints = [...(chem.madeIn || [])];
+
+      axis.forEach((step, idx) => {
+        allEndpoints.push(step.from, step.to);
+        const isActive = (r.tab === 'axis') ? (subIdx == null || subIdx === idx ? true : 'ambient') : 'ambient';
+        hormoneArcs.push({
+          from: step.from,
+          to: step.to,
+          style: (step.via === 'blood' || step.via === 'portal') ? 'blood' : undefined,
+          color: chem.color,
+          active: isActive,
+          flow: 'forward',
+        });
+      });
+
+      feedback.forEach((fb) => {
+        allEndpoints.push(fb.from, ...(fb.to || []));
+        for (const toId of (fb.to || [])) {
+          hormoneArcs.push({
+            from: fb.from,
+            to: toId,
+            style: 'blood',
+            color: '#ff6b7d',
+            active: r.tab === 'axis' ? (subIdx == null ? true : 'ambient') : 'ambient',
+            flow: 'forward',
+          });
+        }
+      });
+
+      scene.showChemical({
+        color: chem.color,
+        sources: chem.madeIn || [],
+        density: chem.density || {},
+        tracts: [],
+        group: chem.group,
+      });
+      scene.setArcs(hormoneArcs);
+
+      const uniqueEndpoints = [...new Set(allEndpoints)];
+      if (r.tab === 'axis' && subIdx != null && axis[subIdx]) {
+        const step = axis[subIdx];
+        scene.focus([step.from, step.to], { activity: true });
+        fly([step.from, step.to], 'body', `chem:${chem.id}:${r.sub}`, { maxDist: 7.2 });
       } else {
-        state = 'ambient';
+        scene.focus(uniqueEndpoints, { activity: true });
+        fly(uniqueEndpoints, 'body', `chem:${chem.id}:all`, { maxDist: 7.2 });
       }
-      return {
-        id: t.id,
-        name: t.name,
-        from: t.from,
-        to: t.to || [],
-        state,
-        local: !!t.local,
-      };
-    });
 
-    // Slice first: the fibre trees are built on whichever half is visible.
-    scene.forceSlice(chem.group === 'modulator');
-    scene.setSpin(false);
-    syncToolbar();
-    scene.showChemical({
-      color: chem.color,
-      sources: chem.madeIn || [],
-      density: chem.density || {},
-      tracts: tractList,
-      group: chem.group,
-    });
-    scene.setArcs([]);
-    const chemView = chem.group === 'modulator' ? 'medial' : 'left';
-
-    if (r.tab === 'tracts' && r.sub) {
-      const activeTract = (chem.tracts || []).find((t) => t.id === r.sub);
-      const targets = activeTract ? [activeTract.from, ...(activeTract.to || [])] : (chem.madeIn || []);
-      fly(targets, chemView, `chem:${chem.id}:${r.sub}`);
-    } else if (r.tab === 'tracts' || r.tab === 'overview') {
-      const allTargets = [...(chem.madeIn || [])];
-      for (const t of chem.tracts || []) {
-        if (t.from) allTargets.push(t.from);
-        for (const tid of (t.to || [])) allTargets.push(tid);
-      }
-      fly([...new Set(allTargets)], chemView, `chem:${chem.id}:all`);
+      if (lensLegendEl) lensLegendEl.hidden = true;
     } else {
-      if (!state.flown.startsWith(`chem:${chem.id}`)) {
+      scene.setBody(false);
+      const tractList = (chem.tracts || []).map((t) => {
+        let state = 'ambient';
+        if (r.tab === 'tracts') {
+          if (r.sub) state = (t.id === r.sub ? 'on' : 'off');
+          else state = 'on';
+        } else if (r.tab === 'overview') {
+          state = 'on';
+        } else {
+          state = 'ambient';
+        }
+        return {
+          id: t.id,
+          name: t.name,
+          from: t.from,
+          to: t.to || [],
+          state,
+          local: !!t.local,
+        };
+      });
+
+      // Slice first: the fibre trees are built on whichever half is visible.
+      scene.forceSlice(chem.group === 'modulator');
+      scene.setSpin(false);
+      syncToolbar();
+      scene.showChemical({
+        color: chem.color,
+        sources: chem.madeIn || [],
+        density: chem.density || {},
+        tracts: tractList,
+        group: chem.group,
+      });
+      scene.setArcs([]);
+      const chemView = chem.group === 'modulator' ? 'medial' : 'left';
+
+      if (r.tab === 'tracts' && r.sub) {
+        const activeTract = (chem.tracts || []).find((t) => t.id === r.sub);
+        const targets = activeTract ? [activeTract.from, ...(activeTract.to || [])] : (chem.madeIn || []);
+        fly(targets, chemView, `chem:${chem.id}:${r.sub}`);
+      } else if (r.tab === 'tracts' || r.tab === 'overview') {
         const allTargets = [...(chem.madeIn || [])];
         for (const t of chem.tracts || []) {
           if (t.from) allTargets.push(t.from);
           for (const tid of (t.to || [])) allTargets.push(tid);
         }
         fly([...new Set(allTargets)], chemView, `chem:${chem.id}:all`);
+      } else {
+        if (!state.flown.startsWith(`chem:${chem.id}`)) {
+          const allTargets = [...(chem.madeIn || [])];
+          for (const t of chem.tracts || []) {
+            if (t.from) allTargets.push(t.from);
+            for (const tid of (t.to || [])) allTargets.push(tid);
+          }
+          fly([...new Set(allTargets)], chemView, `chem:${chem.id}:all`);
+        }
       }
-    }
 
-    if (lensLegendEl) {
-      lensLegendEl.hidden = false;
-      lensLegendEl.style.setProperty('--accent', chem.color);
+      if (lensLegendEl) {
+        lensLegendEl.hidden = false;
+        lensLegendEl.style.setProperty('--accent', chem.color);
+      }
     }
 
     explainerEl.innerHTML = renderChem(chem, r.tab, r.sub);
     if (prev.type !== 'chem' || prev.id !== r.id) explainerEl.scrollTop = 0;
     if (r.tab === 'tracts' && r.sub) {
       const activeCard = explainerEl.querySelector(`.tract-card[data-tract="${r.sub}"]`);
+      if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else if (r.tab === 'axis' && r.sub != null) {
+      const activeCard = explainerEl.querySelector(`.axis-card[data-step="${r.sub}"]`);
       if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   } else if (r.type === 'cellhome') {

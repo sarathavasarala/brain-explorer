@@ -140,6 +140,18 @@ export function validate() {
         if (!known(toId)) problems.push(`${tw}: unknown to structure "${toId}"`);
       }
     }
+    for (const a of c.axis || []) {
+      const aw = `${w} axis step`;
+      if (!known(a.from)) problems.push(`${aw}: unknown from structure "${a.from}"`);
+      if (!known(a.to)) problems.push(`${aw}: unknown to structure "${a.to}"`);
+    }
+    for (const fb of c.feedback || []) {
+      const fbw = `${w} feedback`;
+      if (!known(fb.from)) problems.push(`${fbw}: unknown from structure "${fb.from}"`);
+      for (const toId of fb.to || []) {
+        if (!known(toId)) problems.push(`${fbw}: unknown to structure "${toId}"`);
+      }
+    }
     for (const [sId, d] of Object.entries(c.density || {})) {
       if (!known(sId)) problems.push(`${w}: unknown density structure "${sId}"`);
       if (typeof d !== 'number' || d < 0 || d > 1) problems.push(`${w}: density for "${sId}" must be between 0 and 1, got ${d}`);

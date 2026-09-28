@@ -22,6 +22,7 @@ const VIEWS = {
   medial: [1, 0.08, 0.02],
   'left-front': [1, 0.2, 0.6],
   'left-back': [1, 0.2, -0.6],
+  body: [1, 0.1, 0.35],
 };
 
 const LANDMARK_NAMES = {
@@ -223,7 +224,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   controls.rotateSpeed = 0.65;
   controls.zoomSpeed = 0.8;
   controls.minDistance = 0.45;
-  controls.maxDistance = 6;
+  controls.maxDistance = 10;
   controls.autoRotateSpeed = 0.45;
 
   const composer = new EffectComposer(renderer);
@@ -386,6 +387,55 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     dust.onBeforeRender = () => { dust.rotation.y += 0.00015; };
   }
 
+  // ------------------------------------------------------------ body silhouette (Phase 5)
+  // Faint outline of head, neck, and torso for hormone axis mode
+  let bodyTarget = 0.0;
+  let bodyCurrent = 0.0;
+  const bodyParts = [
+    // Head shell around the brain
+    ellipsoid({ center: [0, 0.08, -0.02], radii: [0.78, 0.88, 0.98], count: 1200, fill: 0 }),
+    // Neck
+    ellipsoid({ center: [0, -0.85, 0.02], radii: [0.34, 0.35, 0.34], count: 600, fill: 0 }),
+    // Torso
+    ellipsoid({ center: [0, -2.3, 0.08], radii: [1.05, 1.45, 0.65], count: 2200, fill: 0 }),
+  ];
+  const totalBodyPts = bodyParts.reduce((acc, p) => acc + p.sizes.length, 0);
+  const bodyPos = new Float32Array(totalBodyPts * 3);
+  const bodySizes = new Float32Array(totalBodyPts);
+  let bOffset = 0;
+  for (const bp of bodyParts) {
+    bodyPos.set(bp.positions, bOffset * 3);
+    bodySizes.set(bp.sizes, bOffset);
+    bOffset += bp.sizes.length;
+  }
+  const bodyCols = tintArray(totalBodyPts, '#7a86c8', 0.15);
+  const bodyMat = makeMaterial(5.5, false);
+  bodyMat.uniforms.uBase.value = 0.0;
+  const bodyObj = new THREE.Points(makeGeometry(bodyPos, bodySizes, bodyCols, bodyCols.slice()), bodyMat);
+  bodyObj.frustumCulled = false;
+  bodyObj.visible = false;
+  scene.add(bodyObj);
+
+  function setBody(on) {
+    bodyTarget = on ? 1.0 : 0.0;
+    if (on) {
+      bodyObj.visible = true;
+      for (const r of anchorRecs) {
+        if (r.anchor.body) {
+          r.obj.visible = true;
+          r.base = 0.45;
+        }
+      }
+    } else {
+      for (const r of anchorRecs) {
+        if (r.anchor.body && !focusIds.includes(r.id)) {
+          r.base = 0;
+          r.hi = 0;
+        }
+      }
+    }
+  }
+
   // ------------------------------------------------------------ arcs (connections / pathway routes)
   const arcGroup = new THREE.Group();
   scene.add(arcGroup);
@@ -416,13 +466,16 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     for (const item of list) {
       const a = centerOf(item.from), b = centerOf(item.to);
       if (!a || !b) continue;
-      const curve = buildArc(a, b, item.lift ?? 1);
-      const ca = recs.get(item.from).color, cb = recs.get(item.to).color;
+      const isBlood = item.style === 'blood';
+      const curve = buildArc(a, b, item.lift ?? (isBlood ? 0.25 : 1));
+      const recA = recs.get(item.from), recB = recs.get(item.to);
+      const ca = item.color ? new THREE.Color(item.color) : recA.color;
+      const cb = item.color ? new THREE.Color(item.color) : recB.color;
       const N = 80;
       const pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
       const isAmbient = item.active === 'ambient';
       const isOff = item.active === false;
-      const k = isOff ? 0.14 : (isAmbient ? 0.26 : 0.48);
+      const k = isBlood ? 0.12 : (isOff ? 0.14 : (isAmbient ? 0.26 : 0.48));
       for (let i = 0; i < N; i++) {
         const t = i / (N - 1), p = curve.getPoint(t);
         pos.set([p.x, p.y, p.z], i * 3);
@@ -435,14 +488,14 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       const line = new THREE.Line(g, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false }));
       arcGroup.add(line);
       const flow = item.flow || 'forward';
-      const dots = isOff || flow === 'none' ? 0 : (isAmbient ? 3 : 9);
-      const defaultSpeed = isAmbient ? 0.16 : 0.32;
-      const arc = { curve, flow, start: dotPos.length / 3, dots, ca, cb, speed: item.speed || defaultSpeed, isAmbient };
+      const dots = isOff || flow === 'none' ? 0 : (isBlood ? 6 : (isAmbient ? 3 : 9));
+      const defaultSpeed = isBlood ? 0.05 : (isAmbient ? 0.16 : 0.32);
+      const arc = { curve, flow, start: dotPos.length / 3, dots, ca, cb, speed: item.speed || defaultSpeed, isAmbient, isBlood };
       for (let i = 0; i < dots; i++) {
         dotPos.push(0, 0, 0);
         const dim = isAmbient ? 0.65 : 1.0;
         dotCol.push(ca.r * dim, ca.g * dim, ca.b * dim);
-        dotSize.push(isAmbient ? 0.75 : (i === 0 ? 1.3 : 0.9));
+        dotSize.push(isBlood ? 2.2 : (isAmbient ? 0.75 : (i === 0 ? 1.3 : 0.9)));
       }
       arcs.push(arc);
     }
@@ -965,19 +1018,20 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
 
   // ------------------------------------------------------------ camera
   let flight = null;
-  function flyTo(ids = [], view) {
+  function flyTo(ids = [], view, opts = {}) {
     const rs = ids.map((id) => recs.get(id)).filter(Boolean);
     let center, dist;
+    const maxDist = opts.maxDist || (view === 'body' ? 7.2 : 3.85);
     if (!rs.length) {
-      center = BRAIN_CENTER.clone();
-      dist = 3.85;
+      center = (view === 'body' ? new THREE.Vector3(0, -1.3, 0.1) : BRAIN_CENTER.clone());
+      dist = view === 'body' ? 6.5 : 3.85;
     } else {
       center = new THREE.Vector3();
       rs.forEach((r) => center.add(r.center));
       center.divideScalar(rs.length);
       let rad = 0;
       rs.forEach((r) => { rad = Math.max(rad, r.center.distanceTo(center) + r.radius); });
-      dist = THREE.MathUtils.clamp(rad * 3.2 + 1.05, 1.75, 3.85);
+      dist = THREE.MathUtils.clamp(rad * 3.2 + 1.05, 1.75, maxDist);
     }
     const v = Array.isArray(view) ? view : VIEWS[view] || VIEWS.left;
     const dir = new THREE.Vector3(...v).normalize();
@@ -1271,7 +1325,8 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       tmpV.copy(r.center).project(camera);
       const vis = tmpV.z < 1;
       el.style.transform = `translate(${((tmpV.x + 1) / 2) * w}px, ${((1 - tmpV.y) / 2) * h + 30}px) translate(-50%, 0)`;
-      el.style.opacity = vis && !activeCellObj && r.hi > 0.05 ? String(Math.min(1, r.hi)) : '0';
+      const showLabel = vis && !activeCellObj && (r.hi > 0.05 || (r.anchor.body && bodyCurrent > 0.25));
+      el.style.opacity = showLabel ? String(Math.min(1, Math.max(r.hi, r.base || 0.7))) : '0';
     }
     // Tract labels sit just above their targets; cell labels sit on their landmark.
     spreadLabels(tractLabels, w, h, -18, !activeCellObj);
@@ -1368,6 +1423,9 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       approach(r.mat.uniforms.uHover, hoverId === r.id && !focusIds.includes(r.id) ? 0.35 : 0, 1 - Math.exp(-dt * 10));
       if (r.kind === 'anchor' && r.hi === 0 && r.mat.uniforms.uHi.value < 0.01) r.obj.visible = false;
     }
+    bodyCurrent += (bodyTarget - bodyCurrent) * (1 - Math.exp(-dt * 4));
+    bodyMat.uniforms.uBase.value = bodyCurrent * 0.22;
+    if (bodyCurrent < 0.005 && bodyTarget === 0) bodyObj.visible = false;
     approach(arcDotMat.uniforms.uHi, 1, k);
     updateArcDots(time);
     updateTreePulses(time);
@@ -1385,9 +1443,11 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     showChemical,
     showCell,
     setCellFire,
+    setBody,
     has: (id) => recs.has(id),
     reset() {
       if (isLensActive) restoreLens();
+      setBody(false);
       focus([]); setArcs([]); flyTo([]); forcedSlice = false; applySlice();
     },
     setSlice(on) { userSlice = on; applySlice(); },

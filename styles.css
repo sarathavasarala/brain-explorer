@@ -791,6 +791,108 @@ kbd {
 }
 .chem-messenger-name { color: var(--c, #ffd36b); }
 
+/* Hormone axis / chain view */
+.axis-timescale {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  font-size: 13px;
+  color: var(--ink-2);
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(190, 200, 255, 0.04);
+  border: 1px solid var(--line);
+}
+.axis-time-val {
+  color: var(--accent);
+  font-weight: 500;
+}
+.axis-chain { margin-top: 10px; }
+.axis-steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+.axis-card {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(190, 200, 255, 0.03);
+  border: 1px solid var(--line);
+  transition: border-color 0.2s, background 0.2s;
+}
+.axis-card.is-on {
+  background: rgba(190, 200, 255, 0.06);
+  border-color: var(--accent);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.12);
+}
+.axis-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.axis-step-num {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+.axis-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  text-decoration: none;
+  flex: 1;
+  margin-left: 10px;
+}
+.axis-act {
+  font-size: 12px;
+  color: var(--ink-2);
+  text-decoration: none;
+}
+.axis-via {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ink-3);
+  margin-left: 6px;
+}
+.axis-text {
+  margin: 10px 0 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+.feedback-section { margin-top: 22px; }
+.feedback-card {
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(255, 107, 125, 0.04);
+  border: 1px solid rgba(255, 107, 125, 0.25);
+  margin-top: 10px;
+}
+.feedback-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #ff6b7d;
+  background: rgba(255, 107, 125, 0.12);
+  padding: 2px 7px;
+  border-radius: 4px;
+  margin-left: auto;
+}
+.feedback-text {
+  margin: 8px 0 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .app { transition: none; }
   .ex, .library, .ask-part { animation: none; }

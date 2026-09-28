@@ -703,4 +703,58 @@ export default [
       ],
     },
   },
+  {
+    id: 'pineal-gland',
+    name: 'Pineal gland',
+    group: 'deep',
+    color: '#818cf8',
+    shape: { type: 'ellipsoid', center: [0, 0.0, -0.22], radii: [0.024, 0.02, 0.024], count: 650, pattern: 'fine', mirror: false, fill: 0.3 },
+    view: 'medial',
+    slice: true,
+    tagline: 'Produces melatonin in the dark to set your daily sleep and wake rhythm.',
+    analogy: 'A light-sensitive clock that marks the night and tells the brain when it is time to sleep.',
+    levels: {
+      where: {
+        text: 'The pineal gland sits nestled deep near the center of the brain, on the midline just above the {{midbrain}} and behind the third ventricle. It is about the size of a grain of rice, roughly 8 millimetres long. Unlike most of the brain, it sits outside the blood-brain barrier with a direct window into the bloodstream.',
+        bullets: [
+          'Small pinecone-shaped gland sitting on the midline behind the thalamus.',
+          'Receives a rich blood supply second only to the kidneys relative to its tiny size.',
+          'Often accumulates harmless calcium deposits (brain sand) as people age.',
+        ],
+      },
+      does: {
+        text: 'The pineal gland acts as the body\'s nocturnal timekeeper. In response to signals from the master circadian clock in the {{hypothalamus}}, it converts serotonin into melatonin during darkness, signaling to tissues and sleep centers that night has arrived.\n\nLooking at bright phone screens late in the evening delays melatonin release because blue light tricks the circadian clock into thinking the sun is still up.',
+        bullets: [
+          'Melatonin secretion: releases high levels of sleep hormone during darkness.',
+          'Circadian timing: works with the hypothalamic suprachiasmatic nucleus to synchronize daily cycles.',
+          'Seasonal adaptation: helps regulate seasonal biological rhythms in response to changing day length.',
+        ],
+      },
+      connects: {
+        text: 'Information about light and darkness arrives indirectly from the {{hypothalamus}} through a sympathetic nerve pathway looping down into the neck and back up. The pineal gland outputs its message chemically, pouring melatonin straight into blood capillaries and surrounding cerebrospinal fluid.',
+        connections: [
+          { id: 'hypothalamus', dir: 'in', label: 'Day and night timing cues from the master clock' },
+          { id: 'thalamus', dir: 'out', label: 'Melatonin signals bathing sleep gating circuits' },
+        ],
+      },
+      cells: {
+        text: 'The gland is composed mainly of pinealocytes, specialized endocrine cells that produce melatonin. They take in serotonin and use two light-sensitive enzymes to convert it into melatonin when sympathetic nerves release noradrenaline in the dark.',
+        synapse: 'serotonin',
+        diagram: 'thalamic-relay',
+        bullets: [
+          'Sympathetic nerve terminals release noradrenaline onto pinealocyte beta receptors to trigger enzyme production.',
+          'Light exposure shuts off sympathetic firing within minutes, stopping melatonin synthesis.',
+        ],
+      },
+    },
+    tryIt: 'Dim the lights in your living space an hour before bed. The reduction in bright light allows your pineal gland to ramp up melatonin release on schedule, helping you feel naturally sleepy.',
+    breaks: {
+      text: 'Damage, cysts, or circadian disruption impairs natural sleep timing and hormone balance.',
+      bullets: [
+        'Delayed sleep phase: difficulty falling asleep at conventional night hours due to shifted melatonin onset.',
+        'Pineal cysts: fluid-filled benign sacs that can cause headaches or compress fluid pathways if unusually large.',
+        'Jet lag: misalignment between destination day-night cycles and the pineal gland\'s internal schedule.',
+      ],
+    },
+  },
 ];
