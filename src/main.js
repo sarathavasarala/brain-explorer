@@ -20,6 +20,11 @@ const hoverEl = $('#hover-label');
 const tipEl = $('#tip');
 const lensLegendEl = $('#lens-legend');
 const cellInsetEl = $('#cell-inset');
+const canAsk = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+if (!canAsk) {
+  const askNav = $('[data-mode="ask"]');
+  if (askNav) askNav.hidden = true;
+}
 
 const INSET_PART_POS = {
   'prefrontal-cortex': [36, 42],
@@ -120,6 +125,7 @@ function parseHash() {
   }
   if (type === 'pathways') return { type: 'library' };
   if (type === 'ask') {
+    if (!canAsk) return { type: 'home' };
     let q = '';
     try { q = normalise(decodeURIComponent(id || '')); } catch { q = ''; }
     return { type: 'ask', query: q };
@@ -262,7 +268,7 @@ function apply() {
 
   if (r.type === 'home') {
     clearScene('home');
-    explainerEl.innerHTML = renderHome();
+    explainerEl.innerHTML = renderHome({ canAsk });
   } else if (r.type === 'chemhome') {
     clearScene('chemhome');
     explainerEl.innerHTML = renderChemHome();
