@@ -966,30 +966,6 @@ kbd {
   border: 1px solid rgba(68, 215, 182, 0.3);
 }
 
-.lib-card-wrap {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-}
-.lib-card-footer {
-  margin-top: -4px;
-  padding: 0 16px 14px;
-}
-.lib-dict-link {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  color: color-mix(in oklab, var(--c, #b98cff) 75%, white);
-  text-decoration: none;
-  transition: color 0.2s var(--ease);
-}
-.lib-dict-link:hover {
-  color: #fff;
-  text-decoration: underline;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .app { transition: none; }
   .ex, .library, .ask-part { animation: none; }
