@@ -55,6 +55,83 @@ breaks: {
 
 Some structures have a `parent` (for example `motor-cortex` has parent `frontal-lobe`). For a parent, keep the text broad and point to its children with `{{id}}` links. For a child, don't repeat what the parent already says.
 
+## Fields to write, per chemical (`src/content/chemicals/*.js`)
+
+```js
+tagline: 'One short sentence explaining what it does.',
+analogy: 'One sentence comparing it to something familiar.',
+overview: {
+  text: '2 to 4 sentences: where it is made, how it broadcasts, and its main effect on circuits.',
+  bullets: ['2 to 3 concise bullet points with key facts'],
+},
+// For neuromodulators:
+tracts: [
+  {
+    id: 'tract-id',
+    name: 'Tract name',
+    from: 'source-structure-id',
+    to: ['target-structure-id'],
+    job: 'Short summary of function',
+    text: '2 to 3 sentences describing the projection and effect.',
+    whenItFails: 'What happens when this projection is damaged.',
+    whenBlocked: 'What happens when medicines block it.',
+  },
+],
+// For hormones:
+axis: [
+  { from: 'source-id', to: 'target-id', label: 'Signal name', text: 'Sentence on step', via: 'portal|blood|nerve' },
+],
+feedback: [
+  { from: 'organ-id', to: 'brain-id', label: 'Feedback signal', text: 'Sentence on how it quiets release' },
+],
+timescale: 'Minutes to hours',
+receptors: [
+  { id: 'R1', family: 'Family', effect: 'excite|inhibit|modulate', where: ['structure-id'], text: 'Sentence on mechanism.' },
+],
+life: {
+  made: 'One sentence on synthesis.',
+  packed: 'One sentence on storage vesicles.',
+  released: 'One sentence on exocytosis and triggers.',
+  binds: 'One sentence on receptor interactions.',
+  cleared: 'One sentence on reuptake or breakdown.',
+  clearedBy: 'reuptake|breakdown|blood',
+},
+breaks: {
+  text: '1 to 2 sentences on disease states or imbalance.',
+  bullets: ['2 to 3 symptoms or clinical conditions, plainly explained'],
+},
+tryIt: '1 to 2 sentences: an everyday activity or state where you feel this chemical working.',
+```
+
+## Fields to write, per cell (`src/content/cells/index.js`)
+
+```js
+tagline: 'One short sentence explaining its role.',
+analogy: 'One sentence comparing it to something familiar.',
+shape: {
+  text: '2 to 4 sentences describing its physical structure and parts.',
+  bullets: ['2 to 3 facts about its dendrites, axon, or processes'],
+},
+fires: {
+  text: '2 to 4 sentences explaining its electrical and signalling style.',
+  steps: [
+    'How inputs arrive at dendrites',
+    'How inputs sum at the cell body',
+    'How the spike travels down the axon',
+    'How transmitter is released at terminals',
+  ],
+},
+chem: {
+  text: '2 to 3 sentences on what transmitters and modulators it uses and senses.',
+  receptors: ['Receptor names'],
+  modulatedBy: ['chemical-ids'],
+},
+breaks: {
+  text: '1 to 2 sentences on what occurs when this cell type degenerates or misfires.',
+  bullets: ['2 to 3 symptoms or clinical conditions, plainly explained'],
+},
+```
+
 ## Fields to write, per pathway (`src/content/pathways/index.js`)
 
 ```js
@@ -77,9 +154,9 @@ Each step's text should follow on from the previous one, like a story.
 
 ### Valid structure ids
 
-frontal-lobe, prefrontal-cortex, motor-cortex, brocas-area, parietal-lobe, somatosensory-cortex, posterior-parietal, temporal-lobe, auditory-cortex, wernickes-area, occipital-lobe, visual-cortex, cingulate-cortex, insula, thalamus, hypothalamus, striatum, globus-pallidus, substantia-nigra, hippocampus, amygdala, corpus-callosum, cerebellum, midbrain, pons, medulla, spinal-cord
+frontal-lobe, prefrontal-cortex, motor-cortex, brocas-area, parietal-lobe, somatosensory-cortex, posterior-parietal, temporal-lobe, auditory-cortex, wernickes-area, occipital-lobe, visual-cortex, cingulate-cortex, insula, thalamus, hypothalamus, striatum, globus-pallidus, substantia-nigra, vta, nucleus-accumbens, basal-forebrain, raphe-nuclei, locus-coeruleus, pituitary, pineal-gland, hippocampus, amygdala, corpus-callosum, cerebellum, midbrain, pons, medulla, spinal-cord
 
-(`eye`, `ear` and `hand` are body anchors used in pathway routes. Don't use them in `{{ }}` links.)
+(`eye`, `ear`, `hand`, `thyroid`, `heart`, `stomach`, `adrenal`, `fat`, and `gonads` are body anchors used in pathways, axes, and organ targets. Don't use them in `{{ }}` links.)
 
 ### Glossary terms that exist
 

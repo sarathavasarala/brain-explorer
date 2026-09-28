@@ -1,4 +1,4 @@
-import { structures, byId, groups, levels, diagrams, synapses, pathways, anchorById, cells } from '../content/index.js';
+import { structures, byId, groups, levels, diagrams, synapses, pathways, anchorById, chemicals, chemById, cells, cellById } from '../content/index.js';
 import { fmt, paragraphs, esc } from './format.js';
 import { renderCircuit, renderSynapse, LINK_COLORS } from './diagrams.js';
 import { icon } from './icons.js';
@@ -66,15 +66,27 @@ export function renderStructure(s, levelId, source) {
   const idx = structures.indexOf(s);
   const prev = structures[idx - 1], next = structures[idx + 1];
   const file = source || 'src/content/structures/…';
+  const makes = chemicals.filter((c) => c.madeIn?.includes(s.id));
 
   let body = L.text ? paragraphs(L.text) : todo(`${file} → ${s.id}.levels.${level.id}.text`);
   body += bullets(L.bullets);
   if (level.id === 'connects') body += connectionRows(s);
   if (level.id === 'cells') {
+    const actingChems = chemicals.filter((c) => c.density && c.density[s.id]);
+    if (actingChems.length) {
+      body += `<div class="cell-zoom-row">
+        <h3 class="cell-zoom-h">Chemicals that act here</h3>
+        <div class="chips">${actingChems.map((c) => {
+          const recs = (c.receptors || []).filter((r) => r.where?.includes(s.id)).map((r) => r.id);
+          const recText = recs.length ? ` (${recs.join(', ')})` : '';
+          return `<a class="chip" href="#/chem/${c.id}" style="--c:${c.color}"><i class="dot"></i>${esc(c.name)}${recText ? `<span class="chip-sub">${esc(recText)}</span>` : ''}</a>`;
+        }).join('')}</div>
+      </div>`;
+    }
     const residentCells = cells.filter((c) => c.where?.includes(s.id));
     if (residentCells.length) {
       body += `<div class="cell-zoom-row">
-        <h3 class="cell-zoom-h">Zoom into a cell</h3>
+        <h3 class="cell-zoom-h">Cells found here</h3>
         <div class="chips">${residentCells.map((c) => `<a class="chip" href="#/cell/${c.id}/shape" style="--c:${c.color}"><i class="dot"></i>${esc(c.name)}</a>`).join('')}</div>
       </div>`;
     }
@@ -91,6 +103,7 @@ export function renderStructure(s, levelId, source) {
     </nav>
     <h1 class="ex-title">${esc(s.name)}</h1>
     <p class="tagline">${fmt(s.tagline || '')}</p>
+    ${makes.length ? `<div class="part-makes-row"><span class="part-makes-lead">Makes:</span> <span class="chips">${makes.map((c) => `<a class="chip chip-sm" href="#/chem/${c.id}" style="--c:${c.color}"><i class="dot"></i>${esc(c.name)}</a>`).join('')}</span></div>` : ''}
     ${s.analogy ? `<p class="analogy"><span class="analogy-lead">Think of it as</span> ${fmt(s.analogy)}</p>` : ''}
     ${ladder(level.id)}
     <section class="level" data-level="${level.id}">
@@ -170,6 +183,12 @@ export function renderPathway(p, step, playing) {
 
 export function renderHome() {
   const starts = ['cerebellum', 'hippocampus', 'prefrontal-cortex', 'amygdala'].filter((id) => byId.has(id));
+  const featuredChems = ['dopamine', 'serotonin', 'cortisol']
+    .map((id) => chemById.get(id))
+    .filter(Boolean);
+  const featuredCells = ['pyramidal', 'purkinje', 'astrocyte']
+    .map((id) => cellById.get(id))
+    .filter(Boolean);
   const featuredPathways = ['seeing', 'hearing-speech', 'moving']
     .map((id) => pathways.find((p) => p.id === id))
     .filter(Boolean);
@@ -185,6 +204,10 @@ export function renderHome() {
     </dl>
     <h3 class="home-h">Good places to start</h3>
     <div class="chips">${starts.map((id) => { const s = byId.get(id); return `<a class="chip" href="#/s/${id}" style="--c:${s.color}"><i></i>${esc(s.name)}</a>`; }).join('')}</div>
+    <h3 class="home-h">Start with a chemical</h3>
+    <div class="chips">${featuredChems.map((c) => `<a class="chip" href="#/chem/${c.id}" style="--c:${c.color}"><i class="dot"></i>${esc(c.name)}</a>`).join('')}<a class="chip chip-path" href="#/chem">See all ${chemicals.length}</a></div>
+    <h3 class="home-h">Zoom into a cell</h3>
+    <div class="chips">${featuredCells.map((c) => `<a class="chip" href="#/cell/${c.id}" style="--c:${c.color}"><i class="dot"></i>${esc(c.name)}</a>`).join('')}<a class="chip chip-path" href="#/cell">See all ${cells.length}</a></div>
     <h3 class="home-h">Or follow a pathway</h3>
     <div class="chips">${featuredPathways.map((p) => `<a class="chip chip-path" href="#/p/${p.id}">${icon('pathway', 14)}${esc(p.name)}</a>`).join('')}<a class="chip chip-path" href="#/pathways">See all ${pathways.length}</a></div>
     <h3 class="home-h">Or ask about something else</h3>

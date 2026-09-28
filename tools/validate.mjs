@@ -29,7 +29,11 @@ for (const c of chemicals) {
 for (const c of cells) {
   const gaps = [];
   if (!c.tagline) gaps.push('tagline');
+  if (!c.analogy) gaps.push('analogy');
   if (!c.shape?.text) gaps.push('shape');
+  if (!c.fires?.text) gaps.push('fires');
+  if (!c.chem?.text) gaps.push('chem');
+  if (!c.breaks?.text) gaps.push('breaks');
   if (gaps.length) missing.push(`  cell ${c.id}: ${gaps.join(', ')}`);
 }
 

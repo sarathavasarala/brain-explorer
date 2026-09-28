@@ -164,9 +164,7 @@ function setMode(type) {
   });
   const searchInput = $('#search');
   if (searchInput) {
-    searchInput.placeholder = dict === 'chem' ? 'Search chemicals'
-      : dict === 'cell' ? 'Search cell types'
-      : 'Search parts of the brain';
+    searchInput.placeholder = 'Search parts, chemicals, cells';
   }
 }
 

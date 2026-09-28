@@ -15,7 +15,7 @@ Hand this whole file to the implementing model. Work one phase at a time. Each p
    - Existing routes must still work exactly as before: `#/`, `#/s/thalamus/where`, `#/s/cerebellum/cells`, `#/pathways`, `#/p/moving/3`, `#/ask`.
    - Keep the frame rate smooth. Budget: no more than 15,000 extra points on screen from any new feature.
 7. Coordinates: +x is the person's left, +y up, +z front. The camera looks at the left side by default, so draw one-sided things on x > 0.
-8. Commit message per phase: `Phase N: <short summary>`, with the trailer `Co-authored-by: Copilot App <223556219+Copilot@users.noreply.github.com>`.
+8. Commit message per phase: `Phase N: <short summary>`.
 
 ## 1. What we are building
 

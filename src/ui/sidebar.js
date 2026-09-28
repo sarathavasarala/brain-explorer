@@ -6,6 +6,45 @@ export function renderSidebar(el, { dict = 'parts', selected, query } = {}) {
   const q = (query || '').trim().toLowerCase();
   const match = (s) => !q || s.name.toLowerCase().includes(q) || (s.tagline || '').toLowerCase().includes(q);
 
+  if (q) {
+    const results = [];
+    for (const s of structures) {
+      if (match(s)) results.push({ kind: 'Part', href: `#/s/${s.id}`, id: s.id, name: s.name, tagline: s.tagline || '', color: s.color });
+    }
+    for (const c of chemicals) {
+      if (match(c)) results.push({ kind: 'Chemical', href: `#/chem/${c.id}`, id: c.id, name: c.name, tagline: c.tagline || '', color: c.color });
+    }
+    for (const c of cells) {
+      if (match(c)) results.push({ kind: 'Cell', href: `#/cell/${c.id}`, id: c.id, name: c.name, tagline: c.tagline || '', color: c.color });
+    }
+    results.sort((a, b) => {
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
+      const aStarts = aName.startsWith(q);
+      const bStarts = bName.startsWith(q);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+      const aIn = aName.includes(q);
+      const bIn = bName.includes(q);
+      if (aIn && !bIn) return -1;
+      if (!aIn && bIn) return 1;
+      return 0;
+    });
+
+    if (!results.length) {
+      el.innerHTML = `<p class="empty">Nothing matches “${esc(query)}”.</p>`;
+      return;
+    }
+    const rows = results.map((item) => `<li><a href="${item.href}" class="item ${selected === item.id ? 'is-on' : ''}" data-id="${item.id}" style="--c:${item.color}" title="${esc(item.tagline)}">
+      <i class="dot"></i><span class="item-text">
+        <span class="item-name-row"><span class="item-name">${esc(item.name)}</span><span class="badge badge-type badge-type-${item.kind.toLowerCase()}">${esc(item.kind)}</span></span>
+        <span class="item-sub">${esc(item.tagline)}</span>
+      </span>
+    </a></li>`);
+    el.innerHTML = `<section class="group"><h2 class="group-h">Search results<span>${results.length} found</span></h2><ul>${rows.join('')}</ul></section>`;
+    return;
+  }
+
   if (dict === 'chem') {
     const html = [];
     for (const g of chemicalGroups) {

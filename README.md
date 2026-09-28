@@ -31,12 +31,20 @@ npm run validate
 
 ## What is inside
 
-- 31 structures with shapes, colours, camera views, connections, and beginner-level text
+- 34 structures with shapes, colours, camera views, connections, and beginner-level text
+- 17 chemicals across fast transmitters, neuromodulators, and body-wide hormones with 3D fibre trees, density glow, receptor profiles, and interactive synapse and chain views
+- 13 cell types across neurons and glia with 3D procedural morphologies, real-time firing animations, and zoom transitions
 - 11 pathways in three groups: how you do things, brain chemicals and brain networks
 - Ask: type a feeling, condition or activity and get a short sketch of the parts involved
 - 4 zoom levels per structure: where it is, what it does, how it connects, down to cells
-- Cell circuit diagrams, animated synapses, and hover glossary definitions
-- Three modes in the top bar. Parts: `#/`, `#/s/<id>/<level>`. Pathways: `#/pathways`, `#/p/<id>/<step>`. Ask: `#/ask`, `#/ask/<question>`. Keyboard: arrows, Esc (goes back one level), Space.
+- Global search across parts, chemicals, and cells from the unified search bar
+- Modes in the top bar:
+  - Parts: `#/`, `#/s/<id>/<level>`
+  - Chemicals: `#/chem`, `#/chem/<id>/<tab>`
+  - Cells: `#/cell`, `#/cell/<id>/<tab>`
+  - Pathways: `#/pathways`, `#/p/<id>/<step>`
+  - Ask: `#/ask`, `#/ask/<question>`
+  - Keyboard: arrows, Esc (steps back one level), Space
 
 Shapes are simplified for explanation, not an anatomical atlas. Coordinates: +x is the person's left, +y is up, +z is the front. The brain is about 1.7 units long front to back.
 
@@ -45,13 +53,16 @@ Shapes are simplified for explanation, not an anatomical atlas. Coordinates: +x 
 | File | What it does |
 |---|---|
 | `index.html` | Layout shell, importmap, fonts |
-| `styles.css` | All styling (dark theme, per-structure accent colour) |
+| `styles.css` | All styling (dark holographic theme, per-part accent colour, badges, steppers) |
 | `server.py` | Static server plus the `/api/ask` proxy that holds the API key |
 | `src/main.js` | Hash routing, modes, wires sidebar, library, explainer, scene, toolbar |
-| `src/scene/brain-scene.js` | 3D engine: point shader, bloom, focus/highlight, arcs, picking, camera flights, slice |
+| `src/scene/brain-scene.js` | 3D engine: point shaders, bloom, focus/highlight, arcs, picking, chemical lens, cell view, body view |
+| `src/scene/neuron.js` | Procedural 3D cell morphologies (pyramidal, Purkinje, motor, astrocyte, microglia, etc.) |
 | `src/scene/shapes.js` | Point-cloud generators (`cortex`, `ellipsoid`, `tube`, `band`, `parts`, `custom`) |
 | `src/scene/noise.js` | Seeded random and Perlin noise |
 | `src/content/structures/*.js` | One object per brain part: shape, colour, camera view, connections, text |
+| `src/content/chemicals/*.js` | Chemical dictionary: fast transmitters, neuromodulators, and body hormones |
+| `src/content/cells/*.js` | Cell dictionary: excitatory, inhibitory, neuromodulatory, and glial types |
 | `src/content/pathways/index.js` | Guided tours: steps with focus, route, view, plus a `category` |
 | `src/content/pathways/groups.js` | The sections of the pathway library |
 | `src/content/ask-presets.js` | Saved Ask answers, checked by hand, that load without the server |
@@ -59,8 +70,8 @@ Shapes are simplified for explanation, not an anatomical atlas. Coordinates: +x 
 | `src/content/diagrams/index.js` | Circuit diagrams for the "Down to cells" level |
 | `src/content/synapses.js`, `glossary/index.js`, `levels.js`, `groups.js`, `anchors.js` | Supporting data |
 | `src/content/index.js` | Merges everything, exports `validate()` |
-| `src/ui/*.js` | Explainer, sidebar (Parts), library (Pathways), Ask screen, SVG diagrams, text markup, icons |
-| `tools/validate.mjs` | Lists missing text and broken references |
+| `src/ui/*.js` | Explainer, sidebar, chem/cell explainers, synapse stepper, library, Ask screen, SVG diagrams |
+| `tools/validate.mjs` | Lists missing text and broken references across parts, chemicals, cells, pathways |
 
 ## Adding content
 
@@ -72,6 +83,10 @@ Keep all text beginner-level: short sentences, concrete everyday examples, no em
 - Deep parts use `ellipsoid` / `tube` / `band`, or `parts: [...]` to combine several.
 - `mirror: true` duplicates the shape on both sides.
 - `pattern` can be `gyri`, `fine`, `folia`, `rings`, `fibers`, or `cross`.
+
+**Chemical / Hormone:** add an object to `src/content/chemicals/fast.js`, `modulators.js`, or `hormones.js`. Required: `id`, `name`, `group`, `color`, `tagline`, `analogy`, `overview`, `density`, `receptors`, `life`, `breaks`, `tryIt`. Modulators include `tracts`. Hormones include `axis`, `feedback`, `timescale`.
+
+**Cell:** add an object to `src/content/cells/index.js`. Required: `id`, `name`, `group`, `color`, `tagline`, `analogy`, `transmitter`, `where`, `size`, `morph` (style and seed), `landmarks`, `shape`, `fires`, `chem`, `breaks`.
 
 **Pathway:** add to `src/content/pathways/index.js` with a `category` from `pathways/groups.js`. Each step has `title`, `focus: [ids]`, `route: [[from, to], ...]`, optional `view` and `slice`. Add `summary` plus a 2 to 4 sentence `text` per step that follows the previous one like a story.
 

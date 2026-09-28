@@ -1,4 +1,4 @@
-import { pathways, pathwayGroups, byId } from '../content/index.js';
+import { pathways, pathwayGroups, byId, chemicals } from '../content/index.js';
 import { routeStrip } from './explainer.js';
 import { fmt, esc } from './format.js';
 
@@ -31,13 +31,20 @@ export function renderLibraryBody(query = '') {
         <h2 class="lib-section-h">${esc(g.label)}</h2>
         <p class="lib-section-blurb">${esc(g.blurb)}</p>
       </div>
-      <ul class="lib-list">${list.map((p) => `
-        <li><a class="lib-item" href="#/p/${p.id}" style="--c:${firstColor(p)}">
-          ${routeStrip(p)}
-          <span class="lib-name">${esc(p.name)}</span>
-          <span class="lib-tag">${fmt(p.tagline || '')}</span>
-          <span class="lib-meta">${p.steps.length} steps</span>
-        </a></li>`).join('')}
+      <ul class="lib-list">${list.map((p) => {
+        const chem = g.id === 'chemistry' ? chemicals.find((c) => c.pathwayId === p.id || p.id.startsWith(c.id)) : null;
+        return `<li>
+          <div class="lib-card-wrap">
+            <a class="lib-item" href="#/p/${p.id}" style="--c:${firstColor(p)}">
+              ${routeStrip(p)}
+              <span class="lib-name">${esc(p.name)}</span>
+              <span class="lib-tag">${fmt(p.tagline || '')}</span>
+              <span class="lib-meta">${p.steps.length} steps</span>
+            </a>
+            ${chem ? `<div class="lib-card-footer"><a class="lib-dict-link" href="#/chem/${chem.id}" style="--c:${chem.color}">Open dictionary entry &rarr;</a></div>` : ''}
+          </div>
+        </li>`;
+      }).join('')}
       </ul>
     </section>`;
   }).join('');

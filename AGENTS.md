@@ -44,20 +44,30 @@ brain-explorer/
 └── src/
     ├── main.js                 # Hash router, top-level state, keyboard navigation, wiring
     ├── scene/                  # 3D holographic point-cloud engine
-    │   ├── brain-scene.js      # Three.js scene, point shaders, bloom, camera flights, slice plane, picking
+    │   ├── brain-scene.js      # Three.js scene, point shaders, bloom, camera flights, slice plane, picking, chemical lens, cell view, body view
+    │   ├── neuron.js           # Procedural 3D cell morphologies & firing animation geometries
     │   ├── shapes.js           # Point-cloud math, procedural generators (cortex, ellipsoid, tube, etc.)
     │   └── noise.js            # Seeded random and 3D Perlin noise
     ├── content/                # Declarative neuroscience data & text
     │   ├── index.js            # Unified export & validation engine (validate())
     │   ├── groups.js           # Structural groupings (Cortex, Deep, Hindbrain)
     │   ├── levels.js           # 4 zoom levels (where, does, connects, cells)
-    │   ├── anchors.js          # Sensory/motor body endpoints (eye, ear, hand) for pathways
+    │   ├── anchors.js          # Sensory/motor and body organ endpoints for pathways and hormones
     │   ├── synapses.js         # Synapse types (glutamate, gaba, dopamine, etc.)
     │   ├── ask-presets.js      # Hand-verified fallback answers for Ask mode
     │   ├── structures/
     │   │   ├── cortex.js       # Cortical lobes and areas (views into shared cortex cloud)
     │   │   ├── deep.js         # Subcortical structures (limbic, basal ganglia, thalamus, etc.)
     │   │   └── hindbrain.js    # Cerebellum, brainstem, spinal cord
+    │   ├── chemicals/
+    │   │   ├── groups.js       # Chemical groups (Fast, Modulators, Hormones)
+    │   │   ├── fast.js         # Fast amino acid transmitters (Glutamate, GABA, Glycine)
+    │   │   ├── modulators.js   # Monoamines and acetylcholine with projection tracts
+    │   │   ├── hormones.js     # Body-wide endocrine signals with axis chains and feedback
+    │   │   └── index.js        # Merged chemical registry
+    │   ├── cells/
+    │   │   ├── groups.js       # Cell groups (Excitatory, Inhibitory, Modulatory, Glia)
+    │   │   └── index.js        # Cell definitions with morphology recipes and firing steps
     │   ├── pathways/
     │   │   ├── groups.js       # Pathway categories (actions, chemicals, networks)
     │   │   └── index.js        # Step-by-step guided tours and neural routes
@@ -68,8 +78,12 @@ brain-explorer/
     ├── services/
     │   └── ask.js              # Client-side Ask query service (presets -> /api/ask)
     └── ui/
-        ├── explainer.js        # Right-side card: 4 zoom levels, try-it, breaks, synapse/circuit
-        ├── sidebar.js          # Left-side Parts navigation accordion
+        ├── explainer.js        # Right-side card: 4 zoom levels, try-it, breaks, cross-links
+        ├── sidebar.js          # Left-side Parts/Chemicals/Cells tabs with global search
+        ├── chem.js             # Chemical explainer: overview, tracts, synapse, medicine, axis chain
+        ├── cell.js             # Cell explainer: shape, firing sequencer, lives in, chemistry
+        ├── synapse-stepper.js  # Interactive synapse mechanism with drug condition toggles
+        ├── ladder.js           # 4-level zoom ladder widget
         ├── library.js          # Full-width Pathways tour browser
         ├── ask.js              # Ask query bar, preset chips, multi-part spotlight cards
         ├── diagrams.js         # Interactive SVG circuit diagrams with animated action potentials
@@ -88,14 +102,23 @@ The app is a single-page application driven by hash navigation in [src/main.js](
 | **Parts** | `#/` | Default view (whole brain, left lateral view). |
 | **Parts** | `#/s/<structure-id>` | Selects structure, opens default zoom level (`where`). |
 | **Parts** | `#/s/<structure-id>/<level>` | Opens specific level (`where`, `does`, `connects`, `cells`). |
+| **Chemicals** | `#/chem` | Chemical dictionary home with group overview. |
+| **Chemicals** | `#/chem/<chem-id>` | Chemical overview with receptor density glow and fibre arbors. |
+| **Chemicals** | `#/chem/<chem-id>/<tab>` | Opens specific chemical tab (`overview`, `tracts`, `synapse`, `medicine`, `axis`). |
+| **Chemicals** | `#/chem/<chem-id>/<tab>/<sub>` | Sub-focuses a specific tract or hormone axis step. |
+| **Cells** | `#/cell` | Cell dictionary home with neuron and glial catalog. |
+| **Cells** | `#/cell/<cell-id>` | 3D procedural cell morphology view. |
+| **Cells** | `#/cell/<cell-id>/<tab>` | Opens specific cell tab (`shape`, `fires`, `lives`, `chem`). |
 | **Pathways** | `#/pathways` | Opens the full-width library grid of guided tours. |
 | **Pathways** | `#/p/<pathway-id>/<step>` | Enters guided tour at 0-indexed step number (hides sidebar). |
 | **Ask** | `#/ask` | Opens the search / question interface with preset chips. |
 | **Ask** | `#/ask/<query>` | Executes query, highlights involved brain parts in 3D. |
 
-### Keyboard Shortcuts
-- `ArrowRight` / `ArrowLeft`: Navigate between zoom levels (Parts) or tour steps (Pathways).
-- `Escape`: Step up / go back (cells -> connects -> does -> where -> home).
+### Global Search & Keyboard Shortcuts
+- Unified search in the sidebar filters across all structures, chemicals, and cells simultaneously. Pressing Enter opens the top match.
+- `ArrowRight` / `ArrowLeft`: Navigate between zoom levels (Parts), tabs (Chemicals, Cells), or tour steps (Pathways).
+- `ArrowUp` / `ArrowDown`: Step to previous or next item in the active category.
+- `Escape`: Step up or go back (cells -> connects -> does -> where -> home; sub-tabs -> home).
 - `Space`: Next step in active pathway tour.
 
 ---
@@ -117,13 +140,28 @@ Defined in `brain-scene.js`:
 - `'medial'`: Sliced sagittal view looking at inner wall from midline.
 - `'back'`: Occipital / posterior view.
 - `'below'`: Ventral / inferior view.
+- `'body'`: Zoomed-out view framing the torso and body organs.
 
 ### Point-Cloud Shaders & Rendering
 - Points are rendered with custom GLSL shaders (`brain-scene.js`).
-- Dynamic uniform controls: `uFocus`, `uDim`, `uTime`, `uSlice`, `uSliceDir`.
-- Points have an attribute `aSize` and `color`.
+- Dynamic uniform controls: `uFocus`, `uDim`, `uTime`, `uSlice`, `uSliceDir`, `uGlobal`.
+- Points have attributes `aSize`, `color`, `aHiColor`, `aHi`.
 - Bloom is handled by `UnrealBloomPass` with tuned parameters to keep background black without haze.
-- Arcs between regions are animated quadratic / cubic Bezier curves in 3D space with particle pulses.
+- Arcs between regions are animated quadratic or cubic Bezier curves in 3D space with particle pulses.
+- Blood-borne arcs (`style: 'blood'`) provide slower, larger pulse dots hugging the body for endocrine signals.
+
+### Chemical Lens (`showChemical(entry, opts)`)
+- Recolor cortex and subcortical structures by receptor density (`paintLens`).
+- Branching axon arbor fibre trees with slow pulse particles and synaptic release sparkles.
+- Midline structures automatically engage sagittal slice.
+
+### Cell Morphology Engine (`showCell(cell, opts)`)
+- Procedural cell geometries via `buildCell` in `neuron.js` (pyramidal, Purkinje, motor, astrocyte, microglia, etc.).
+- Custom cell GLSL shader (`cellVertexShader`/`cellFragmentShader`) animating dendritic EPSPs, soma depolarization, axonal saltatory spike jumps, and terminal transmitter release.
+
+### Body & Hormone View (`setBody(on)`)
+- Faint 4,000-point body silhouette (`#7a86c8`) with visceral organ anchors (`thyroid`, `heart`, `stomach`, `adrenal`, `fat`, `gonads`).
+- Endocrine arcs connect brain to body glands, and feedback loops return from organs to the brain.
 
 ### Shape Generators (`shapes.js`)
 There are two ways 3D points are allocated to a structure:
@@ -300,6 +338,99 @@ Hand-verified answers displayed as instant chips and offline fallbacks:
 }
 ```
 
+### 6. Chemical Schema (`src/content/chemicals/*.js`)
+```javascript
+{
+  id: 'dopamine',
+  name: 'Dopamine',
+  group: 'modulator',            // 'fast' | 'modulator' | 'hormone'
+  color: '#b98cff',
+  tagline: 'Short one-sentence summary.',
+  analogy: 'Familiar physical analogy.',
+  synapse: 'dopamine',           // optional synapse key
+  pathwayId: 'dopamine-pathways', // optional pathway key
+  madeFrom: 'tyrosine',
+  madeIn: ['substantia-nigra', 'vta'],
+  overview: {
+    text: '2 to 4 sentences introducing the messenger.',
+    bullets: ['2 to 3 bullet points with key facts.'],
+  },
+  tracts: [                      // for modulators
+    {
+      id: 'nigrostriatal',
+      name: 'Nigrostriatal pathway',
+      from: 'substantia-nigra',
+      to: ['striatum'],
+      job: 'Starting and smoothing voluntary physical movements',
+      text: 'Description of the projection.',
+      whenItFails: 'Clinical symptom when damaged.',
+      whenBlocked: 'Side effect when blocked.',
+    },
+  ],
+  axis: [                        // for hormones
+    { from: 'hypothalamus', to: 'pituitary', label: 'CRH signal', text: 'Steps down the axis', via: 'portal' },
+  ],
+  feedback: [                    // for hormones
+    { from: 'adrenal', to: 'hypothalamus', label: 'Cortisol feedback', text: 'Shuts down release' },
+  ],
+  timescale: 'Minutes to hours',  // for hormones
+  density: { 'striatum': 1.0, 'prefrontal-cortex': 0.5 },
+  receptors: [
+    { id: 'D1', family: 'D1-like', effect: 'modulate', where: ['striatum'], text: 'Excitatory modulation.' },
+  ],
+  life: {
+    made: 'Synthesis description.',
+    packed: 'Storage description.',
+    released: 'Exocytosis description.',
+    binds: 'Receptor action description.',
+    cleared: 'Clearance mechanism description.',
+    clearedBy: 'reuptake',       // 'reuptake' | 'breakdown' | 'blood'
+  },
+  drugs: [
+    { name: 'L-DOPA', type: 'Precursor', action: 'boost', text: 'Boosts dopamine synthesis.' },
+  ],
+  breaks: {
+    text: 'What happens when imbalanced.',
+    bullets: ['Symptoms or conditions.'],
+  },
+  tryIt: 'Everyday physical or mental check.',
+}
+```
+
+### 7. Cell Schema (`src/content/cells/index.js`)
+```javascript
+{
+  id: 'purkinje',
+  name: 'Purkinje cell',
+  group: 'inhibitory',           // 'excitatory' | 'inhibitory' | 'modulatory' | 'glia'
+  color: '#ffd36b',
+  tagline: 'Short one-sentence summary.',
+  analogy: 'Familiar physical analogy.',
+  transmitter: 'gaba',           // chemical id, or null for glia
+  where: ['cerebellum'],         // structure ids where it resides
+  size: 'Cell body about 0.05 mm across',
+  morph: { style: 'purkinje', seed: 7 }, // procedural generator style and seed
+  landmarks: ['soma', 'dendrites', 'axon', 'terminals'],
+  shape: {
+    text: '2 to 4 sentences describing its physical structure.',
+    bullets: ['2 to 3 structural facts.'],
+  },
+  fires: {
+    text: '2 to 4 sentences explaining its electrical firing pattern.',
+    steps: ['Inputs arrive', 'Integration at soma', 'Spike along axon', 'Transmitter release'],
+  },
+  chem: {
+    text: 'Neurotransmitters, receptors, and modulators.',
+    receptors: ['GABA-A', 'AMPA'],
+    modulatedBy: ['noradrenaline'],
+  },
+  breaks: {
+    text: 'What happens when these cells fail or degenerate.',
+    bullets: ['Clinical conditions or symptoms.'],
+  },
+}
+```
+
 ---
 
 ## 8. How to Extend Brain Explorer
@@ -314,6 +445,21 @@ Hand-verified answers displayed as instant chips and offline fallbacks:
 4. Ensure all connections reference valid structure IDs and valid directions (`in`, `out`, `both`).
 5. Ensure any referenced `diagram` or `synapse` exists.
 6. Run `npm run validate` and resolve any warnings.
+
+### Adding a New Chemical or Hormone
+1. Choose the file in `src/content/chemicals/`:
+   - Fast transmitters: `fast.js`
+   - Neuromodulators: `modulators.js`
+   - Body hormones: `hormones.js`
+2. Define the chemical object adhering to the schema in Section 7.
+3. Ensure all structures in `madeIn`, `density`, `receptors[].where`, and `axis` / `feedback` are valid IDs or body anchors.
+4. Run `npm run validate`.
+
+### Adding a New Cell Type
+1. Open `src/content/cells/index.js`.
+2. Define the cell object with valid `group`, `morph.style` (supported by `src/scene/neuron.js`), `where` structures, and `transmitter`.
+3. Provide `fires.steps` (array of step descriptions) and `landmarks`.
+4. Run `npm run validate`.
 
 ### Adding a New Pathway
 1. Open [src/content/pathways/index.js](file:///Users/sarathavasarala/Desktop/Projects/brain-explorer/src/content/pathways/index.js).
