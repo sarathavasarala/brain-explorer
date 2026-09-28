@@ -1,4 +1,4 @@
-import { structures, byId, groups, levels, diagrams, synapses, pathways, anchorById, chemicals, chemById, cells, cellById } from '../content/index.js';
+import { structures, byId, groups, levels, diagrams, synapses, pathways, anchorById, chemicals, cells } from '../content/index.js';
 import { fmt, paragraphs, esc } from './format.js';
 import { renderCircuit, renderSynapse, LINK_COLORS } from './diagrams.js';
 import { icon } from './icons.js';
@@ -182,14 +182,8 @@ export function renderPathway(p, step, playing) {
 }
 
 export function renderHome() {
-  const starts = ['cerebellum', 'hippocampus', 'prefrontal-cortex', 'amygdala'].filter((id) => byId.has(id));
-  const featuredChems = ['dopamine', 'serotonin', 'cortisol']
-    .map((id) => chemById.get(id))
-    .filter(Boolean);
-  const featuredCells = ['pyramidal', 'purkinje', 'astrocyte']
-    .map((id) => cellById.get(id))
-    .filter(Boolean);
-  const featuredPathways = ['seeing', 'hearing-speech', 'moving']
+  const starts = ['cerebellum', 'hippocampus', 'prefrontal-cortex', 'amygdala', 'motor-cortex', 'visual-cortex'].filter((id) => byId.has(id));
+  const featuredPathways = ['seeing', 'moving', 'pain', 'fear', 'hearing-speech']
     .map((id) => pathways.find((p) => p.id === id))
     .filter(Boolean);
   return `<article class="ex ex-home" style="--accent:#c77dff">
@@ -202,15 +196,11 @@ export function renderHome() {
     <dl class="ladder-key">
       ${levels.map((l) => `<div><dt>${esc(l.label)}</dt><dd>${esc({ where: 'Its location, shape and landmarks.', does: 'The jobs it handles and what you would notice without it.', connects: 'Who it talks to. The model animates the traffic.', cells: 'The cell types, wiring and chemical messengers inside.' }[l.id] || l.size)}</dd></div>`).join('')}
     </dl>
-    <h3 class="home-h">Good places to start</h3>
+    <h3 class="home-h">Explore key brain regions</h3>
     <div class="chips">${starts.map((id) => { const s = byId.get(id); return `<a class="chip" href="#/s/${id}" style="--c:${s.color}"><i></i>${esc(s.name)}</a>`; }).join('')}</div>
-    <h3 class="home-h">Start with a chemical</h3>
-    <div class="chips">${featuredChems.map((c) => `<a class="chip" href="#/chem/${c.id}" style="--c:${c.color}"><i class="dot"></i>${esc(c.name)}</a>`).join('')}<a class="chip chip-path" href="#/chem">See all ${chemicals.length}</a></div>
-    <h3 class="home-h">Zoom into a cell</h3>
-    <div class="chips">${featuredCells.map((c) => `<a class="chip" href="#/cell/${c.id}" style="--c:${c.color}"><i class="dot"></i>${esc(c.name)}</a>`).join('')}<a class="chip chip-path" href="#/cell">See all ${cells.length}</a></div>
-    <h3 class="home-h">Or follow a pathway</h3>
-    <div class="chips">${featuredPathways.map((p) => `<a class="chip chip-path" href="#/p/${p.id}">${icon('pathway', 14)}${esc(p.name)}</a>`).join('')}<a class="chip chip-path" href="#/pathways">See all ${pathways.length}</a></div>
-    <h3 class="home-h">Or ask about something else</h3>
+    <h3 class="home-h">Follow a guided pathway</h3>
+    <div class="chips">${featuredPathways.map((p) => `<a class="chip chip-path" href="#/p/${p.id}">${icon('pathway', 14)}${esc(p.name)}</a>`).join('')}<a class="chip chip-path" href="#/pathways">See all ${pathways.length} pathways</a></div>
+    <h3 class="home-h">Or ask a question</h3>
     <div class="chips"><a class="chip chip-path" href="#/ask">What happens in the brain when…</a></div>
     <p class="controls-hint">Drag to rotate · scroll to zoom · right-drag to pan · <kbd>↑</kbd><kbd>↓</kbd> move through parts · <kbd>←</kbd><kbd>→</kbd> change level</p>
   </article>`;
