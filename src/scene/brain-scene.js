@@ -1032,7 +1032,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   // Zoom between a brain part and a cell. 'in': fly into the part, then the brain fades and the
   // cell grows out of that spot. 'out': the cell shrinks back into the part as the brain returns.
   let zoom = null;
-  const ZOOM_IN_FLY = 0.8, ZOOM_GROW = 1.0, ZOOM_OUT = 0.8;
+  const ZOOM_IN_FLY = 0.8, ZOOM_GROW = 1.0, ZOOM_OUT = 0.6;
   const ORIGIN = new THREE.Vector3();
 
   function zoomPointOf(id) {
@@ -1063,7 +1063,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       const q = e * e;
       o.position.lerpVectors(ORIGIN, zoom.at, q);
       o.scale.setScalar(1 - 0.97 * q);
-      zoom.cell.mat.uniforms.uGlobal.value = 1 - q;
+      zoom.cell.mat.uniforms.uGlobal.value = (1 - e) ** 2;
       if (e >= 1) { o.visible = false; o.position.set(0, 0, 0); o.scale.setScalar(1); zoom = null; }
     }
   }

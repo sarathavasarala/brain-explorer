@@ -19,6 +19,62 @@ const libraryEl = $('#library');
 const hoverEl = $('#hover-label');
 const tipEl = $('#tip');
 const lensLegendEl = $('#lens-legend');
+const cellInsetEl = $('#cell-inset');
+
+const INSET_PART_POS = {
+  'prefrontal-cortex': [36, 42],
+  'motor-cortex': [65, 30],
+  'somatosensory-cortex': [75, 32],
+  'parietal-lobe': [95, 36],
+  'visual-cortex': [130, 56],
+  'occipital-lobe': [126, 54],
+  'temporal-lobe': [60, 68],
+  'hippocampus': [70, 64],
+  'striatum': [65, 52],
+  'nucleus-accumbens': [54, 58],
+  'substantia-nigra': [80, 72],
+  'vta': [78, 70],
+  'thalamus': [82, 52],
+  'cerebellum': [118, 82],
+  'spinal-cord': [90, 102],
+  'medulla': [90, 92],
+  'pons': [86, 82],
+  'corpus-callosum': [76, 44],
+  'amygdala': [58, 64],
+  'hypothalamus': [72, 60],
+  'auditory-cortex': [74, 54],
+  'brocas-area': [44, 48],
+  'wernickes-area': [96, 52],
+};
+
+function renderCellInset(cell) {
+  if (!cellInsetEl) return;
+  const where = cell?.where || [];
+  const dots = where.map((id) => {
+    const pos = INSET_PART_POS[id] || [75, 55];
+    return `
+      <circle cx="${pos[0]}" cy="${pos[1]}" r="8" fill="${cell.color || '#ffd36b'}" opacity="0.35"/>
+      <circle cx="${pos[0]}" cy="${pos[1]}" r="3.5" fill="${cell.color || '#ffd36b'}"/>
+    `;
+  }).join('');
+
+  cellInsetEl.href = `#/cell/${cell.id}/lives`;
+  cellInsetEl.hidden = false;
+  cellInsetEl.innerHTML = `
+    <div class="cell-inset-head">
+      <span>Where it lives</span>
+      <span class="arrow">&rarr;</span>
+    </div>
+    <svg viewBox="0 0 150 110" aria-hidden="true">
+      <path d="M 24 46 C 22 36, 34 22, 58 18 C 82 14, 114 18, 132 40 C 138 48, 136 58, 124 64 C 132 70, 132 82, 120 88 C 110 92, 100 90, 96 85 L 95 100 L 85 100 L 86 85 C 80 82, 65 80, 52 74 C 44 70, 42 60, 48 54 C 36 54, 25 52, 24 46 Z"
+            fill="rgba(190, 200, 255, 0.06)" stroke="rgba(190, 200, 255, 0.28)" stroke-width="1.2"/>
+      <path d="M 48 54 C 65 52, 85 55, 100 48" fill="none" stroke="rgba(190, 200, 255, 0.16)" stroke-width="1"/>
+      <path d="M 72 18 C 70 32, 73 45, 78 52" fill="none" stroke="rgba(190, 200, 255, 0.16)" stroke-width="1"/>
+      <path d="M 98 75 C 105 70, 120 70, 124 64" fill="none" stroke="rgba(190, 200, 255, 0.16)" stroke-width="1"/>
+      ${dots}
+    </svg>
+  `;
+}
 
 const problems = validate();
 if (problems.length) console.warn(`[brain] ${problems.length} content problem(s):\n` + problems.join('\n'));
@@ -178,6 +234,7 @@ function apply() {
   }
 
   if (r.type !== 'cell' || r.tab === 'lives') {
+    if (cellInsetEl) cellInsetEl.hidden = true;
     // Leaving a cell for its home in the brain (or for the part you came from): shrink back into it.
     let to = null;
     if (prev.type === 'cell' && prev.tab !== 'lives') {
@@ -281,6 +338,7 @@ function apply() {
     const cell = cellById.get(r.id);
     if (!cell) { location.hash = '#/cell'; return; }
     if (r.tab === 'lives') {
+      if (cellInsetEl) cellInsetEl.hidden = true;
       scene.showCell(null);
       scene.focus(cell.where, { activity: true });
       scene.setArcs([]);
@@ -289,6 +347,7 @@ function apply() {
     } else {
       scene.setSpin(false);
       syncToolbar();
+      renderCellInset(cell);
       // Arriving from a part (or from this cell's "where it lives" view): zoom in from that part.
       let from = null;
       if (prev.type === 's' && cell.where?.includes(prev.id)) from = prev.id;
