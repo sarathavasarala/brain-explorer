@@ -33,15 +33,18 @@ export function buildCell({ style = 'pyramidal', seed = 7 } = {}) {
   }
 
   // Generate a spherical or ellipsoidal body (soma, ghost cells, etc.)
-  function addSoma({ center = [0, 0, 0], radii = [0.05, 0.05, 0.05], count = 500, part = 0, dist = 0, size = 0.55 }) {
+  // taper > 0 narrows the top of the body, giving the triangular soma of a pyramidal cell.
+  function addSoma({ center = [0, 0, 0], radii = [0.05, 0.05, 0.05], count = 500, part = 0, dist = 0, size = 0.55, taper = 0 }) {
     for (let i = 0; i < count; i++) {
       const u = rnd() * 2 - 1;
       const theta = rnd() * Math.PI * 2;
       const q = Math.sqrt(Math.max(0, 1 - u * u));
-      const rJitter = 0.88 + rnd() * 0.24;
-      const x = center[0] + radii[0] * q * Math.cos(theta) * rJitter;
+      // Two thirds on the surface, the rest filling the inside, so the body reads as solid.
+      const rJitter = i % 3 === 2 ? Math.cbrt(rnd()) * 0.9 : 0.9 + rnd() * 0.2;
+      const narrow = 1 - taper * ((u + 1) / 2);
+      const x = center[0] + radii[0] * q * Math.cos(theta) * rJitter * narrow;
       const y = center[1] + radii[1] * u * rJitter;
-      const z = center[2] + radii[2] * q * Math.sin(theta) * rJitter;
+      const z = center[2] + radii[2] * q * Math.sin(theta) * rJitter * narrow;
       addPt(x, y, z, size * (0.8 + rnd() * 0.4), part, dist);
     }
   }
@@ -79,11 +82,12 @@ export function buildCell({ style = 'pyramidal', seed = 7 } = {}) {
     part = 1,
     dist0 = 0,
     totalDist = 1,
-    stepLen = 0.013,
+    stepLen = 0.009,
     squashZ = 1.0,
   }) {
     let cur = [...start];
     let d = norm(dir);
+    const aim = norm(dir);
     const steps = Math.max(4, Math.floor(length / stepLen));
     const effectiveStep = length / steps;
 
@@ -93,10 +97,12 @@ export function buildCell({ style = 'pyramidal', seed = 7 } = {}) {
       const nx = noise3(cur[0] * nScale + seed, cur[1] * nScale, cur[2] * nScale);
       const ny = noise3(cur[0] * nScale, cur[1] * nScale + seed, cur[2] * nScale);
       const nz = noise3(cur[0] * nScale, cur[1] * nScale, cur[2] * nScale + seed);
+      // noise3 is centred on 0. Wander a little, but keep being pulled back toward the
+      // branch's own direction so trees grow the way each style intends.
       d = norm([
-        d[0] + (nx - 0.5) * 0.18,
-        d[1] + (ny - 0.5) * 0.18,
-        d[2] + (nz - 0.5) * 0.18,
+        d[0] + nx * 0.14 + (aim[0] - d[0]) * 0.18,
+        d[1] + ny * 0.14 + (aim[1] - d[1]) * 0.18,
+        d[2] + nz * 0.14 + (aim[2] - d[2]) * 0.18,
       ]);
 
       cur = [
@@ -111,15 +117,17 @@ export function buildCell({ style = 'pyramidal', seed = 7 } = {}) {
 
       // Ring points around centerline
       const [u, v] = getPerp(d);
-      const ptsOnRing = 4 + Math.floor(rnd() * 3);
+      // Thick branches get fuller rings so they read as continuous glowing tubes.
+      const ptsOnRing = Math.min(12, Math.max(5, Math.round(curRad / 0.0016)));
       for (let p = 0; p < ptsOnRing; p++) {
         const angle = (p / ptsOnRing) * Math.PI * 2 + rnd() * 0.4;
         const rx = Math.cos(angle) * curRad;
         const ry = Math.sin(angle) * curRad;
-        const px = cur[0] + (u[0] * rx + v[0] * ry);
-        const py = cur[1] + (u[1] * rx + v[1] * ry);
-        const pz = (cur[2] + (u[2] * rx + v[2] * ry)) * squashZ;
-        addPt(px, py, pz, 0.45, part, curDist);
+        const along = (rnd() - 0.5) * effectiveStep;
+        const px = cur[0] + (u[0] * rx + v[0] * ry) - d[0] * along;
+        const py = cur[1] + (u[1] * rx + v[1] * ry) - d[1] * along;
+        const pz = (cur[2] + (u[2] * rx + v[2] * ry) - d[2] * along) * squashZ;
+        addPt(px, py, pz, 0.5 + Math.min(0.35, curRad * 14), part, curDist);
       }
 
       // Spines along dendrite
@@ -171,7 +179,7 @@ export function buildCell({ style = 'pyramidal', seed = 7 } = {}) {
 
   if (style === 'pyramidal') {
     // Triangular soma
-    addSoma({ center: [0, 0, 0], radii: [0.045, 0.055, 0.04], count: 650, part: 0, dist: 0 });
+    addSoma({ center: [0, 0, 0], radii: [0.07, 0.07, 0.06], count: 1400, part: 0, dist: 0, taper: 0.85 });
     landmarks.soma = [0, 0, 0];
 
     // Apical dendrite
@@ -182,9 +190,10 @@ export function buildCell({ style = 'pyramidal', seed = 7 } = {}) {
         if (depth === 3) {
           // Tuft at the top
           return [
-            { dir: norm([curDir[0] - 0.4, curDir[1] + 0.3, curDir[2] + 0.2]), length: 0.16 },
-            { dir: norm([curDir[0] + 0.35, curDir[1] + 0.4, curDir[2] - 0.2]), length: 0.18 },
-            { dir: norm([curDir[0] + 0.05, curDir[1] + 0.5, curDir[2] + 0.1]), length: 0.2 },
+            { dir: norm([curDir[0] - 0.95, curDir[1] + 0.3, curDir[2] + 0.3]), length: 0.18 },
+            { dir: norm([curDir[0] + 0.9, curDir[1] + 0.35, curDir[2] - 0.3]), length: 0.2 },
+            { dir: norm([curDir[0] + 0.1, curDir[1] + 0.5, curDir[2] + 0.6]), length: 0.2 },
+            { dir: norm([curDir[0] - 0.2, curDir[1] + 0.4, curDir[2] - 0.8]), length: 0.18 },
           ];
         }
         return [
@@ -924,12 +933,62 @@ export function buildCell({ style = 'pyramidal', seed = 7 } = {}) {
     landmarks.processes = [0.18, 0.22, 0];
   }
 
+  // Centre the cell on the origin and scale it to a fixed height, so every style frames the same way.
+  let min = [Infinity, Infinity, Infinity], max = [-Infinity, -Infinity, -Infinity];
+  for (let i = 0; i < pos.length; i += 3) {
+    for (let a = 0; a < 3; a++) { min[a] = Math.min(min[a], pos[i + a]); max[a] = Math.max(max[a], pos[i + a]); }
+  }
+  const mid = [0, 1, 2].map((a) => (min[a] + max[a]) / 2);
+  const extent = Math.max(max[0] - min[0], max[1] - min[1], 1e-6);
+  const k = CELL_SIZE / extent;
+  for (let i = 0; i < pos.length; i += 3) for (let a = 0; a < 3; a++) pos[i + a] = (pos[i + a] - mid[a]) * k;
+  const moved = (p) => p.map((v, a) => (v - mid[a]) * k);
+
+  // Labels sit on real points: for each landmark, the point of that part closest to the part's centre.
+  const PART_OF = { soma: [0], dendrites: [1], processes: [1], spines: [4], axon: [2], terminals: [3], myelin: [5], node: [5], vessel: [6] };
+  const onGeometry = (key) => {
+    const want = PART_OF[key];
+    if (!want) return null;
+    const idx = [];
+    for (let i = 0; i < parts.length; i++) {
+      if (!want.includes(parts[i])) continue;
+      if ((key === 'dendrites' || key === 'processes') && dists[i] < 0.45) continue;
+      if (key === 'axon' && (dists[i] < 0.25 || dists[i] > 0.7)) continue;
+      idx.push(i);
+    }
+    if (!idx.length) return null;
+    const c = [0, 0, 0];
+    for (const i of idx) for (let a = 0; a < 3; a++) c[a] += pos[i * 3 + a] / idx.length;
+    // Radial cells average out to the middle. Aim for the upper right of the tree instead,
+    // so the label points at branches and not at the cell body.
+    if (key !== 'soma' && Math.hypot(c[0] - somaC[0], c[1] - somaC[1]) < CELL_SIZE * 0.15) {
+      const lean = key === 'spines' ? [-0.25, 0.3] : [0.3, 0.25];
+      c[0] = somaC[0] + lean[0] * CELL_SIZE; c[1] = somaC[1] + lean[1] * CELL_SIZE; c[2] = 0;
+    }
+    let best = idx[0], bd = Infinity;
+    for (const i of idx) {
+      const d = (pos[i * 3] - c[0]) ** 2 + (pos[i * 3 + 1] - c[1]) ** 2 + (pos[i * 3 + 2] - c[2]) ** 2;
+      if (d < bd) { bd = d; best = i; }
+    }
+    return [pos[best * 3], pos[best * 3 + 1], pos[best * 3 + 2]];
+  };
+  const somaC = [0, 0, 0];
+  { let n = 0; for (let i = 0; i < parts.length; i++) if (parts[i] === 0) { for (let a = 0; a < 3; a++) somaC[a] += pos[i * 3 + a]; n++; } if (n) for (let a = 0; a < 3; a++) somaC[a] /= n; }
+  const placed = {};
+  for (const key of Object.keys(landmarks)) {
+    const g = key === 'node' ? null : onGeometry(key);
+    placed[key] = g || moved(landmarks[key]);
+  }
+
   return {
     positions: new Float32Array(pos),
     sizes: new Float32Array(sizes),
     part: new Float32Array(parts),
     dist: new Float32Array(dists),
-    landmarks,
+    landmarks: placed,
     nodes: nodesCount,
   };
 }
+
+// Height (or width, whichever is larger) of every cell after normalising, in scene units.
+export const CELL_SIZE = 1.5;

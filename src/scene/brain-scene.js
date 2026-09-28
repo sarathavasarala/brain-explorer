@@ -170,7 +170,7 @@ const cellVertexShader = /* glsl */ `
     }
 
     vColor = col;
-    vAlpha = brightness * mix(0.6, 1.0, aSize) * uGlobal;
+    vAlpha = 1.35 * brightness * mix(0.6, 1.0, aSize) * uGlobal;
     vAlpha *= smoothstep(0.2, 0.8, -mv.z);
 
     float pointSize = uScale * aSize * (1.0 + glow * 0.8) * uPixel / -mv.z;
@@ -1061,7 +1061,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
         uniforms: {
           uTime: { value: 0 },
           uPixel: { value: pixel },
-          uScale: { value: 7.5 },
+          uScale: { value: 17 },
           uPhase: { value: 0 },
           uFire: { value: fire ? 1.0 : 0.0 },
           uNodes: { value: morph.nodes || 0 },
@@ -1084,6 +1084,10 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       cellCache.set(cellEntry.id, cached);
     }
 
+    // Switching cells: drop the previous one at once instead of letting both overlap while fading.
+    for (const c of cellCache.values()) {
+      if (c !== cached) { c.obj.visible = false; c.mat.uniforms.uGlobal.value = 0; }
+    }
     cached.obj.visible = true;
     cached.mat.uniforms.uFire.value = fire ? 1.0 : 0.0;
     cached.mat.uniforms.uBaseColor.value.set(cellEntry.color);
@@ -1093,7 +1097,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     }
     activeCellObj = cached;
 
-    flyToTarget(new THREE.Vector3(0, 0, 0), 2.6, 'front');
+    flyToTarget(new THREE.Vector3(0, 0, 0), 2.85, 'front');
     controls.autoRotate = false;
     setupCellLabels(cellEntry, cached.landmarks);
   }
@@ -1208,10 +1212,16 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       el.style.transform = `translate(${((tmpV.x + 1) / 2) * w}px, ${((1 - tmpV.y) / 2) * h + 30}px) translate(-50%, 0)`;
       el.style.opacity = vis && !activeCellObj && r.hi > 0.05 ? String(Math.min(1, r.hi)) : '0';
     }
-    // Tract labels sit over their targets. Push apart any that would overlap.
-    const placed = tractLabels.map((t) => {
+    // Tract labels sit just above their targets; cell labels sit on their landmark.
+    spreadLabels(tractLabels, w, h, -18, !activeCellObj);
+    spreadLabels(cellLandmarkLabels, w, h, 0, !!activeCellObj);
+  }
+
+  // Project labels to the screen and push down any that would overlap an earlier one.
+  function spreadLabels(list, w, h, lift, show) {
+    const placed = list.map((t) => {
       tmpV.copy(t.pos).project(camera);
-      return { ...t, vis: tmpV.z < 1, x: ((tmpV.x + 1) / 2) * w, y: ((1 - tmpV.y) / 2) * h - 18, hw: (t.el.offsetWidth || 120) / 2 };
+      return { el: t.el, vis: tmpV.z < 1, x: ((tmpV.x + 1) / 2) * w, y: ((1 - tmpV.y) / 2) * h + lift, hw: (t.el.offsetWidth || 120) / 2 };
     }).sort((a, b) => a.y - b.y);
     for (let i = 1; i < placed.length; i++) {
       for (let j = 0; j < i; j++) {
@@ -1221,15 +1231,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     }
     for (const t of placed) {
       t.el.style.transform = `translate(${t.x}px, ${t.y}px) translate(-50%, -50%)`;
-      t.el.style.opacity = t.vis && !activeCellObj ? '1' : '0';
-    }
-    for (const { pos, el } of cellLandmarkLabels) {
-      tmpV.copy(pos).project(camera);
-      const vis = tmpV.z < 1;
-      const lx = ((tmpV.x + 1) / 2) * w;
-      const ly = ((1 - tmpV.y) / 2) * h;
-      el.style.transform = `translate(${lx}px, ${ly}px) translate(-50%, -50%)`;
-      el.style.opacity = vis && activeCellObj ? '1' : '0';
+      t.el.style.opacity = t.vis && show ? '1' : '0';
     }
   }
 
