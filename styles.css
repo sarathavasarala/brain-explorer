@@ -480,7 +480,12 @@ kbd {
   opacity: 0; transition: opacity 0.15s;
 }
 .tip.is-on { opacity: 1; }
-.tip strong { display: block; color: var(--ink); font-weight: 600; margin-bottom: 3px; font-size: 13.5px; }
+.tip strong { display: block; color: var(--ink); font-weight: 600; margin-bottom: 5px; font-size: 13.5px; }
+.tip-def { margin: 0; color: var(--ink); font-size: 13px; line-height: 1.5; }
+.tip-origin {
+  margin: 8px 0 0; padding-top: 8px; border-top: 1px solid var(--line-2);
+  font-size: 12px; line-height: 1.45; color: var(--ink-2);
+}
 
 /* ------------------------------------------------------------ route strip */
 /* One dot per step, coloured by the part that step lights up. */

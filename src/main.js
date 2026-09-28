@@ -619,7 +619,10 @@ function showTip(el) {
   const g = findTerm(el.dataset.term);
   if (!g) return;
   const title = g.term.charAt(0).toUpperCase() + g.term.slice(1);
-  tipEl.innerHTML = `<strong>${esc(title)}</strong>${esc(g.def)}`;
+  const parts = g.def.split('\n\n');
+  const defHtml = `<p class="tip-def">${esc(parts[0])}</p>`;
+  const etymHtml = parts[1] ? `<p class="tip-origin">${esc(parts[1])}</p>` : '';
+  tipEl.innerHTML = `<strong>${esc(title)}</strong>${defHtml}${etymHtml}`;
   const r = el.getBoundingClientRect();
   tipEl.classList.add('is-on');
   const w = tipEl.offsetWidth;
