@@ -265,11 +265,11 @@ export default [
       },
       {
         id: 'ventral-noradrenergic',
-        name: 'Descending bulbospinal projection',
+        name: 'Autonomic and spinal noradrenergic projections',
         from: 'locus-coeruleus',
         to: ['hypothalamus', 'spinal-cord'],
         job: 'Activating fight-or-flight body responses and muting spinal pain',
-        text: 'Descending fibres travel into the {{hypothalamus}} and down the {{spinal-cord}}. Noradrenaline quickens your heart rate, dilates airways, and closes pain gates in the spine during emergencies.',
+        text: 'Noradrenergic fibres ascend into the {{hypothalamus}} and descend down the {{spinal-cord}}. Noradrenaline quickens your heart rate, dilates airways, and closes pain gates in the spine during emergencies.',
         whenItFails: 'Weakened signalling can cause dizziness on standing due to poor blood pressure regulation.',
         whenBlocked: 'Blood pressure and sympathetic nerve activity drop when central alpha-2 receptors are stimulated.',
       },

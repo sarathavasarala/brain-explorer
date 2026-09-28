@@ -171,7 +171,7 @@ export default [
         family: 'Gs coupled adrenergic receptor',
         effect: 'modulate',
         where: ['heart'],
-        text: 'Relaxes smooth muscle around bronchioles to open airways and dilates arteries supplying skeletal muscles.',
+        text: 'Carried through the circulation to relax smooth muscle around airways and dilate arteries supplying skeletal muscles.',
       },
       {
         id: 'beta-1',
@@ -356,7 +356,7 @@ export default [
         family: 'Gs coupled vasopressin receptor',
         effect: 'modulate',
         where: ['heart'],
-        text: 'Stimulates cAMP in renal collecting ducts to move aquaporin-2 water channels to the cell surface, reclaiming water.',
+        text: 'Carried through the circulation to renal collecting ducts, moving aquaporin-2 water channels to the cell surface to reclaim water.',
       },
       {
         id: 'V1a',

@@ -10,7 +10,7 @@ export default {
   'action potential': 'The brief electrical pulse (a "spike") a neuron fires to send a message.',
   excitatory: 'Makes the receiving neuron more likely to fire.',
   inhibitory: 'Makes the receiving neuron less likely to fire.',
-  cortex: 'The thin, folded outer sheet of the brain, about 2–4 mm thick.',
+  cortex: 'The thin, folded outer sheet of the brain, about 2 to 4 mm thick.',
   'grey matter': 'Tissue packed with cell bodies. The cortex and deep nuclei are grey matter.',
   'white matter': 'Bundles of axons wrapped in fatty insulation (myelin) that connect brain areas.',
   hemisphere: 'One half of the brain, left or right.',

@@ -76,8 +76,8 @@ export default [
     },
     chem: {
       text: 'Motor neurons use [[acetylcholine]] as their primary neurotransmitter to stimulate nicotinic [[receptors]] on skeletal muscle. They receive excitatory [[glutamate]] inputs, inhibitory glycine and [[GABA]] signals, and modulatory tuning from [[serotonin]] and [[noradrenaline]] to adjust motor gain.',
-      receptors: ['AMPA', 'NMDA', 'GABA-A'],
-      modulatedBy: ['serotonin', 'noradrenaline', 'glutamate'],
+      receptors: ['AMPA', 'NMDA', 'GABA-A', 'GlyR'],
+      modulatedBy: ['serotonin', 'noradrenaline'],
     },
     breaks: {
       text: 'Damage to motor neurons severs the brain\'s physical connection to the muscular system, producing weakness, muscle wasting, and paralysis.',
