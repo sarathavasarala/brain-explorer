@@ -2,7 +2,7 @@
 //   **bold**                 bold
 //   [[term]] / [[term|shown]] glossary term with hover definition
 //   {{id}} / {{id|shown}}    link to another structure
-import { byId, glossary } from '../content/index.js';
+import { glossary, resolveRef } from '../content/index.js';
 
 const lookup = new Map(Object.entries(glossary).map(([k, v]) => [k.toLowerCase(), { term: k, def: v }]));
 
@@ -20,13 +20,18 @@ export function fmt(text = '') {
     const [term, shown = term] = inner.split('|');
     const g = findTerm(term);
     if (!g) return shown;
+    const slug = term.toLowerCase().trim().replace(/\s+/g, '-');
+    const chem = resolveRef('chem:' + slug);
+    if (chem) {
+      return `<a class="term xref xref-chem" data-term="${esc(g.term)}" href="${chem.href}" style="--c:${chem.color}">${shown}</a>`;
+    }
     return `<span class="term" tabindex="0" data-term="${esc(g.term)}">${shown}</span>`;
   });
   out = out.replace(/\{\{([^}]+)\}\}/g, (_, inner) => {
     const [id, shown] = inner.split('|');
-    const s = byId.get(id.trim());
-    if (!s) return shown || id;
-    return `<a class="xref" href="#/s/${s.id}" style="--c:${s.color}">${shown || s.name}</a>`;
+    const ref = resolveRef(id.trim());
+    if (!ref) return shown || id;
+    return `<a class="xref xref-${ref.kind}" href="${ref.href}" style="--c:${ref.color}">${shown || ref.name}</a>`;
   });
   return out;
 }

@@ -11,6 +11,10 @@ import pathways from './pathways/index.js';
 import pathwayGroups from './pathways/groups.js';
 import glossary from './glossary/index.js';
 import askPresets from './ask-presets.js';
+import chemicals from './chemicals/index.js';
+import chemicalGroups from './chemicals/groups.js';
+import cells from './cells/index.js';
+import cellGroups from './cells/groups.js';
 
 const files = {
   'src/content/structures/cortex.js': cortex,
@@ -20,10 +24,22 @@ const files = {
 export const structures = Object.values(files).flat();
 // Which file each structure lives in, so the UI can point at where to add missing text.
 export const sourceOf = new Map(Object.entries(files).flatMap(([f, list]) => list.map((s) => [s.id, f])));
-export { groups, levels, anchors, synapses, diagrams, pathways, pathwayGroups, glossary, askPresets };
+export { groups, levels, anchors, synapses, diagrams, pathways, pathwayGroups, glossary, askPresets, chemicals, chemicalGroups, cells, cellGroups };
 
 export const byId = new Map(structures.map((s) => [s.id, s]));
 export const anchorById = new Map(anchors.map((a) => [a.id, a]));
+export const chemById = new Map(chemicals.map((c) => [c.id, c]));
+export const cellById = new Map(cells.map((c) => [c.id, c]));
+
+// "thalamus" -> part, "chem:dopamine" -> chemical, "cell:purkinje" -> cell
+export function resolveRef(ref) {
+  const [a, b] = ref.includes(':') ? ref.split(':') : ['part', ref];
+  const id = (b || '').trim();
+  if (a === 'part' && byId.has(id)) { const s = byId.get(id); return { kind: 'part', id, name: s.name, color: s.color, href: `#/s/${id}` }; }
+  if (a === 'chem' && chemById.has(id)) { const c = chemById.get(id); return { kind: 'chem', id, name: c.name, color: c.color, href: `#/chem/${id}` }; }
+  if (a === 'cell' && cellById.has(id)) { const c = cellById.get(id); return { kind: 'cell', id, name: c.name, color: c.color, href: `#/cell/${id}` }; }
+  return null;
+}
 
 // Returns a list of human-readable problems. Used by the app (console) and tools/validate.mjs.
 export function validate() {
@@ -42,8 +58,8 @@ export function validate() {
       if (!termOk(term)) problems.push(`${where}: glossary term "${term}" is not defined`);
     }
     for (const m of text.matchAll(/\{\{([^}]+)\}\}/g)) {
-      const id = m[1].split('|')[0].trim();
-      if (!byId.has(id)) problems.push(`${where}: link to unknown structure "${id}"`);
+      const ref = m[1].split('|')[0].trim();
+      if (!resolveRef(ref)) problems.push(`${where}: link to unknown reference "${ref}"`);
     }
   };
   const scanDeep = (where, v) => {

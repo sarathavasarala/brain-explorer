@@ -1,5 +1,5 @@
 // Checks every content file for broken references. Run: node tools/validate.mjs
-import { validate, structures, pathways } from '../src/content/index.js';
+import { validate, structures, pathways, chemicals, cells } from '../src/content/index.js';
 
 const problems = validate();
 const levelKeys = ['where', 'does', 'connects', 'cells'];
@@ -17,10 +17,22 @@ for (const p of pathways) {
   if (!p.summary) missing.push(`  pathway ${p.id}: summary`);
   if (n) missing.push(`  pathway ${p.id}: ${n} step(s) without text`);
 }
+for (const c of chemicals) {
+  const gaps = [];
+  if (!c.tagline) gaps.push('tagline');
+  if (!c.overview?.text) gaps.push('overview');
+  if (gaps.length) missing.push(`  chemical ${c.id}: ${gaps.join(', ')}`);
+}
+for (const c of cells) {
+  const gaps = [];
+  if (!c.tagline) gaps.push('tagline');
+  if (!c.shape?.text) gaps.push('shape');
+  if (gaps.length) missing.push(`  cell ${c.id}: ${gaps.join(', ')}`);
+}
 
 if (missing.length) console.log(`Unwritten text (${missing.length}):\n${missing.join('\n')}\n`);
 if (problems.length) {
   console.error(`Problems (${problems.length}):\n  ${problems.join('\n  ')}`);
   process.exit(1);
 }
-console.log(`OK: ${structures.length} structures, ${pathways.length} pathways, no broken references.`);
+console.log(`OK: ${structures.length} structures, ${chemicals.length} chemicals, ${cells.length} cells, ${pathways.length} pathways, no broken references.`);

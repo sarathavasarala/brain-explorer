@@ -1,4 +1,4 @@
-import { structures, byId, groups, levels, pathways, anchors, validate, sourceOf } from './content/index.js';
+import { structures, byId, groups, levels, pathways, anchors, validate, sourceOf, chemicals, chemicalGroups, cells, cellGroups, chemById, cellById } from './content/index.js';
 import { createBrainScene } from './scene/brain-scene.js';
 import { renderSidebar } from './ui/sidebar.js';
 import { renderStructure, renderPathway, renderHome } from './ui/explainer.js';
@@ -19,7 +19,7 @@ const tipEl = $('#tip');
 const problems = validate();
 if (problems.length) console.warn(`[brain] ${problems.length} content problem(s):\n` + problems.join('\n'));
 
-const state = { query: '', libQuery: '', route: { type: 'home' }, playing: false, flown: '' };
+const state = { query: '', libQuery: '', dict: 'parts', route: { type: 'home' }, playing: false, flown: '' };
 let timer = null;
 
 // ---------------------------------------------------------------- scene
@@ -42,11 +42,13 @@ const scene = createBrainScene($('#brain'), {
 });
 
 // ---------------------------------------------------------------- routing
-// #/            Parts home         #/s/<id>/<level>  a part
-// #/pathways    pathway library    #/p/<id>/<step>   a pathway tour
-// #/ask         Ask intro          #/ask/<question>  a sketch
+// #/            Parts home         #/s/<id>/<level>   a part
+// #/chem        Chemicals home     #/chem/<id>/<tab>  a chemical
+// #/cell        Cells home         #/cell/<id>/<tab>  a cell
+// #/pathways    pathway library    #/p/<id>/<step>    a pathway tour
+// #/ask         Ask intro          #/ask/<question>   a sketch
 function parseHash() {
-  const [type, id, extra] = location.hash.replace(/^#\/?/, '').split('/');
+  const [type, id, extra, sub] = location.hash.replace(/^#\/?/, '').split('/');
   if (type === 's' && byId.has(id)) {
     return { type: 's', id, level: levels.some((l) => l.id === extra) ? extra : levels[0].id };
   }
@@ -60,14 +62,26 @@ function parseHash() {
     try { q = normalise(decodeURIComponent(id || '')); } catch { q = ''; }
     return { type: 'ask', query: q };
   }
+  if (type === 'chem') {
+    if (id && chemById.has(id)) {
+      return { type: 'chem', id, tab: extra || 'overview', sub: sub || null };
+    }
+    return { type: 'chemhome' };
+  }
+  if (type === 'cell') {
+    if (id && cellById.has(id)) {
+      return { type: 'cell', id, tab: extra || 'shape' };
+    }
+    return { type: 'cellhome' };
+  }
   return { type: 'home' };
 }
 
-const MODE = { home: 'parts', s: 'parts', library: 'library', p: 'tour', ask: 'ask' };
+const MODE = { home: 'parts', s: 'parts', chemhome: 'parts', chem: 'parts', cellhome: 'parts', cell: 'parts', library: 'library', p: 'tour', ask: 'ask' };
 const NAV = { parts: 'parts', library: 'pathways', tour: 'pathways', ask: 'ask' };
 
 function setMode(type) {
-  const mode = MODE[type];
+  const mode = MODE[type] || 'parts';
   appEl.classList.remove('mode-parts', 'mode-library', 'mode-tour', 'mode-ask');
   appEl.classList.add(`mode-${mode}`);
   document.querySelectorAll('[data-mode]').forEach((a) => {
@@ -76,6 +90,22 @@ function setMode(type) {
     if (on) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current');
   });
   libraryEl.hidden = mode !== 'library';
+
+  const dict = (type === 'chemhome' || type === 'chem') ? 'chem'
+             : (type === 'cellhome' || type === 'cell') ? 'cell'
+             : 'parts';
+  state.dict = dict;
+  document.querySelectorAll('[data-dict]').forEach((a) => {
+    const on = a.dataset.dict === dict;
+    a.classList.toggle('is-on', on);
+    if (on) a.setAttribute('aria-selected', 'true'); else a.removeAttribute('aria-selected');
+  });
+  const searchInput = $('#search');
+  if (searchInput) {
+    searchInput.placeholder = dict === 'chem' ? 'Search chemicals'
+      : dict === 'cell' ? 'Search cell types'
+      : 'Search parts of the brain';
+  }
 }
 
 function arcFor(from, c) {
@@ -138,6 +168,18 @@ function apply() {
   if (r.type === 'home') {
     clearScene('home');
     explainerEl.innerHTML = renderHome();
+  } else if (r.type === 'chemhome') {
+    clearScene('chemhome');
+    explainerEl.innerHTML = renderChemHomePlaceholder();
+  } else if (r.type === 'chem') {
+    clearScene(r.id);
+    explainerEl.innerHTML = renderChemPlaceholder(r);
+  } else if (r.type === 'cellhome') {
+    clearScene('cellhome');
+    explainerEl.innerHTML = renderCellHomePlaceholder();
+  } else if (r.type === 'cell') {
+    clearScene(r.id);
+    explainerEl.innerHTML = renderCellPlaceholder(r);
   } else if (r.type === 's') {
     const s = byId.get(r.id);
     const lv = levels.find((l) => l.id === r.level);
@@ -176,7 +218,7 @@ function apply() {
   } else if (r.type === 'ask') {
     applyAsk(r);
   }
-  if (r.type === 'home' || r.type === 's') drawSidebar();
+  if (['home', 's', 'chemhome', 'chem', 'cellhome', 'cell'].includes(r.type)) drawSidebar();
 }
 
 function applyAsk(r) {
@@ -201,8 +243,66 @@ function applyAsk(r) {
   });
 }
 
+function renderChemHomePlaceholder() {
+  return `<article class="ex">
+    <header class="ex-head">
+      <span class="crumbs">Atlas / Chemicals</span>
+      <h1 class="ex-title">Brain Chemicals</h1>
+      <p class="tagline">The molecules that carry signals across synapses and shape circuit activity.</p>
+    </header>
+    <div class="level">
+      <p>Chemical directory coming soon. You will be able to explore fast signals, neuromodulators, and hormones across the brain.</p>
+    </div>
+  </article>`;
+}
+
+function renderChemPlaceholder(r) {
+  const c = chemById.get(r.id);
+  return `<article class="ex">
+    <header class="ex-head">
+      <span class="crumbs">Atlas / Chemicals</span>
+      <h1 class="ex-title">${esc(c?.name || r.id)}</h1>
+      <p class="tagline">${esc(c?.tagline || 'Chemical details coming soon.')}</p>
+    </header>
+    <div class="level">
+      <p>Detailed chemical pathways, synapse interactions, and receptor maps coming in Phase 2.</p>
+    </div>
+  </article>`;
+}
+
+function renderCellHomePlaceholder() {
+  return `<article class="ex">
+    <header class="ex-head">
+      <span class="crumbs">Atlas / Cells</span>
+      <h1 class="ex-title">Brain Cells</h1>
+      <p class="tagline">The individual neurons and glia that build brain circuits.</p>
+    </header>
+    <div class="level">
+      <p>Cell directory coming soon. You will be able to explore 3D neuron morphologies, glia, and cell firing mechanisms.</p>
+    </div>
+  </article>`;
+}
+
+function renderCellPlaceholder(r) {
+  const cell = cellById.get(r.id);
+  return `<article class="ex">
+    <header class="ex-head">
+      <span class="crumbs">Atlas / Cells</span>
+      <h1 class="ex-title">${esc(cell?.name || r.id)}</h1>
+      <p class="tagline">${esc(cell?.tagline || 'Cell details coming soon.')}</p>
+    </header>
+    <div class="level">
+      <p>Interactive 3D cell morphologies and firing animations coming in Phase 4.</p>
+    </div>
+  </article>`;
+}
+
 function drawSidebar() {
-  renderSidebar(listEl, { selected: state.route.type === 's' ? state.route.id : null, query: state.query });
+  const selected = state.route.type === 's' ? state.route.id
+                 : state.route.type === 'chem' ? state.route.id
+                 : state.route.type === 'cell' ? state.route.id
+                 : null;
+  renderSidebar(listEl, { dict: state.dict, selected, query: state.query });
   listEl.querySelector('.is-on')?.scrollIntoView({ block: 'nearest' });
 }
 
@@ -310,7 +410,9 @@ toolbar.addEventListener('click', (e) => {
   if (t === 'reset') {
     state.flown = '';
     const type = state.route.type;
-    if ((type === 'home' || type === 's') && location.hash && location.hash !== '#/') location.hash = '#/';
+    if (type === 'chem') location.hash = '#/chem';
+    else if (type === 'cell') location.hash = '#/cell';
+    else if ((type === 'home' || type === 's') && location.hash && location.hash !== '#/') location.hash = '#/';
     else apply();
   }
   if (t === 'slice') scene.setSlice(!scene.slice);
@@ -320,7 +422,7 @@ toolbar.addEventListener('click', (e) => {
 $('#brain').addEventListener('pointerdown', () => setTimeout(syncToolbar, 0));
 $('#search-icon').innerHTML = icon('search', 16);
 
-// Keyboard: ↑/↓ move through parts (or steps), ←/→ change level
+// Keyboard: ↑/↓ move through parts/chemicals/cells (or steps), ←/→ change level/tab
 function orderedIds() {
   const out = [];
   for (const g of groups) {
@@ -330,13 +432,49 @@ function orderedIds() {
   }
   return out;
 }
+
+function orderedChemIds() {
+  const out = [];
+  for (const g of chemicalGroups) {
+    chemicals.filter((c) => c.group === g.id).forEach((c) => out.push(c.id));
+  }
+  return out;
+}
+
+function orderedCellIds() {
+  const out = [];
+  for (const g of cellGroups) {
+    cells.filter((c) => c.group === g.id).forEach((c) => out.push(c.id));
+  }
+  return out;
+}
+
+const CHEM_TABS = ['overview', 'tracts', 'synapse', 'medicine'];
+const CELL_TABS = ['shape', 'fires', 'lives', 'chem'];
+
 window.addEventListener('keydown', (e) => {
   if (e.target.matches('input, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
   const r = state.route;
-  if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && ['home', 's', 'p'].includes(r.type)) {
+  if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && ['home', 's', 'p', 'chem', 'chemhome', 'cell', 'cellhome'].includes(r.type)) {
     e.preventDefault();
     const d = e.key === 'ArrowDown' ? 1 : -1;
     if (r.type === 'p') { stopPlay(); stepTo(r.step + d); return; }
+    if (r.type === 'chem' || r.type === 'chemhome') {
+      const ids = orderedChemIds();
+      if (!ids.length) return;
+      const i = r.type === 'chem' ? ids.indexOf(r.id) : -1;
+      const next = ids[(i + d + ids.length) % ids.length];
+      location.hash = `#/chem/${next}/${r.type === 'chem' ? r.tab : 'overview'}`;
+      return;
+    }
+    if (r.type === 'cell' || r.type === 'cellhome') {
+      const ids = orderedCellIds();
+      if (!ids.length) return;
+      const i = r.type === 'cell' ? ids.indexOf(r.id) : -1;
+      const next = ids[(i + d + ids.length) % ids.length];
+      location.hash = `#/cell/${next}/${r.type === 'cell' ? r.tab : 'shape'}`;
+      return;
+    }
     const ids = orderedIds();
     const i = r.type === 's' ? ids.indexOf(r.id) : -1;
     const next = ids[(i + d + ids.length) % ids.length];
@@ -348,9 +486,24 @@ window.addEventListener('keydown', (e) => {
     const n = Math.min(Math.max(i + (e.key === 'ArrowRight' ? 1 : -1), 0), levels.length - 1);
     location.hash = `#/s/${r.id}/${levels[n].id}`;
   }
+  if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && r.type === 'chem') {
+    e.preventDefault();
+    const i = CHEM_TABS.indexOf(r.tab);
+    const n = Math.min(Math.max((i === -1 ? 0 : i) + (e.key === 'ArrowRight' ? 1 : -1), 0), CHEM_TABS.length - 1);
+    location.hash = `#/chem/${r.id}/${CHEM_TABS[n]}`;
+  }
+  if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && r.type === 'cell') {
+    e.preventDefault();
+    const i = CELL_TABS.indexOf(r.tab);
+    const n = Math.min(Math.max((i === -1 ? 0 : i) + (e.key === 'ArrowRight' ? 1 : -1), 0), CELL_TABS.length - 1);
+    location.hash = `#/cell/${r.id}/${CELL_TABS[n]}`;
+  }
   if (e.key === 'Escape') {
     if (r.type === 'p') location.hash = '#/pathways';
     else if (r.type === 'ask' && r.query) location.hash = '#/ask';
+    else if (r.type === 'chem') location.hash = '#/chem';
+    else if (r.type === 'cell') location.hash = '#/cell';
+    else if (r.type === 'chemhome' || r.type === 'cellhome') location.hash = '#/';
     else if (r.type !== 'home') location.hash = '#/';
   }
   if (e.key === ' ' && r.type === 'p') { e.preventDefault(); togglePlay(); }

@@ -68,12 +68,26 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 }
 .sidebar > * { width: 288px; flex-shrink: 0; }
 .sidebar > .list { flex: 1 1 auto; }
+.sidebar > .dict-tabs { width: 256px; }
 .sidebar > .search { width: 256px; }
 .app:not(.mode-parts) .sidebar { border-right-color: transparent; }
 
+.dict-tabs {
+  display: flex; gap: 2px; padding: 3px;
+  margin: 14px 16px 0;
+  background: rgba(190, 200, 255, 0.05); border-radius: 10px;
+}
+.dict-tabs a {
+  flex: 1; text-align: center;
+  padding: 5px 8px; border-radius: 8px; font-size: 12px; font-weight: 500; color: var(--ink-2);
+  transition: background 0.25s var(--ease), color 0.25s var(--ease);
+}
+.dict-tabs a:hover { color: var(--ink); }
+.dict-tabs a.is-on { background: rgba(190, 200, 255, 0.1); color: var(--ink); }
+
 .search {
   display: flex; align-items: center; gap: 8px;
-  margin: 16px 16px 6px; padding: 0 12px; height: 36px;
+  margin: 8px 16px 6px; padding: 0 12px; height: 36px;
   border-radius: 10px; border: 1px solid var(--line); color: var(--ink-3);
   transition: border-color 0.2s;
 }
