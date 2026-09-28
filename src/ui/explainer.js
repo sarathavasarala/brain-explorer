@@ -17,16 +17,10 @@ function bullets(list) {
   return `<ul class="bullets">${list.map((b) => `<li>${fmt(b)}</li>`).join('')}</ul>`;
 }
 
+import { renderLadder } from './ladder.js';
+
 function ladder(active, { interactive = true } = {}) {
-  return `<div class="ladder" role="tablist" aria-label="Level of detail">
-    ${levels.map((l, i) => `
-      <button class="rung ${l.id === active ? 'is-on' : ''}" role="tab" aria-selected="${l.id === active}" data-level="${l.id}" ${interactive ? '' : 'tabindex="-1"'}>
-        <span class="rung-icon">${icon(l.icon, 18)}</span>
-        <span class="rung-label">${esc(l.label)}</span>
-        <span class="rung-scale">${esc(l.scale)}</span>
-        ${i < levels.length - 1 ? '<span class="rung-line"></span>' : ''}
-      </button>`).join('')}
-  </div>`;
+  return renderLadder(levels, active, { interactive });
 }
 
 function connectionRows(s) {

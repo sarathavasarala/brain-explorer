@@ -111,5 +111,54 @@ export function validate() {
       if (!byId.has(part.id)) problems.push(`ask preset "${a.query}": unknown part "${part.id}"`);
     }
   }
+
+  const chemIds = new Set();
+  const drugActs = new Set(['precursor', 'release', 'reuptake-block', 'enzyme-block', 'receptor-block', 'receptor-mimic', 'boost-receptor', 'release-block']);
+  const receptorEffects = new Set(['excite', 'inhibit', 'modulate']);
+  const clearedBys = new Set(['reuptake', 'enzyme', 'astrocyte', 'blood']);
+
+  for (const c of chemicals) {
+    const w = `chemical "${c.id}"`;
+    if (chemIds.has(c.id)) problems.push(`${w}: duplicate id`);
+    chemIds.add(c.id);
+    if (!c.name) problems.push(`${w}: missing name`);
+    if (!chemicalGroups.some((g) => g.id === c.group)) problems.push(`${w}: unknown group "${c.group}"`);
+    if (c.synapse) {
+      if (!synapses[c.synapse]) problems.push(`${w}: unknown synapse "${c.synapse}"`);
+      else if (synapses[c.synapse].color !== c.color) problems.push(`${w}: color "${c.color}" does not match synapse color "${synapses[c.synapse].color}"`);
+    }
+    if (c.pathwayId && !pathways.some((p) => p.id === c.pathwayId)) {
+      problems.push(`${w}: unknown pathwayId "${c.pathwayId}"`);
+    }
+    for (const id of c.madeIn || []) {
+      if (!known(id)) problems.push(`${w}: unknown madeIn structure "${id}"`);
+    }
+    for (const t of c.tracts || []) {
+      const tw = `${w} tract "${t.id}"`;
+      if (!known(t.from)) problems.push(`${tw}: unknown from structure "${t.from}"`);
+      for (const toId of t.to || []) {
+        if (!known(toId)) problems.push(`${tw}: unknown to structure "${toId}"`);
+      }
+    }
+    for (const [sId, d] of Object.entries(c.density || {})) {
+      if (!known(sId)) problems.push(`${w}: unknown density structure "${sId}"`);
+      if (typeof d !== 'number' || d < 0 || d > 1) problems.push(`${w}: density for "${sId}" must be between 0 and 1, got ${d}`);
+    }
+    for (const r of c.receptors || []) {
+      const rw = `${w} receptor "${r.id}"`;
+      if (!receptorEffects.has(r.effect)) problems.push(`${rw}: unknown effect "${r.effect}"`);
+      for (const whereId of r.where || []) {
+        if (!known(whereId)) problems.push(`${rw}: unknown where structure "${whereId}"`);
+      }
+    }
+    if (c.life?.clearedBy && !clearedBys.has(c.life.clearedBy)) {
+      problems.push(`${w}: unknown clearedBy "${c.life.clearedBy}"`);
+    }
+    for (const d of c.drugs || []) {
+      const dw = `${w} drug "${d.id}"`;
+      if (!drugActs.has(d.acts)) problems.push(`${dw}: unknown acts "${d.acts}"`);
+    }
+    scanDeep(w, c);
+  }
   return problems;
 }

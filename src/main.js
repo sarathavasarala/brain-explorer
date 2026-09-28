@@ -4,6 +4,8 @@ import { renderSidebar } from './ui/sidebar.js';
 import { renderStructure, renderPathway, renderHome } from './ui/explainer.js';
 import { renderAsk } from './ui/ask.js';
 import { renderLibraryShell, renderLibraryBody } from './ui/library.js';
+import { renderChemHome, renderChem } from './ui/chem.js';
+import { setStepperStage, toggleStepperPlay, stopStepperPlay, renderSynapseStepper } from './ui/synapse-stepper.js';
 import { ask, cached, normalise } from './services/ask.js';
 import { findTerm, esc } from './ui/format.js';
 import { icon } from './ui/icons.js';
@@ -163,6 +165,7 @@ function apply() {
   const prev = state.route;
   const r = (state.route = parseHash());
   if (r.type !== 'p') stopPlay();
+  if (r.type !== 'chem') stopStepperPlay();
   setMode(r.type);
 
   if (r.type === 'home') {
@@ -170,10 +173,18 @@ function apply() {
     explainerEl.innerHTML = renderHome();
   } else if (r.type === 'chemhome') {
     clearScene('chemhome');
-    explainerEl.innerHTML = renderChemHomePlaceholder();
+    explainerEl.innerHTML = renderChemHome();
   } else if (r.type === 'chem') {
-    clearScene(r.id);
-    explainerEl.innerHTML = renderChemPlaceholder(r);
+    const chem = chemById.get(r.id);
+    if (!chem) { location.hash = '#/chem'; return; }
+    const madeIn = chem.madeIn || [];
+    const context = Object.keys(chem.density || {});
+    scene.focus(madeIn, { context, activity: true });
+    scene.setArcs([]);
+    scene.forceSlice(false);
+    fly(madeIn.length ? madeIn : context, 'left', `chem:${chem.id}`);
+    explainerEl.innerHTML = renderChem(chem, r.tab, r.sub);
+    if (prev.type !== 'chem' || prev.id !== r.id) explainerEl.scrollTop = 0;
   } else if (r.type === 'cellhome') {
     clearScene('cellhome');
     explainerEl.innerHTML = renderCellHomePlaceholder();
@@ -241,33 +252,6 @@ function applyAsk(r) {
     explainerEl.innerHTML = renderAsk({ query: r.query, result: res });
     if (res.status === 'ok') { state.flown = ''; showSketch(res, key); }
   });
-}
-
-function renderChemHomePlaceholder() {
-  return `<article class="ex">
-    <header class="ex-head">
-      <span class="crumbs">Atlas / Chemicals</span>
-      <h1 class="ex-title">Brain Chemicals</h1>
-      <p class="tagline">The molecules that carry signals across synapses and shape circuit activity.</p>
-    </header>
-    <div class="level">
-      <p>Chemical directory coming soon. You will be able to explore fast signals, neuromodulators, and hormones across the brain.</p>
-    </div>
-  </article>`;
-}
-
-function renderChemPlaceholder(r) {
-  const c = chemById.get(r.id);
-  return `<article class="ex">
-    <header class="ex-head">
-      <span class="crumbs">Atlas / Chemicals</span>
-      <h1 class="ex-title">${esc(c?.name || r.id)}</h1>
-      <p class="tagline">${esc(c?.tagline || 'Chemical details coming soon.')}</p>
-    </header>
-    <div class="level">
-      <p>Detailed chemical pathways, synapse interactions, and receptor maps coming in Phase 2.</p>
-    </div>
-  </article>`;
 }
 
 function renderCellHomePlaceholder() {
@@ -375,6 +359,28 @@ explainerEl.addEventListener('click', (e) => {
   if (act === 'play') togglePlay();
   const head = e.target.closest('.step-head');
   if (head) { stopPlay(); stepTo(Number(head.dataset.step)); }
+  const stageBtn = e.target.closest('[data-stage]');
+  if (stageBtn && state.route.type === 'chem') {
+    const stageNum = Number(stageBtn.dataset.stage);
+    setStepperStage(stageNum);
+    const chem = chemById.get(state.route.id);
+    const stepperEl = explainerEl.querySelector('.stepper');
+    if (chem && stepperEl) {
+      stepperEl.outerHTML = renderSynapseStepper(chem, { stage: stageNum, drugId: state.route.sub });
+    }
+    return;
+  }
+  const playStepperBtn = e.target.closest('[data-play-stepper]');
+  if (playStepperBtn && state.route.type === 'chem') {
+    const chem = chemById.get(state.route.id);
+    toggleStepperPlay((nextStage) => {
+      const stepperEl = explainerEl.querySelector('.stepper');
+      if (chem && stepperEl) {
+        stepperEl.outerHTML = renderSynapseStepper(chem, { stage: nextStage, drugId: state.route.sub });
+      }
+    });
+    return;
+  }
 });
 
 // Glossary tooltips

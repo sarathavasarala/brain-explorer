@@ -591,4 +591,116 @@ export default [
       ],
     },
   },
+  {
+    id: 'nucleus-accumbens',
+    name: 'Nucleus accumbens',
+    group: 'deep',
+    parent: 'striatum',
+    color: '#2ed9aa',
+    shape: { type: 'ellipsoid', center: [0.12, -0.03, 0.24], radii: [0.035, 0.03, 0.04], count: 850, pattern: 'fine', mirror: true, fill: 0.2 },
+    view: 'left-front',
+    tagline: 'Ventral striatum that translates reward signals and motivation into action.',
+    analogy: 'A gateway where wanting meets doing.',
+    levels: {
+      where: {
+        text: 'The nucleus accumbens sits at the bottom front of the {{striatum}}, where the head of the caudate meets the putamen. There is one in each [[hemisphere]]. Together with neighbouring tissue, it forms the ventral striatum.',
+        bullets: [
+          'A round cluster about the size of a small almond on each side.',
+          'Sits right in front of the preoptic area and under the internal capsule.',
+          'Consists of two main sub-regions: a core and an outer shell.',
+        ],
+      },
+      does: {
+        text: 'The nucleus accumbens responds to rewarding cues and helps drive motivation. When [[dopamine]] arrives from the {{vta}}, it highlights opportunities and promotes effort to reach a goal.\n\nCatching the aroma of fresh baking and walking toward the bakery is a classic example of this circuit in action.',
+        bullets: [
+          'Motivation: helps turn wanting into physical movement.',
+          'Reward prediction: fires when unexpected good outcomes occur.',
+          'Reinforcement learning: strengthens associations between cues and rewards.',
+          'Effort allocation: decides whether a reward is worth the physical work.',
+        ],
+      },
+      connects: {
+        text: 'Dopamine arrives from the {{vta}} along the mesolimbic pathway. Context and emotional cues arrive from the {{hippocampus}} and {{amygdala}}. Goals come from the {{prefrontal-cortex}}, and output leaves for the ventral pallidum and motor circuits.',
+        connections: [
+          { id: 'vta', dir: 'in', label: 'Dopamine reward signals from the midbrain' },
+          { id: 'prefrontal-cortex', dir: 'in', label: 'Goal and value plans arriving from cortex' },
+          { id: 'amygdala', dir: 'in', label: 'Emotional weight and threat assessments' },
+          { id: 'hippocampus', dir: 'in', label: 'Spatial and memory context' },
+        ],
+      },
+      cells: {
+        text: 'Like the rest of the striatum, most cells are medium spiny [[neuron|neurons]] that use [[GABA]]. They express high densities of dopamine D1 and D2 [[receptor|receptors]], which modulate how easily cortical and limbic signals excite them.',
+        diagram: 'basal-ganglia',
+        synapse: 'dopamine',
+        bullets: [
+          'The shell region is wired into limbic systems, while the core connects more directly to motor loops.',
+          'Most addictive substances produce surges of extracellular dopamine here.',
+        ],
+      },
+    },
+    tryIt: 'Notice the sudden urge to check your phone when you hear a notification chime. That prompt pull involves the nucleus accumbens responding to a learned reward cue.',
+    breaks: {
+      text: 'Disruptions in this area affect motivation, mood and control over reward-seeking habits.',
+      bullets: [
+        'Anhedonia: loss of interest or pleasure in everyday activities during depression.',
+        'Addiction: compulsively seeking cues despite negative consequences.',
+        'Apathy: reduced willingness to invest physical effort for rewards.',
+      ],
+    },
+  },
+  {
+    id: 'pituitary',
+    name: 'Pituitary gland',
+    group: 'deep',
+    color: '#ff9fd1',
+    shape: { type: 'ellipsoid', center: [0, -0.17, 0.08], radii: [0.03, 0.025, 0.03], count: 800, pattern: 'fine', mirror: false, fill: 0.25 },
+    view: 'medial',
+    slice: true,
+    tagline: 'The master endocrine gland that releases hormones into the bloodstream.',
+    analogy: 'A dispatcher that turns instructions from the brain into chemical packages for the body.',
+    levels: {
+      where: {
+        text: 'The pituitary gland sits at the base of the skull in a small bony hollow called the sella turcica. It dangles just beneath the {{hypothalamus}}, connected by a thin stalk called the infundibulum. It lies on the midline behind the bridge of the nose.',
+        bullets: [
+          'About the size of a pea, roughly 1 cm across.',
+          'Split into an anterior lobe (hormone-producing gland) and posterior lobe (neural extension).',
+          'Sits outside the blood-brain barrier so its hormones can enter circulation quickly.',
+        ],
+      },
+      does: {
+        text: 'The pituitary gland converts neural commands from the hypothalamus into hormonal signals that travel through the blood. It regulates growth, metabolism, blood pressure, reproduction, and stress responses throughout the entire body.\n\nDuring a stressful moment, orders from the hypothalamus cause the pituitary to send ACTH to the adrenal glands, which in turn release cortisol.',
+        bullets: [
+          'Master control: coordinates thyroid, adrenal glands, and reproductive organs.',
+          'Growth and repair: secretes growth hormone to rebuild tissues.',
+          'Water balance: releases vasopressin from its posterior lobe to conserve body water.',
+          'Bonding and birth: releases oxytocin during social bonding, labour, and nursing.',
+        ],
+      },
+      connects: {
+        text: 'Direct neural and blood portal connections link it to the {{hypothalamus}}. Hormones produced here leave through capillary networks to circulate across the rest of the body.',
+        connections: [
+          { id: 'hypothalamus', dir: 'in', label: 'Releasing hormones and direct nerve axons' },
+          { id: 'thalamus', dir: 'both', label: 'Feedback relayed through subcortical networks' },
+        ],
+      },
+      cells: {
+        text: 'The anterior lobe contains endocrine cells (somatotropes, corticotropes, thyrotropes) that synthesize and secrete peptide hormones. The posterior lobe consists of unmyelinated [[axon|axons]] extending directly from neurosecretory cells in the {{hypothalamus}}.',
+        diagram: 'thalamic-relay',
+        synapse: 'oxytocin',
+        bullets: [
+          'Posterior pituitary hormones are actually made in the hypothalamus and only stored here.',
+          'A specialized capillary portal system carries hypothalamic releasing hormones directly to the anterior lobe.',
+        ],
+      },
+    },
+    tryIt: 'Drink a large glass of water. Within an hour, your hypothalamus detects diluted blood and tells the posterior pituitary to hold back vasopressin, prompting your kidneys to release water.',
+    breaks: {
+      text: 'Pituitary tumours or tissue injury disrupt the balance of multiple hormones at once.',
+      bullets: [
+        'Pituitary adenoma: benign tumours that can press on the optic chiasm and blur peripheral vision.',
+        'Hypopituitarism: underproduction of hormones causing fatigue, low blood pressure, or growth failure.',
+        'Cushing\'s disease: excess ACTH production causing high cortisol and elevated blood sugar.',
+      ],
+    },
+  },
 ];

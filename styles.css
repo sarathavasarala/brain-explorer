@@ -551,6 +551,44 @@ kbd {
 .ask-wait i b:nth-child(3) { animation-delay: 0.3s; }
 @keyframes ask-blink { 0%, 100% { opacity: 0.2; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
 
+/* ------------------------------------------------------------ chemical & stepper styles */
+.stepper-drug-banner {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+  padding: 8px 12px; margin-bottom: 12px; border-radius: 8px;
+  background: rgba(185, 140, 255, 0.12); border: 1px solid rgba(185, 140, 255, 0.3);
+  font-size: 12.5px; color: var(--ink);
+}
+.drug-tag { color: var(--accent); font-weight: 600; }
+.drug-note { color: var(--ink-2); flex: 1; }
+.drug-clear { color: var(--ink-3); text-decoration: underline; font-size: 11px; }
+.drug-clear:hover { color: var(--ink); }
+
+.stepper-controls {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+  margin-top: 10px;
+}
+.stepper-buttons { display: flex; gap: 4px; flex-wrap: wrap; }
+.step-btn {
+  padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  background: rgba(190, 200, 255, 0.06); color: var(--ink-2);
+  border: 1px solid var(--line); transition: background 0.2s, color 0.2s;
+}
+.step-btn:hover { background: rgba(190, 200, 255, 0.12); color: var(--ink); }
+.step-btn.is-on { background: rgba(190, 200, 255, 0.18); color: #fff; border-color: var(--line-2); }
+
+.stepper-play-btn {
+  padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
+  background: rgba(190, 200, 255, 0.08); color: var(--ink-2);
+  border: 1px solid var(--line); transition: background 0.2s, color 0.2s;
+}
+.stepper-play-btn:hover { background: rgba(190, 200, 255, 0.14); color: var(--ink); }
+.stepper-play-btn.is-playing { background: color-mix(in oklab, var(--accent) 30%, transparent); color: #fff; }
+
+.speed-widget { margin-top: 20px; }
+.speed-diagram { width: 100%; height: auto; display: block; }
+.tract-card { transition: border-color 0.2s, background 0.2s; }
+.tract-card.is-on { border-color: var(--accent); background: rgba(190, 200, 255, 0.05); }
+
 @media (prefers-reduced-motion: reduce) {
   .app { transition: none; }
   .ex, .library, .ask-part { animation: none; }

@@ -20,7 +20,10 @@ for (const p of pathways) {
 for (const c of chemicals) {
   const gaps = [];
   if (!c.tagline) gaps.push('tagline');
+  if (!c.analogy) gaps.push('analogy');
   if (!c.overview?.text) gaps.push('overview');
+  if (!c.breaks?.text) gaps.push('breaks');
+  if (!c.life?.made) gaps.push('life');
   if (gaps.length) missing.push(`  chemical ${c.id}: ${gaps.join(', ')}`);
 }
 for (const c of cells) {
