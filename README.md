@@ -47,7 +47,7 @@ Procedurally generated 3D cells spanning excitatory neurons, inhibitory interneu
 
 ### 4. Guided Pathways (11 Tours)
 Narrative multi-step tours through brain systems:
-- **Actions**: How you see an object, reach for a cup, react to fear, or form a lasting memory.
+- **Actions**: How you see an object, reach for a cup, process pain and quiet the hurt, react to fear, or form a lasting memory.
 - **Chemicals**: The dopamine reward loop, serotonin mood regulation, and noradrenaline alert broadcasting.
 - **Networks**: Default mode wandering, executive attention control, and salience switching.
 
