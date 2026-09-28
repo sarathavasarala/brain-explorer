@@ -17,6 +17,7 @@ const explainerEl = $('#explainer');
 const libraryEl = $('#library');
 const hoverEl = $('#hover-label');
 const tipEl = $('#tip');
+const lensLegendEl = $('#lens-legend');
 
 const problems = validate();
 if (problems.length) console.warn(`[brain] ${problems.length} content problem(s):\n` + problems.join('\n'));
@@ -168,6 +169,11 @@ function apply() {
   if (r.type !== 'chem') stopStepperPlay();
   setMode(r.type);
 
+  if (r.type !== 'chem') {
+    scene.showChemical(null);
+    if (lensLegendEl) lensLegendEl.hidden = true;
+  }
+
   if (r.type === 'home') {
     clearScene('home');
     explainerEl.innerHTML = renderHome();
@@ -177,12 +183,65 @@ function apply() {
   } else if (r.type === 'chem') {
     const chem = chemById.get(r.id);
     if (!chem) { location.hash = '#/chem'; return; }
-    const madeIn = chem.madeIn || [];
-    const context = Object.keys(chem.density || {});
-    scene.focus(madeIn, { context, activity: true });
+
+    const tractList = (chem.tracts || []).map((t) => {
+      let state = 'ambient';
+      if (r.tab === 'tracts') {
+        if (r.sub) state = (t.id === r.sub ? 'on' : 'ambient');
+        else state = 'on';
+      } else if (r.tab === 'overview') {
+        state = 'on';
+      } else {
+        state = 'ambient';
+      }
+      return {
+        id: t.id,
+        name: t.name,
+        from: t.from,
+        to: t.to || [],
+        state,
+        local: !!t.local,
+      };
+    });
+
+    scene.showChemical({
+      color: chem.color,
+      sources: chem.madeIn || [],
+      density: chem.density || {},
+      tracts: tractList,
+      group: chem.group,
+    });
     scene.setArcs([]);
-    scene.forceSlice(false);
-    fly(madeIn.length ? madeIn : context, 'left', `chem:${chem.id}`);
+
+    scene.forceSlice(chem.group === 'modulator');
+
+    if (r.tab === 'tracts' && r.sub) {
+      const activeTract = (chem.tracts || []).find((t) => t.id === r.sub);
+      const targets = activeTract ? [activeTract.from, ...(activeTract.to || [])] : (chem.madeIn || []);
+      fly(targets, 'left', `chem:${chem.id}:${r.sub}`);
+    } else if (r.tab === 'tracts' || r.tab === 'overview') {
+      const allTargets = [...(chem.madeIn || [])];
+      for (const t of chem.tracts || []) {
+        if (t.from) allTargets.push(t.from);
+        for (const tid of (t.to || [])) allTargets.push(tid);
+      }
+      fly([...new Set(allTargets)], 'left', `chem:${chem.id}:all`);
+    } else {
+      if (!state.flown.startsWith(`chem:${chem.id}`)) {
+        const allTargets = [...(chem.madeIn || [])];
+        for (const t of chem.tracts || []) {
+          if (t.from) allTargets.push(t.from);
+          for (const tid of (t.to || [])) allTargets.push(tid);
+        }
+        fly([...new Set(allTargets)], 'left', `chem:${chem.id}:all`);
+      }
+    }
+
+    if (lensLegendEl) {
+      lensLegendEl.hidden = false;
+      lensLegendEl.style.setProperty('--accent', chem.color);
+    }
+
     explainerEl.innerHTML = renderChem(chem, r.tab, r.sub);
     if (prev.type !== 'chem' || prev.id !== r.id) explainerEl.scrollTop = 0;
   } else if (r.type === 'cellhome') {

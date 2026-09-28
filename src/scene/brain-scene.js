@@ -5,6 +5,7 @@ import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
 import { cortex, cortexPoint, buildShape, ellipsoid } from './shapes.js';
+import { mulberry32 } from './noise.js';
 
 // Base tint of each cortical lobe when nothing is selected (index matches LOBES in shapes.js).
 const LOBE_TINT = ['#c14ef0', '#5f78ff', '#9868ff', '#b15ae8'];
@@ -208,6 +209,7 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
     scene.add(obj);
     const { center, radius } = anchorOf(shape.positions);
     const rec = { id: s.id, kind: 'deep', obj, mat, color: new THREE.Color(s.color), center, radius, structure: s, base: 0.4, hi: 0, activity: 0, hover: 0 };
+    rec.hiOrig = geo.getAttribute('aHiColor').array.slice();
     recs.set(s.id, rec);
     deepRecs.push(rec);
   }
@@ -223,6 +225,7 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
     obj.visible = false;
     scene.add(obj);
     const rec = { id: a.id, kind: 'anchor', obj, mat, color: new THREE.Color(a.color || '#ffffff'), center: new THREE.Vector3(...a.position), radius: 0.05, anchor: a, base: 0, hi: 0, activity: 0, hover: 0 };
+    rec.hiOrig = geo.getAttribute('aHiColor').array.slice();
     recs.set(a.id, rec);
     anchorRecs.push(rec);
   }
@@ -347,6 +350,7 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
   let hoverId = null;
 
   function focus(ids = [], { context = [], activity = false, ambient = true } = {}) {
+    if (isLensActive) restoreLens();
     focusIds = ids.filter((id) => recs.has(id));
     const ctx = context.filter((id) => recs.has(id) && !focusIds.includes(id));
     const any = focusIds.length > 0;
@@ -401,6 +405,7 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
     losing_cells: { cortex: 0.26, deep: 0.2, activity: 0 },
   };
   function paintSketch(parts = []) {
+    if (isLensActive) restoreLens();
     const looks = new Map(parts.filter((p) => recs.has(p.id)).map((p) => [p.id, ROLE_LOOK[p.role] || ROLE_LOOK.involved]));
     focusIds = [...looks.keys()];
     const any = focusIds.length > 0;
@@ -441,6 +446,438 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
     }
   }
 
+  // ------------------------------------------------------------ chemical lens in 3D
+  class SubCurve extends THREE.Curve {
+    constructor(curve, t0 = 0, t1 = 1) {
+      super();
+      this.curve = curve;
+      this.t0 = t0;
+      this.t1 = t1;
+    }
+    getPoint(t, optionalTarget = new THREE.Vector3()) {
+      const actualT = this.t0 + t * (this.t1 - this.t0);
+      return this.curve.getPoint(actualT, optionalTarget);
+    }
+  }
+
+  function leftCenterOf(id) {
+    const r = recs.get(id);
+    if (!r) return null;
+    if (r.kind === 'region') return r.center.clone();
+    if (r.kind === 'deep') {
+      const posAttr = r.obj.geometry.getAttribute('position');
+      let count = 0;
+      const c = new THREE.Vector3();
+      for (let i = 0; i < posAttr.count; i++) {
+        if (posAttr.getX(i) >= 0.01) {
+          c.x += posAttr.getX(i);
+          c.y += posAttr.getY(i);
+          c.z += posAttr.getZ(i);
+          count++;
+        }
+      }
+      if (count > 0) return c.divideScalar(count);
+    }
+    return r.center.clone();
+  }
+
+  function samplePoints(id, n, rnd) {
+    const r = recs.get(id);
+    if (!r) return [BRAIN_CENTER.clone()];
+    const pts = [];
+    if (r.kind === 'region') {
+      const candidates = [];
+      for (let i = 0; i < nC; i++) {
+        if (r.mask[i] && cx.positions[i * 3] > 0.01) candidates.push(i);
+      }
+      const list = candidates.length ? candidates : [];
+      if (!list.length) {
+        for (let i = 0; i < nC; i++) if (r.mask[i]) list.push(i);
+      }
+      if (!list.length) return [r.center.clone()];
+      for (let k = 0; k < n; k++) {
+        const idx = list[Math.floor(rnd() * list.length)];
+        pts.push(new THREE.Vector3(cx.positions[idx * 3], cx.positions[idx * 3 + 1], cx.positions[idx * 3 + 2]));
+      }
+    } else if (r.kind === 'deep') {
+      const posAttr = r.obj.geometry.getAttribute('position');
+      const total = posAttr.count;
+      const candidates = [];
+      for (let i = 0; i < total; i++) {
+        if (posAttr.getX(i) > 0.01) candidates.push(i);
+      }
+      const list = candidates.length ? candidates : [];
+      if (!list.length) {
+        for (let i = 0; i < total; i++) if (posAttr.getX(i) >= 0) list.push(i);
+      }
+      if (!list.length) {
+        for (let i = 0; i < total; i++) list.push(i);
+      }
+      if (!list.length) return [r.center.clone()];
+      for (let k = 0; k < n; k++) {
+        const idx = list[Math.floor(rnd() * list.length)];
+        pts.push(new THREE.Vector3(posAttr.getX(idx), posAttr.getY(idx), posAttr.getZ(idx)));
+      }
+    } else if (r.kind === 'anchor') {
+      for (let k = 0; k < n; k++) {
+        pts.push(r.center.clone().add(new THREE.Vector3(
+          (rnd() - 0.5) * 0.03,
+          (rnd() - 0.5) * 0.03,
+          (rnd() - 0.5) * 0.03
+        )));
+      }
+    } else {
+      pts.push(r.center.clone());
+    }
+    return pts;
+  }
+
+  function randomOffset(rnd, maxDist) {
+    return new THREE.Vector3(
+      (rnd() - 0.5) * 2 * maxDist,
+      (rnd() - 0.5) * 2 * maxDist,
+      (rnd() - 0.5) * 2 * maxDist
+    );
+  }
+
+  function buildTree(fromId, toId, { branches = 16, color, state, rnd }) {
+    const a = leftCenterOf(fromId) || BRAIN_CENTER.clone();
+    const b = leftCenterOf(toId) || BRAIN_CENTER.clone();
+    const trunk = buildArc(a, b, 0.55);
+    const split = trunk.getPoint(0.72);
+    const ends = samplePoints(toId, branches, rnd);
+    const paths = ends.map((e) => {
+      const mid = split.clone().lerp(e, 0.5).add(randomOffset(rnd, 0.04));
+      const branch = new THREE.QuadraticBezierCurve3(split, mid, e);
+      const path = new THREE.CurvePath();
+      path.add(new SubCurve(trunk, 0, 0.72));
+      path.add(branch);
+      return { path, branch, end: e };
+    });
+    return { fromId, toId, trunk, paths, split, ends, state, color };
+  }
+
+  const treeGroup = new THREE.Group();
+  scene.add(treeGroup);
+
+  const treeFibersMat = makeMaterial(5);
+  treeFibersMat.uniforms.uBase.value = 1.0;
+  treeFibersMat.uniforms.uHi.value = 0;
+
+  const treePulsesMat = makeMaterial(7);
+  treePulsesMat.uniforms.uBase.value = 1.35;
+  treePulsesMat.uniforms.uHi.value = 0;
+
+  const treeSparklesMat = makeMaterial(9);
+  treeSparklesMat.uniforms.uBase.value = 1.5;
+  treeSparklesMat.uniforms.uHi.value = 0;
+
+  let treeFibers = null;
+  let treePulses = null;
+  let treeSparkles = null;
+  let activePulses = [];
+  let tractLabels = [];
+  let isLensActive = false;
+
+  function clearTrees() {
+    treeGroup.clear();
+    if (treeFibers) { treeFibers.geometry.dispose(); treeFibers = null; }
+    if (treePulses) { treePulses.geometry.dispose(); treePulses = null; }
+    if (treeSparkles) { treeSparkles.geometry.dispose(); treeSparkles = null; }
+    activePulses = [];
+    for (const item of tractLabels) item.el.remove();
+    tractLabels = [];
+  }
+
+  function updateTreePulses(time) {
+    if (!treePulses || !activePulses.length) return;
+    const posAttr = treePulses.geometry.getAttribute('position');
+    const colAttr = treePulses.geometry.getAttribute('aColor');
+    const sizeAttr = treePulses.geometry.getAttribute('aSize');
+    const sparkSizeAttr = treeSparkles?.geometry.getAttribute('aSize');
+    const sparkColAttr = treeSparkles?.geometry.getAttribute('aColor');
+
+    for (let i = 0; i < activePulses.length; i++) {
+      const p = activePulses[i];
+      const t = (time * 0.09 + p.offset) % 1;
+      const pt = p.path.getPoint(t);
+      posAttr.setXYZ(i, pt.x, pt.y, pt.z);
+      const isAmb = p.treeState === 'ambient';
+      const dim = isAmb ? 0.35 : 1.0;
+      colAttr.setXYZ(i, p.color.r * dim, p.color.g * dim, p.color.b * dim);
+      sizeAttr.setX(i, isAmb ? 0.85 : 1.3);
+
+      if (sparkSizeAttr) {
+        if (t > 0.95 && !isAmb) {
+          const s = Math.sin(((t - 0.95) / 0.05) * Math.PI);
+          sparkSizeAttr.setX(i, 0.4 + s * 1.4);
+          if (sparkColAttr) {
+            sparkColAttr.setXYZ(i, Math.min(1, p.color.r * (1 + s)), Math.min(1, p.color.g * (1 + s)), Math.min(1, p.color.b * (1 + s)));
+          }
+        } else {
+          sparkSizeAttr.setX(i, 0.0);
+        }
+      }
+    }
+    posAttr.needsUpdate = true;
+    colAttr.needsUpdate = true;
+    sizeAttr.needsUpdate = true;
+    if (sparkSizeAttr) sparkSizeAttr.needsUpdate = true;
+    if (sparkColAttr) sparkColAttr.needsUpdate = true;
+  }
+
+  function paintLens(colorHex, sources = [], density = {}, isLocalOrFast = false) {
+    isLensActive = true;
+    const lensColor = new THREE.Color(colorHex);
+    focusIds = [...sources];
+
+    // Cross-fade cortex highlight mask
+    aHiPrev.array.set(aHi.array);
+    aHiColorPrev.array.set(aHiColor.array);
+    aHi.array.fill(0);
+    aHiColor.array.set(cBase);
+
+    for (const [id, d] of Object.entries(density)) {
+      const r = recs.get(id);
+      if (r?.kind === 'region') {
+        const val = 0.25 + 0.75 * Math.max(0, Math.min(1, d));
+        for (let i = 0; i < nC; i++) {
+          if (!r.mask[i] || aHi.array[i] >= val) continue;
+          aHi.array[i] = val;
+          aHiColor.array[i * 3] = lensColor.r;
+          aHiColor.array[i * 3 + 1] = lensColor.g;
+          aHiColor.array[i * 3 + 2] = lensColor.b;
+        }
+      }
+    }
+
+    for (const id of sources) {
+      const r = recs.get(id);
+      if (r?.kind === 'region') {
+        for (let i = 0; i < nC; i++) {
+          if (!r.mask[i]) continue;
+          aHi.array[i] = 1.0;
+          aHiColor.array[i * 3] = lensColor.r;
+          aHiColor.array[i * 3 + 1] = lensColor.g;
+          aHiColor.array[i * 3 + 2] = lensColor.b;
+        }
+      }
+    }
+
+    aHi.needsUpdate = aHiPrev.needsUpdate = aHiColor.needsUpdate = aHiColorPrev.needsUpdate = true;
+    cortexMat.uniforms.uMix.value = 0;
+    cortexRec.base = 0.08;
+    cortexRec.hi = 1.0;
+    cortexRec.activity = isLocalOrFast ? 0.6 : (sources.some((id) => recs.get(id)?.kind === 'region') ? 1.0 : 0.0);
+
+    for (const r of deepRecs) {
+      const curHi = r.obj.geometry.getAttribute('aHiColor');
+      const prevHi = r.obj.geometry.getAttribute('aHiColorPrev');
+      prevHi.array.set(curHi.array);
+      prevHi.needsUpdate = true;
+      r.mat.uniforms.uMix.value = 0;
+
+      const isSource = sources.includes(r.id);
+      const d = density[r.id];
+      const isTarget = d !== undefined;
+
+      if (isSource) {
+        const cols = tintArray(r.obj.geometry.getAttribute('position').count, colorHex, 0.06);
+        curHi.array.set(cols);
+        curHi.needsUpdate = true;
+        r.base = 0.12;
+        r.hi = 1.0;
+        r.activity = 1.0;
+      } else if (isTarget) {
+        const cols = tintArray(r.obj.geometry.getAttribute('position').count, colorHex, 0.06);
+        curHi.array.set(cols);
+        curHi.needsUpdate = true;
+        r.base = 0.07;
+        r.hi = 0.2 + 0.6 * Math.max(0, Math.min(1, d));
+        r.activity = isLocalOrFast ? 0.6 : 0.0;
+      } else {
+        r.base = 0.07;
+        r.hi = 0.0;
+        r.activity = 0.0;
+      }
+    }
+
+    for (const r of anchorRecs) {
+      r.base = 0;
+      r.hi = 0;
+      r.activity = 0;
+      r.obj.visible = false;
+    }
+
+    applySlice();
+  }
+
+  function restoreLens() {
+    if (!isLensActive) return;
+    isLensActive = false;
+    clearTrees();
+
+    for (const r of deepRecs) {
+      if (r.hiOrig) {
+        const curHi = r.obj.geometry.getAttribute('aHiColor');
+        const prevHi = r.obj.geometry.getAttribute('aHiColorPrev');
+        curHi.array.set(r.hiOrig);
+        prevHi.array.set(r.hiOrig);
+        curHi.needsUpdate = prevHi.needsUpdate = true;
+      }
+      r.mat.uniforms.uMix.value = 1;
+      r.base = 0.4;
+      r.hi = 0;
+      r.activity = 0;
+    }
+
+    aHiPrev.array.set(aHi.array);
+    aHiColorPrev.array.set(aHiColor.array);
+    aHi.array.fill(0);
+    aHiColor.array.set(cBase);
+    aHi.needsUpdate = aHiPrev.needsUpdate = aHiColor.needsUpdate = aHiColorPrev.needsUpdate = true;
+    cortexMat.uniforms.uMix.value = 0;
+    cortexRec.base = 0.42;
+    cortexRec.hi = 0;
+    cortexRec.activity = 0;
+    focusIds = [];
+
+    applySlice();
+  }
+
+  function showChemical(config) {
+    if (!config) {
+      restoreLens();
+      return;
+    }
+    const { color, sources = [], density = {}, tracts = [], group } = config;
+    const isLocalOrFast = group === 'fast' || (tracts.length > 0 && tracts.every((t) => t.local));
+
+    paintLens(color, sources, density, isLocalOrFast);
+    clearTrees();
+
+    if (!isLocalOrFast && tracts.length) {
+      const rnd = mulberry32(42);
+      const lensColor = new THREE.Color(color);
+      const trees = [];
+      let targetCount = 0;
+      for (const t of tracts) {
+        if (t.local) continue;
+        const targets = Array.isArray(t.to) ? t.to : [t.to];
+        targetCount += targets.length;
+      }
+      const branchesPerTree = Math.min(16, Math.max(6, Math.floor((10000 - targetCount * 140) / Math.max(1, targetCount * 22))));
+
+      for (const t of tracts) {
+        if (t.local) continue;
+        const targets = Array.isArray(t.to) ? t.to : [t.to];
+        const tractColor = t.color ? new THREE.Color(t.color) : lensColor;
+        for (const toId of targets) {
+          if (!recs.has(t.from) || !recs.has(toId)) continue;
+          const tree = buildTree(t.from, toId, {
+            branches: branchesPerTree,
+            color: tractColor,
+            state: t.state || 'ambient',
+            rnd,
+          });
+          tree.tract = t;
+          trees.push(tree);
+        }
+      }
+
+      const fiberPos = [], fiberCol = [], fiberSize = [];
+      const pulsePos = [], pulseCol = [], pulseSize = [];
+      const sparkPos = [], sparkCol = [], sparkSize = [];
+      const labelDone = new Set();
+
+      for (const tree of trees) {
+        const k = tree.state === 'on' ? 0.35 : tree.state === 'ambient' ? 0.15 : 0;
+        for (let i = 0; i < 140; i++) {
+          const pt = tree.trunk.getPoint((i / 139) * 0.72);
+          fiberPos.push(pt.x, pt.y, pt.z);
+          fiberCol.push(tree.color.r * k, tree.color.g * k, tree.color.b * k);
+          fiberSize.push(0.25 + rnd() * 0.2);
+        }
+        for (const p of tree.paths) {
+          for (let j = 1; j <= 22; j++) {
+            const pt = p.branch.getPoint(j / 22);
+            fiberPos.push(pt.x, pt.y, pt.z);
+            fiberCol.push(tree.color.r * k, tree.color.g * k, tree.color.b * k);
+            fiberSize.push(0.25 + rnd() * 0.2);
+          }
+          if (tree.state !== 'off') {
+            activePulses.push({
+              path: p.path,
+              offset: rnd(),
+              treeState: tree.state,
+              color: tree.color,
+              end: p.end,
+            });
+            pulsePos.push(0, 0, 0);
+            pulseCol.push(tree.color.r, tree.color.g, tree.color.b);
+            pulseSize.push(1);
+
+            sparkPos.push(p.end.x, p.end.y, p.end.z);
+            sparkCol.push(tree.color.r, tree.color.g, tree.color.b);
+            sparkSize.push(0);
+          }
+        }
+
+        if (tree.state === 'on' && tree.tract && !labelDone.has(tree.tract.id)) {
+          labelDone.add(tree.tract.id);
+          const midPos = tree.trunk.getPoint(0.36);
+          const el = document.createElement('div');
+          el.className = 'anchor-label tract-label';
+          el.style.setProperty('--c', color);
+          el.innerHTML = `<i></i><span>${tree.tract.name || tree.tract.label || tree.tract.id}</span>`;
+          labelsEl?.appendChild(el);
+          tractLabels.push({ el, pos: midPos });
+        }
+      }
+
+      if (fiberPos.length) {
+        const gFibers = makeGeometry(
+          new Float32Array(fiberPos),
+          new Float32Array(fiberSize),
+          new Float32Array(fiberCol),
+          new Float32Array(fiberCol)
+        );
+        treeFibers = new THREE.Points(gFibers, treeFibersMat);
+        treeFibers.frustumCulled = false;
+        treeGroup.add(treeFibers);
+      }
+
+      if (pulsePos.length) {
+        const gPulses = makeGeometry(
+          new Float32Array(pulsePos),
+          new Float32Array(pulseSize),
+          new Float32Array(pulseCol),
+          new Float32Array(pulseCol)
+        );
+        gPulses.getAttribute('position').setUsage(THREE.DynamicDrawUsage);
+        gPulses.getAttribute('aColor').setUsage(THREE.DynamicDrawUsage);
+        gPulses.getAttribute('aSize').setUsage(THREE.DynamicDrawUsage);
+        treePulses = new THREE.Points(gPulses, treePulsesMat);
+        treePulses.frustumCulled = false;
+        treeGroup.add(treePulses);
+      }
+
+      if (sparkPos.length) {
+        const gSparkles = makeGeometry(
+          new Float32Array(sparkPos),
+          new Float32Array(sparkSize),
+          new Float32Array(sparkCol),
+          new Float32Array(sparkCol)
+        );
+        gSparkles.getAttribute('aSize').setUsage(THREE.DynamicDrawUsage);
+        gSparkles.getAttribute('aColor').setUsage(THREE.DynamicDrawUsage);
+        treeSparkles = new THREE.Points(gSparkles, treeSparklesMat);
+        treeSparkles.frustumCulled = false;
+        treeGroup.add(treeSparkles);
+      }
+    }
+  }
+
   // ------------------------------------------------------------ camera
   let flight = null;
   function flyTo(ids = [], view) {
@@ -470,7 +907,16 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
   let userSlice = false, forcedSlice = false;
   function applySlice() {
     const v = userSlice || forcedSlice ? 1 : 0;
-    materials.forEach((m) => { m.uniforms.uClip.value = v; });
+    if (isLensActive) {
+      cortexMat.uniforms.uClip.value = v;
+      deepRecs.forEach((r) => { r.mat.uniforms.uClip.value = 0; });
+      anchorRecs.forEach((r) => { r.mat.uniforms.uClip.value = 0; });
+      treeFibersMat.uniforms.uClip.value = 0;
+      treePulsesMat.uniforms.uClip.value = 0;
+      treeSparklesMat.uniforms.uClip.value = 0;
+    } else {
+      materials.forEach((m) => { m.uniforms.uClip.value = v; });
+    }
   }
 
   // ------------------------------------------------------------ picking
@@ -567,6 +1013,14 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
       el.style.transform = `translate(${((tmpV.x + 1) / 2) * w}px, ${((1 - tmpV.y) / 2) * h + 30}px) translate(-50%, 0)`;
       el.style.opacity = vis && r.hi > 0.05 ? String(Math.min(1, r.hi)) : '0';
     }
+    for (const { pos, el } of tractLabels) {
+      tmpV.copy(pos).project(camera);
+      const vis = tmpV.z < 1;
+      const lx = ((tmpV.x + 1) / 2) * w;
+      const ly = ((1 - tmpV.y) / 2) * h;
+      el.style.transform = `translate(${lx}px, ${ly}px) translate(-50%, -50%)`;
+      el.style.opacity = vis ? '1' : '0';
+    }
   }
 
   // ------------------------------------------------------------ loop
@@ -620,11 +1074,13 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
       approach(r.mat.uniforms.uBase, r.base, k);
       approach(r.mat.uniforms.uHi, r.hi, k);
       approach(r.mat.uniforms.uActivity, r.activity, k);
+      approach(r.mat.uniforms.uMix, 1, 1 - Math.exp(-dt * 4));
       approach(r.mat.uniforms.uHover, hoverId === r.id && !focusIds.includes(r.id) ? 0.35 : 0, 1 - Math.exp(-dt * 10));
       if (r.kind === 'anchor' && r.hi === 0 && r.mat.uniforms.uHi.value < 0.01) r.obj.visible = false;
     }
     approach(arcDotMat.uniforms.uHi, 1, k);
     updateArcDots(time);
+    updateTreePulses(time);
     updateLabels(width, height);
     composer.render();
     requestAnimationFrame(frame);
@@ -636,8 +1092,12 @@ export function createBrainScene(canvas, { structures, anchors = [], labelsEl, o
     paintSketch,
     flyTo,
     setArcs,
+    showChemical,
     has: (id) => recs.has(id),
-    reset() { focus([]); setArcs([]); flyTo([]); forcedSlice = false; applySlice(); },
+    reset() {
+      if (isLensActive) restoreLens();
+      focus([]); setArcs([]); flyTo([]); forcedSlice = false; applySlice();
+    },
     setSlice(on) { userSlice = on; applySlice(); },
     forceSlice(on) { forcedSlice = on; applySlice(); },
     get slice() { return userSlice; },
