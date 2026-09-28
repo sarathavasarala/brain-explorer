@@ -2,6 +2,8 @@
 
 > The human brain as a dynamic canvas for thought, feeling, and action.
 
+**Live Demo**: [https://sarathavasarala.github.io/brain-explorer/](https://sarathavasarala.github.io/brain-explorer/)
+
 Brain Explorer is an interactive 3D atlas designed for curious adults and learners who want to understand the mind without drowning in sterile textbook jargon.
 
 ![Brain Explorer showing the cerebellum highlighted in 3D with its explainer](screenshot.png)
