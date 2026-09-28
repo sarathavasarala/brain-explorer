@@ -6,7 +6,7 @@ import { renderAsk } from './ui/ask.js';
 import { renderLibraryShell, renderLibraryBody } from './ui/library.js';
 import { renderChemHome, renderChem } from './ui/chem.js';
 import { renderCellHome, renderCell } from './ui/cell.js';
-import { setStepperStage, toggleStepperPlay, stopStepperPlay, renderSynapseStepper } from './ui/synapse-stepper.js';
+import { setStepperStage, getStepperStage, setDrugMode, toggleStepperPlay, stopStepperPlay, renderSynapseStepper } from './ui/synapse-stepper.js';
 import { ask, cached, normalise } from './services/ask.js';
 import { findTerm, esc } from './ui/format.js';
 import { icon } from './ui/icons.js';
@@ -510,6 +510,17 @@ explainerEl.addEventListener('click', (e) => {
     const stepperEl = explainerEl.querySelector('.stepper');
     if (chem && stepperEl) {
       stepperEl.outerHTML = renderSynapseStepper(chem, { stage: stageNum, drugId: state.route.sub });
+    }
+    return;
+  }
+  const drugModeBtn = e.target.closest('[data-drug-mode]');
+  if (drugModeBtn && state.route.type === 'chem') {
+    const isAct = drugModeBtn.dataset.drugMode === 'active';
+    setDrugMode(isAct);
+    const chem = chemById.get(state.route.id);
+    const stepperEl = explainerEl.querySelector('.stepper');
+    if (chem && stepperEl) {
+      stepperEl.outerHTML = renderSynapseStepper(chem, { stage: getStepperStage(), drugId: state.route.sub });
     }
     return;
   }

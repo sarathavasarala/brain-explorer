@@ -613,13 +613,31 @@ kbd {
 
 /* ------------------------------------------------------------ chemical & stepper styles */
 .stepper-drug-banner {
-  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-  padding: 8px 12px; margin-bottom: 12px; border-radius: 8px;
-  background: rgba(185, 140, 255, 0.12); border: 1px solid rgba(185, 140, 255, 0.3);
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 10px 14px; margin-bottom: 12px; border-radius: 10px;
+  background: rgba(185, 140, 255, 0.1); border: 1px solid rgba(185, 140, 255, 0.28);
   font-size: 12.5px; color: var(--ink);
+}
+.drug-banner-main {
+  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
 }
 .drug-tag { color: var(--accent); font-weight: 600; }
 .drug-note { color: var(--ink-2); flex: 1; }
+.drug-mode-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+}
+.drug-mode-toggle {
+  display: inline-flex; gap: 2px; padding: 2px;
+  background: rgba(16, 20, 36, 0.65); border: 1px solid var(--line); border-radius: 8px;
+}
+.drug-toggle-btn {
+  padding: 3px 9px; border-radius: 6px; font-size: 11.5px; font-weight: 500;
+  color: var(--ink-3); transition: background 0.2s, color 0.2s;
+}
+.drug-toggle-btn:hover { color: var(--ink); }
+.drug-toggle-btn.is-on {
+  background: rgba(190, 200, 255, 0.16); color: #fff; font-weight: 600;
+}
 .drug-clear { color: var(--ink-3); text-decoration: underline; font-size: 11px; }
 .drug-clear:hover { color: var(--ink); }
 
@@ -643,6 +661,20 @@ kbd {
 }
 .stepper-play-btn:hover { background: rgba(190, 200, 255, 0.14); color: var(--ink); }
 .stepper-play-btn.is-playing { background: color-mix(in oklab, var(--accent) 30%, transparent); color: #fff; }
+
+.stepper-head {
+  display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
+}
+.gap-meter {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 11.5px; font-weight: 500; color: var(--ink-2);
+  padding: 3px 8px; border-radius: 6px;
+  background: rgba(190, 200, 255, 0.06); border: 1px solid var(--line);
+}
+.gap-dot {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--accent, #b98cff);
+  box-shadow: 0 0 6px var(--accent, #b98cff);
+}
 
 .speed-widget { margin-top: 20px; }
 .speed-diagram { width: 100%; height: auto; display: block; }
