@@ -74,16 +74,16 @@ export default [
       {
         id: 'D1',
         family: 'D1-like (Gs coupled)',
-        effect: 'excite',
+        effect: 'modulate',
         where: ['striatum', 'nucleus-accumbens', 'prefrontal-cortex'],
-        text: 'Stimulates adenylyl cyclase to increase cyclic AMP, enhancing the responsiveness of striatal go cells and prefrontal pyramidal neurons.',
+        text: 'Tunes target neurons by boosting cAMP signaling, making striatal go cells and prefrontal networks more responsive to strong inputs.',
       },
       {
         id: 'D2',
         family: 'D2-like (Gi coupled)',
-        effect: 'inhibit',
+        effect: 'modulate',
         where: ['striatum', 'nucleus-accumbens', 'pituitary'],
-        text: 'Inhibits adenylyl cyclase and opens potassium channels, dampening striatal stop cells and inhibiting pituitary prolactin release.',
+        text: 'Tunes target neurons by dampening cAMP and opening potassium channels, quieting striatal stop cells and curbing prolactin output.',
       },
     ],
     life: {

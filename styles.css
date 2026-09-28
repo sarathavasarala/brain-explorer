@@ -78,10 +78,12 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background: rgba(16, 20, 36, 0.65);
   border: 1px solid var(--line);
   border-radius: 10px;
+  box-sizing: border-box;
 }
 .dict-tabs a {
   flex: 1; text-align: center;
   padding: 6px 8px; border-radius: 7px; font-size: 12px; font-weight: 500; color: var(--ink-3);
+  text-decoration: none;
   transition: background 0.2s var(--ease), color 0.2s var(--ease), box-shadow 0.2s var(--ease);
 }
 .dict-tabs a:hover { color: var(--ink); }
@@ -644,8 +646,101 @@ kbd {
 
 .speed-widget { margin-top: 20px; }
 .speed-diagram { width: 100%; height: auto; display: block; }
-.tract-card { transition: border-color 0.2s, background 0.2s; }
-.tract-card.is-on { border-color: var(--accent); background: rgba(190, 200, 255, 0.05); }
+.speed-track { stroke: rgba(190, 200, 255, 0.12); stroke-width: 2.5px; stroke-linecap: round; }
+.speed-label { font-size: 11px; fill: var(--ink-2); font-family: var(--sans); }
+.speed-dot.speed-fast { fill: #ffcf6b; filter: drop-shadow(0 0 4px #ffcf6b); }
+.speed-dot.speed-mod { fill: #b98cff; filter: drop-shadow(0 0 5px #b98cff); }
+.speed-dot.speed-hormone { fill: #ff9fd1; filter: drop-shadow(0 0 6px #ff9fd1); }
+
+.stepper-spike { filter: drop-shadow(0 0 6px #ffffff); }
+.stepper-mol-white { filter: drop-shadow(0 0 4px #ffffff); }
+.receptor-boosted { filter: drop-shadow(0 0 7px var(--c, #ffd36b)); }
+
+.section-lead { margin-bottom: 16px; color: var(--ink-2); font-size: 14px; }
+.chem-meta, .cell-meta { margin: 20px 0; display: grid; gap: 12px; }
+.meta-row { display: flex; flex-direction: column; gap: 4px; }
+.meta-label { margin: 0; font-size: 13px; font-weight: 600; color: var(--ink-2); letter-spacing: -0.01em; }
+.meta-val { margin: 0; color: var(--ink); font-size: 13.5px; }
+
+.chem-groups-list, .cell-groups-list { margin-top: 20px; display: grid; gap: 16px; }
+.chem-group-item, .cell-group-item { margin: 0; }
+.group-sub { font-weight: 400; color: var(--ink-3); font-size: 12px; display: block; margin-top: 2px; }
+
+.tract-all-link { margin-bottom: 12px; }
+.tract-cards { display: grid; gap: 12px; }
+.tract-card {
+  position: relative; margin: 0; padding: 14px; border-radius: 12px;
+  transition: border-color 0.2s, background 0.2s;
+}
+.tract-card.is-on {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 8%, var(--panel-2));
+}
+.tract-card-head {
+  display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px;
+}
+.tract-title { font-size: 14px; font-weight: 600; text-decoration: none; color: inherit; }
+.tract-card.is-on .tract-title { color: var(--accent); }
+.tract-act {
+  font-size: 11.5px; opacity: 0; transition: opacity 0.15s;
+}
+.tract-card:hover .tract-act { opacity: 1; }
+.tract-route {
+  display: flex; align-items: center; gap: 8px; margin: 6px 0 10px; font-size: 12px;
+}
+.tract-arrow { color: var(--ink-3); }
+.tract-job { font-size: 13px; font-weight: 500; color: var(--ink); margin: 0 0 6px; }
+.tract-note { margin-top: 6px; font-size: 12px; line-height: 1.4; }
+.tract-note-fails { color: #ffcf6b; }
+.tract-note-blocked { color: var(--ink-3); }
+
+.receptors-section, .drugs-section, .breaks-section { margin-top: 24px; }
+.receptors-list, .drugs-list { display: grid; gap: 10px; margin-top: 10px; }
+.receptor-card, .drug-card { margin: 0; padding: 12px 14px; border-radius: 10px; }
+.receptor-head, .drug-head {
+  display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;
+}
+.receptor-name, .drug-name { font-weight: 600; font-size: 13.5px; color: var(--ink); }
+.receptor-family, .drug-target { font-weight: 400; font-size: 12px; color: var(--ink-3); }
+.receptor-where { margin: 4px 0 6px; }
+.receptor-desc, .drug-desc { font-size: 12.5px; color: var(--ink-2); margin: 0; line-height: 1.45; }
+.drug-link { margin-top: 8px; font-size: 11.5px; padding: 4px 10px; align-self: flex-start; display: inline-flex; }
+
+.badge-excite {
+  font-size: 11px; padding: 2px 7px; border-radius: 6px; font-weight: 500;
+  color: #ffcf6b; background: rgba(255, 207, 107, 0.12);
+}
+.badge-inhibit {
+  font-size: 11px; padding: 2px 7px; border-radius: 6px; font-weight: 500;
+  color: #ff6b7d; background: rgba(255, 107, 125, 0.12);
+}
+.badge-modulate {
+  font-size: 11px; padding: 2px 7px; border-radius: 6px; font-weight: 500;
+  color: #b98cff; background: rgba(185, 140, 255, 0.12);
+}
+
+.breaks-desc { color: var(--ink-2); font-size: 14px; margin-bottom: 10px; }
+.try-box { margin-top: 20px; }
+.try-label { color: var(--accent); }
+
+.cell-steps-h { font-size: 13px; font-weight: 600; margin: 18px 0 8px; color: var(--ink-2); }
+.cell-steps { margin-top: 8px; list-style: none; padding: 0; }
+.cell-step-item {
+  padding: 10px 14px; margin-bottom: 8px; border-radius: 8px;
+  background: rgba(190, 200, 255, 0.03); border: 1px solid var(--line);
+}
+.cell-step-p { margin: 0; font-size: 13.5px; line-height: 1.5; color: var(--ink); }
+
+.cell-loc-list { display: grid; gap: 10px; margin-top: 12px; }
+.cell-loc-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 14px; border-radius: 8px;
+  background: rgba(190, 200, 255, 0.03); border: 1px solid var(--line);
+}
+.cell-loc-name { font-weight: 600; font-size: 14px; color: var(--ink); }
+.cell-loc-tag { font-size: 12px; color: var(--ink-3); margin-top: 2px; }
+.cell-loc-chip { margin-left: 12px; white-space: nowrap; flex-shrink: 0; }
+.cell-circuit-fig { margin-top: 22px; }
 
 .cell-zoom-row {
   margin: 18px 0 22px;
@@ -654,7 +749,7 @@ kbd {
   background: rgba(190, 200, 255, 0.03);
   border: 1px solid var(--line);
 }
-.cell-zoom-row h3 {
+.cell-zoom-h {
   font-size: 11.5px;
   font-weight: 600;
   text-transform: uppercase;
@@ -662,6 +757,7 @@ kbd {
   color: var(--ink-2);
   margin: 0 0 10px;
 }
+.chem-messenger-name { color: var(--c, #ffd36b); }
 
 @media (prefers-reduced-motion: reduce) {
   .app { transition: none; }

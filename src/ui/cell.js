@@ -30,24 +30,28 @@ function chemicalChip(chemId) {
 export function renderCellHome() {
   return `<article class="ex" style="--accent:#ffd36b">
     <header class="ex-head">
-      <span class="crumbs">Atlas / Cells</span>
+      <nav class="crumbs">
+        <a href="#/cell">Atlas</a>
+        <span class="sep">/</span>
+        <span>Cells</span>
+      </nav>
       <h1 class="ex-title">Brain Cells</h1>
       <p class="tagline">The individual neurons and glia that generate thoughts, store memories, and coordinate the body.</p>
     </header>
     <div class="level">
       <p>The human brain contains about 86 billion neurons and roughly the same number of non-neuronal glial cells. Each specialized cell type brings its own distinctive morphology, firing pattern, and chemical vocabulary.</p>
 
-      <div class="cell-groups-list" style="margin-top:20px;">
+      <div class="cell-groups-list">
         ${cellGroups.map((g) => {
           const list = cells.filter((c) => c.group === g.id);
-          return `<section class="group" style="margin-top:20px;">
-            <h2 class="group-h" style="font-size:13px; font-weight:600; padding:0 0 4px;">
+          return `<section class="group cell-group-item">
+            <h2 class="group-h">
               ${esc(g.label)}
-              <span style="font-weight:400; color:var(--ink-3); font-size:12px; display:block; margin-top:2px;">${esc(g.blurb || '')}</span>
+              <span class="group-sub">${esc(g.blurb || '')}</span>
             </h2>
-            <div class="chips" style="margin-top:8px;">
+            <div class="chips">
               ${list.map((c) => `
-                <a class="chip" href="#/cell/${c.id}" style="--c:${c.color}; font-size:13px; padding:6px 12px;">
+                <a class="chip" href="#/cell/${c.id}" style="--c:${c.color}">
                   <i class="dot"></i>${esc(c.name)}
                 </a>
               `).join('')}
@@ -74,18 +78,18 @@ export function renderCell(cell, tabId = 'shape', isFiring = false) {
         ${paragraphs(cell.shape?.text || '')}
         ${bullets(cell.shape?.bullets || [])}
 
-        <div class="cell-meta" style="margin:20px 0; display:grid; gap:12px;">
+        <div class="cell-meta">
           ${cell.size ? `
             <div class="meta-row">
-              <span class="meta-label" style="font-weight:600; font-size:12.5px; color:var(--ink-2);">Estimated size:</span>
-              <span style="color:var(--ink); font-size:13px; margin-left:6px;">${esc(cell.size)}</span>
+              <h3 class="meta-label">Estimated size</h3>
+              <p class="meta-val">${esc(cell.size)}</p>
             </div>` : ''}
           <div class="meta-row">
-            <span class="meta-label" style="font-weight:600; font-size:12.5px; color:var(--ink-2); display:block; margin-bottom:4px;">Primary transmitter:</span>
+            <h3 class="meta-label">Primary transmitter</h3>
             ${chemicalChip(cell.transmitter)}
           </div>
           <div class="meta-row">
-            <span class="meta-label" style="font-weight:600; font-size:12.5px; color:var(--ink-2); display:block; margin-bottom:4px;">Lives in:</span>
+            <h3 class="meta-label">Lives in</h3>
             ${partChips(cell.where)}
           </div>
         </div>
@@ -95,7 +99,7 @@ export function renderCell(cell, tabId = 'shape', isFiring = false) {
     const isGlia = cell.group === 'glia';
     body = `
       <div class="level">
-        <div class="player" style="margin: 4px 0 16px;">
+        <div class="player">
           <button class="pl-btn pl-play" data-act="cell-fire" aria-label="${isFiring ? 'Pause animation' : 'Animate firing'}">
             ${icon(isFiring ? 'pause' : 'play', 18)}
             <span>${isFiring ? (isGlia ? 'Pause wave' : 'Pause firing') : (isGlia ? 'Animate wave' : 'Animate firing')}</span>
@@ -105,11 +109,11 @@ export function renderCell(cell, tabId = 'shape', isFiring = false) {
         ${paragraphs(cell.fires?.text || '')}
 
         ${cell.fires?.steps?.length ? `
-          <h3 style="font-size:13px; font-weight:600; margin:18px 0 8px; color:var(--ink-2);">Sequence of activity</h3>
-          <ol class="steps" style="margin-top:8px; list-style:none; padding:0;">
+          <h3 class="cell-steps-h">Sequence of activity</h3>
+          <ol class="steps cell-steps">
             ${cell.fires.steps.map((st) => `
-              <li style="padding:10px 14px; margin-bottom:8px; border-radius:6px; background:rgba(255,255,255,0.03); border:1px solid var(--border);">
-                <p style="margin:0; font-size:13.5px; line-height:1.5;">${fmt(st)}</p>
+              <li class="cell-step-item">
+                <p class="cell-step-p">${fmt(st)}</p>
               </li>
             `).join('')}
           </ol>
@@ -119,20 +123,20 @@ export function renderCell(cell, tabId = 'shape', isFiring = false) {
   } else if (activeTab === 'lives') {
     body = `
       <div class="level">
-        <p style="margin-bottom:16px; color:var(--ink-2); font-size:14px;">
+        <p class="section-lead">
           Found within the circuits of the following brain regions. The 3D view zooms out to highlight where this cell type lives.
         </p>
-        <div style="display:grid; gap:10px; margin-top:12px;">
+        <div class="cell-loc-list">
           ${(cell.where || []).map((id) => {
             const s = byId.get(id);
             if (!s) return '';
             return `
-              <div style="display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-radius:8px; background:rgba(255,255,255,0.03); border:1px solid var(--border);">
-                <div>
-                  <div style="font-weight:600; font-size:14px; color:var(--ink);">${esc(s.name)}</div>
-                  <div style="font-size:12px; color:var(--ink-3); margin-top:2px;">${fmt(s.tagline || '')}</div>
+              <div class="cell-loc-item">
+                <div class="cell-loc-info">
+                  <div class="cell-loc-name">${esc(s.name)}</div>
+                  <div class="cell-loc-tag">${fmt(s.tagline || '')}</div>
                 </div>
-                <a class="chip" href="#/s/${s.id}" style="--c:${s.color}; margin-left:12px; white-space:nowrap;">
+                <a class="chip cell-loc-chip" href="#/s/${s.id}" style="--c:${s.color}">
                   <i class="dot"></i>Open Part
                 </a>
               </div>
@@ -147,17 +151,17 @@ export function renderCell(cell, tabId = 'shape', isFiring = false) {
       <div class="level">
         ${paragraphs(cell.chem?.text || '')}
 
-        <div class="chem-meta" style="margin:20px 0; display:grid; gap:14px;">
+        <div class="chem-meta">
           ${cell.chem?.receptors?.length ? `
             <div class="meta-row">
-              <span class="meta-label" style="font-weight:600; font-size:12.5px; color:var(--ink-2); display:block; margin-bottom:4px;">Receptors expressed:</span>
+              <h3 class="meta-label">Receptors expressed</h3>
               <div class="chips">
                 ${cell.chem.receptors.map((r) => `<span class="chip">${esc(r)}</span>`).join('')}
               </div>
             </div>` : ''}
           ${cell.chem?.modulatedBy?.length ? `
             <div class="meta-row">
-              <span class="meta-label" style="font-weight:600; font-size:12.5px; color:var(--ink-2); display:block; margin-bottom:4px;">Modulated by:</span>
+              <h3 class="meta-label">Modulated by</h3>
               <div class="chips">
                 ${cell.chem.modulatedBy.map((modId) => {
                   const ch = chemicals.find((c) => c.id === modId);
@@ -169,7 +173,7 @@ export function renderCell(cell, tabId = 'shape', isFiring = false) {
         </div>
 
         ${d ? `
-          <figure class="fig" style="margin-top:22px;">
+          <figure class="fig cell-circuit-fig">
             <figcaption class="fig-title">${esc(d.title)}</figcaption>
             ${renderCircuit(d, cell.diagram)}
             <div class="legend">${Object.entries(LINK_COLORS).map(([k, c]) => `<span><i style="--c:${c}" class="lg-${k}"></i>${{ excite: 'Excites', inhibit: 'Inhibits', modulate: 'Modulates' }[k]}</span>`).join('')}</div>

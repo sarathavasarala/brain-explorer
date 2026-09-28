@@ -112,7 +112,7 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null 
   // Stage 2: Spike running down terminal
   let spikeElement = '';
   if (currentStage === 2 && acts !== 'release') {
-    spikeElement = `<circle r="4" fill="#ffffff" style="filter: drop-shadow(0 0 6px #ffffff);">
+    spikeElement = `<circle r="4" fill="#ffffff" class="stepper-spike">
       <animate attributeName="cx" values="200;200" dur="1.4s" repeatCount="indefinite"/>
       <animate attributeName="cy" values="0;76" dur="1.4s" repeatCount="indefinite" calcMode="linear"/>
       <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.1;0.9;1" dur="1.4s" repeatCount="indefinite"/>
@@ -147,7 +147,7 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null 
         </circle>`);
       } else if (acts === 'receptor-mimic') {
         // White drug molecules sit in the pocket
-        moleculeElements.push(`<circle cx="${rx}" cy="120" r="2.8" fill="#ffffff" style="filter: drop-shadow(0 0 4px #ffffff);">
+        moleculeElements.push(`<circle cx="${rx}" cy="120" r="2.8" fill="#ffffff" class="stepper-mol-white">
           <animate attributeName="opacity" values="0.4;1;0.4" dur="2s" repeatCount="indefinite"/>
         </circle>`);
       } else {
@@ -254,11 +254,11 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null 
   const receptorElements = receptors.map((r, i) => {
     const n = receptors.length;
     const rx = 200 + (i - (n - 1) / 2) * 88;
-    const glow = (currentStage === 3 && acts === 'boost-receptor') ? `style="filter: drop-shadow(0 0 7px ${color});"` : '';
+    const glowClass = (currentStage === 3 && acts === 'boost-receptor') ? 'class="receptor-boosted"' : '';
     const cap = (currentStage === 3 && acts === 'receptor-block') ? `
       <rect x="${rx - 8}" y="114" width="16" height="5" rx="2" fill="#8890aa" stroke="#fff" stroke-width="1"/>` : '';
 
-    return `<g ${glow}>
+    return `<g ${glowClass} style="--c:${color}">
       <path d="M${rx - 10} 126 v-8 h5 v5 h10 v-5 h5 v8" stroke="${color}" stroke-width="1.4" fill="none"/>
       ${cap}
       <text x="${rx}" y="148" text-anchor="middle" class="dg-label" font-size="10.5">${esc(r.id)}</text>

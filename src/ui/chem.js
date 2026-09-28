@@ -24,7 +24,11 @@ function partChips(ids = []) {
 export function renderChemHome() {
   return `<article class="ex" style="--accent:#b98cff">
     <header class="ex-head">
-      <span class="crumbs">Atlas / Chemicals</span>
+      <nav class="crumbs">
+        <a href="#/chem">Atlas</a>
+        <span class="sep">/</span>
+        <span>Chemicals</span>
+      </nav>
       <h1 class="ex-title">Brain Chemicals</h1>
       <p class="tagline">The molecules that carry signals across synapses, modulate circuits, and coordinate the body.</p>
     </header>
@@ -37,17 +41,17 @@ export function renderChemHome() {
       <div class="chem-groups-list">
         ${chemicalGroups.map((g) => {
           const list = chemicals.filter((c) => c.group === g.id);
-          return `<section class="group" style="margin-top:20px;">
-            <h2 class="group-h" style="font-size:13px; font-weight:600; padding:0 0 4px;">
+          return `<section class="group chem-group-item">
+            <h2 class="group-h">
               ${esc(g.label)}
-              <span style="font-weight:400; color:var(--ink-3); font-size:12px; display:block; margin-top:2px;">${esc(g.blurb || '')}</span>
+              <span class="group-sub">${esc(g.blurb || '')}</span>
             </h2>
-            <div class="chips" style="margin-top:8px;">
+            <div class="chips">
               ${list.length ? list.map((c) => `
-                <a class="chip" href="#/chem/${c.id}" style="--c:${c.color}; font-size:13px; padding:6px 12px;">
+                <a class="chip" href="#/chem/${c.id}" style="--c:${c.color}">
                   <i class="dot"></i>${esc(c.name)}
                 </a>
-              `).join('') : '<span class="empty" style="padding:4px 0; font-size:12px;">Hormone directory coming in Phase 5.</span>'}
+              `).join('') : '<span class="empty">Hormone directory coming in Phase 5.</span>'}
             </div>
           </section>`;
         }).join('')}
@@ -71,20 +75,20 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
         ${paragraphs(chem.overview?.text || '')}
         ${bullets(chem.overview?.bullets || [])}
 
-        <div class="chem-meta" style="margin:20px 0; display:grid; gap:12px;">
+        <div class="chem-meta">
           <div class="meta-row">
-            <span class="meta-label" style="font-weight:600; font-size:12.5px; color:var(--ink-2); display:block; margin-bottom:4px;">Cell bodies located in:</span>
+            <h3 class="meta-label">Made in</h3>
             ${partChips(chem.madeIn)}
           </div>
           ${chem.madeFrom ? `
             <div class="meta-row">
-              <span class="meta-label" style="font-weight:600; font-size:12.5px; color:var(--ink-2);">Synthesized from:</span>
-              <span style="color:var(--ink); font-size:13px; margin-left:6px;">${esc(chem.madeFrom)}</span>
+              <h3 class="meta-label">Made from</h3>
+              <p class="meta-val">${esc(chem.madeFrom)}</p>
             </div>` : ''}
           ${chem.pathwayId ? `
-            <div class="meta-row" style="margin-top:4px;">
-              <a class="chip" href="#/p/${chem.pathwayId}/0" style="--c:${chem.color}; font-weight:500;">
-                Take the guided tour: ${esc(chem.name)} pathways →
+            <div class="meta-row">
+              <a class="chip chip-path" href="#/p/${chem.pathwayId}/0">
+                ${icon('pathway', 14)} Take the guided tour: ${esc(chem.name)} pathways &rarr;
               </a>
             </div>` : ''}
         </div>
@@ -94,37 +98,41 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
     `;
   } else if (activeTab === 'tracts') {
     const tracts = chem.tracts || [];
+    let list = tracts.slice();
+    if (sub) {
+      list.sort((a, b) => (a.id === sub ? -1 : b.id === sub ? 1 : 0));
+    }
     body = `
       <div class="level">
-        <p style="margin-bottom:16px; color:var(--ink-2); font-size:14px;">
+        <p class="section-lead">
           Primary projection routes where ${esc(chem.name)} is synthesized and delivered across target regions.
         </p>
-        ${sub ? `<div style="margin-bottom:12px;"><a class="xref" href="#/chem/${chem.id}/tracts">← Show all pathways</a></div>` : ''}
+        ${sub ? `<div class="tract-all-link"><a class="xref" href="#/chem/${chem.id}/tracts">&larr; Show all pathways</a></div>` : ''}
         <div class="tract-cards">
-          ${tracts.map((t) => {
+          ${list.map((t) => {
             const on = sub === t.id;
-            return `<div class="fig tract-card ${on ? 'is-on' : ''}" style="margin:12px 0; padding:14px; border-radius:12px; ${on ? 'border-color:var(--accent); background:rgba(190,200,255,0.06);' : ''}">
-              <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; margin-bottom:6px;">
-                <a href="#/chem/${chem.id}/tracts/${t.id}" class="fig-title" style="font-size:14px; font-weight:600; color:${on ? 'var(--accent)' : 'inherit'};">
+            return `<div class="fig tract-card ${on ? 'is-on' : ''}" data-tract="${t.id}">
+              <div class="tract-card-head">
+                <a href="#/chem/${chem.id}/tracts/${t.id}" class="fig-title tract-title">
                   ${esc(t.name)}
                 </a>
-                <a href="#/chem/${chem.id}/tracts/${t.id}" class="xref" style="font-size:11.5px;">${on ? 'Active' : 'Highlight'}</a>
+                ${!on ? `<a href="#/chem/${chem.id}/tracts/${t.id}" class="xref tract-act">Highlight</a>` : ''}
               </div>
-              <div style="display:flex; align-items:center; gap:8px; margin:6px 0 10px; font-size:12px;">
+              <div class="tract-route">
                 ${partChips([t.from])}
-                <span style="color:var(--ink-3);">→</span>
+                <span class="tract-arrow">&rarr;</span>
                 ${partChips(t.to)}
               </div>
-              <p style="font-size:13px; font-weight:500; color:var(--ink); margin:0 0 6px;">
+              <p class="tract-job">
                 ${esc(t.job)}
               </p>
               ${paragraphs(t.text)}
               ${t.whenItFails ? `
-                <div class="tract-note" style="margin-top:8px; font-size:12px; color:#ffcf6b; line-height:1.4;">
+                <div class="tract-note tract-note-fails">
                   <strong>When it fails:</strong> ${esc(t.whenItFails)}
                 </div>` : ''}
               ${t.whenBlocked ? `
-                <div class="tract-note" style="margin-top:4px; font-size:12px; color:var(--ink-3); line-height:1.4;">
+                <div class="tract-note tract-note-blocked">
                   <strong>When blocked:</strong> ${esc(t.whenBlocked)}
                 </div>` : ''}
             </div>`;
@@ -138,19 +146,19 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
       <div class="level">
         ${renderSynapseStepper(chem, { stage: getStepperStage(), drugId: sub })}
 
-        <div class="receptors-section" style="margin-top:24px;">
-          <h3 class="fig-title" style="font-size:14px; font-weight:600; margin-bottom:10px;">Receptors</h3>
-          <div class="receptors-list" style="display:grid; gap:10px;">
+        <div class="receptors-section">
+          <h3 class="fig-title">Receptors</h3>
+          <div class="receptors-list">
             ${receptors.map((r) => `
-              <div class="fig" style="margin:0; padding:12px 14px; border-radius:10px;">
-                <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
-                  <span style="font-weight:600; font-size:13.5px; color:var(--ink);">${esc(r.id)} <span style="font-weight:400; font-size:12px; color:var(--ink-3);">(${esc(r.family)})</span></span>
-                  <span class="badge" style="font-size:11px; padding:2px 7px; border-radius:6px; font-weight:500; background:rgba(190,200,255,0.08); color:${r.effect === 'excite' ? '#ffcf6b' : r.effect === 'inhibit' ? '#ff6b7d' : '#b98cff'};">
-                    ${r.effect === 'excite' ? 'Excitatory' : r.effect === 'inhibit' ? 'Inhibitory' : 'Modulatory'}
+              <div class="fig receptor-card">
+                <div class="receptor-head">
+                  <span class="receptor-name">${esc(r.id)} <span class="receptor-family">(${esc(r.family)})</span></span>
+                  <span class="badge badge-${r.effect}">
+                    ${{ excite: 'Excites', inhibit: 'Quiets', modulate: 'Tunes' }[r.effect] || r.effect}
                   </span>
                 </div>
-                <div style="margin:4px 0 6px;">${partChips(r.where)}</div>
-                <p style="font-size:12.5px; color:var(--ink-2); margin:0; line-height:1.45;">${esc(r.text)}</p>
+                <div class="receptor-where">${partChips(r.where)}</div>
+                <p class="receptor-desc">${esc(r.text)}</p>
               </div>
             `).join('')}
           </div>
@@ -161,32 +169,32 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
     const drugs = chem.drugs || [];
     body = `
       <div class="level">
-        <h3 class="fig-title" style="font-size:14px; font-weight:600; margin-bottom:10px;">Key Drugs & Clinical Agents</h3>
-        <div class="drugs-list" style="display:grid; gap:10px; margin-bottom:24px;">
+        <h3 class="fig-title">Key Drugs and Clinical Agents</h3>
+        <div class="drugs-list">
           ${drugs.map((d) => `
-            <div class="fig" style="margin:0; padding:12px 14px; border-radius:10px;">
-              <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:4px;">
-                <span style="font-weight:600; font-size:13.5px; color:var(--ink);">${esc(d.name)}</span>
-                <span style="font-size:11.5px; color:var(--ink-3);">Target: ${esc(d.target)}</span>
+            <div class="fig drug-card">
+              <div class="drug-head">
+                <span class="drug-name">${esc(d.name)}</span>
+                <span class="drug-target">Target: ${esc(d.target)}</span>
               </div>
-              <p style="font-size:12.5px; color:var(--ink-2); margin:0 0 8px; line-height:1.45;">${esc(d.text)}</p>
-              <a class="chip" href="#/chem/${chem.id}/synapse/${d.id}" style="font-size:11.5px; padding:3px 9px;">
-                See action in synapse stepper →
+              <p class="drug-desc">${esc(d.text)}</p>
+              <a class="chip drug-link" href="#/chem/${chem.id}/synapse/${d.id}">
+                See action in synapse stepper &rarr;
               </a>
             </div>
           `).join('')}
         </div>
 
-        <div class="breaks-section" style="margin-top:20px;">
-          <h3 class="fig-title" style="font-size:14px; font-weight:600; margin-bottom:6px;">When It Breaks Down</h3>
-          <p style="color:var(--ink-2); font-size:14px; margin-bottom:10px;">${fmt(chem.breaks?.text || '')}</p>
+        <div class="breaks-section">
+          <h3 class="fig-title">When It Breaks Down</h3>
+          <p class="breaks-desc">${fmt(chem.breaks?.text || '')}</p>
           ${bullets(chem.breaks?.bullets || [])}
         </div>
 
         ${chem.tryIt ? `
-          <div class="extra" style="margin-top:20px;">
-            <p style="margin:0; font-size:13px; line-height:1.5;">
-              <strong style="color:var(--accent);">Try this:</strong> ${fmt(chem.tryIt)}
+          <div class="extra try-box">
+            <p>
+              <strong class="try-label">Try this:</strong> ${fmt(chem.tryIt)}
             </p>
           </div>` : ''}
       </div>
@@ -195,23 +203,26 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
 
   return `<article class="ex" style="--accent:${chem.color}">
     <header class="ex-head">
-      <span class="crumbs">Atlas / Chemicals / ${esc(group.label)}</span>
+      <nav class="crumbs">
+        <a href="#/chem">Chemicals</a>
+        <span class="sep">/</span>
+        <span>${esc(group.label)}</span>
+      </nav>
       <h1 class="ex-title">${esc(chem.name)}</h1>
       <p class="tagline">${esc(chem.tagline || '')}</p>
     </header>
 
     ${chem.analogy ? `
-      <div class="analogy">
-        <span class="analogy-lead">Analogy:</span>${fmt(chem.analogy)}
-      </div>` : ''}
+      <p class="analogy"><span class="analogy-lead">Think of it as</span> ${fmt(chem.analogy)}</p>
+    ` : ''}
 
     ${renderLadder(tabs, activeTab, { hrefPrefix: `#/chem/${chem.id}`, attr: 'data-tab' })}
 
     ${body}
 
-    <nav class="pager" aria-label="Adjacent chemicals">
-      ${prev ? `<a class="pg" href="#/chem/${prev.id}" style="--c:${prev.color}"><i class="dot"></i>${esc(prev.name)}</a>` : '<span></span>'}
-      ${next ? `<a class="pg" href="#/chem/${next.id}" style="--c:${next.color}">${esc(next.name)}<i class="dot"></i></a>` : '<span></span>'}
-    </nav>
+    <footer class="pager">
+      ${prev ? `<a href="#/chem/${prev.id}/${activeTab}" class="pg">${icon('prev', 16)}<span>${esc(prev.name)}</span></a>` : '<span></span>'}
+      ${next ? `<a href="#/chem/${next.id}/${activeTab}" class="pg pg-next"><span>${esc(next.name)}</span>${icon('next', 16)}</a>` : '<span></span>'}
+    </footer>
   </article>`;
 }

@@ -49,7 +49,7 @@ function cellsFigure(cells) {
   }
   if (syn) {
     html += `<figure class="fig">
-      <figcaption class="fig-title">Main chemical messenger: <span style="color:${syn.color}">${esc(syn.name)}</span></figcaption>
+      <figcaption class="fig-title">Main chemical messenger: <span class="chem-messenger-name" style="--c:${syn.color}">${esc(syn.name)}</span></figcaption>
       ${renderSynapse(syn)}
       <p class="fig-caption">${fmt(syn.blurb)}</p>
     </figure>`;
@@ -73,8 +73,8 @@ export function renderStructure(s, levelId, source) {
   if (level.id === 'cells') {
     const residentCells = cells.filter((c) => c.where?.includes(s.id));
     if (residentCells.length) {
-      body += `<div class="cell-zoom-row" style="margin: 16px 0 20px;">
-        <h3 style="font-size:12.5px; font-weight:600; text-transform:uppercase; letter-spacing:0.04em; color:var(--ink-2); margin-bottom:8px;">Zoom into a cell</h3>
+      body += `<div class="cell-zoom-row">
+        <h3 class="cell-zoom-h">Zoom into a cell</h3>
         <div class="chips">${residentCells.map((c) => `<a class="chip" href="#/cell/${c.id}/shape" style="--c:${c.color}"><i class="dot"></i>${esc(c.name)}</a>`).join('')}</div>
       </div>`;
     }

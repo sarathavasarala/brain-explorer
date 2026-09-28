@@ -331,6 +331,10 @@ function apply() {
 
     explainerEl.innerHTML = renderChem(chem, r.tab, r.sub);
     if (prev.type !== 'chem' || prev.id !== r.id) explainerEl.scrollTop = 0;
+    if (r.tab === 'tracts' && r.sub) {
+      const activeCard = explainerEl.querySelector(`.tract-card[data-tract="${r.sub}"]`);
+      if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
   } else if (r.type === 'cellhome') {
     clearScene('cellhome');
     explainerEl.innerHTML = renderCellHome();
