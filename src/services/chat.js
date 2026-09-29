@@ -248,63 +248,15 @@ export async function sendChat(messages) {
     return { status: 'error' };
   }
 
-  // 1. If user configured an API key in localStorage, call directly from browser
   const userConfig = getAiConfig();
-  if (userConfig?.apiKey) {
-    try {
-      return await sendChatDirect(userConfig, messages);
-    } catch (e) {
-      console.error('[brain-explorer] direct chat failed:', e);
-      return { status: 'error', error: e.message || 'Direct API call failed' };
-    }
-  }
-
-  // 2. Otherwise fall back to local server /api/chat proxy
-  let res;
-  try {
-    res = await fetch('/api/chat', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Brain-Explorer': '1',
-      },
-      body: JSON.stringify({ messages }),
-    });
-  } catch {
+  if (!userConfig?.apiKey) {
     return { status: 'no_key' };
   }
 
-  if (res.status === 404 || res.status === 501) return { status: 'no_key' };
-
-  let data;
   try {
-    data = await res.json();
-  } catch {
-    return { status: 'no_key' };
+    return await sendChatDirect(userConfig, messages);
+  } catch (e) {
+    console.error('[brain-explorer] direct chat failed:', e);
+    return { status: 'error', error: e.message || 'Direct API call failed' };
   }
-
-  if (!res.ok) {
-    return { status: data?.status || 'error' };
-  }
-
-  if (data.status === 'out_of_scope') {
-    return {
-      status: 'out_of_scope',
-      title: data.title || 'Out of scope',
-      summary: data.summary || 'Brain Explorer explores how the brain and body work. Try asking about a feeling, memory, or action.',
-      steps: [],
-    };
-  }
-
-  if (data.status === 'ok') {
-    const sanitized = sanitizeScript(data);
-    return {
-      status: 'ok',
-      title: sanitized.title || 'Brain Explorer',
-      summary: sanitized.summary || '',
-      steps: sanitized.steps || [],
-    };
-  }
-
-  return { status: data.status || 'error' };
 }

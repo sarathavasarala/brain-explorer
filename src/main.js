@@ -466,6 +466,17 @@ async function submitChatQuestion(query) {
   const q = normalise(query);
   if (!q) return;
 
+  if (!hasAiKey()) {
+    state.chat.turns = [
+      { role: 'user', text: q },
+      { role: 'assistant', status: 'no_key' },
+    ];
+    clearScene('ask');
+    explainerEl.innerHTML = renderChat(state.chat);
+    explainerEl.scrollTop = 0;
+    return;
+  }
+
   state.chat.turns = [{ role: 'user', text: q }];
   state.chat.loading = true;
   state.chat.currentQuery = q;

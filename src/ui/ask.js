@@ -271,10 +271,14 @@ export function renderChat({ turns = [], loading = false, currentQuery = '' } = 
     return `
       <article class="ex ex-ask" style="--accent:${ACCENT}">
         <header class="chat-header">
-          <h1 class="ex-title">Ask the brain</h1>
+          <div class="chat-title-group">
+            <h1 class="ex-title">Ask</h1>
+            <span class="ask-badge-experimental">Experimental</span>
+          </div>
           ${keyBtnHtml}
         </header>
         <p class="lede">Ask what your brain is doing, and watch it happen in 3D.</p>
+        <p class="ask-key-subtext">Note: This feature connects directly to an AI model and requires an API key.</p>
         ${chatForm('', { busy: false })}
         <div class="chat-starters">
           <h3 class="home-h">Try asking</h3>
@@ -285,19 +289,6 @@ export function renderChat({ turns = [], loading = false, currentQuery = '' } = 
           </div>
         </div>
 
-        <div class="byok-card">
-          <div class="byok-card-head">
-            <span class="byok-badge">Serverless and Private</span>
-            ${hasKey ? `<span class="byok-status is-connected">${icon('check', 11)} ${providerLabel} connected</span>` : '<span class="byok-status">Bring your own key</span>'}
-          </div>
-          <p class="byok-card-text">
-            Brain Explorer runs in your browser without a backend server. Bring your own Azure OpenAI or OpenAI API key to explore any neuroscience question in 3D. Your key never leaves your browser.
-          </p>
-          <button class="byok-card-btn" type="button" data-chat-act="open-key-modal">
-            ${hasKey ? 'Manage API key' : 'Connect your API key'}
-          </button>
-        </div>
-
         <p class="ask-disclosure">Brain Explorer provides educational explanations of neural systems. It is not medical advice.</p>
       </article>
     `;
@@ -306,7 +297,10 @@ export function renderChat({ turns = [], loading = false, currentQuery = '' } = 
   return `
     <article class="ex ex-ask" style="--accent:${ACCENT}">
       <header class="chat-header">
-        <h1 class="ex-title">Ask the brain</h1>
+        <div class="chat-title-group">
+          <h1 class="ex-title">Ask</h1>
+          <span class="ask-badge-experimental">Experimental</span>
+        </div>
         <div class="chat-header-actions">
           ${keyBtnHtml}
           <button class="chat-new-btn" type="button" data-chat-act="new-chat">${icon('reset', 14)}<span>New question</span></button>
@@ -322,11 +316,22 @@ export function renderChat({ turns = [], loading = false, currentQuery = '' } = 
               return renderNudgeCard(turn.title, turn.summary);
             }
             if (turn.status === 'no_key') {
-              return `<div class="chat-card chat-scope-card">
-                <span class="chat-badge">API Key Required</span>
-                <h2 class="chat-card-title">Bring your own API key</h2>
-                <p class="chat-card-summary">Brain Explorer is serverless. To ask questions and explore neural journeys in 3D, connect your Azure OpenAI or OpenAI API key. Your key is stored only in this browser.</p>
-                <button class="byok-card-btn" type="button" data-chat-act="open-key-modal" style="margin-top: 14px;">Connect your API key</button>
+              return `<div class="chat-card chat-scope-card chat-nudge-card">
+                <div class="chat-card-meta">
+                  <span class="chat-badge">API Key Required</span>
+                  <button class="chat-new-btn" type="button" data-chat-act="new-chat">
+                    ${icon('reset', 13)}<span>New question</span>
+                  </button>
+                </div>
+                <h2 class="chat-card-title">Connect your API key</h2>
+                <div class="chat-card-summary">
+                  <p>Brain Explorer connects directly from your browser to Azure OpenAI or OpenAI to generate 3D neural journeys. To ask questions, connect your API key. Your key stays in this browser and never touches a server.</p>
+                </div>
+                <div class="chat-nudge-action">
+                  <button class="byok-card-btn" type="button" data-chat-act="open-key-modal">
+                    ${icon('key', 14)}<span>Connect API key</span>
+                  </button>
+                </div>
               </div>`;
             }
             if (turn.status === 'offline') {

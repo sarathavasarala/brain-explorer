@@ -631,7 +631,18 @@ kbd {
 .chat-header {
   display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 8px;
 }
+.chat-title-group {
+  display: flex; align-items: center; gap: 10px;
+}
 .chat-header .ex-title { margin: 0; }
+.ask-badge-experimental {
+  font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+  color: #ffd36b; background: rgba(255, 211, 107, 0.12); border: 1px solid rgba(255, 211, 107, 0.28);
+  padding: 2px 8px; border-radius: 999px; line-height: 1.4;
+}
+.ask-key-subtext {
+  font-size: 13px; color: var(--ink-3); margin: -4px 0 16px; line-height: 1.45;
+}
 .chat-header-actions {
   display: flex; align-items: center; gap: 8px;
 }
