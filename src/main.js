@@ -9,7 +9,7 @@ import { renderChemHome, renderChem } from './ui/chem.js';
 import { renderCellHome, renderCell } from './ui/cell.js';
 import { setStepperStage, getStepperStage, setDrugMode, toggleStepperPlay, stopStepperPlay, renderSynapseStepper } from './ui/synapse-stepper.js';
 import { ask, cached, normalise } from './services/ask.js';
-import { sendChat } from './services/chat.js';
+import { sendChat, getAiConfig, saveAiConfig, clearAiConfig, hasAiKey } from './services/chat.js';
 import { telemetry } from './services/telemetry.js';
 import { findTerm, esc } from './ui/format.js';
 import { icon } from './ui/icons.js';
@@ -23,11 +23,6 @@ const hoverEl = $('#hover-label');
 const tipEl = $('#tip');
 const lensLegendEl = $('#lens-legend');
 const cellInsetEl = $('#cell-inset');
-const canAsk = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
-if (!canAsk) {
-  const askNav = $('[data-mode="ask"]');
-  if (askNav) askNav.hidden = true;
-}
 
 const INSET_PART_POS = {
   'prefrontal-cortex': [36, 42],
@@ -660,6 +655,11 @@ explainerEl.addEventListener('click', (e) => {
     submitChatQuestion(followup);
     return;
   }
+  const openKeyBtn = e.target.closest('[data-chat-act="open-key-modal"]');
+  if (openKeyBtn) {
+    openByokDialog();
+    return;
+  }
   const newChatBtn = e.target.closest('[data-chat-act="new-chat"]');
   if (newChatBtn) {
     state.chat = { turns: [], loading: false, currentQuery: '' };
@@ -917,6 +917,10 @@ window.addEventListener('keydown', (e) => {
     }
   }
   if (e.key === 'Escape') {
+    if (byokDialog?.open) {
+      byokDialog.close();
+      return;
+    }
     const aboutDialog = $('#about-dialog');
     if (aboutDialog?.open) {
       aboutDialog.close();
@@ -936,6 +940,103 @@ window.addEventListener('keydown', (e) => {
   }
   if (e.key === ' ' && r.type === 'p') { e.preventDefault(); togglePlay(); }
 });
+
+// AI key dialog wiring
+const byokDialog = $('#byok-dialog');
+const byokForm = $('#byok-form');
+const byokClearBtn = $('#byok-clear-btn');
+let currentProviderChoice = 'azure';
+
+function syncProviderFields() {
+  if (!byokDialog) return;
+  byokDialog.querySelectorAll('[data-provider-choice]').forEach((btn) => {
+    btn.classList.toggle('is-active', btn.dataset.providerChoice === currentProviderChoice);
+  });
+  byokDialog.querySelectorAll('[data-provider-field]').forEach((field) => {
+    const forProvider = field.dataset.providerField;
+    field.style.display = forProvider === currentProviderChoice ? '' : 'none';
+  });
+  const keyInput = $('#byok-key');
+  if (keyInput) {
+    keyInput.placeholder = currentProviderChoice === 'azure' ? 'Paste your Azure API key' : 'sk-...';
+  }
+}
+
+function openByokDialog() {
+  if (!byokDialog) return;
+  const cfg = getAiConfig() || {};
+  currentProviderChoice = cfg.provider || 'azure';
+  syncProviderFields();
+
+  const endpointInput = $('#byok-endpoint');
+  const keyInput = $('#byok-key');
+  const deploymentInput = $('#byok-deployment');
+  const versionInput = $('#byok-version');
+  const modelInput = $('#byok-model');
+
+  if (endpointInput) endpointInput.value = cfg.endpoint || '';
+  if (keyInput) keyInput.value = cfg.apiKey || '';
+  if (deploymentInput) deploymentInput.value = cfg.deployment || '';
+  if (versionInput) versionInput.value = cfg.apiVersion || '';
+  if (modelInput) modelInput.value = cfg.model || '';
+
+  if (byokClearBtn) {
+    byokClearBtn.style.display = cfg.apiKey ? '' : 'none';
+  }
+
+  byokDialog.showModal();
+}
+
+if (byokDialog) {
+  byokDialog.addEventListener('click', (e) => {
+    if (e.target === byokDialog || e.target.closest('[data-close-byok]')) {
+      byokDialog.close();
+    }
+    const provBtn = e.target.closest('[data-provider-choice]');
+    if (provBtn) {
+      currentProviderChoice = provBtn.dataset.providerChoice;
+      syncProviderFields();
+    }
+  });
+
+  if (byokForm) {
+    byokForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const apiKey = $('#byok-key')?.value.trim();
+      if (!apiKey) return;
+
+      const newCfg = {
+        provider: currentProviderChoice,
+        apiKey,
+      };
+
+      if (currentProviderChoice === 'azure') {
+        newCfg.endpoint = $('#byok-endpoint')?.value.trim();
+        newCfg.deployment = $('#byok-deployment')?.value.trim() || 'gpt-5.6-luna';
+        newCfg.apiVersion = $('#byok-version')?.value.trim() || '2025-04-01-preview';
+      } else {
+        newCfg.model = $('#byok-model')?.value.trim() || 'gpt-4o-mini';
+      }
+
+      saveAiConfig(newCfg);
+      byokDialog.close();
+
+      if (state.route.type === 'ask') {
+        explainerEl.innerHTML = renderChat(state.chat);
+      }
+    });
+  }
+
+  if (byokClearBtn) {
+    byokClearBtn.addEventListener('click', () => {
+      clearAiConfig();
+      byokDialog.close();
+      if (state.route.type === 'ask') {
+        explainerEl.innerHTML = renderChat(state.chat);
+      }
+    });
+  }
+}
 
 // About dialog wiring
 const aboutBtn = $('#about-btn');

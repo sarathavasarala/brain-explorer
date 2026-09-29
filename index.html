@@ -141,6 +141,68 @@
       </div>
     </div>
   </dialog>
+
+  <dialog id="byok-dialog" class="about-dialog byok-dialog" aria-labelledby="byok-dialog-title">
+    <div class="about-card byok-modal-card">
+      <div class="about-head">
+        <div class="about-title-row">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true" style="width:20px;height:20px">
+            <circle cx="11" cy="13" r="7.5" fill="none" stroke="#d36bff" stroke-width="1.4" />
+            <circle cx="20" cy="13" r="7.5" fill="none" stroke="#6f86ff" stroke-width="1.4" />
+            <circle cx="18" cy="23" r="4.5" fill="none" stroke="#f5b83d" stroke-width="1.4" />
+          </svg>
+          <h2 id="byok-dialog-title" class="about-title">Connect your AI key</h2>
+        </div>
+        <button type="button" class="about-close" data-close-byok aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="byok-modal-body">
+        <p class="byok-modal-desc">
+          Brain Explorer runs serverless in your browser. Connect your own Azure OpenAI or OpenAI API key to ask questions and paint neural journeys in 3D.
+        </p>
+
+        <div class="byok-provider-toggle" role="tablist">
+          <button type="button" class="byok-provider-btn is-active" data-provider-choice="azure">Azure OpenAI</button>
+          <button type="button" class="byok-provider-btn" data-provider-choice="openai">OpenAI</button>
+        </div>
+
+        <form id="byok-form" class="byok-form">
+          <div class="byok-field" data-provider-field="azure">
+            <label for="byok-endpoint">Endpoint URL</label>
+            <input id="byok-endpoint" type="url" placeholder="https://your-resource.services.ai.azure.com" autocomplete="off" spellcheck="false" />
+          </div>
+
+          <div class="byok-field">
+            <label for="byok-key">API Key</label>
+            <input id="byok-key" type="password" placeholder="Paste your API key" autocomplete="off" spellcheck="false" required />
+          </div>
+
+          <div class="byok-field" data-provider-field="azure">
+            <label for="byok-deployment">Deployment Name</label>
+            <input id="byok-deployment" type="text" placeholder="gpt-5.6-luna or gpt-4o" autocomplete="off" spellcheck="false" />
+          </div>
+
+          <div class="byok-field" data-provider-field="azure">
+            <label for="byok-version">API Version</label>
+            <input id="byok-version" type="text" placeholder="2025-04-01-preview" autocomplete="off" spellcheck="false" />
+          </div>
+
+          <div class="byok-field" data-provider-field="openai" style="display:none">
+            <label for="byok-model">Model Name</label>
+            <input id="byok-model" type="text" placeholder="gpt-4o-mini or gpt-4o" autocomplete="off" spellcheck="false" />
+          </div>
+
+          <div class="byok-privacy-note">
+            <span>🔒 Your key is saved only in this browser's <code>localStorage</code>. It is sent directly to the AI provider and never touches any proxy or server.</span>
+          </div>
+
+          <div class="byok-btn-row">
+            <button type="button" id="byok-clear-btn" class="byok-clear-btn">Clear Key</button>
+            <button type="submit" class="byok-save-btn">Save and Connect</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </dialog>
   <div id="tip" class="tip" role="tooltip"></div>
   <script type="module" src="src/main.js?v=4"></script>
 </body>

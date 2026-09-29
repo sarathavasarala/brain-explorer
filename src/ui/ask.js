@@ -1,4 +1,5 @@
 import { byId, structures, anchors, chemById } from '../content/index.js';
+import { getAiConfig } from '../services/chat.js';
 import { fmt, esc, paragraphs } from './format.js';
 import { icon } from './icons.js';
 
@@ -211,10 +212,23 @@ function renderAnswerCard(script, step, turnIndex, followups = []) {
 }
 
 export function renderChat({ turns = [], loading = false, currentQuery = '' } = {}) {
+  const config = getAiConfig();
+  const hasKey = Boolean(config?.apiKey);
+  const providerLabel = config?.provider === 'openai' ? 'OpenAI' : 'Azure OpenAI';
+
+  const keyBtnHtml = `
+    <button class="chat-key-btn ${hasKey ? 'is-connected' : ''}" type="button" data-chat-act="open-key-modal" title="Manage AI API key">
+      ${icon('key', 14)}<span>${hasKey ? providerLabel : 'API key'}</span>
+    </button>
+  `;
+
   if (turns.length === 0 && !loading) {
     return `
       <article class="ex ex-ask" style="--accent:${ACCENT}">
-        <h1 class="ex-title">Ask the brain</h1>
+        <header class="chat-header">
+          <h1 class="ex-title">Ask the brain</h1>
+          ${keyBtnHtml}
+        </header>
         <p class="lede">Ask what your brain is doing, and watch it happen in 3D.</p>
         ${chatForm('', { busy: false })}
         <div class="chat-starters">
@@ -227,6 +241,20 @@ export function renderChat({ turns = [], loading = false, currentQuery = '' } = 
             <button class="chip chip-starter" type="button" data-chat-starter="How does the brain form a memory?">How does the brain form a memory?</button>
           </div>
         </div>
+
+        <div class="byok-card">
+          <div class="byok-card-head">
+            <span class="byok-badge">Serverless and Private</span>
+            ${hasKey ? `<span class="byok-status is-connected">${icon('check', 11)} ${providerLabel} connected</span>` : '<span class="byok-status">Bring your own key</span>'}
+          </div>
+          <p class="byok-card-text">
+            Brain Explorer runs in your browser without a backend server. Bring your own Azure OpenAI or OpenAI API key to explore any neuroscience question in 3D. Your key never leaves your browser.
+          </p>
+          <button class="byok-card-btn" type="button" data-chat-act="open-key-modal">
+            ${hasKey ? 'Manage API key' : 'Connect your API key'}
+          </button>
+        </div>
+
         <p class="ask-disclosure">Brain Explorer provides educational explanations of neural systems. It is not medical advice.</p>
       </article>
     `;
@@ -236,7 +264,10 @@ export function renderChat({ turns = [], loading = false, currentQuery = '' } = 
     <article class="ex ex-ask" style="--accent:${ACCENT}">
       <header class="chat-header">
         <h1 class="ex-title">Ask the brain</h1>
-        <button class="chat-new-btn" type="button" data-chat-act="new-chat">${icon('reset', 14)}<span>New question</span></button>
+        <div class="chat-header-actions">
+          ${keyBtnHtml}
+          <button class="chat-new-btn" type="button" data-chat-act="new-chat">${icon('reset', 14)}<span>New question</span></button>
+        </div>
       </header>
       <div class="chat-thread">
         ${turns.map((turn, tIdx) => {
@@ -252,13 +283,21 @@ export function renderChat({ turns = [], loading = false, currentQuery = '' } = 
               </div>`;
             }
             if (turn.status === 'no_key') {
-              return `<div class="chat-card chat-err-card"><p class="chat-status-msg">Chat is not configured on this server.</p></div>`;
+              return `<div class="chat-card chat-scope-card">
+                <span class="chat-badge">API Key Required</span>
+                <h2 class="chat-card-title">Bring your own API key</h2>
+                <p class="chat-card-summary">Brain Explorer is serverless. To ask questions and explore neural journeys in 3D, connect your Azure OpenAI or OpenAI API key. Your key is stored only in this browser.</p>
+                <button class="byok-card-btn" type="button" data-chat-act="open-key-modal" style="margin-top: 14px;">Connect your API key</button>
+              </div>`;
             }
             if (turn.status === 'offline') {
-              return `<div class="chat-card chat-err-card"><p class="chat-status-msg">Cannot reach the local server. Run <code>npm start</code>.</p></div>`;
+              return `<div class="chat-card chat-err-card"><p class="chat-status-msg">Cannot reach the AI endpoint. Check your internet connection or API settings.</p></div>`;
             }
             if (turn.status === 'error') {
-              return `<div class="chat-card chat-err-card"><p class="chat-status-msg">Something went wrong. Try again.</p></div>`;
+              return `<div class="chat-card chat-err-card">
+                <p class="chat-status-msg">${esc(turn.error || 'Something went wrong reaching the AI model. Check your API key and connection.')}</p>
+                <button class="byok-card-btn" type="button" data-chat-act="open-key-modal" style="margin-top: 10px;">Check API key settings</button>
+              </div>`;
             }
             if (turn.status === 'ok' && turn.script) {
               return renderAnswerCard(turn.script, turn.step || 0, tIdx);
