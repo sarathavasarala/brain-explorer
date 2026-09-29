@@ -275,7 +275,6 @@ export function renderChat({ turns = [], loading = false, currentQuery = '' } = 
           return '';
         }).join('')}
         ${loading ? `
-          <div class="chat-user-msg"><span class="chat-user-text">${esc(currentQuery)}</span></div>
           <p class="ask-wait"><i><b></b><b></b><b></b></i>Thinking and lighting up the brain…</p>
         ` : ''}
       </div>
