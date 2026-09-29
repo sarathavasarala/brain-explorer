@@ -26,14 +26,21 @@ function getStoredId(storage, key) {
   }
 }
 
-// Default HTTP provider: posts JSON to /api/telemetry using sendBeacon or fetch keepalive.
+// Default HTTP provider: posts JSON to a custom backend or local server.
+// Only sends if an endpoint is explicitly configured or if running locally with server.py.
 export class HttpBeaconProvider {
-  constructor(endpoint = '/api/telemetry') {
-    this.endpoint = endpoint;
+  constructor(endpoint) {
+    this.endpoint = endpoint || (typeof window !== 'undefined' ? window.TELEMETRY_ENDPOINT : null);
+    if (!this.endpoint) {
+      const isLocal = typeof location !== 'undefined' && (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
+      if (isLocal) {
+        this.endpoint = '/api/telemetry';
+      }
+    }
   }
 
   send(events) {
-    if (!events || !events.length) return;
+    if (!this.endpoint || !events || !events.length) return;
     const body = JSON.stringify({ events });
     if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
       const blob = new Blob([body], { type: 'application/json' });
@@ -53,8 +60,82 @@ export class HttpBeaconProvider {
   }
 }
 
+// Umami analytics provider.
+// Works seamlessly with Umami Cloud (https://cloud.umami.is) or self-hosted Umami.
+// Supports both the official script tag (window.umami) and direct API dispatch.
+export class UmamiProvider {
+  constructor(opts = {}) {
+    this.websiteId = opts.websiteId || (typeof window !== 'undefined' ? window.UMAMI_WEBSITE_ID : '');
+    this.hostUrl = (opts.hostUrl || (typeof window !== 'undefined' ? window.UMAMI_HOST_URL : '') || 'https://cloud.umami.is').replace(/\/+$/, '');
+  }
+
+  send(events) {
+    if (!events || !events.length) return;
+
+    // Use official Umami tracker script if loaded
+    if (typeof window !== 'undefined' && window.umami && typeof window.umami.track === 'function') {
+      for (const ev of events) {
+        if (ev.type === 'pageview') {
+          window.umami.track((props) => ({
+            ...props,
+            url: ev.path || location.hash || '#/',
+            title: ev.title || 'Brain Explorer',
+          }));
+        } else if (ev.type === 'event') {
+          window.umami.track(ev.event_name, ev.data || {});
+        } else if (ev.type === 'duration') {
+          window.umami.track('dwell_time', { path: ev.path, seconds: ev.duration });
+        }
+      }
+      return;
+    }
+
+    // Direct HTTP API fallback (no script tag needed if websiteId is set)
+    if (!this.websiteId) return;
+    const endpoint = `${this.hostUrl}/api/send`;
+
+    for (const ev of events) {
+      const payload = {
+        website: this.websiteId,
+        hostname: typeof location !== 'undefined' ? location.hostname : 'brain-explorer',
+        screen: ev.screen || '',
+        language: ev.locale || '',
+        url: ev.path || (typeof location !== 'undefined' ? location.hash || '#/' : '#/'),
+        title: ev.title || 'Brain Explorer',
+      };
+      if (ev.type === 'event') {
+        payload.name = ev.event_name;
+        payload.data = ev.data || {};
+      } else if (ev.type === 'duration') {
+        payload.name = 'dwell_time';
+        payload.data = { path: ev.path, seconds: ev.duration };
+      }
+
+      const body = JSON.stringify({ type: 'event', payload });
+      if (typeof navigator !== 'undefined' && navigator.sendBeacon) {
+        const blob = new Blob([body], { type: 'application/json' });
+        navigator.sendBeacon(endpoint, blob);
+      } else if (typeof fetch !== 'undefined') {
+        fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body,
+          keepalive: true,
+        }).catch(() => {});
+      }
+    }
+  }
+}
+
+function resolveDefaultProvider() {
+  if (typeof window !== 'undefined' && (window.UMAMI_WEBSITE_ID || window.umami)) {
+    return new UmamiProvider();
+  }
+  return new HttpBeaconProvider();
+}
+
 export class TelemetryService {
-  constructor(provider = new HttpBeaconProvider()) {
+  constructor(provider = resolveDefaultProvider()) {
     this.provider = provider;
     this.visitorId = typeof localStorage !== 'undefined' ? getStoredId(localStorage, 'be_visitor_id') : generateId();
     this.sessionId = typeof sessionStorage !== 'undefined' ? getStoredId(sessionStorage, 'be_session_id') : generateId();
@@ -202,7 +283,11 @@ export class TelemetryService {
   }
 
   flush() {
-    if (!this.queue.length || !this.provider) return;
+    if (!this.queue.length) return;
+    if (this.provider instanceof HttpBeaconProvider && typeof window !== 'undefined' && (window.umami || window.UMAMI_WEBSITE_ID)) {
+      this.provider = new UmamiProvider();
+    }
+    if (!this.provider) return;
     const items = [...this.queue];
     this.queue = [];
     try {
