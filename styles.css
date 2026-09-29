@@ -627,6 +627,104 @@ kbd {
 .ask-wait i b:nth-child(3) { animation-delay: 0.3s; }
 @keyframes ask-blink { 0%, 100% { opacity: 0.2; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-3px); } }
 
+/* ------------------------------------------------------------ ask chat */
+.chat-header {
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 8px;
+}
+.chat-header .ex-title { margin: 0; }
+.chat-new-btn {
+  display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px;
+  font-size: 12.5px; font-weight: 500; color: var(--ink-2); background: rgba(190, 200, 255, 0.06);
+  border: 1px solid var(--line); transition: color 0.2s, background 0.2s, border-color 0.2s;
+}
+.chat-new-btn:hover { color: var(--ink); background: rgba(190, 200, 255, 0.1); border-color: var(--line-2); }
+.chat-thread {
+  display: flex; flex-direction: column; gap: 24px; margin: 20px 0 28px;
+}
+.chat-user-msg {
+  align-self: flex-start; max-width: 90%; padding: 10px 16px; border-radius: 14px 14px 14px 4px;
+  background: rgba(190, 200, 255, 0.06); border: 1px solid var(--line-2);
+}
+.chat-user-text {
+  font-family: var(--read); font-size: 16.5px; line-height: 1.45; color: var(--ink);
+}
+.chat-card {
+  padding: 20px 20px 22px; border-radius: 16px;
+  background: color-mix(in oklab, var(--accent) 5%, rgba(190, 200, 255, 0.025));
+  border: 1px solid color-mix(in oklab, var(--accent) 22%, transparent);
+  animation: ex-in 0.4s var(--ease);
+}
+.chat-card-meta {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px;
+}
+.chat-badge {
+  display: inline-flex; align-items: center; gap: 5px; font-size: 11.5px; font-weight: 500;
+  color: var(--ink-3); text-transform: uppercase; letter-spacing: 0.06em;
+}
+.chat-badge::before {
+  content: ''; width: 4.5px; height: 4.5px; border-radius: 50%; background: var(--accent);
+}
+.chat-copy-btn {
+  display: inline-flex; align-items: center; gap: 5px; padding: 4px 9px; border-radius: 6px;
+  font-size: 11.5px; font-weight: 500; color: var(--ink-3); background: rgba(190, 200, 255, 0.04);
+  border: 1px solid var(--line); transition: color 0.2s, background 0.2s;
+}
+.chat-copy-btn:hover { color: var(--ink); background: rgba(190, 200, 255, 0.08); }
+.chat-copy-btn.is-copied { color: #34d399; border-color: rgba(52, 211, 153, 0.4); }
+.chat-card-title {
+  margin: 0 0 8px; font-size: 22px; font-weight: 600; letter-spacing: -0.015em; line-height: 1.3;
+}
+.chat-card-summary {
+  margin: 0 0 16px; font-family: var(--read); font-style: italic; font-size: 15.5px;
+  line-height: 1.5; color: var(--ink-2);
+}
+.chat-card-summary p { margin: 0; }
+.chat-step-indicator {
+  font-size: 12.5px; color: var(--ink-3); font-variant-numeric: tabular-nums; margin: 0 auto;
+}
+.chat-step-text {
+  font-family: var(--read); font-size: 15.5px; line-height: 1.6; color: var(--ink); margin-bottom: 12px;
+}
+.chat-step-text p { margin: 0 0 8px; }
+.chat-step-text p:last-child { margin-bottom: 0; }
+.chat-followups {
+  margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--line);
+}
+.chat-followups-label {
+  display: block; font-size: 12px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.05em; color: var(--ink-3); margin-bottom: 10px;
+}
+.chip-followup {
+  cursor: pointer; border: 1px solid var(--line-2); background: rgba(190, 200, 255, 0.03);
+  text-align: left; transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.chip-followup:hover {
+  background: rgba(190, 200, 255, 0.08); border-color: var(--line); color: #fff;
+}
+.chat-starters {
+  margin: 24px 0;
+}
+.chip-starter {
+  cursor: pointer; border: 1px solid var(--line-2); background: rgba(190, 200, 255, 0.04);
+  text-align: left; transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+.chip-starter:hover {
+  background: rgba(190, 200, 255, 0.09); border-color: var(--line); color: #fff;
+}
+.chat-presets-section {
+  margin: 28px 0 0; padding-top: 18px; border-top: 1px solid var(--line);
+}
+.chat-status-msg {
+  margin: 0; font-family: var(--read); font-size: 15.5px; line-height: 1.55; color: var(--ink);
+}
+.chat-err-card {
+  padding: 16px 18px; border-radius: 12px; background: rgba(255, 107, 125, 0.08);
+  border: 1px solid rgba(255, 107, 125, 0.25);
+}
+.chat-scope-card {
+  border-color: rgba(190, 200, 255, 0.15);
+}
+
 /* ------------------------------------------------------------ chemical & stepper styles */
 .stepper-drug-banner {
   display: flex; flex-direction: column; gap: 8px;

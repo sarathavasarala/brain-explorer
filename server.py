@@ -25,18 +25,34 @@ CLIENT_HEADER = 'X-Brain-Explorer'
 PUBLIC_FILES = {'/', '/index.html', '/styles.css'}
 
 
-def load_key():
+def load_env():
+    env = {}
     path = os.path.join(ROOT, '.env')
     if os.path.exists(path):
-        with open(path) as f:
+        with open(path, 'r', encoding='utf-8') as f:
             for line in f:
                 line = line.strip()
-                if line.startswith('TYPESAFE_API_KEY='):
-                    return line.split('=', 1)[1].strip().strip('"\'')
-    return os.environ.get('TYPESAFE_API_KEY')
+                if not line or line.startswith('#') or '=' not in line:
+                    continue
+                k, v = line.split('=', 1)
+                env[k.strip()] = v.strip().strip('"\'')
+    return env
 
 
-API_KEY = load_key()
+ENV = load_env()
+
+
+def get_env(key, default=''):
+    return os.environ.get(key) or ENV.get(key, default)
+
+
+API_KEY = get_env('TYPESAFE_API_KEY')
+AZURE_ENDPOINT = get_env('AZURE_OPENAI_ENDPOINT').rstrip('/')
+AZURE_KEY = get_env('AZURE_OPENAI_API_KEY')
+AZURE_DEPLOYMENT = get_env('AZURE_OPENAI_DEPLOYMENT')
+AZURE_VERSION = get_env('AZURE_OPENAI_API_VERSION', '2024-10-21')
+
+CHAT_ENABLED = bool(AZURE_ENDPOINT and AZURE_KEY and AZURE_DEPLOYMENT)
 
 # Parts Jev can choose from. Keys must match structure ids in src/content/structures.
 PARTS = {
@@ -195,6 +211,269 @@ def ask(query):
             return {'query': query, 'status': 'no_key'}
         CACHE[key] = interpret(query, call_jev(query))
     return CACHE[key]
+
+
+# ---------------------------------------------------------------- Azure OpenAI Chat
+CATALOG_PATH = os.path.join(ROOT, 'src', 'content', 'catalog.json')
+
+
+def load_catalog():
+    if os.path.exists(CATALOG_PATH):
+        try:
+            with open(CATALOG_PATH, 'r', encoding='utf-8') as f:
+                return json.load(f)
+        except Exception as e:
+            print(f'[brain-explorer] error loading catalog: {e}')
+    return {'structures': [], 'anchors': [], 'chemicals': [], 'glossary': [], 'roles': [], 'views': []}
+
+
+CATALOG = load_catalog()
+REGION_IDS = [s['id'] for s in CATALOG.get('structures', [])] + [a['id'] for a in CATALOG.get('anchors', [])]
+CHEMICAL_IDS = [c['id'] for c in CATALOG.get('chemicals', [])]
+ROLES_LIST = CATALOG.get('roles', ['more_active', 'less_active', 'typical', 'involved', 'cut_off', 'losing_cells'])
+VIEWS_LIST = CATALOG.get('views', ['left', 'left-front', 'left-back', 'medial', 'back', 'below', 'body'])
+
+
+def build_system_prompt():
+    lines = [
+        "You are the narrator of Brain Explorer, an interactive 3D atlas of the human brain.",
+        "The user is viewing a 3D holographic point-cloud model of the brain. Each step in your script dynamically lights up brain regions, animates signals along neural pathways, and changes camera views.",
+        "",
+        "Available brain structures (use these ids in parts, focus, route, or {{id}} links):",
+    ]
+    for s in CATALOG.get('structures', []):
+        lines.append(f"- {s['id']}: {s['name']} ({s.get('tagline', '')})")
+    lines.append("\nAvailable body anchors (use for sensory inputs, motor outputs, or endocrine organs):")
+    for a in CATALOG.get('anchors', []):
+        lines.append(f"- {a['id']}: {a['name']}")
+    lines.append("\nAvailable chemical messengers (use for the chemical field):")
+    for c in CATALOG.get('chemicals', []):
+        lines.append(f"- {c['id']}: {c['name']} [{c.get('group', '')}] ({c.get('tagline', '')})")
+    lines.append("\nAvailable glossary terms (ONLY use [[term]] or [[term|shown text]] for these terms):")
+    lines.append(", ".join(CATALOG.get('glossary', [])))
+    lines.extend([
+        "",
+        "Step structure and fields:",
+        "- title: Short descriptive step title.",
+        "- text: 2 to 4 sentences explaining this step like an unfolding story. Plain, warm, concrete.",
+        "- parts: Array of { id, role } when activity goes up or down. Roles: more_active, less_active, typical, involved, cut_off, losing_cells.",
+        "- route: Array of { from, to } connecting regions when a signal travels from one part to another.",
+        "- chemical: Chemical id when a messenger (e.g. dopamine, melatonin, noradrenaline) is central to this step.",
+        "- view: Camera angle. Options: 'left', 'left-front', 'left-back', 'medial', 'back', 'below', 'body'. Use 'medial' + slice: true for deep midline structures (hippocampus, hypothalamus, etc.). Use 'body' + body: true for hormone steps that reach organs (thyroid, heart, adrenal, etc.).",
+        "- slice: true to slice the brain open to view inner structures.",
+        "- body: true to show the body silhouette when endocrine signals travel to visceral organs.",
+        "",
+        "Storytelling and Narrative Rules:",
+        "1. Build a coherent story in order: 2 to 6 steps. Each step handles one clear idea.",
+        "2. In each step, light only a few relevant parts. Do not light the whole brain at once.",
+        "3. Plain, warm, and concrete tone. Use familiar physical analogies (e.g. catching keys, reaching for a mug).",
+        "4. Use 'about' or 'roughly' for figures. Never use false precision.",
+        "5. STRICT PROHIBITION: NO EM DASHES. Never use the '—' character. Use commas, periods, or parentheses.",
+        "6. STRICT PROHIBITION: NO HYPE OR FILLER WORDS. Avoid 'fascinating', 'incredible', 'remarkable', 'delve', 'intricate', 'vital', 'complex interplay'.",
+        "7. Mention a part with {{id}} at least once in the step text where it lights up.",
+        "8. Be honest when science is debated (e.g. 'researchers still debate...').",
+        "9. Followups: Provide exactly 3 short, intriguing follow-up questions.",
+        "10. Out of scope / Medical Advice:",
+        "    If the query is not about the brain, mind, or body, or if it asks for personal medical diagnosis/treatment advice:",
+        "    Set status: 'out_of_scope', steps: [], and write a friendly summary explaining what Brain Explorer can help explore.",
+    ])
+    return "\n".join(lines)
+
+
+SYSTEM_PROMPT = build_system_prompt()
+
+
+def build_script_schema():
+    step_schema = {
+        'type': 'object',
+        'properties': {
+            'title': {'type': 'string'},
+            'text': {'type': 'string'},
+            'focus': {
+                'type': ['array', 'null'],
+                'items': {'type': 'string', 'enum': REGION_IDS}
+            },
+            'parts': {
+                'type': ['array', 'null'],
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'id': {'type': 'string', 'enum': REGION_IDS},
+                        'role': {'type': 'string', 'enum': ROLES_LIST}
+                    },
+                    'required': ['id', 'role'],
+                    'additionalProperties': False
+                }
+            },
+            'route': {
+                'type': ['array', 'null'],
+                'items': {
+                    'type': 'object',
+                    'properties': {
+                        'from': {'type': 'string', 'enum': REGION_IDS},
+                        'to': {'type': 'string', 'enum': REGION_IDS}
+                    },
+                    'required': ['from', 'to'],
+                    'additionalProperties': False
+                }
+            },
+            'view': {
+                'type': ['string', 'null'],
+                'enum': VIEWS_LIST + [None]
+            },
+            'slice': {'type': ['boolean', 'null']},
+            'chemical': {
+                'type': ['string', 'null'],
+                'enum': CHEMICAL_IDS + [None]
+            },
+            'body': {'type': ['boolean', 'null']}
+        },
+        'required': ['title', 'text', 'focus', 'parts', 'route', 'view', 'slice', 'chemical', 'body'],
+        'additionalProperties': False
+    }
+
+    return {
+        'type': 'object',
+        'properties': {
+            'status': {
+                'type': 'string',
+                'enum': ['ok', 'out_of_scope']
+            },
+            'title': {'type': 'string'},
+            'summary': {'type': 'string'},
+            'steps': {
+                'type': 'array',
+                'items': step_schema
+            },
+            'followups': {
+                'type': 'array',
+                'items': {'type': 'string'}
+            }
+        },
+        'required': ['status', 'title', 'summary', 'steps', 'followups'],
+        'additionalProperties': False
+    }
+
+
+SCRIPT_SCHEMA = build_script_schema()
+CHAT_CACHE = {}
+
+
+def sanitize_chat_response(raw_data):
+    status = raw_data.get('status', 'ok')
+    if status != 'ok':
+        return {
+            'status': 'out_of_scope',
+            'title': (raw_data.get('title') or 'Out of scope').replace('—', ', '),
+            'summary': (raw_data.get('summary') or 'That does not seem to be about the brain. Try asking about a feeling, memory, or action.').replace('—', ', '),
+            'steps': [],
+            'followups': [f.replace('—', ', ') for f in (raw_data.get('followups') or [])][:3]
+        }
+
+    valid_regions = set(REGION_IDS)
+    valid_chems = set(CHEMICAL_IDS)
+    valid_roles = set(ROLES_LIST)
+    valid_views = set(VIEWS_LIST)
+
+    raw_steps = raw_data.get('steps', [])
+    clean_steps = []
+    for st in raw_steps[:6]:
+        if not isinstance(st, dict):
+            continue
+        title = (st.get('title') or 'Step').replace('—', ', ')
+        text = (st.get('text') or '').replace('—', ', ')
+
+        focus = [fid for fid in (st.get('focus') or []) if fid in valid_regions]
+        parts = [{'id': p['id'], 'role': p['role']} for p in (st.get('parts') or []) if isinstance(p, dict) and p.get('id') in valid_regions and p.get('role') in valid_roles]
+
+        route = []
+        for r in (st.get('route') or []):
+            if isinstance(r, dict) and r.get('from') in valid_regions and r.get('to') in valid_regions:
+                route.append([r['from'], r['to']])
+            elif isinstance(r, list) and len(r) >= 2 and r[0] in valid_regions and r[1] in valid_regions:
+                route.append([r[0], r[1]])
+
+        chemical = st.get('chemical') if st.get('chemical') in valid_chems else None
+        view = st.get('view') if st.get('view') in valid_views else None
+        slice_val = bool(st['slice']) if st.get('slice') is not None else None
+        body_val = bool(st['body']) if st.get('body') is not None else None
+
+        has_visual = bool(focus or parts or route or chemical)
+        if not has_visual:
+            continue
+
+        step_dict = {'title': title, 'text': text}
+        if focus:
+            step_dict['focus'] = focus
+        if parts:
+            step_dict['parts'] = parts
+        if route:
+            step_dict['route'] = route
+        if view:
+            step_dict['view'] = view
+        if slice_val is not None:
+            step_dict['slice'] = slice_val
+        if chemical:
+            step_dict['chemical'] = chemical
+        if body_val is not None:
+            step_dict['body'] = body_val
+
+        clean_steps.append(step_dict)
+
+    followups = [f.replace('—', ', ') for f in (raw_data.get('followups') or [])][:3]
+    return {
+        'status': 'ok',
+        'title': (raw_data.get('title') or 'Brain Explorer').replace('—', ', '),
+        'summary': (raw_data.get('summary') or '').replace('—', ', '),
+        'steps': clean_steps,
+        'followups': followups,
+    }
+
+
+def handle_chat(messages):
+    is_first_turn = len(messages) == 1 and messages[0]['role'] == 'user'
+    q_key = ' '.join(messages[0]['content'].lower().split())[:120] if is_first_turn else None
+    if is_first_turn and q_key in CHAT_CACHE:
+        return CHAT_CACHE[q_key]
+
+    formatted_messages = [{'role': 'system', 'content': SYSTEM_PROMPT}]
+    for m in messages:
+        formatted_messages.append({'role': m['role'], 'content': m['content']})
+
+    payload = {
+        'messages': formatted_messages,
+        'temperature': 0.4,
+        'response_format': {
+            'type': 'json_schema',
+            'json_schema': {
+                'name': 'brain_script',
+                'strict': True,
+                'schema': SCRIPT_SCHEMA
+            }
+        }
+    }
+    url = f'{AZURE_ENDPOINT}/openai/deployments/{AZURE_DEPLOYMENT}/chat/completions?api-version={AZURE_VERSION}'
+    req = urllib.request.Request(
+        url,
+        data=json.dumps(payload).encode('utf-8'),
+        headers={
+            'Content-Type': 'application/json',
+            'api-key': AZURE_KEY
+        }
+    )
+    with urllib.request.urlopen(req, timeout=45) as resp:
+        resp_data = json.loads(resp.read().decode('utf-8'))
+
+    choice = resp_data.get('choices', [{}])[0]
+    msg = choice.get('message', {})
+    content = msg.get('content', '{}')
+    parsed = json.loads(content)
+    result = sanitize_chat_response(parsed)
+
+    if is_first_turn and q_key and result.get('status') in ('ok', 'out_of_scope'):
+        CHAT_CACHE[q_key] = result
+
+    return result
 
 
 def init_db():
@@ -425,6 +704,40 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_POST(self):
         parsed = urllib.parse.urlparse(self.path)
+        if parsed.path == '/api/chat':
+            if not self.local_host() or self.headers.get(CLIENT_HEADER) != '1':
+                return self.send_json(403, {'status': 'error', 'error': 'forbidden'})
+            if not CHAT_ENABLED:
+                return self.send_json(501, {'status': 'no_key'})
+            length = int(self.headers.get('Content-Length', 0))
+            if length > 65536:
+                return self.send_json(413, {'status': 'error', 'error': 'payload too large'})
+            body = self.rfile.read(length) if length > 0 else b''
+            try:
+                data = json.loads(body.decode('utf-8')) if body else {}
+            except Exception:
+                return self.send_json(400, {'status': 'error', 'error': 'invalid json'})
+
+            messages = data.get('messages')
+            if not isinstance(messages, list) or len(messages) == 0:
+                return self.send_json(400, {'status': 'error', 'error': 'messages must be a non-empty array'})
+
+            cleaned_messages = []
+            for m in messages[-8:]:
+                if not isinstance(m, dict) or m.get('role') not in ('user', 'assistant') or not isinstance(m.get('content'), str):
+                    return self.send_json(400, {'status': 'error', 'error': 'invalid message format'})
+                cleaned_messages.append({
+                    'role': m['role'],
+                    'content': m['content'][:500]
+                })
+
+            try:
+                res = handle_chat(cleaned_messages)
+                return self.send_json(200, res)
+            except Exception as e:  # noqa: BLE001
+                print(f'[brain-explorer] chat failed: {e}')
+                return self.send_json(502, {'status': 'error', 'error': 'Upstream model error'})
+
         if parsed.path == '/api/telemetry':
             if not self.local_host():
                 return self.send_json(403, {'status': 'error', 'error': 'forbidden'})
@@ -463,6 +776,7 @@ def run():
             continue
         print(f'[brain-explorer] http://localhost:{port}')
         print('[brain-explorer] Ask: ' + ('API key loaded from .env' if API_KEY else 'no TYPESAFE_API_KEY, free-text questions are off'))
+        print('[brain-explorer] Chat: ' + (f'Azure OpenAI ({AZURE_DEPLOYMENT})' if CHAT_ENABLED else 'no Azure OpenAI keys, free-form chat is off'))
         print(f'[brain-explorer] Telemetry: enabled ({DB_PATH})')
         httpd.serve_forever()
         return

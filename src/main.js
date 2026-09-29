@@ -3,12 +3,13 @@ import { createBrainScene } from './scene/brain-scene.js';
 import { playStep, chemLensConfig } from './scene/player.js';
 import { renderSidebar } from './ui/sidebar.js';
 import { renderStructure, renderPathway, renderHome } from './ui/explainer.js';
-import { renderAsk } from './ui/ask.js';
+import { renderAsk, renderChat, scriptToPathwayJs } from './ui/ask.js';
 import { renderLibraryShell, renderLibraryBody } from './ui/library.js';
 import { renderChemHome, renderChem } from './ui/chem.js';
 import { renderCellHome, renderCell } from './ui/cell.js';
 import { setStepperStage, getStepperStage, setDrugMode, toggleStepperPlay, stopStepperPlay, renderSynapseStepper } from './ui/synapse-stepper.js';
 import { ask, cached, normalise } from './services/ask.js';
+import { sendChat } from './services/chat.js';
 import { telemetry } from './services/telemetry.js';
 import { findTerm, esc } from './ui/format.js';
 import { icon } from './ui/icons.js';
@@ -86,7 +87,7 @@ function renderCellInset(cell) {
 const problems = validate();
 if (problems.length) console.warn(`[brain] ${problems.length} content problem(s):\n` + problems.join('\n'));
 
-const state = { query: '', libQuery: '', dict: 'parts', route: { type: 'home' }, playing: false, flown: '' };
+const state = { query: '', libQuery: '', dict: 'parts', route: { type: 'home' }, playing: false, flown: '', chat: { turns: [], loading: false, currentQuery: '' } };
 let timer = null;
 let cellFireActive = false;
 
@@ -466,11 +467,86 @@ function apply() {
   });
 }
 
+async function submitChatQuestion(query) {
+  const q = normalise(query);
+  if (!q) return;
+
+  state.chat.turns.push({ role: 'user', text: q });
+  state.chat.loading = true;
+  state.chat.currentQuery = q;
+  explainerEl.innerHTML = renderChat(state.chat);
+  explainerEl.scrollTop = explainerEl.scrollHeight;
+
+  const prevSpin = scene.spin;
+  scene.setSpin(true);
+
+  const messages = [];
+  for (const turn of state.chat.turns) {
+    if (turn.role === 'user') {
+      messages.push({ role: 'user', content: turn.text });
+    } else if (turn.role === 'assistant' && turn.script) {
+      const summary = `${turn.script.title}: ${(turn.script.steps || []).map((s) => s.title).join(', ')}`;
+      messages.push({ role: 'assistant', content: summary });
+    }
+  }
+
+  let result;
+  try {
+    result = await sendChat(messages);
+  } catch {
+    result = { status: 'error' };
+  } finally {
+    scene.setSpin(prevSpin);
+    syncToolbar();
+    state.chat.loading = false;
+    state.chat.currentQuery = '';
+  }
+
+  if (result.status === 'ok') {
+    const turn = {
+      role: 'assistant',
+      status: 'ok',
+      script: result,
+      step: 0,
+      followups: result.followups || [],
+      generated: true,
+    };
+    state.chat.turns.push(turn);
+    playStep(scene, playerDeps, result, 0);
+  } else if (result.status === 'out_of_scope') {
+    state.chat.turns.push({
+      role: 'assistant',
+      status: 'out_of_scope',
+      title: result.title || 'Out of scope',
+      summary: result.summary || 'Brain Explorer explores how the brain and body work. Try asking about a feeling, memory, or action.',
+      followups: result.followups || [],
+    });
+    clearScene('ask');
+  } else {
+    state.chat.turns.push({
+      role: 'assistant',
+      status: result.status,
+    });
+  }
+
+  explainerEl.innerHTML = renderChat(state.chat);
+  explainerEl.scrollTop = explainerEl.scrollHeight;
+}
+
 function applyAsk(r) {
   const key = `ask:${r.query.toLowerCase()}`;
   if (!r.query) {
-    clearScene('ask');
-    explainerEl.innerHTML = renderAsk();
+    if (state.chat.turns.length > 0) {
+      const latest = state.chat.turns.filter((t) => t.role === 'assistant' && t.script).pop();
+      if (latest) {
+        playStep(scene, playerDeps, latest.script, latest.step || 0);
+      } else {
+        clearScene('ask');
+      }
+    } else {
+      clearScene('ask');
+    }
+    explainerEl.innerHTML = renderChat(state.chat);
     return;
   }
   const hit = cached(r.query);
@@ -554,6 +630,16 @@ $('#lib-search').addEventListener('keydown', (e) => {
 });
 
 explainerEl.addEventListener('submit', (e) => {
+  const chatFormEl = e.target.closest('[data-chat-form]');
+  if (chatFormEl) {
+    e.preventDefault();
+    const q = normalise(chatFormEl.elements.q?.value || '');
+    if (q) {
+      telemetry.event('ask_chat_query', { query: q });
+      submitChatQuestion(q);
+    }
+    return;
+  }
   const f = e.target.closest('[data-ask]');
   if (!f) return;
   e.preventDefault();
@@ -570,6 +656,70 @@ explainerEl.addEventListener('click', (e) => {
     location.hash = `#/s/${state.route.id}/${rung.dataset.level}`;
     return;
   }
+
+  // Chat actions
+  const starter = e.target.closest('[data-chat-starter]')?.dataset.chatStarter;
+  if (starter) {
+    telemetry.event('ask_chat_starter', { query: starter });
+    submitChatQuestion(starter);
+    return;
+  }
+  const followup = e.target.closest('[data-chat-followup]')?.dataset.chatFollowup;
+  if (followup) {
+    telemetry.event('ask_chat_followup', { query: followup });
+    submitChatQuestion(followup);
+    return;
+  }
+  const newChatBtn = e.target.closest('[data-chat-act="new-chat"]');
+  if (newChatBtn) {
+    state.chat = { turns: [], loading: false, currentQuery: '' };
+    clearScene('ask');
+    explainerEl.innerHTML = renderChat(state.chat);
+    return;
+  }
+  const copyBtn = e.target.closest('[data-chat-act="copy-pathway"]');
+  if (copyBtn) {
+    const turnIdx = Number(copyBtn.dataset.turn);
+    const turn = state.chat.turns[turnIdx];
+    if (turn?.script) {
+      navigator.clipboard.writeText(scriptToPathwayJs(turn.script)).then(() => {
+        const span = copyBtn.querySelector('span');
+        if (span) {
+          const orig = span.textContent;
+          span.textContent = 'Copied!';
+          copyBtn.classList.add('is-copied');
+          setTimeout(() => { span.textContent = orig; copyBtn.classList.remove('is-copied'); }, 2000);
+        }
+      });
+    }
+    return;
+  }
+  const chatAct = e.target.closest('[data-chat-act]')?.dataset.chatAct;
+  if (chatAct === 'prev' || chatAct === 'next') {
+    const turnIdx = Number(e.target.closest('[data-chat-act]').dataset.turn);
+    const turn = state.chat.turns[turnIdx];
+    if (turn?.script?.steps?.length) {
+      const d = chatAct === 'next' ? 1 : -1;
+      const nextStep = Math.min(Math.max((turn.step || 0) + d, 0), turn.script.steps.length - 1);
+      turn.step = nextStep;
+      playStep(scene, playerDeps, turn.script, nextStep);
+      explainerEl.innerHTML = renderChat(state.chat);
+    }
+    return;
+  }
+  const chatStepHead = e.target.closest('[data-chat-step]');
+  if (chatStepHead) {
+    const stepIdx = Number(chatStepHead.dataset.chatStep);
+    const turnIdx = Number(chatStepHead.dataset.turn);
+    const turn = state.chat.turns[turnIdx];
+    if (turn?.script?.steps?.length) {
+      turn.step = stepIdx;
+      playStep(scene, playerDeps, turn.script, stepIdx);
+      explainerEl.innerHTML = renderChat(state.chat);
+    }
+    return;
+  }
+
   const act = e.target.closest('[data-act]')?.dataset.act;
   if (act === 'prev') stepTo(state.route.step - 1);
   if (act === 'next') stepTo(state.route.step + 1);
@@ -763,6 +913,19 @@ window.addEventListener('keydown', (e) => {
     const n = Math.min(Math.max((i === -1 ? 0 : i) + (e.key === 'ArrowRight' ? 1 : -1), 0), CELL_TABS.length - 1);
     location.hash = `#/cell/${r.id}/${CELL_TABS[n]}`;
   }
+  if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === ' ') && r.type === 'ask' && !r.query) {
+    const latest = state.chat.turns.filter((t) => t.role === 'assistant' && t.script).pop();
+    if (latest && latest.script?.steps?.length) {
+      e.preventDefault();
+      const d = (e.key === 'ArrowRight' || e.key === ' ') ? 1 : -1;
+      const nextStep = Math.min(Math.max((latest.step || 0) + d, 0), latest.script.steps.length - 1);
+      if (nextStep !== latest.step) {
+        latest.step = nextStep;
+        playStep(scene, playerDeps, latest.script, nextStep);
+        explainerEl.innerHTML = renderChat(state.chat);
+      }
+    }
+  }
   if (e.key === 'Escape') {
     const aboutDialog = $('#about-dialog');
     if (aboutDialog?.open) {
@@ -771,6 +934,11 @@ window.addEventListener('keydown', (e) => {
     }
     if (r.type === 'p') location.hash = '#/pathways';
     else if (r.type === 'ask' && r.query) location.hash = '#/ask';
+    else if (r.type === 'ask' && state.chat.turns.length > 0) {
+      state.chat = { turns: [], loading: false, currentQuery: '' };
+      clearScene('ask');
+      explainerEl.innerHTML = renderChat(state.chat);
+    }
     else if (r.type === 'chem') location.hash = '#/chem';
     else if (r.type === 'cell') location.hash = '#/cell';
     else if (r.type === 'chemhome' || r.type === 'cellhome') location.hash = '#/';

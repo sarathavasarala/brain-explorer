@@ -1,5 +1,25 @@
-// Checks every content file for broken references. Run: node tools/validate.mjs
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { validate, structures, pathways, chemicals, cells } from '../src/content/index.js';
+import { generateCatalog } from './build-catalog.mjs';
+
+const __filename = fileURLToPath(import.meta.url);
+const catalogPath = path.resolve(path.dirname(__filename), '../src/content/catalog.json');
+const expectedCatalog = JSON.stringify(generateCatalog(), null, 2) + '\n';
+
+let currentCatalog = '';
+try {
+  currentCatalog = fs.readFileSync(catalogPath, 'utf8');
+} catch {
+  console.error('catalog.json is missing: run npm run catalog');
+  process.exit(1);
+}
+
+if (currentCatalog !== expectedCatalog) {
+  console.error('catalog.json is out of date: run npm run catalog');
+  process.exit(1);
+}
 
 const problems = validate();
 const levelKeys = ['where', 'does', 'connects', 'cells'];

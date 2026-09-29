@@ -13,8 +13,9 @@ Brain Explorer is an interactive 3D atlas of the human brain built for curious a
 1. **Zero-build, Vanilla ES Modules**: No Vite, Webpack, Rollup, Babel, or TypeScript. All browser code runs directly as native ES modules.
 2. **CDN Import Maps**: Three.js (0.160) and addons (`OrbitControls`, `EffectComposer`, `RenderPass`, `UnrealBloomPass`, `ShaderPass`) are loaded via `<script type="importmap">` from `esm.sh` / `unpkg`. Keep external runtime dependencies strictly to Three.js.
 3. **Vanilla CSS**: All styles reside in `styles.css`. No Tailwind, Sass, or CSS-in-JS. Follow the curated dark holographic theme (`#06070b` background with glowing colored point clouds).
-4. **Standard Library Python Server**: `server.py` uses only Python's standard library (`http.server`, `urllib.request`, `json`, `os`). It serves static assets locally and proxies `/api/ask` to TypeSafe Jev AI to keep the API key safe.
+4. **Standard Library Python Server**: `server.py` uses only Python's standard library (`http.server`, `urllib.request`, `json`, `os`). It serves static assets locally and securely proxies `/api/ask` and `/api/chat` to keep API keys safe.
 5. **No Em Dashes (—)**: In all user-facing content, documentation, and prompt strings, do not use em dashes. Use commas, periods, or parentheses.
+6. **Universal Scene Scripts**: All visual journeys that paint highlights, arcs, slices, or chemical receptor lenses across the brain (guided tours, Ask answers, future feature scripts) must use the Scene Script schema and render through `playStep` in `src/scene/player.js`.
 
 ---
 
@@ -24,10 +25,15 @@ Brain Explorer is an interactive 3D atlas of the human brain built for curious a
 |---|---|
 | `npm start` | Runs `python3 server.py`. Serves app at `http://localhost:5173` (falls back to 5174 if busy). |
 | `PORT=5199 npm start` | Runs server on a custom port. |
-| `npm run validate` | Runs `node tools/validate.mjs`. Validates all content, references, glossary terms, diagrams, and pathways. |
+| `npm run catalog` | Runs `node tools/build-catalog.mjs`. Rebuilds `src/content/catalog.json`. |
+| `npm run validate` | Runs `node tools/validate.mjs`. Validates content, references, glossary terms, diagrams, pathways, scripts, and catalog freshness. |
 
 ### Environment Variables
-- `TYPESAFE_API_KEY`: Placed in `.env` (gitignored) at workspace root. Required for typed dynamic queries in Ask mode. (Preset questions work without a key).
+- `AZURE_OPENAI_ENDPOINT`: Azure OpenAI resource endpoint URL.
+- `AZURE_OPENAI_API_KEY`: Azure OpenAI API key.
+- `AZURE_OPENAI_DEPLOYMENT`: Deployment name (e.g. `gpt-4o`).
+- `AZURE_OPENAI_API_VERSION`: API version (default `2024-10-21`).
+- `TYPESAFE_API_KEY`: Legacy TypeSafe Jev API key for `/api/ask`. (Preset questions work without a key).
 
 ---
 
@@ -37,19 +43,23 @@ Brain Explorer is an interactive 3D atlas of the human brain built for curious a
 brain-explorer/
 ├── index.html                  # Main layout shell, importmap, font imports, design-direction comment
 ├── styles.css                  # Single stylesheet (dark theme, CSS variables, micro-animations)
-├── server.py                   # Local static server & secure /api/ask proxy
-├── package.json                # npm start & npm run validate scripts (type: module)
+├── server.py                   # Local static server & secure /api/ask and /api/chat proxy
+├── package.json                # npm scripts (type: module)
 ├── tools/
-│   └── validate.mjs            # Integrity and content completeness checker
+│   ├── build-catalog.mjs       # Exports catalog.json for server-side schema and system prompt
+│   └── validate.mjs            # Integrity, content completeness, and catalog checker
 └── src/
     ├── main.js                 # Hash router, top-level state, keyboard navigation, wiring
     ├── scene/                  # 3D holographic point-cloud engine
     │   ├── brain-scene.js      # Three.js scene, point shaders, bloom, camera flights, slice plane, picking, chemical lens, cell view, body view
+    │   ├── player.js           # Universal scene script player (playStep, chemLensConfig)
     │   ├── neuron.js           # Procedural 3D cell morphologies & firing animation geometries
     │   ├── shapes.js           # Point-cloud math, procedural generators (cortex, ellipsoid, tube, etc.)
     │   └── noise.js            # Seeded random and 3D Perlin noise
     ├── content/                # Declarative neuroscience data & text
     │   ├── index.js            # Unified export & validation engine (validate())
+    │   ├── catalog.json        # Compiled machine-readable catalog of structures, anchors, chemicals, and glossary
+    │   ├── script.js           # Scene script validation (checkScript) and runtime sanitization (sanitizeScript)
     │   ├── groups.js           # Structural groupings (Cortex, Deep, Hindbrain)
     │   ├── levels.js           # 4 zoom levels (where, does, connects, cells)
     │   ├── anchors.js          # Sensory/motor and body organ endpoints for pathways and hormones
@@ -76,7 +86,8 @@ brain-explorer/
     │   └── glossary/
     │       └── index.js        # Neuroscience definitions for [[term]] markup
     ├── services/
-    │   └── ask.js              # Client-side Ask query service (presets -> /api/ask)
+    │   ├── ask.js              # Client-side Ask query service (presets -> /api/ask)
+    │   └── chat.js             # Client-side Ask chat service (sendChat -> /api/chat)
     └── ui/
         ├── explainer.js        # Right-side card: 4 zoom levels, try-it, breaks, cross-links
         ├── sidebar.js          # Left-side Parts/Chemicals/Cells tabs with global search
@@ -85,7 +96,7 @@ brain-explorer/
         ├── synapse-stepper.js  # Interactive synapse mechanism with drug condition toggles
         ├── ladder.js           # 4-level zoom ladder widget
         ├── library.js          # Full-width Pathways tour browser
-        ├── ask.js              # Ask query bar, preset chips, multi-part spotlight cards
+        ├── ask.js              # Ask chat thread, answer cards, preset chips, pathway exporter
         ├── diagrams.js         # Interactive SVG circuit diagrams with animated action potentials
         ├── format.js           # Tiny markup formatter ([[term|shown]], {{id|shown}}, **bold**)
         └── icons.js            # SVG icons
@@ -431,6 +442,46 @@ Hand-verified answers displayed as instant chips and offline fallbacks:
 }
 ```
 
+### 8. Scene Script Schema (`src/content/script.js`)
+Scene scripts are declarative instructions for painting the 3D brain canvas. Guided pathways, Ask chat responses, and preset spotlight answers all share this universal format:
+```javascript
+{
+  title: 'Falling asleep',                       // Short descriptive title
+  summary: 'How sleep centers take over the brain as you drift off.',
+  steps: [
+    {
+      title: 'Drowsiness sets in',
+      text: 'The [[vlpo]] begins firing [[gaba]] into wake centers...',
+      view: 'medial',                            // 'left' | 'left-front' | 'left-back' | 'medial' | 'back' | 'below' | 'body'
+      slice: true,                               // optional boolean
+      body: false,                               // optional boolean: show body silhouette
+      chemical: 'gaba',                          // optional chemical id for receptor density glow
+      focus: ['vlpo', 'thalamus'],               // optional array of structure ids to highlight
+      parts: [                                   // optional role-colored structures
+        { id: 'vlpo', role: 'more_active' },
+        { id: 'thalamus', role: 'less_active' },
+      ],
+      route: [                                   // optional 3D Bezier curve connections
+        ['vlpo', 'thalamus'],
+      ],
+    },
+  ],
+}
+```
+
+#### Roles and Visual Semantics
+- `'more_active'`: Heightened firing rate or metabolic activity (warm highlight).
+- `'less_active'`: Inhibited or quieted region (cool or dim highlight).
+- `'typical'`: Baseline healthy activity.
+- `'involved'`: Active participant in network.
+- `'cut_off'`: Disconnected pathway or signal.
+- `'losing_cells'`: Degenerating or damaged area.
+
+#### Validation and Player Engine
+- `checkScript(script, catalog)`: Pure validator returning an array of string error descriptions. Used by `npm run validate` to test content integrity.
+- `sanitizeScript(raw, catalog)`: Runtime defense layer. Strips nonexistent structures, invalid roles/views, invalid route endpoints, unknown glossary terms, and converts any em dashes to commas. Discards steps lacking visual features and caps step count at 8.
+- `playStep(scene, deps, script, index, options)`: The unified player in `src/scene/player.js`. Coordinates camera flight, slice plane, body view, chemical lens painting, structure highlighting with role-based colors, and 3D arc drawing.
+
 ---
 
 ## 8. How to Extend Brain Explorer
@@ -444,7 +495,7 @@ Hand-verified answers displayed as instant chips and offline fallbacks:
 3. If cortical, write a coordinate `test(p)` filtering the shared cortex points. If subcortical, construct procedural points using `shapes.js`.
 4. Ensure all connections reference valid structure IDs and valid directions (`in`, `out`, `both`).
 5. Ensure any referenced `diagram` or `synapse` exists.
-6. Run `npm run validate` and resolve any warnings.
+6. Run `npm run catalog` and `npm run validate`.
 
 ### Adding a New Chemical or Hormone
 1. Choose the file in `src/content/chemicals/`:
@@ -453,31 +504,39 @@ Hand-verified answers displayed as instant chips and offline fallbacks:
    - Body hormones: `hormones.js`
 2. Define the chemical object adhering to the schema in Section 7.
 3. Ensure all structures in `madeIn`, `density`, `receptors[].where`, and `axis` / `feedback` are valid IDs or body anchors.
-4. Run `npm run validate`.
+4. Run `npm run catalog` and `npm run validate`.
 
 ### Adding a New Cell Type
 1. Open `src/content/cells/index.js`.
 2. Define the cell object with valid `group`, `morph.style` (supported by `src/scene/neuron.js`), `where` structures, and `transmitter`.
 3. Provide `fires.steps` (array of step descriptions) and `landmarks`.
-4. Run `npm run validate`.
+4. Run `npm run catalog` and `npm run validate`.
 
 ### Adding a New Pathway
-1. Open [src/content/pathways/index.js](file:///Users/sarathavasarala/Desktop/Projects/brain-explorer/src/content/pathways/index.js).
+1. Open `src/content/pathways/index.js`.
 2. Choose a valid `category` from `src/content/pathways/groups.js` (`actions`, `chemicals`, `networks`).
 3. Write steps sequentially, forming a cohesive narrative.
 4. For each step, supply `focus` (structures to highlight) and `route` (pairs of IDs or body anchors for 3D arcs).
-5. Run `npm run validate`.
+5. Run `npm run catalog` and `npm run validate`.
 
 ### Adding a New Neural Circuit Diagram
-1. Open [src/content/diagrams/index.js](file:///Users/sarathavasarala/Desktop/Projects/brain-explorer/src/content/diagrams/index.js).
+1. Open `src/content/diagrams/index.js`.
 2. Create an exported entry with `title`, `nodes` (with coordinates in SVG space ~500x320), and `links` (`excite`, `inhibit`, or `modulate`).
 3. Reference the diagram ID in a structure's `levels.cells.diagram`.
 4. Verify rendering in the browser by opening `#/s/<structure-id>/cells`.
 
 ### Adding a Glossary Term
-1. Open [src/content/glossary/index.js](file:///Users/sarathavasarala/Desktop/Projects/brain-explorer/src/content/glossary/index.js).
+1. Open `src/content/glossary/index.js`.
 2. Add the term in lowercase: `'my-term': 'One or two plain, beginner-level sentences.'`.
 3. Use it anywhere in content as `[[my-term]]` or `[[my-term|display word]]`.
+4. Run `npm run catalog` and `npm run validate`.
+
+### Updating the Machine-Readable Catalog
+Whenever you add or update structures, anchors, chemicals, or glossary terms, rebuild the catalog:
+```sh
+npm run catalog
+```
+This updates `src/content/catalog.json`, which is consumed by `server.py` to build the Azure OpenAI system prompt and JSON schema. `npm run validate` enforces that `catalog.json` remains in sync with the source content.
 
 ---
 
@@ -485,19 +544,24 @@ Hand-verified answers displayed as instant chips and offline fallbacks:
 
 Before submitting any code or content changes, execute this verification sequence:
 
-1. **Run Static Validation**:
+1. **Rebuild Catalog**:
+   ```sh
+   npm run catalog
+   ```
+
+2. **Run Static Validation**:
    ```sh
    npm run validate
    ```
    Must output: `OK: ... structures, ... pathways, no broken references.` with 0 problems.
 
-2. **No Em Dashes Check**:
+3. **No Em Dashes Check**:
    Confirm no em dashes were introduced in content or UI:
    ```sh
    git diff | grep "—"
    ```
 
-3. **Browser Smoke Test**:
+4. **Browser Smoke Test**:
    Run `npm start` and test key user journeys in the browser:
    - `#/`: Home point cloud renders cleanly with glowing points and no background haze.
    - `#/s/hippocampus/where`: Structure highlights in its accent color, camera flies smoothly.
@@ -505,5 +569,6 @@ Before submitting any code or content changes, execute this verification sequenc
    - `#/s/cerebellum/cells`: Circuit diagram renders SVG nodes, links, and animated pulse dots.
    - `#/pathways`: Library cards load correctly.
    - `#/p/visual-stream/0`: Pathway tour steps through 3D routes cleanly.
-   - `#/ask`: Preset chips load; clicking a preset spotlights involved parts.
+   - `#/ask`: Preset chips load; clicking a preset spotlights involved parts and plays scene script.
+   - Free-form Ask chat: Ask a question (e.g. "what happens when I fall asleep?"), verify streaming answer card, mini-tour step navigation, 3D camera/slice changes, and follow-up chips.
    - Browser developer console has zero errors or 404s.

@@ -53,8 +53,10 @@ Narrative multi-step tours through brain systems:
 - **Chemicals**: The dopamine reward loop, serotonin mood regulation, and noradrenaline alert broadcasting.
 - **Networks**: Default mode wandering, executive attention control, and salience switching.
 
-### 5. Ask Mode
-Type a feeling, condition, or daily action (e.g., *"why does coffee wake me up?"*, *"panic attack"*, *"jet lag"*). The application queries structured classification models to spotlight which brain regions, chemicals, and circuits take part.
+### 5. Ask Mode ("Ask the Brain" Chat)
+Ask natural questions about how your brain works, such as *"what happens when I fall asleep?"*, *"why does coffee wake me up?"*, or *"what happens in a panic attack?"*.
+
+The brain acts as an explanatory canvas. The model returns a structured scene script, and Brain Explorer plays the script step by step in 3D. Brain regions light up with activity, neural pathways animate along 3D tracts, and chemical messengers glow in real time.
 
 ---
 
@@ -73,14 +75,24 @@ npm start
 
 Open `http://localhost:5173` in your browser (falls back to `5174` if busy). Set `PORT=5199 npm start` to pick another port.
 
-### Ask Mode Setup (Optional)
-The Ask interface includes hand-verified preset queries that work offline. For dynamic typed questions, place your TypeSafe Jev API key in a `.env` file at the root:
+### Ask Mode and Chat Setup
+
+Brain Explorer provides hand-verified preset queries that work completely offline without API keys or a local server.
+
+For live, free-form chat powered by Azure OpenAI, start the local server with `npm start` and configure your Azure OpenAI credentials in a `.env` file at the repository root:
 
 ```sh
-TYPESAFE_API_KEY=your-api-key-here
+# Azure OpenAI configuration for free-form chat
+AZURE_OPENAI_ENDPOINT=https://your-resource.openai.azure.com/
+AZURE_OPENAI_API_KEY=your-azure-api-key
+AZURE_OPENAI_DEPLOYMENT=gpt-4o
+AZURE_OPENAI_API_VERSION=2024-10-21
+
+# Optional legacy TypeSafe Jev API key
+TYPESAFE_API_KEY=your-typesafe-key
 ```
 
-`server.py` securely proxies queries to `/api/ask` and never exposes the key to client browsers.
+`server.py` securely proxies chat requests to `/api/chat` using only Python standard library modules, enforcing schema validation and keeping API keys safe on your machine.
 
 ### Content Validation
 Run the built-in integrity checker to verify all cross-references, glossary terms, pathways, and diagrams:

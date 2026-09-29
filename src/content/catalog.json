@@ -1,0 +1,446 @@
+{
+  "structures": [
+    {
+      "id": "frontal-lobe",
+      "name": "Frontal lobe",
+      "tagline": "Planning, deciding and moving."
+    },
+    {
+      "id": "prefrontal-cortex",
+      "name": "Prefrontal cortex",
+      "tagline": "Keeps goals in mind and puts the brakes on impulses."
+    },
+    {
+      "id": "motor-cortex",
+      "name": "Primary motor cortex",
+      "tagline": "Shapes voluntary movement commands sent toward the spinal cord."
+    },
+    {
+      "id": "brocas-area",
+      "name": "Broca's area",
+      "tagline": "Helps plan speech, grammar and demanding language sequences."
+    },
+    {
+      "id": "parietal-lobe",
+      "name": "Parietal lobe",
+      "tagline": "Touch, body sense and where things are in space."
+    },
+    {
+      "id": "somatosensory-cortex",
+      "name": "Primary somatosensory cortex",
+      "tagline": "Where touch, temperature and pain from your body arrive."
+    },
+    {
+      "id": "posterior-parietal",
+      "name": "Posterior parietal cortex",
+      "tagline": "Builds a map of space so you can reach and look."
+    },
+    {
+      "id": "temporal-lobe",
+      "name": "Temporal lobe",
+      "tagline": "Hearing, language and recognising what things are."
+    },
+    {
+      "id": "auditory-cortex",
+      "name": "Primary auditory cortex",
+      "tagline": "The first stop in the cortex for sound."
+    },
+    {
+      "id": "wernickes-area",
+      "name": "Wernicke's area",
+      "tagline": "Helps you understand the words you hear and read."
+    },
+    {
+      "id": "occipital-lobe",
+      "name": "Occipital lobe",
+      "tagline": "The vision department at the back of your head."
+    },
+    {
+      "id": "visual-cortex",
+      "name": "Primary visual cortex",
+      "tagline": "Breaks what you see into edges, lines and motion."
+    },
+    {
+      "id": "cingulate-cortex",
+      "name": "Cingulate cortex",
+      "tagline": "Notices mistakes and conflict, and links feelings to action."
+    },
+    {
+      "id": "insula",
+      "name": "Insula",
+      "tagline": "Your sense of the inside of your body: heartbeat, hunger, disgust."
+    },
+    {
+      "id": "thalamus",
+      "name": "Thalamus",
+      "tagline": "The relay station that passes almost every sense on to the cortex."
+    },
+    {
+      "id": "hypothalamus",
+      "name": "Hypothalamus",
+      "tagline": "Runs the body: hunger, thirst, temperature, sleep and hormones."
+    },
+    {
+      "id": "striatum",
+      "name": "Striatum",
+      "tagline": "Learns habits and helps pick which action to do next."
+    },
+    {
+      "id": "globus-pallidus",
+      "name": "Globus pallidus",
+      "tagline": "The brake pedal on movement, released only for the right action."
+    },
+    {
+      "id": "substantia-nigra",
+      "name": "Substantia nigra",
+      "tagline": "Uses dopamine and inhibitory output to tune movement circuits."
+    },
+    {
+      "id": "hippocampus",
+      "name": "Hippocampus",
+      "tagline": "Turns what happened today into memories you can recall later."
+    },
+    {
+      "id": "amygdala",
+      "name": "Amygdala",
+      "tagline": "The alarm that flags danger and gives memories emotional weight."
+    },
+    {
+      "id": "corpus-callosum",
+      "name": "Corpus callosum",
+      "tagline": "A thick cable of fibres that lets the two halves talk."
+    },
+    {
+      "id": "vta",
+      "name": "Ventral tegmental area",
+      "tagline": "Sends learning and motivation signals through several dopamine pathways."
+    },
+    {
+      "id": "basal-forebrain",
+      "name": "Basal forebrain",
+      "tagline": "Sends acetylcholine widely to tune attention, learning and wakefulness."
+    },
+    {
+      "id": "nucleus-accumbens",
+      "name": "Nucleus accumbens",
+      "tagline": "Ventral striatum that translates reward signals and motivation into action."
+    },
+    {
+      "id": "pituitary",
+      "name": "Pituitary gland",
+      "tagline": "The master endocrine gland that releases hormones into the bloodstream."
+    },
+    {
+      "id": "pineal-gland",
+      "name": "Pineal gland",
+      "tagline": "Produces melatonin in the dark to set your daily sleep and wake rhythm."
+    },
+    {
+      "id": "cerebellum",
+      "name": "Cerebellum",
+      "tagline": "Fine-tunes movement so it comes out smooth, timed and accurate."
+    },
+    {
+      "id": "midbrain",
+      "name": "Midbrain",
+      "tagline": "Reflex hub for eyes and ears, and home of the dopamine cells."
+    },
+    {
+      "id": "pons",
+      "name": "Pons",
+      "tagline": "A bridge carrying signals between the cortex and the cerebellum."
+    },
+    {
+      "id": "medulla",
+      "name": "Medulla oblongata",
+      "tagline": "Keeps you alive on autopilot: breathing, heart rate, swallowing."
+    },
+    {
+      "id": "spinal-cord",
+      "name": "Spinal cord",
+      "tagline": "The main cable between brain and body."
+    },
+    {
+      "id": "raphe-nuclei",
+      "name": "Raphe nuclei",
+      "tagline": "Brainstem nuclei that send serotonin through widespread circuits."
+    },
+    {
+      "id": "locus-coeruleus",
+      "name": "Locus coeruleus",
+      "tagline": "A small noradrenaline system that retunes alertness and attention."
+    }
+  ],
+  "anchors": [
+    {
+      "id": "eye",
+      "name": "Eye"
+    },
+    {
+      "id": "ear",
+      "name": "Inner ear"
+    },
+    {
+      "id": "hand",
+      "name": "Hand"
+    },
+    {
+      "id": "thyroid",
+      "name": "Thyroid"
+    },
+    {
+      "id": "heart",
+      "name": "Heart"
+    },
+    {
+      "id": "stomach",
+      "name": "Stomach"
+    },
+    {
+      "id": "adrenal",
+      "name": "Adrenal glands"
+    },
+    {
+      "id": "fat",
+      "name": "Fat tissue"
+    },
+    {
+      "id": "gonads",
+      "name": "Ovaries or testes"
+    }
+  ],
+  "chemicals": [
+    {
+      "id": "glutamate",
+      "name": "Glutamate",
+      "group": "fast",
+      "tagline": "The main go signal of the brain, driving fast thoughts and helping build memories."
+    },
+    {
+      "id": "gaba",
+      "name": "GABA",
+      "group": "fast",
+      "tagline": "The main calming messenger of the brain, keeping neural activity balanced and under control."
+    },
+    {
+      "id": "dopamine",
+      "name": "Dopamine",
+      "group": "modulator",
+      "tagline": "Signals reward surprises, tunes voluntary movement, and shapes motivation."
+    },
+    {
+      "id": "serotonin",
+      "name": "Serotonin",
+      "group": "modulator",
+      "tagline": "Broadcasts from the brainstem to steady mood, patience, appetite, sleep, and pain."
+    },
+    {
+      "id": "noradrenaline",
+      "name": "Noradrenaline",
+      "group": "modulator",
+      "tagline": "Snaps the brain to high alert, sharpens attention, and primes the body for action."
+    },
+    {
+      "id": "acetylcholine",
+      "name": "Acetylcholine",
+      "group": "modulator",
+      "tagline": "Commands muscle contraction, sharpens attention, and helps encode new memories."
+    },
+    {
+      "id": "cortisol",
+      "name": "Cortisol",
+      "group": "hormone",
+      "tagline": "Mobilises energy, sharpens alertness under stress, and quiets inflammation."
+    },
+    {
+      "id": "adrenaline",
+      "name": "Adrenaline",
+      "group": "hormone",
+      "tagline": "Triggers the rapid fight-or-flight surge, accelerating heart rate and opening airways."
+    },
+    {
+      "id": "oxytocin",
+      "name": "Oxytocin",
+      "group": "hormone",
+      "tagline": "Promotes social bonding, maternal care, and physical birth contractions."
+    },
+    {
+      "id": "vasopressin",
+      "name": "Vasopressin",
+      "group": "hormone",
+      "tagline": "Conserves body water, concentrates urine, and raises blood pressure."
+    },
+    {
+      "id": "melatonin",
+      "name": "Melatonin",
+      "group": "hormone",
+      "tagline": "Signals environmental darkness to coordinate the biological sleep clock."
+    },
+    {
+      "id": "thyroid-hormone",
+      "name": "Thyroid hormone",
+      "group": "hormone",
+      "tagline": "Sets the metabolic burn rate of every cell, governing warmth and energy."
+    },
+    {
+      "id": "leptin",
+      "name": "Leptin",
+      "group": "hormone",
+      "tagline": "Signals body fat reserves to the brain, curbing appetite and approving reproduction."
+    },
+    {
+      "id": "ghrelin",
+      "name": "Ghrelin",
+      "group": "hormone",
+      "tagline": "The hunger hormone released by an empty stomach to drive food seeking."
+    },
+    {
+      "id": "growth-hormone",
+      "name": "Growth hormone",
+      "group": "hormone",
+      "tagline": "Stimulates tissue growth, bone lengthening, muscle protein synthesis, and cellular repair."
+    },
+    {
+      "id": "sex-hormones",
+      "name": "Sex hormones",
+      "group": "hormone",
+      "tagline": "Drives sexual maturation, reproductive cycles, bone strength, and social behaviour."
+    },
+    {
+      "id": "prolactin",
+      "name": "Prolactin",
+      "group": "hormone",
+      "tagline": "Promotes milk production after birth and fosters nurturing parental instincts."
+    }
+  ],
+  "glossary": [
+    "frontal lobe",
+    "prefrontal cortex",
+    "primary motor cortex",
+    "motor cortex",
+    "Broca's area",
+    "brocas area",
+    "parietal lobe",
+    "primary somatosensory cortex",
+    "somatosensory cortex",
+    "posterior parietal cortex",
+    "posterior parietal",
+    "temporal lobe",
+    "primary auditory cortex",
+    "auditory cortex",
+    "Wernicke's area",
+    "wernickes area",
+    "occipital lobe",
+    "primary visual cortex",
+    "visual cortex",
+    "cingulate cortex",
+    "cingulate gyrus",
+    "insula",
+    "insular cortex",
+    "thalamus",
+    "hypothalamus",
+    "striatum",
+    "corpus striatum",
+    "globus pallidus",
+    "substantia nigra",
+    "hippocampus",
+    "amygdala",
+    "corpus callosum",
+    "ventral tegmental area",
+    "VTA",
+    "basal forebrain",
+    "nucleus accumbens",
+    "pituitary gland",
+    "pituitary",
+    "pineal gland",
+    "pineal",
+    "cerebellum",
+    "midbrain",
+    "mesencephalon",
+    "pons",
+    "medulla oblongata",
+    "medulla",
+    "spinal cord",
+    "raphe nuclei",
+    "raphe",
+    "locus coeruleus",
+    "locus ceruleus",
+    "neuron",
+    "axon",
+    "dendrite",
+    "synapse",
+    "neurotransmitter",
+    "receptor",
+    "action potential",
+    "excitatory",
+    "inhibitory",
+    "cortex",
+    "grey matter",
+    "white matter",
+    "hemisphere",
+    "lobe",
+    "gyrus",
+    "sulcus",
+    "nucleus",
+    "basal ganglia",
+    "interneuron",
+    "neuromodulator",
+    "myelin",
+    "ataxia",
+    "pyramidal cell",
+    "granule cell",
+    "Purkinje cell",
+    "purkinje cell",
+    "stellate cell",
+    "basket cell",
+    "chandelier cell",
+    "medium spiny neuron",
+    "MSN",
+    "thalamic relay neuron",
+    "dopamine neuron",
+    "motor neuron",
+    "astrocyte",
+    "oligodendrocyte",
+    "microglia",
+    "dopamine",
+    "serotonin",
+    "noradrenaline",
+    "norepinephrine",
+    "acetylcholine",
+    "glutamate",
+    "GABA",
+    "adrenaline",
+    "epinephrine",
+    "cortisol",
+    "oxytocin",
+    "vasopressin",
+    "melatonin",
+    "thyroid hormone",
+    "leptin",
+    "ghrelin",
+    "growth hormone",
+    "sex hormones",
+    "prolactin",
+    "retina",
+    "eye",
+    "cochlea",
+    "ear"
+  ],
+  "roles": [
+    "more_active",
+    "less_active",
+    "typical",
+    "involved",
+    "cut_off",
+    "losing_cells"
+  ],
+  "views": [
+    "left",
+    "left-front",
+    "left-back",
+    "medial",
+    "back",
+    "below",
+    "body"
+  ]
+}
