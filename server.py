@@ -442,7 +442,7 @@ def handle_chat(messages):
 
     payload = {
         'messages': formatted_messages,
-        'temperature': 0.4,
+        'temperature': 1.0,
         'response_format': {
             'type': 'json_schema',
             'json_schema': {
