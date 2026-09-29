@@ -809,6 +809,57 @@ kbd {
 .chat-scope-card {
   border-color: rgba(190, 200, 255, 0.15);
 }
+.chat-nudge-card {
+  border-color: rgba(190, 200, 255, 0.16);
+  background: radial-gradient(circle at 10% 10%, rgba(111, 134, 255, 0.05), transparent 60%),
+              radial-gradient(circle at 90% 90%, rgba(199, 125, 255, 0.04), transparent 50%),
+              rgba(190, 200, 255, 0.02);
+}
+.chat-nudge-card .chat-card-summary {
+  font-style: normal;
+  color: var(--ink-2);
+  margin-bottom: 20px;
+}
+.chat-nudge-box {
+  margin: 18px 0 16px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: rgba(190, 200, 255, 0.035);
+  border: 1px solid var(--line);
+}
+.chat-nudge-heading {
+  margin: 0 0 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+}
+.chat-nudge-action {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 18px;
+}
+.chat-nudge-btn {
+  padding: 8px 16px;
+  border-radius: 8px;
+  background: rgba(190, 200, 255, 0.08);
+  border: 1px solid var(--line-2);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, border-color 0.2s;
+}
+.chat-nudge-btn:hover {
+  background: rgba(190, 200, 255, 0.15);
+  border-color: var(--line);
+  color: #fff;
+}
 
 /* ------------------------------------------------------------ chemical & stepper styles */
 .stepper-drug-banner {

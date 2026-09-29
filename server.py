@@ -273,9 +273,9 @@ def build_system_prompt():
         "7. Mention a part with {{id}} at least once in the step text where it lights up.",
         "8. Be honest when science is debated (e.g. 'researchers still debate...').",
         "9. Followups: Provide exactly 3 short, intriguing follow-up questions.",
-        "10. Out of scope / Medical Advice:",
-        "    If the query is not about the brain, mind, or body, or if it asks for personal medical diagnosis/treatment advice:",
-        "    Set status: 'out_of_scope', steps: [], and write a friendly summary explaining what Brain Explorer can help explore.",
+        "10. Out of scope / Greetings / Conversational:",
+        "    If the query is a greeting (such as 'hey', 'hello', 'hi'), conversational chit-chat, unrelated to the brain, mind, or body, or asks for personal medical advice:",
+        "    Set status: 'out_of_scope', steps: [], title: 'Ask about how the brain works', and write a warm, friendly summary welcoming them, explaining that Brain Explorer shows what the brain is doing in 3D (like sleep, caffeine, panic, music chills, or memory), and inviting them to ask a brain question.",
     ])
     return "\n".join(lines)
 

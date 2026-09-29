@@ -23,6 +23,7 @@ const hoverEl = $('#hover-label');
 const tipEl = $('#tip');
 const lensLegendEl = $('#lens-legend');
 const cellInsetEl = $('#cell-inset');
+const canAsk = true;
 
 const INSET_PART_POS = {
   'prefrontal-cortex': [36, 42],
@@ -123,7 +124,6 @@ function parseHash() {
   }
   if (type === 'pathways') return { type: 'library' };
   if (type === 'ask') {
-    if (!canAsk) return { type: 'home' };
     let q = '';
     try { q = normalise(decodeURIComponent(id || '')); } catch { q = ''; }
     return { type: 'ask', query: q };
@@ -489,7 +489,7 @@ async function submitChatQuestion(query) {
     state.chat.currentQuery = '';
   }
 
-  if (result.status === 'ok') {
+  if (result.status === 'ok' && result.steps?.length > 0) {
     const turn = {
       role: 'assistant',
       status: 'ok',
@@ -499,12 +499,12 @@ async function submitChatQuestion(query) {
     };
     state.chat.turns.push(turn);
     playStep(scene, playerDeps, result, 0);
-  } else if (result.status === 'out_of_scope') {
+  } else if (result.status === 'out_of_scope' || (result.status === 'ok' && (!result.steps || result.steps.length === 0))) {
     state.chat.turns.push({
       role: 'assistant',
       status: 'out_of_scope',
-      title: result.title || 'Out of scope',
-      summary: result.summary || 'Brain Explorer explores how the brain and body work. Try asking about a feeling, memory, or action.',
+      title: result.title || 'Ask about how the brain works',
+      summary: result.summary || 'Brain Explorer explores how the brain turns signals into thoughts, feelings, movements, and body responses in 3D. Try asking about a feeling, memory, or action.',
     });
     clearScene('ask');
   } else {
@@ -665,6 +665,7 @@ explainerEl.addEventListener('click', (e) => {
     state.chat = { turns: [], loading: false, currentQuery: '' };
     clearScene('ask');
     explainerEl.innerHTML = renderChat(state.chat);
+    explainerEl.querySelector('input[name="q"]')?.focus();
     return;
   }
   const copyBtn = e.target.closest('[data-chat-act="copy-pathway"]');
