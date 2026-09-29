@@ -8,6 +8,7 @@ import { renderChemHome, renderChem } from './ui/chem.js';
 import { renderCellHome, renderCell } from './ui/cell.js';
 import { setStepperStage, getStepperStage, setDrugMode, toggleStepperPlay, stopStepperPlay, renderSynapseStepper } from './ui/synapse-stepper.js';
 import { ask, cached, normalise } from './services/ask.js';
+import { telemetry } from './services/telemetry.js';
 import { findTerm, esc } from './ui/format.js';
 import { icon } from './ui/icons.js';
 
@@ -472,6 +473,25 @@ function apply() {
     applyAsk(r);
   }
   if (['home', 's', 'chemhome', 'chem', 'cellhome', 'cell'].includes(r.type)) drawSidebar();
+
+  let viewTitle = 'Brain Explorer';
+  if (r.type === 'home') viewTitle = 'Whole Brain Atlas';
+  else if (r.type === 'chemhome') viewTitle = 'Chemicals Dictionary';
+  else if (r.type === 'cellhome') viewTitle = 'Cells Dictionary';
+  else if (r.type === 'library') viewTitle = 'Pathways Library';
+  else if (r.type === 'ask') viewTitle = r.query ? `Ask: ${r.query}` : 'Ask Brain Explorer';
+  else if (r.type === 's') viewTitle = byId.get(r.id)?.name || r.id;
+  else if (r.type === 'chem') viewTitle = chemById.get(r.id)?.name || r.id;
+  else if (r.type === 'cell') viewTitle = cellById.get(r.id)?.name || r.id;
+  else if (r.type === 'p') viewTitle = pathways.find((q) => q.id === r.id)?.title || r.id;
+
+  telemetry.pageView({
+    path: location.hash || '#/',
+    title: viewTitle,
+    type: r.type,
+    id: r.id || '',
+    level: r.level || r.tab || (r.step != null ? String(r.step) : ''),
+  });
 }
 
 function applyAsk(r) {
@@ -540,7 +560,10 @@ $('#search').addEventListener('input', (e) => { state.query = e.target.value; dr
 $('#search').addEventListener('keydown', (e) => {
   if (e.key !== 'Enter') return;
   const first = listEl.querySelector('.item');
-  if (first) location.hash = first.getAttribute('href');
+  if (first) {
+    telemetry.event('search_sidebar', { query: state.query, destination: first.getAttribute('href') });
+    location.hash = first.getAttribute('href');
+  }
 });
 
 libraryEl.innerHTML = renderLibraryShell();
@@ -552,7 +575,10 @@ $('#lib-search').addEventListener('input', (e) => {
 $('#lib-search').addEventListener('keydown', (e) => {
   if (e.key !== 'Enter') return;
   const first = libraryEl.querySelector('.lib-item');
-  if (first) location.hash = first.getAttribute('href');
+  if (first) {
+    telemetry.event('search_pathways', { query: state.libQuery, destination: first.getAttribute('href') });
+    location.hash = first.getAttribute('href');
+  }
 });
 
 explainerEl.addEventListener('submit', (e) => {
@@ -560,7 +586,10 @@ explainerEl.addEventListener('submit', (e) => {
   if (!f) return;
   e.preventDefault();
   const q = normalise(f.elements.q.value);
-  if (q) location.hash = `#/ask/${encodeURIComponent(q)}`;
+  if (q) {
+    telemetry.event('ask_query', { query: q });
+    location.hash = `#/ask/${encodeURIComponent(q)}`;
+  }
 });
 
 explainerEl.addEventListener('click', (e) => {

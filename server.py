@@ -8,15 +8,18 @@ The API key is read from .env (TYPESAFE_API_KEY) and never sent to the browser.
 Standard library only.
 """
 
+import datetime
 import http.server
 import json
 import os
+import sqlite3
 import urllib.parse
 import urllib.request
 
 HOST = '127.0.0.1'
 PORT = int(os.environ.get('PORT', 5173))
 ROOT = os.path.dirname(os.path.abspath(__file__))
+DB_PATH = os.path.join(ROOT, 'telemetry.db')
 MAX_QUERY = 120
 CLIENT_HEADER = 'X-Brain-Explorer'
 PUBLIC_FILES = {'/', '/index.html', '/styles.css'}
@@ -194,6 +197,176 @@ def ask(query):
     return CACHE[key]
 
 
+def init_db():
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.execute('PRAGMA journal_mode=WAL;')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS telemetry_pageviews (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT,
+                visitor_id TEXT,
+                session_id TEXT,
+                path TEXT,
+                title TEXT,
+                duration REAL DEFAULT 0,
+                country TEXT,
+                city TEXT,
+                timezone TEXT,
+                locale TEXT,
+                screen TEXT,
+                referrer TEXT,
+                user_agent TEXT
+            )
+        ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS telemetry_events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                timestamp TEXT,
+                visitor_id TEXT,
+                session_id TEXT,
+                event_name TEXT,
+                path TEXT,
+                data TEXT,
+                country TEXT,
+                city TEXT,
+                timezone TEXT,
+                locale TEXT
+            )
+        ''')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_pv_visitor ON telemetry_pageviews(visitor_id)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_pv_session ON telemetry_pageviews(session_id)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_pv_path ON telemetry_pageviews(path)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_pv_timestamp ON telemetry_pageviews(timestamp)')
+        conn.execute('CREATE INDEX IF NOT EXISTS idx_ev_name ON telemetry_events(event_name)')
+
+
+def record_telemetry(events, client_meta):
+    if not events:
+        return
+    if isinstance(events, dict):
+        events = [events]
+    with sqlite3.connect(DB_PATH) as conn:
+        for ev in events:
+            if not isinstance(ev, dict):
+                continue
+            ev_type = ev.get('type', 'event')
+            visitor_id = str(ev.get('visitor_id') or '')[:64]
+            session_id = str(ev.get('session_id') or '')[:64]
+            ts = ev.get('timestamp') or datetime.datetime.now(datetime.timezone.utc).isoformat()
+            path = str(ev.get('path') or '')[:200]
+            title = str(ev.get('title') or '')[:200]
+            tz = str(ev.get('timezone') or client_meta.get('timezone') or '')[:64]
+            locale = str(ev.get('locale') or client_meta.get('locale') or '')[:32]
+            screen = str(ev.get('screen') or '')[:32]
+            referrer = str(ev.get('referrer') or '')[:500]
+            ua = str(ev.get('user_agent') or client_meta.get('user_agent') or '')[:500]
+            country = client_meta.get('country') or ''
+            city = client_meta.get('city') or ''
+
+            if ev_type == 'pageview':
+                conn.execute('''
+                    INSERT INTO telemetry_pageviews
+                    (timestamp, visitor_id, session_id, path, title, duration, country, city, timezone, locale, screen, referrer, user_agent)
+                    VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?)
+                ''', (ts, visitor_id, session_id, path, title, country, city, tz, locale, screen, referrer, ua))
+            elif ev_type == 'duration':
+                dur = float(ev.get('duration', 0))
+                cur = conn.execute('''
+                    SELECT id, duration FROM telemetry_pageviews
+                    WHERE visitor_id = ? AND session_id = ? AND path = ?
+                    ORDER BY id DESC LIMIT 1
+                ''', (visitor_id, session_id, path))
+                row = cur.fetchone()
+                if row:
+                    conn.execute('UPDATE telemetry_pageviews SET duration = duration + ? WHERE id = ?', (dur, row[0]))
+                else:
+                    conn.execute('''
+                        INSERT INTO telemetry_pageviews
+                        (timestamp, visitor_id, session_id, path, title, duration, country, city, timezone, locale, screen, referrer, user_agent)
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ''', (ts, visitor_id, session_id, path, title, dur, country, city, tz, locale, screen, referrer, ua))
+            elif ev_type == 'event':
+                name = str(ev.get('event_name') or '')[:64]
+                data_str = json.dumps(ev.get('data') or {})[:2000]
+                conn.execute('''
+                    INSERT INTO telemetry_events
+                    (timestamp, visitor_id, session_id, event_name, path, data, country, city, timezone, locale)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ''', (ts, visitor_id, session_id, name, path, data_str, country, city, tz, locale))
+
+
+def get_telemetry_stats():
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
+        cur = conn.cursor()
+
+        cur.execute('''
+            SELECT
+                COUNT(*) as total_pageviews,
+                COUNT(DISTINCT visitor_id) as unique_visitors,
+                COUNT(DISTINCT session_id) as total_sessions,
+                ROUND(COALESCE(SUM(duration), 0), 1) as total_dwell_seconds,
+                ROUND(COALESCE(AVG(CASE WHEN duration > 0 THEN duration END), 0), 1) as avg_dwell_seconds
+            FROM telemetry_pageviews
+        ''')
+        summary = dict(cur.fetchone() or {})
+
+        cur.execute('''
+            SELECT path, COUNT(*) as views, ROUND(COALESCE(AVG(CASE WHEN duration > 0 THEN duration END), 0), 1) as avg_dwell
+            FROM telemetry_pageviews
+            GROUP BY path
+            ORDER BY views DESC
+            LIMIT 20
+        ''')
+        top_paths = [dict(r) for r in cur.fetchall()]
+
+        cur.execute('''
+            SELECT COALESCE(NULLIF(country, ''), 'Local/Unknown') as name, COUNT(DISTINCT visitor_id) as count
+            FROM telemetry_pageviews
+            GROUP BY name
+            ORDER BY count DESC
+            LIMIT 10
+        ''')
+        top_countries = [dict(r) for r in cur.fetchall()]
+
+        cur.execute('''
+            SELECT COALESCE(NULLIF(timezone, ''), 'Unknown') as name, COUNT(DISTINCT visitor_id) as count
+            FROM telemetry_pageviews
+            GROUP BY name
+            ORDER BY count DESC
+            LIMIT 10
+        ''')
+        top_timezones = [dict(r) for r in cur.fetchall()]
+
+        cur.execute('''
+            SELECT SUBSTR(timestamp, 1, 10) as date, COUNT(*) as pageviews, COUNT(DISTINCT visitor_id) as visitors
+            FROM telemetry_pageviews
+            GROUP BY date
+            ORDER BY date DESC
+            LIMIT 14
+        ''')
+        daily = [dict(r) for r in cur.fetchall()]
+
+        cur.execute('''
+            SELECT event_name, COUNT(*) as count
+            FROM telemetry_events
+            GROUP BY event_name
+            ORDER BY count DESC
+            LIMIT 10
+        ''')
+        events = [dict(r) for r in cur.fetchall()]
+
+        return {
+            'status': 'ok',
+            'summary': summary,
+            'top_paths': top_paths,
+            'countries': top_countries,
+            'timezones': top_timezones,
+            'daily': daily,
+            'events': events,
+        }
+
+
 class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=ROOT, **kwargs)
@@ -228,6 +401,15 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
     def do_GET(self):
         parsed = urllib.parse.urlparse(self.path)
+        if parsed.path == '/api/telemetry/stats':
+            if not self.local_host():
+                return self.send_json(403, {'status': 'error', 'error': 'forbidden'})
+            try:
+                return self.send_json(200, get_telemetry_stats())
+            except Exception as e:  # noqa: BLE001
+                self.log_error('telemetry stats failed: %s', e)
+                return self.send_json(500, {'status': 'error', 'error': 'failed to query telemetry stats'})
+
         if parsed.path != '/api/ask':
             return super().do_GET()
         # Only the app itself may spend the key: the custom header forces a CORS
@@ -241,8 +423,38 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             self.log_error('ask failed: %s', e)
             self.send_json(502, {'status': 'error', 'error': 'The model could not be reached.'})
 
+    def do_POST(self):
+        parsed = urllib.parse.urlparse(self.path)
+        if parsed.path == '/api/telemetry':
+            if not self.local_host():
+                return self.send_json(403, {'status': 'error', 'error': 'forbidden'})
+            length = int(self.headers.get('Content-Length', 0))
+            if length > 65536:
+                return self.send_json(413, {'status': 'error', 'error': 'payload too large'})
+            body = self.rfile.read(length) if length > 0 else b''
+            try:
+                data = json.loads(body.decode('utf-8')) if body else {}
+            except Exception:
+                return self.send_json(400, {'status': 'error', 'error': 'invalid json'})
+
+            events = data.get('events', [data] if 'type' in data else [])
+            client_meta = {
+                'country': self.headers.get('CF-IPCountry') or self.headers.get('X-Vercel-IP-Country') or self.headers.get('X-Country-Code') or '',
+                'city': self.headers.get('CF-IPCity') or self.headers.get('X-Vercel-IP-City') or '',
+                'user_agent': self.headers.get('User-Agent') or '',
+            }
+            try:
+                record_telemetry(events, client_meta)
+                return self.send_json(200, {'status': 'ok'})
+            except Exception as e:  # noqa: BLE001
+                self.log_error('telemetry write failed: %s', e)
+                return self.send_json(500, {'status': 'error', 'error': 'internal error'})
+
+        self.send_error(404)
+
 
 def run():
+    init_db()
     for port in (PORT, PORT + 1):
         try:
             httpd = http.server.ThreadingHTTPServer((HOST, port), Handler)
@@ -251,6 +463,7 @@ def run():
             continue
         print(f'[brain-explorer] http://localhost:{port}')
         print('[brain-explorer] Ask: ' + ('API key loaded from .env' if API_KEY else 'no TYPESAFE_API_KEY, free-text questions are off'))
+        print(f'[brain-explorer] Telemetry: enabled ({DB_PATH})')
         httpd.serve_forever()
         return
 
