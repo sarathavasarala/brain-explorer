@@ -1,4 +1,4 @@
-import { structures, byId, groups, levels, pathways, anchors, validate, sourceOf, chemicals, chemicalGroups, cells, cellGroups, chemById, cellById } from './content/index.js';
+import { structures, byId, anchorById, groups, levels, pathways, anchors, validate, sourceOf, chemicals, chemicalGroups, cells, cellGroups, chemById, cellById } from './content/index.js';
 import { createBrainScene } from './scene/brain-scene.js';
 import { playStep, chemLensConfig } from './scene/player.js';
 import { renderSidebar } from './ui/sidebar.js';
