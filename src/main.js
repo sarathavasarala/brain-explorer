@@ -471,24 +471,16 @@ async function submitChatQuestion(query) {
   const q = normalise(query);
   if (!q) return;
 
-  state.chat.turns.push({ role: 'user', text: q });
+  state.chat.turns = [{ role: 'user', text: q }];
   state.chat.loading = true;
   state.chat.currentQuery = q;
   explainerEl.innerHTML = renderChat(state.chat);
-  explainerEl.scrollTop = explainerEl.scrollHeight;
+  explainerEl.scrollTop = 0;
 
   const prevSpin = scene.spin;
   scene.setSpin(true);
 
-  const messages = [];
-  for (const turn of state.chat.turns) {
-    if (turn.role === 'user') {
-      messages.push({ role: 'user', content: turn.text });
-    } else if (turn.role === 'assistant' && turn.script) {
-      const summary = `${turn.script.title}: ${(turn.script.steps || []).map((s) => s.title).join(', ')}`;
-      messages.push({ role: 'assistant', content: summary });
-    }
-  }
+  const messages = [{ role: 'user', content: q }];
 
   let result;
   try {
@@ -508,7 +500,6 @@ async function submitChatQuestion(query) {
       status: 'ok',
       script: result,
       step: 0,
-      followups: result.followups || [],
       generated: true,
     };
     state.chat.turns.push(turn);
@@ -519,7 +510,6 @@ async function submitChatQuestion(query) {
       status: 'out_of_scope',
       title: result.title || 'Out of scope',
       summary: result.summary || 'Brain Explorer explores how the brain and body work. Try asking about a feeling, memory, or action.',
-      followups: result.followups || [],
     });
     clearScene('ask');
   } else {
