@@ -41,9 +41,8 @@ function form(value = '', { compact = false, busy = false } = {}) {
 }
 
 function chatForm(value = '', { compact = false, busy = false, placeholder = '' } = {}) {
-  const defaultPlaceholder = compact ? 'Ask a follow-up…' : '…why does coffee wake me up?';
+  const defaultPlaceholder = 'Why does coffee wake me up?';
   return `<form class="ask-form ${compact ? 'is-compact' : ''}" data-chat-form>
-    ${compact ? '' : '<span class="ask-form-lead">When…</span>'}
     <input name="q" type="text" maxlength="120" autocomplete="off" spellcheck="true"
       value="${esc(value)}" placeholder="${esc(placeholder || defaultPlaceholder)}"
       aria-label="Ask what your brain is doing" ${busy ? 'disabled' : ''} />
