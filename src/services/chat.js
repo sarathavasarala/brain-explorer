@@ -73,7 +73,7 @@ function getSystemPrompt() {
     '- route: Array of { from, to } connecting regions when a signal travels from one part to another.',
     '- chemical: Chemical id when a messenger (e.g. dopamine, melatonin, noradrenaline) is central to this step.',
     "- view: Camera angle. Options: 'left', 'left-front', 'left-back', 'medial', 'back', 'below', 'body'. Use 'medial' + slice: true for deep midline structures (hippocampus, hypothalamus, etc.). Use 'body' + body: true for hormone steps that reach organs (thyroid, heart, adrenal, etc.).",
-    '- slice: true to slice the brain open to view inner structures.',
+    '- slice: true to slice the brain open to view inner structures. Do not slice when routing to or focusing outer cortical areas (auditory-cortex, visual-cortex, motor-cortex) because slicing cuts away the outer cortex. Use slice: false with lateral views (left, left-front) when showing cortical destinations.',
     '- body: true to show the body silhouette when endocrine signals travel to visceral organs.',
     '',
     'Storytelling and Narrative Rules:',
