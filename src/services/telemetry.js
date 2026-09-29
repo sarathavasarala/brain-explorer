@@ -65,7 +65,8 @@ export class HttpBeaconProvider {
 // Supports both the official script tag (window.umami) and direct API dispatch.
 export class UmamiProvider {
   constructor(opts = {}) {
-    this.websiteId = opts.websiteId || (typeof window !== 'undefined' ? window.UMAMI_WEBSITE_ID : '');
+    const scriptEl = typeof document !== 'undefined' ? document.querySelector('script[data-website-id]') : null;
+    this.websiteId = opts.websiteId || (typeof window !== 'undefined' ? window.UMAMI_WEBSITE_ID : '') || scriptEl?.dataset?.websiteId || '';
     this.hostUrl = (opts.hostUrl || (typeof window !== 'undefined' ? window.UMAMI_HOST_URL : '') || 'https://cloud.umami.is').replace(/\/+$/, '');
   }
 
@@ -128,7 +129,8 @@ export class UmamiProvider {
 }
 
 function resolveDefaultProvider() {
-  if (typeof window !== 'undefined' && (window.UMAMI_WEBSITE_ID || window.umami)) {
+  const hasScript = typeof document !== 'undefined' && document.querySelector('script[data-website-id]');
+  if (typeof window !== 'undefined' && (window.UMAMI_WEBSITE_ID || window.umami || hasScript)) {
     return new UmamiProvider();
   }
   return new HttpBeaconProvider();
@@ -284,7 +286,8 @@ export class TelemetryService {
 
   flush() {
     if (!this.queue.length) return;
-    if (this.provider instanceof HttpBeaconProvider && typeof window !== 'undefined' && (window.umami || window.UMAMI_WEBSITE_ID)) {
+    const hasScript = typeof document !== 'undefined' && document.querySelector('script[data-website-id]');
+    if (this.provider instanceof HttpBeaconProvider && typeof window !== 'undefined' && (window.umami || window.UMAMI_WEBSITE_ID || hasScript)) {
       this.provider = new UmamiProvider();
     }
     if (!this.provider) return;
