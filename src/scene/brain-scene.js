@@ -436,40 +436,6 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     }
   }
 
-  // ------------------------------------------------------------ slicing state & visible half
-  let userSlice = false, forcedSlice = false;
-  // The visible half. With the slice on, the camera looks at the cut face of the right half (x < 0),
-  // which is the classic textbook sagittal view of these pathways. Without it, the left half (x > 0).
-  const visibleSide = () => (userSlice || forcedSlice ? -1 : 1);
-
-  function centroidOf(arr, idxs, s, fallback) {
-    const c = new THREE.Vector3();
-    let n = 0;
-    for (const i of idxs) if (arr[i] * s > 0.004) { c.x += arr[i]; c.y += arr[i + 1]; c.z += arr[i + 2]; n++; }
-    if (!n) for (const i of idxs) if (Math.abs(arr[i]) < 0.03) { c.x += arr[i]; c.y += arr[i + 1]; c.z += arr[i + 2]; n++; }
-    if (!n) return fallback ? fallback.clone() : new THREE.Vector3();
-    c.divideScalar(n);
-    return c;
-  }
-
-  function sideCenterOf(id, s) {
-    const r = recs.get(id);
-    if (!r) return null;
-    if (r.kind === 'anchor') {
-      const p = r.center.clone();
-      if (r.anchor?.mirror && s < 0) p.x = -p.x;
-      return p;
-    }
-    const pts = [];
-    if (r.kind === 'region') {
-      for (let i = 0; i < nC; i++) if (r.mask[i]) pts.push(i * 3);
-      return centroidOf(cx.positions, pts, s, r.center);
-    }
-    const pos = r.obj.geometry.getAttribute('position').array;
-    for (let i = 0; i < pos.length; i += 3) pts.push(i);
-    return centroidOf(pos, pts, s, r.center);
-  }
-
   // ------------------------------------------------------------ arcs (connections / pathway routes)
   const arcGroup = new THREE.Group();
   scene.add(arcGroup);
@@ -477,8 +443,6 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   const arcDotMat = makeMaterial(10);
   arcDotMat.uniforms.uBase.value = 1.25;
   let arcDots = null;
-  let lastArcList = [];
-  let lastArcSide = 0;
 
   function centerOf(id) {
     const r = recs.get(id);
@@ -495,16 +459,12 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   }
 
   function setArcs(list) {
-    lastArcList = list || [];
-    lastArcSide = visibleSide();
     arcGroup.clear();
     arcs = [];
     if (arcDots) { scene.remove(arcDots); arcDots.geometry.dispose(); arcDots = null; }
     const dotPos = [], dotCol = [], dotSize = [];
-    const s = visibleSide();
-    for (const item of lastArcList) {
-      const a = sideCenterOf(item.from, s) || centerOf(item.from);
-      const b = sideCenterOf(item.to, s) || centerOf(item.to);
+    for (const item of list) {
+      const a = centerOf(item.from), b = centerOf(item.to);
       if (!a || !b) continue;
       const isBlood = item.style === 'blood';
       const curve = buildArc(a, b, item.lift ?? (isBlood ? 0.25 : 1));
@@ -689,6 +649,34 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       const actualT = this.t0 + t * (this.t1 - this.t0);
       return this.curve.getPoint(actualT, optionalTarget);
     }
+  }
+
+  // The visible half. With the slice on, the camera looks at the cut face of the right half (x < 0),
+  // which is the classic textbook sagittal view of these pathways. Without it, the left half (x > 0).
+  const visibleSide = () => (userSlice || forcedSlice ? -1 : 1);
+
+  function sideCenterOf(id, s) {
+    const r = recs.get(id);
+    if (!r) return null;
+    if (r.kind === 'anchor') return r.center.clone();
+    const pts = [];
+    if (r.kind === 'region') {
+      for (let i = 0; i < nC; i++) if (r.mask[i]) pts.push(i * 3);
+      return centroidOf(cx.positions, pts, s, r.center);
+    }
+    const pos = r.obj.geometry.getAttribute('position').array;
+    for (let i = 0; i < pos.length; i += 3) pts.push(i);
+    return centroidOf(pos, pts, s, r.center);
+  }
+
+  function centroidOf(arr, idxs, s, fallback) {
+    const c = new THREE.Vector3();
+    let n = 0;
+    for (const i of idxs) if (arr[i] * s > 0.004) { c.x += arr[i]; c.y += arr[i + 1]; c.z += arr[i + 2]; n++; }
+    if (!n) for (const i of idxs) if (Math.abs(arr[i]) < 0.03) { c.x += arr[i]; c.y += arr[i + 1]; c.z += arr[i + 2]; n++; }
+    if (!n) return fallback.clone();
+    c.divideScalar(n);
+    return c;
   }
 
   // Points inside a target where fibres can end, on the visible side and close to the midline
@@ -1236,13 +1224,12 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   }
 
   // ------------------------------------------------------------ slicing
+  let userSlice = false, forcedSlice = false;
   function applySlice() {
     const v = userSlice || forcedSlice ? 1 : 0;
     materials.forEach((m) => { m.uniforms.uClip.value = v; });
     // Fibre trees are built on the visible half, so rebuild them if the slice flips sides.
     if (isLensActive && lastChemConfig && lastChemSide !== visibleSide()) showChemical(lastChemConfig);
-    // Rebuild arcs on the visible half if the slice flips sides.
-    if (lastArcList.length && lastArcSide !== visibleSide()) setArcs(lastArcList);
   }
 
   // ------------------------------------------------------------ picking
@@ -1461,7 +1448,6 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     reset() {
       if (isLensActive) restoreLens();
       setBody(false);
-      lastArcList = [];
       focus([]); setArcs([]); flyTo([]); forcedSlice = false; applySlice();
     },
     setSlice(on) { userSlice = on; applySlice(); },
