@@ -19,6 +19,29 @@
   </script>
 </head>
 <body>
+  <aside id="mobile-notice" class="mobile-notice" aria-live="polite">
+    <div class="mobile-notice-card">
+      <svg class="mobile-notice-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <circle cx="11" cy="13" r="7.5" fill="none" stroke="#d36bff" stroke-width="1.4" />
+        <circle cx="20" cy="13" r="7.5" fill="none" stroke="#6f86ff" stroke-width="1.4" />
+        <circle cx="18" cy="23" r="4.5" fill="none" stroke="#f5b83d" stroke-width="1.4" />
+      </svg>
+      <span class="mobile-notice-badge">Desktop Recommended</span>
+      <h2 class="mobile-notice-title">Best experienced on a bigger screen</h2>
+      <p class="mobile-notice-text">
+        Brain Explorer is currently designed for desktop displays. The interactive 3D point-cloud atlas, camera controls, and multi-level zoom ladder need mouse or trackpad navigation and a wider screen to work properly.
+      </p>
+      <p class="mobile-notice-sub">
+        Please open this link on a laptop or desktop computer for the intended experience.
+      </p>
+      <div class="mobile-notice-actions">
+        <button id="mobile-dismiss-btn" class="mobile-notice-btn" type="button">
+          Continue anyway
+        </button>
+      </div>
+    </div>
+  </aside>
+
   <!--
     THESIS: The brain as a luminous specimen you study at four magnifications. Refuses the static textbook plate with numbered callouts.
     OWN-WORLD: Holographic point-cloud anatomy on blue-black; each structure owns a hue that tints the whole explainer when chosen. Bricolage Grotesque for names and controls, Spectral for reading.
@@ -42,6 +65,9 @@
         <a data-mode="pathways" href="#/pathways">Pathways</a>
         <a data-mode="ask" href="#/ask">Ask</a>
       </nav>
+      <button id="about-btn" class="about-btn" type="button" aria-haspopup="dialog" aria-expanded="false">
+        About
+      </button>
     </header>
 
     <aside class="sidebar">
@@ -75,6 +101,46 @@
 
     <section id="explainer" class="explainer"></section>
   </div>
+  <dialog id="about-dialog" class="about-dialog" aria-labelledby="about-dialog-title">
+    <div class="about-card">
+      <div class="about-head">
+        <div class="about-title-row">
+          <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <circle cx="11" cy="13" r="7.5" fill="none" stroke="#d36bff" stroke-width="1.4" />
+            <circle cx="20" cy="13" r="7.5" fill="none" stroke="#6f86ff" stroke-width="1.4" />
+            <circle cx="18" cy="23" r="4.5" fill="none" stroke="#f5b83d" stroke-width="1.4" />
+          </svg>
+          <h2 id="about-dialog-title" class="about-title">About Brain Explorer</h2>
+        </div>
+        <button type="button" class="about-close" data-close-about aria-label="Close dialog">&times;</button>
+      </div>
+      <div class="about-body">
+        <p>
+          Hey! Sarath here. I recently took to reading books on neuroscience and doing some courses on how the brain works, and I kept running into the same wall: flat textbook diagrams make everything feel disconnected. You read about dopamine in one chapter, the prefrontal cortex in another, and fear circuits in a third, but it is hard to see how it all fits together.
+        </p>
+        <p>
+          My goal with Brain Explorer is to make the brain a dynamic 3D canvas you can paint on and explore. You can see where a part lives, watch how chemical messengers bathe its circuits, and zoom from whole regions down to firing cells.
+        </p>
+        <p class="about-reachout">
+          If you spot a bug or have feedback, I would love to hear from you.
+        </p>
+        <div class="about-links">
+          <a class="about-chip" href="https://github.com/sarathavasarala/brain-explorer" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+              <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+            </svg>
+            <span>GitHub</span>
+          </a>
+          <a class="about-chip" href="https://www.linkedin.com/in/sarath-avasarala/" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor" aria-hidden="true">
+              <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+            </svg>
+            <span>LinkedIn</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </dialog>
   <div id="tip" class="tip" role="tooltip"></div>
   <script type="module" src="src/main.js?v=4"></script>
 </body>

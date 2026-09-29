@@ -792,6 +792,11 @@ window.addEventListener('keydown', (e) => {
     location.hash = `#/cell/${r.id}/${CELL_TABS[n]}`;
   }
   if (e.key === 'Escape') {
+    const aboutDialog = $('#about-dialog');
+    if (aboutDialog?.open) {
+      aboutDialog.close();
+      return;
+    }
     if (r.type === 'p') location.hash = '#/pathways';
     else if (r.type === 'ask' && r.query) location.hash = '#/ask';
     else if (r.type === 'chem') location.hash = '#/chem';
@@ -801,6 +806,35 @@ window.addEventListener('keydown', (e) => {
   }
   if (e.key === ' ' && r.type === 'p') { e.preventDefault(); togglePlay(); }
 });
+
+// About dialog wiring
+const aboutBtn = $('#about-btn');
+const aboutDialog = $('#about-dialog');
+if (aboutBtn && aboutDialog) {
+  aboutBtn.addEventListener('click', () => {
+    aboutDialog.showModal();
+    telemetry.event('about_open');
+  });
+  aboutDialog.addEventListener('click', (e) => {
+    if (e.target === aboutDialog || e.target.closest('[data-close-about]')) {
+      aboutDialog.close();
+    }
+  });
+}
+
+// Mobile notice dismissal wiring
+const mobileNotice = $('#mobile-notice');
+const mobileDismissBtn = $('#mobile-dismiss-btn');
+if (mobileNotice && mobileDismissBtn) {
+  if (sessionStorage.getItem('mobile_notice_dismissed') === '1') {
+    mobileNotice.classList.add('is-dismissed');
+  }
+  mobileDismissBtn.addEventListener('click', () => {
+    mobileNotice.classList.add('is-dismissed');
+    sessionStorage.setItem('mobile_notice_dismissed', '1');
+    telemetry.event('mobile_notice_dismiss');
+  });
+}
 
 apply();
 syncToolbar();
