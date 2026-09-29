@@ -1,5 +1,6 @@
 import { structures, byId, groups, levels, pathways, anchors, validate, sourceOf, chemicals, chemicalGroups, cells, cellGroups, chemById, cellById } from './content/index.js';
 import { createBrainScene } from './scene/brain-scene.js';
+import { playStep, chemLensConfig } from './scene/player.js';
 import { renderSidebar } from './ui/sidebar.js';
 import { renderStructure, renderPathway, renderHome } from './ui/explainer.js';
 import { renderAsk } from './ui/ask.js';
@@ -216,15 +217,24 @@ function clearScene(key) {
   fly([], 'left', key);
 }
 
+const playerDeps = {
+  fly,
+  normalizeArc,
+  routeEndpoints,
+  chemLensConfig,
+  byId,
+  anchorById,
+  chemById,
+};
+
 function showSketch(r, key) {
   const parts = (r.parts || []).filter((p) => byId.has(p.id));
-  scene.paintSketch(parts);
-  const cut = parts.filter((p) => p.role === 'cut_off').map((p) => p.id);
-  scene.setArcs(cut.slice(1).map((id) => ({ from: cut[0], to: id, active: false })));
-  const sliced = parts.find((p) => byId.get(p.id).slice);
-  scene.forceSlice(!!sliced);
-  const view = byId.get((sliced || parts[0])?.id)?.view || 'left';
-  fly(parts.map((p) => p.id), view, key);
+  const script = {
+    id: key,
+    title: r.query,
+    steps: [{ title: r.query, text: '', parts }],
+  };
+  playStep(scene, playerDeps, script, 0, { key });
 }
 
 function apply() {
@@ -316,13 +326,7 @@ function apply() {
         }
       });
 
-      scene.showChemical({
-        color: chem.color,
-        sources: chem.madeIn || [],
-        density: chem.density || {},
-        tracts: [],
-        group: chem.group,
-      });
+      scene.showChemical(chemLensConfig(chem));
       scene.setArcs(hormoneArcs);
 
       const uniqueEndpoints = [...new Set(allEndpoints)];
@@ -338,37 +342,17 @@ function apply() {
       if (lensLegendEl) lensLegendEl.hidden = true;
     } else {
       scene.setBody(false);
-      const tractList = (chem.tracts || []).map((t) => {
-        let state = 'ambient';
-        if (r.tab === 'tracts') {
-          if (r.sub) state = (t.id === r.sub ? 'on' : 'off');
-          else state = 'on';
-        } else if (r.tab === 'overview') {
-          state = 'on';
-        } else {
-          state = 'ambient';
-        }
-        return {
-          id: t.id,
-          name: t.name,
-          from: t.from,
-          to: t.to || [],
-          state,
-          local: !!t.local,
-        };
-      });
+      const tractsOnFn = (t) => {
+        if (r.tab === 'tracts') return r.sub ? (t.id === r.sub ? 'on' : 'off') : 'on';
+        if (r.tab === 'overview') return 'on';
+        return 'ambient';
+      };
 
       // Slice first: the fibre trees are built on whichever half is visible.
       scene.forceSlice(chem.group === 'modulator');
       scene.setSpin(false);
       syncToolbar();
-      scene.showChemical({
-        color: chem.color,
-        sources: chem.madeIn || [],
-        density: chem.density || {},
-        tracts: tractList,
-        group: chem.group,
-      });
+      scene.showChemical(chemLensConfig(chem, { tractsOn: tractsOnFn }));
       scene.setArcs([]);
       const chemView = chem.group === 'modulator' ? 'medial' : 'left';
 
@@ -454,19 +438,7 @@ function apply() {
     }
   } else if (r.type === 'p') {
     const p = pathways.find((q) => q.id === r.id);
-    const st = p.steps[r.step];
-    const past = p.steps.slice(0, r.step);
-    const pastIds = past.flatMap((x) => [...(x.focus || []), ...routeEndpoints(x.route)]);
-    const currentIds = [...(st.focus || []), ...routeEndpoints(st.route)];
-    const context = [...new Set([...pastIds, ...currentIds])];
-    scene.focus(st.focus || [], { context, activity: true, ambient: true });
-    scene.setArcs([
-      ...past.flatMap((x) => (x.route || []).map((arc) => normalizeArc(arc, 'ambient'))),
-      ...(st.route || []).map((arc) => normalizeArc(arc, true)),
-    ]);
-    scene.forceSlice(!!st.slice);
-    const frame = [...new Set(currentIds)];
-    fly(frame, st.view || 'left', `${p.id}:${r.step}`);
+    playStep(scene, playerDeps, p, r.step);
     explainerEl.innerHTML = renderPathway(p, r.step, state.playing);
     if (prev.type !== 'p' || prev.id !== r.id) explainerEl.scrollTop = 0;
   } else if (r.type === 'ask') {
