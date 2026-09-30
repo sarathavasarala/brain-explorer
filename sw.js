@@ -1,7 +1,7 @@
 // Service Worker for Brain Explorer PWA
 // Provides offline shell caching and enables Add to Home Screen on mobile.
 
-const CACHE_NAME = 'brain-explorer-v1';
+const CACHE_NAME = 'brain-explorer-v2';
 const PRECACHE_URLS = [
   './',
   './index.html',
@@ -11,6 +11,8 @@ const PRECACHE_URLS = [
   './icons/apple-touch-icon.png',
   './icons/icon-192.png',
   './icons/icon-512.png',
+  './icons/icon-maskable-192.png',
+  './icons/icon-maskable-512.png',
   './src/content/catalog.json',
 ];
 
