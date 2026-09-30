@@ -206,6 +206,28 @@ const fragmentShader = /* glsl */ `
   }
 `;
 
+const arcLineVertexShader = /* glsl */ `
+  attribute vec3 color;
+  varying vec3 vColor;
+  varying float vWorldX;
+  void main() {
+    vec4 world = modelMatrix * vec4(position, 1.0);
+    vWorldX = world.x;
+    vColor = color;
+    gl_Position = projectionMatrix * viewMatrix * world;
+  }
+`;
+
+const arcLineFragmentShader = /* glsl */ `
+  uniform float uClip;
+  varying vec3 vColor;
+  varying float vWorldX;
+  void main() {
+    if (uClip > 0.5 && vWorldX > 0.004) discard;
+    gl_FragColor = vec4(vColor, 1.0);
+  }
+`;
+
 const easeOutExpo = (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
 export function createBrainScene(canvas, { structures, anchors = [], chemicals = [], labelsEl, onHover, onPick }) {
@@ -428,12 +450,62 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       }
     } else {
       for (const r of anchorRecs) {
-        if (r.anchor.body && !focusIds.includes(r.id)) {
+        if (r.anchor.body) {
           r.base = 0;
           r.hi = 0;
+          r.obj.visible = false;
         }
       }
     }
+  }
+
+  // ------------------------------------------------------------ slicing state & visible half
+  // With the slice on, the camera looks at the cut face of the right half (x < 0),
+  // which is the classic textbook sagittal view of these pathways. Without it, the left half (x > 0).
+  function visibleSide() {
+    return userSlice || forcedSlice ? -1 : 1;
+  }
+
+  function centroidOf(arr, idxs, s, fallback) {
+    const c = new THREE.Vector3();
+    let n = 0;
+    for (const i of idxs) if (arr[i] * s > 0.004) { c.x += arr[i]; c.y += arr[i + 1]; c.z += arr[i + 2]; n++; }
+    if (!n) for (const i of idxs) if (Math.abs(arr[i]) < 0.03) { c.x += arr[i]; c.y += arr[i + 1]; c.z += arr[i + 2]; n++; }
+    if (!n) {
+      if (!fallback) return new THREE.Vector3();
+      const f = fallback.clone();
+      if (s < 0 && f.x > 0) f.x = -f.x;
+      return f;
+    }
+    c.divideScalar(n);
+    return c;
+  }
+
+  function sideCenterOf(id, s) {
+    const r = recs.get(id);
+    if (!r) return null;
+    if (r.kind === 'anchor') {
+      if (r.anchor?.body && bodyTarget < 0.5) return null;
+      const p = r.center.clone();
+      if (s < 0 && p.x > 0.004) {
+        if (r.anchor?.mirror || r.anchor?.flipWhenSliced) {
+          p.x = -p.x;
+        } else {
+          // Anchors on the clipped (+x) half when sliced that cannot be mirrored
+          // (such as unmirrored body organs) cannot be seen, so return null to avoid drawing arcs to them.
+          return null;
+        }
+      }
+      return p;
+    }
+    const pts = [];
+    if (r.kind === 'region') {
+      for (let i = 0; i < nC; i++) if (r.mask[i]) pts.push(i * 3);
+      return centroidOf(cx.positions, pts, s, r.center);
+    }
+    const pos = r.obj.geometry.getAttribute('position').array;
+    for (let i = 0; i < pos.length; i += 3) pts.push(i);
+    return centroidOf(pos, pts, s, r.center);
   }
 
   // ------------------------------------------------------------ arcs (connections / pathway routes)
@@ -443,34 +515,55 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   const arcDotMat = makeMaterial(10);
   arcDotMat.uniforms.uBase.value = 1.25;
   let arcDots = null;
+  let lastArcList = [];
+  let lastArcSide = 0;
 
-  function centerOf(id) {
-    const r = recs.get(id);
-    return r ? r.center.clone() : null;
-  }
+  const arcLineMat = new THREE.ShaderMaterial({
+    uniforms: {
+      uTime: { value: 0 },
+      uClip: { value: 0 },
+    },
+    vertexShader: arcLineVertexShader,
+    fragmentShader: arcLineFragmentShader,
+    transparent: true,
+    depthTest: false,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  materials.push(arcLineMat);
 
-  function buildArc(a, b, lift = 1) {
+  function buildArc(a, b, lift = 1, s = 1) {
     const mid = a.clone().add(b).multiplyScalar(0.5);
     const out = mid.clone().sub(BRAIN_CENTER);
     if (out.length() < 0.05) out.set(0, 1, 0);
     out.normalize();
-    const ctrl = mid.add(out.multiplyScalar((0.12 + a.distanceTo(b) * 0.35) * lift));
+    if (s < 0 && out.x > 0) out.x = -out.x;
+    const maxLift = Math.min((0.12 + a.distanceTo(b) * 0.35) * lift, 0.35);
+    const ctrl = mid.add(out.multiplyScalar(maxLift));
+    if (s < 0 && ctrl.x > 0) ctrl.x = 0;
     return new THREE.QuadraticBezierCurve3(a, ctrl, b);
   }
 
   function setArcs(list) {
+    lastArcList = list || [];
+    lastArcSide = visibleSide();
+    for (const child of arcGroup.children) {
+      child.geometry?.dispose();
+    }
     arcGroup.clear();
     arcs = [];
     if (arcDots) { scene.remove(arcDots); arcDots.geometry.dispose(); arcDots = null; }
     const dotPos = [], dotCol = [], dotSize = [];
-    for (const item of list) {
-      const a = centerOf(item.from), b = centerOf(item.to);
+    const s = visibleSide();
+    for (const item of lastArcList) {
+      const a = sideCenterOf(item.from, s);
+      const b = sideCenterOf(item.to, s);
       if (!a || !b) continue;
       const isBlood = item.style === 'blood';
-      const curve = buildArc(a, b, item.lift ?? (isBlood ? 0.25 : 1));
+      const curve = buildArc(a, b, item.lift ?? (isBlood ? 0.25 : 1), s);
       const recA = recs.get(item.from), recB = recs.get(item.to);
-      const ca = item.color ? new THREE.Color(item.color) : recA.color;
-      const cb = item.color ? new THREE.Color(item.color) : recB.color;
+      const ca = item.color ? new THREE.Color(item.color) : (recA ? recA.color : new THREE.Color('#ffffff'));
+      const cb = item.color ? new THREE.Color(item.color) : (recB ? recB.color : new THREE.Color('#ffffff'));
       const N = 80;
       const pos = new Float32Array(N * 3), col = new Float32Array(N * 3);
       const isAmbient = item.active === 'ambient';
@@ -485,7 +578,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       const g = new THREE.BufferGeometry();
       g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
       g.setAttribute('color', new THREE.BufferAttribute(col, 3));
-      const line = new THREE.Line(g, new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false }));
+      const line = new THREE.Line(g, arcLineMat);
       arcGroup.add(line);
       const flow = item.flow || 'forward';
       const dots = isOff || flow === 'none' ? 0 : (isBlood ? 6 : (isAmbient ? 3 : 9));
@@ -577,11 +670,19 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       r.activity = f && activity ? 1 : (c && activity && ambient ? 0.35 : 0);
     }
     for (const r of anchorRecs) {
+      if (r.anchor.body && bodyTarget < 0.5) {
+        r.base = 0; r.hi = 0; r.activity = 0; r.obj.visible = false;
+        continue;
+      }
+      if (visibleSide() < 0 && !r.anchor.mirror && !r.anchor.flipWhenSliced && r.center.x > 0.004) {
+        r.base = 0; r.hi = 0; r.activity = 0; r.obj.visible = false;
+        continue;
+      }
       const f = focusIds.includes(r.id), c = ctx.includes(r.id);
       r.base = 0;
       r.hi = f ? 1.1 : c ? 0.5 : 0;
       r.activity = f && activity ? 1 : (c && activity && ambient ? 0.35 : 0);
-      if (r.hi > 0) r.obj.visible = true;
+      r.obj.visible = r.hi > 0;
     }
   }
 
@@ -595,27 +696,34 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     less_active: { cortex: 0.42, deep: 0.34, activity: 0 },
     losing_cells: { cortex: 0.26, deep: 0.2, activity: 0 },
   };
-  function paintSketch(parts = []) {
+  function paintSketch(parts = [], { context = [] } = {}) {
     if (isLensActive) restoreLens();
     const looks = new Map(parts.filter((p) => recs.has(p.id)).map((p) => [p.id, ROLE_LOOK[p.role] || ROLE_LOOK.involved]));
     focusIds = [...looks.keys()];
-    const any = focusIds.length > 0;
+    const ctx = context.filter((id) => recs.has(id) && !looks.has(id));
+    const any = focusIds.length > 0 || ctx.length > 0;
 
     aHiPrev.array.set(aHi.array);
     aHiColorPrev.array.set(aHiColor.array);
     aHi.array.fill(0);
     aHiColor.array.set(cBase);
     let cortexActivity = 0, cortexFocus = false;
+    const paint = (id, value) => {
+      const r = recs.get(id);
+      if (r?.kind !== 'region') return;
+      for (let i = 0; i < nC; i++) {
+        if (!r.mask[i] || aHi.array[i] >= value) continue;
+        aHi.array[i] = value;
+        aHiColor.array[i * 3] = r.color.r; aHiColor.array[i * 3 + 1] = r.color.g; aHiColor.array[i * 3 + 2] = r.color.b;
+      }
+    };
+    for (const id of ctx) paint(id, 0.35);
     for (const [id, look] of looks) {
       const r = recs.get(id);
       if (r.kind !== 'region') continue;
       cortexFocus = true;
       cortexActivity = Math.max(cortexActivity, look.activity);
-      for (let i = 0; i < nC; i++) {
-        if (!r.mask[i] || aHi.array[i] >= look.cortex) continue;
-        aHi.array[i] = look.cortex;
-        aHiColor.array[i * 3] = r.color.r; aHiColor.array[i * 3 + 1] = r.color.g; aHiColor.array[i * 3 + 2] = r.color.b;
-      }
+      paint(id, look.cortex);
     }
     aHi.needsUpdate = aHiPrev.needsUpdate = aHiColor.needsUpdate = aHiColorPrev.needsUpdate = true;
     cortexMat.uniforms.uMix.value = 0;
@@ -624,16 +732,25 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     cortexRec.activity = cortexActivity;
 
     for (const r of deepRecs) {
-      const look = looks.get(r.id);
+      const look = looks.get(r.id), c = ctx.includes(r.id);
       r.base = !any ? 0.4 : 0.1;
-      r.hi = look ? look.deep : 0;
-      r.activity = look ? look.activity : 0;
+      r.hi = look ? look.deep : (c ? 0.35 : 0);
+      r.activity = look ? look.activity : (c ? 0.2 : 0);
     }
     for (const r of anchorRecs) {
-      const look = looks.get(r.id);
+      if (r.anchor.body && bodyTarget < 0.5) {
+        r.base = 0; r.hi = 0; r.activity = 0; r.obj.visible = false;
+        continue;
+      }
+      if (visibleSide() < 0 && !r.anchor.mirror && !r.anchor.flipWhenSliced && r.center.x > 0.004) {
+        r.base = 0; r.hi = 0; r.activity = 0; r.obj.visible = false;
+        continue;
+      }
+      const look = looks.get(r.id), c = ctx.includes(r.id);
       r.base = 0;
-      r.hi = look ? Math.min(1.1, look.deep * 1.4) : 0;
-      if (r.hi > 0) r.obj.visible = true;
+      r.hi = look ? Math.min(1.1, look.deep * 1.4) : (c ? 0.5 : 0);
+      r.activity = look ? look.activity : (c ? 0.2 : 0);
+      r.obj.visible = r.hi > 0;
     }
   }
 
@@ -649,34 +766,6 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       const actualT = this.t0 + t * (this.t1 - this.t0);
       return this.curve.getPoint(actualT, optionalTarget);
     }
-  }
-
-  // The visible half. With the slice on, the camera looks at the cut face of the right half (x < 0),
-  // which is the classic textbook sagittal view of these pathways. Without it, the left half (x > 0).
-  const visibleSide = () => (userSlice || forcedSlice ? -1 : 1);
-
-  function sideCenterOf(id, s) {
-    const r = recs.get(id);
-    if (!r) return null;
-    if (r.kind === 'anchor') return r.center.clone();
-    const pts = [];
-    if (r.kind === 'region') {
-      for (let i = 0; i < nC; i++) if (r.mask[i]) pts.push(i * 3);
-      return centroidOf(cx.positions, pts, s, r.center);
-    }
-    const pos = r.obj.geometry.getAttribute('position').array;
-    for (let i = 0; i < pos.length; i += 3) pts.push(i);
-    return centroidOf(pos, pts, s, r.center);
-  }
-
-  function centroidOf(arr, idxs, s, fallback) {
-    const c = new THREE.Vector3();
-    let n = 0;
-    for (const i of idxs) if (arr[i] * s > 0.004) { c.x += arr[i]; c.y += arr[i + 1]; c.z += arr[i + 2]; n++; }
-    if (!n) for (const i of idxs) if (Math.abs(arr[i]) < 0.03) { c.x += arr[i]; c.y += arr[i + 1]; c.z += arr[i + 2]; n++; }
-    if (!n) return fallback.clone();
-    c.divideScalar(n);
-    return c;
   }
 
   // Points inside a target where fibres can end, on the visible side and close to the midline
@@ -723,7 +812,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   function buildTree(fromId, toId, { branches, rnd, s }) {
     const a = sideCenterOf(fromId, s) || BRAIN_CENTER.clone();
     const b = sideCenterOf(toId, s) || BRAIN_CENTER.clone();
-    const trunk = buildArc(a, b, 0.4);
+    const trunk = buildArc(a, b, 0.4, s);
     const split = trunk.getPoint(TRUNK_SPLIT);
     const ends = sidePoints(toId, branches, rnd, s);
 
@@ -778,7 +867,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   treeSparklesMat.uniforms.uBase.value = 1.6;
   treeSparklesMat.uniforms.uHi.value = 0;
 
-  const treeLineMat = new THREE.LineBasicMaterial({ vertexColors: true, transparent: true, blending: THREE.AdditiveBlending, depthTest: false, depthWrite: false });
+  const treeLineMat = arcLineMat;
 
   let treeLines = null, treeGlow = null, treePulses = null, treeSparkles = null;
   let activePulses = [];
@@ -1227,9 +1316,17 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   let userSlice = false, forcedSlice = false;
   function applySlice() {
     const v = userSlice || forcedSlice ? 1 : 0;
-    materials.forEach((m) => { m.uniforms.uClip.value = v; });
+    materials.forEach((m) => { if (m.uniforms?.uClip) m.uniforms.uClip.value = v; });
+    const s = visibleSide();
+    for (const r of anchorRecs) {
+      if (r.anchor?.flipWhenSliced) {
+        r.obj.scale.x = s < 0 ? -1 : 1;
+      }
+    }
     // Fibre trees are built on the visible half, so rebuild them if the slice flips sides.
     if (isLensActive && lastChemConfig && lastChemSide !== visibleSide()) showChemical(lastChemConfig);
+    // Rebuild arcs on the visible half if the slice flips sides.
+    if (lastArcList.length && lastArcSide !== visibleSide()) setArcs(lastArcList);
   }
 
   // ------------------------------------------------------------ picking
@@ -1307,6 +1404,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     const el = document.createElement('div');
     el.className = 'anchor-label';
     el.style.setProperty('--c', r.anchor.color || '#fff');
+    el.style.opacity = '0';
     el.innerHTML = `<i></i><span>${r.anchor.name}</span>`;
     labelsEl?.appendChild(el);
     return { r, el };
@@ -1322,7 +1420,16 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       o.el.style.opacity = vis && !activeCellObj ? '' : '0';
     }
     for (const { r, el } of anchorLabels) {
-      tmpV.copy(r.center).project(camera);
+      if (!r.obj.visible) {
+        el.style.opacity = '0';
+        continue;
+      }
+      const p = sideCenterOf(r.id, visibleSide());
+      if (!p) {
+        el.style.opacity = '0';
+        continue;
+      }
+      tmpV.copy(p).project(camera);
       const vis = tmpV.z < 1;
       el.style.transform = `translate(${((tmpV.x + 1) / 2) * w}px, ${((1 - tmpV.y) / 2) * h + 30}px) translate(-50%, 0)`;
       const showLabel = vis && !activeCellObj && (r.hi > 0.05 || (r.anchor.body && bodyCurrent > 0.25));
@@ -1409,7 +1516,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       }
     }
 
-    materials.forEach((m) => { m.uniforms.uTime.value = time; });
+    materials.forEach((m) => { if (m.uniforms?.uTime) m.uniforms.uTime.value = time; });
     approach(cortexMat.uniforms.uBase, cortexRec.base, k);
     approach(cortexMat.uniforms.uHi, cortexRec.hi, k);
     approach(cortexMat.uniforms.uMix, 1, 1 - Math.exp(-dt * 4));
@@ -1448,6 +1555,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     reset() {
       if (isLensActive) restoreLens();
       setBody(false);
+      lastArcList = [];
       focus([]); setArcs([]); flyTo([]); forcedSlice = false; applySlice();
     },
     setSlice(on) { userSlice = on; applySlice(); },

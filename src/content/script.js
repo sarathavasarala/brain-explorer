@@ -177,10 +177,24 @@ export function sanitizeScript(script) {
       }
     }
 
+    const hasBodyAnchor =
+      focus.some((id) => anchorById.get(id)?.body) ||
+      parts.some((p) => anchorById.get(p.id)?.body) ||
+      route.some(([a, b]) => anchorById.get(a)?.body || anchorById.get(b)?.body);
+
     const chemical = (raw.chemical && chemById.has(raw.chemical)) ? raw.chemical : undefined;
-    const view = (raw.view && VIEWS.includes(raw.view)) ? raw.view : undefined;
-    const slice = typeof raw.slice === 'boolean' ? raw.slice : undefined;
-    const body = typeof raw.body === 'boolean' ? raw.body : undefined;
+    let view = (raw.view && VIEWS.includes(raw.view)) ? raw.view : undefined;
+    let slice = typeof raw.slice === 'boolean' ? raw.slice : undefined;
+    let body = typeof raw.body === 'boolean' ? raw.body : undefined;
+
+    if (hasBodyAnchor && !body) {
+      body = true;
+      if (!view) view = 'body';
+    }
+
+    if (body) {
+      slice = false;
+    }
 
     // Drop step if there is nothing visual to show in 3D
     const hasVisual = focus.length > 0 || parts.length > 0 || route.length > 0 || Boolean(chemical);
