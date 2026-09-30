@@ -6,7 +6,7 @@
 
 Brain Explorer is an interactive 3D atlas designed for curious adults and learners who want to understand the mind without drowning in sterile textbook jargon.
 
-![Brain Explorer showing the cerebellum highlighted in 3D with its explainer](screenshot.png)
+[![Watch the video demo](https://raw.githubusercontent.com/sarathavasarala/brain-explorer/main/assets/thumbnail.jpg)](https://raw.githubusercontent.com/sarathavasarala/brain-explorer/main/assets/brain-explorer-demo.mp4)
 
 ---
 
