@@ -19,7 +19,14 @@ PORT = int(os.environ.get('PORT', 5173))
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MAX_QUERY = 120
 CLIENT_HEADER = 'X-Brain-Explorer'
-PUBLIC_FILES = {'/', '/index.html', '/styles.css'}
+PUBLIC_FILES = {
+    '/',
+    '/index.html',
+    '/styles.css',
+    '/manifest.webmanifest',
+    '/sw.js',
+    '/favicon.svg',
+}
 
 
 def load_env():
@@ -474,6 +481,12 @@ def handle_chat(messages):
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
+    extensions_map = {
+        **http.server.SimpleHTTPRequestHandler.extensions_map,
+        '.webmanifest': 'application/manifest+json',
+        '.svg': 'image/svg+xml',
+    }
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=ROOT, **kwargs)
 
@@ -505,7 +518,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def send_head(self):
         # Serve the app and nothing else: no .env, .git, server.py or tools.
         path = urllib.parse.unquote(urllib.parse.urlparse(self.path).path)
-        if not self.local_host() or not (path in PUBLIC_FILES or path.startswith('/src/')) or '/.' in path:
+        if not self.local_host() or not (path in PUBLIC_FILES or path.startswith('/src/') or path.startswith('/icons/')) or '/.' in path:
             self.send_error(404)
             return None
         return super().send_head()

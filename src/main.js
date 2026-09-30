@@ -1134,3 +1134,11 @@ window.addEventListener('resize', () => {
 
 apply();
 syncToolbar();
+
+// Register PWA service worker for mobile installability and offline shell
+if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch(() => {});
+  });
+}
+
