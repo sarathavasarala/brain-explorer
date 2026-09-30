@@ -23,7 +23,20 @@ const hoverEl = $('#hover-label');
 const tipEl = $('#tip');
 const lensLegendEl = $('#lens-legend');
 const cellInsetEl = $('#cell-inset');
+const sidebarToggleBtn = $('#sidebar-toggle');
+const sidebarBackdrop = $('#sidebar-backdrop');
+const sidebarEl = $('.sidebar');
 const canAsk = true;
+
+function setMobileSidebar(open) {
+  if (!sidebarEl) return;
+  sidebarEl.classList.toggle('is-open', open);
+  if (sidebarBackdrop) sidebarBackdrop.classList.toggle('is-open', open);
+  if (sidebarToggleBtn) {
+    sidebarToggleBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    sidebarToggleBtn.classList.toggle('is-active', open);
+  }
+}
 
 const INSET_PART_POS = {
   'prefrontal-cortex': [36, 42],
@@ -239,6 +252,7 @@ function apply() {
   if (r.type !== 'p') stopPlay();
   if (r.type !== 'chem') stopStepperPlay();
   setMode(r.type);
+  setMobileSidebar(false);
 
   if (r.type !== 'chem') {
     scene.setBody(false);
@@ -435,7 +449,7 @@ function apply() {
   } else if (r.type === 'p') {
     const p = pathways.find((q) => q.id === r.id);
     playStep(scene, playerDeps, p, r.step);
-    explainerEl.innerHTML = renderPathway(p, r.step, state.playing);
+    explainerEl.innerHTML = renderPathway(p, r.step, state.playing, { isMobile: window.innerWidth <= 860 });
     if (prev.type !== 'p' || prev.id !== r.id) explainerEl.scrollTop = 0;
   } else if (r.type === 'ask') {
     applyAsk(r);
@@ -1065,19 +1079,58 @@ if (aboutBtn && aboutDialog) {
   });
 }
 
-// Mobile notice dismissal wiring
-const mobileNotice = $('#mobile-notice');
-const mobileDismissBtn = $('#mobile-dismiss-btn');
-if (mobileNotice && mobileDismissBtn) {
-  if (sessionStorage.getItem('mobile_notice_dismissed') === '1') {
-    mobileNotice.classList.add('is-dismissed');
-  }
-  mobileDismissBtn.addEventListener('click', () => {
-    mobileNotice.classList.add('is-dismissed');
-    sessionStorage.setItem('mobile_notice_dismissed', '1');
-    telemetry.event('mobile_notice_dismiss');
+
+if (sidebarToggleBtn) {
+  sidebarToggleBtn.addEventListener('click', () => {
+    const isOpen = sidebarEl?.classList.contains('is-open');
+    setMobileSidebar(!isOpen);
   });
 }
+
+if (sidebarBackdrop) {
+  sidebarBackdrop.addEventListener('click', () => {
+    setMobileSidebar(false);
+  });
+}
+
+// Mobile swipe gesture for guided tour story card
+let touchStartX = 0;
+let touchStartY = 0;
+
+explainerEl.addEventListener('touchstart', (e) => {
+  if (state.route.type !== 'p' || window.innerWidth > 860) return;
+  const touch = e.touches[0];
+  touchStartX = touch.clientX;
+  touchStartY = touch.clientY;
+}, { passive: true });
+
+explainerEl.addEventListener('touchend', (e) => {
+  if (state.route.type !== 'p' || window.innerWidth > 860) return;
+  const touch = e.changedTouches[0];
+  const diffX = touch.clientX - touchStartX;
+  const diffY = touch.clientY - touchStartY;
+  if (Math.abs(diffX) > 48 && Math.abs(diffY) < 45) {
+    if (diffX < 0) {
+      stepTo(state.route.step + 1);
+    } else {
+      stepTo(state.route.step - 1);
+    }
+  }
+}, { passive: true });
+
+let prevWasMobile = window.innerWidth <= 860;
+window.addEventListener('resize', () => {
+  const nowMobile = window.innerWidth <= 860;
+  if (nowMobile !== prevWasMobile) {
+    prevWasMobile = nowMobile;
+    if (state.route.type === 'p') {
+      const p = pathways.find((q) => q.id === state.route.id);
+      if (p) {
+        explainerEl.innerHTML = renderPathway(p, state.route.step, state.playing, { isMobile: nowMobile });
+      }
+    }
+  }
+});
 
 apply();
 syncToolbar();

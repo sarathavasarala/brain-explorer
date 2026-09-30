@@ -231,8 +231,9 @@ const arcLineFragmentShader = /* glsl */ `
 const easeOutExpo = (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
 export function createBrainScene(canvas, { structures, anchors = [], chemicals = [], labelsEl, onHover, onPick }) {
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 860;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
-  const pixel = Math.min(window.devicePixelRatio, 2);
+  const pixel = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
   renderer.setPixelRatio(pixel);
   renderer.setClearColor(0x04050a, 1);
 
@@ -251,16 +252,20 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
 
   const composer = new EffectComposer(renderer);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), 0.72, 0.20, 0.26);
+  const bloomStrength = isMobile ? 0.38 : 0.72;
+  const bloomRadius = isMobile ? 0.14 : 0.20;
+  const bloomThreshold = isMobile ? 0.36 : 0.26;
+  const bloom = new UnrealBloomPass(new THREE.Vector2(256, 256), bloomStrength, bloomRadius, bloomThreshold);
   composer.addPass(bloom);
   composer.addPass(new OutputPass());
 
   const materials = [];
   const brainMaterials = [];
   function makeMaterial(scale = 7, isBrain = true) {
+    const effectiveScale = isMobile ? scale * 0.88 : scale;
     const m = new THREE.ShaderMaterial({
       uniforms: {
-        uTime: { value: 0 }, uPixel: { value: pixel }, uScale: { value: scale },
+        uTime: { value: 0 }, uPixel: { value: pixel }, uScale: { value: effectiveScale },
         uBase: { value: 0 }, uHi: { value: 0 }, uMix: { value: 1 }, uHiSize: { value: 0.55 },
         uClip: { value: 0 }, uActivity: { value: 0 }, uHover: { value: 0 }, uGlobal: { value: 1.0 },
       },
@@ -1331,7 +1336,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
 
   // ------------------------------------------------------------ picking
   const raycaster = new THREE.Raycaster();
-  raycaster.params.Points.threshold = 0.014;
+  raycaster.params.Points.threshold = (typeof window !== 'undefined' && window.innerWidth <= 860) ? 0.026 : 0.014;
   const mouse = new THREE.Vector2();
   let pendingPick = null;
   let lastHover = null;
@@ -1466,6 +1471,10 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     renderer.setSize(width, height, false);
     composer.setSize(width, height);
     bloom.setSize(width * pixel, height * pixel);
+    const mobile = window.innerWidth <= 860;
+    bloom.strength = mobile ? 0.38 : 0.72;
+    bloom.radius = mobile ? 0.14 : 0.20;
+    bloom.threshold = mobile ? 0.36 : 0.26;
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
   }

@@ -209,10 +209,14 @@ async function sendChatDirect(config, messages) {
     body: JSON.stringify(payload),
   });
 
-  const respData = await res.json();
+  const respData = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const msg = respData?.error?.message || `Request failed (${res.status})`;
-    return { status: 'error', error: msg };
+    if (res.status === 401 || res.status === 403) {
+      return { status: 'error', error: 'Invalid or unauthorized API key. Please check your credentials.' };
+    }
+    const rawMsg = respData?.error?.message || `Request failed (${res.status})`;
+    const sanitizedMsg = String(rawMsg).replace(/sk-[a-zA-Z0-9_\-]{6,}/g, 'sk-***');
+    return { status: 'error', error: sanitizedMsg };
   }
 
   const content = respData?.choices?.[0]?.message?.content;
@@ -256,7 +260,10 @@ export async function sendChat(messages) {
   try {
     return await sendChatDirect(userConfig, messages);
   } catch (e) {
-    console.error('[brain-explorer] direct chat failed:', e);
-    return { status: 'error', error: e.message || 'Direct API call failed' };
+    const safeError = (e && typeof e.message === 'string')
+      ? e.message.replace(/sk-[a-zA-Z0-9_\-]{6,}/g, 'sk-***')
+      : 'Connection to the AI provider failed';
+    return { status: 'error', error: safeError };
   }
 }
+

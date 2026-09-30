@@ -319,9 +319,6 @@ export function renderChat({ turns = [], loading = false, currentQuery = '' } = 
               return `<div class="chat-card chat-scope-card chat-nudge-card">
                 <div class="chat-card-meta">
                   <span class="chat-badge">API Key Required</span>
-                  <button class="chat-new-btn" type="button" data-chat-act="new-chat">
-                    ${icon('reset', 13)}<span>New question</span>
-                  </button>
                 </div>
                 <h2 class="chat-card-title">Connect your API key</h2>
                 <div class="chat-card-summary">

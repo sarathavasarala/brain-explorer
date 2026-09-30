@@ -26,17 +26,14 @@ function getStoredId(storage, key) {
   }
 }
 
-// Default HTTP provider: posts JSON to a custom backend or local server.
-// Only sends if an endpoint is explicitly configured or if running locally with server.py.
+export class NoopProvider {
+  send() {}
+}
+
+// Optional HTTP beacon provider if a custom TELEMETRY_ENDPOINT is explicitly set.
 export class HttpBeaconProvider {
   constructor(endpoint) {
     this.endpoint = endpoint || (typeof window !== 'undefined' ? window.TELEMETRY_ENDPOINT : null);
-    if (!this.endpoint) {
-      const isLocal = typeof location !== 'undefined' && (location.hostname === 'localhost' || location.hostname === '127.0.0.1');
-      if (isLocal) {
-        this.endpoint = '/api/telemetry';
-      }
-    }
   }
 
   send(events) {
@@ -133,7 +130,10 @@ function resolveDefaultProvider() {
   if (typeof window !== 'undefined' && (window.UMAMI_WEBSITE_ID || window.umami || hasScript)) {
     return new UmamiProvider();
   }
-  return new HttpBeaconProvider();
+  if (typeof window !== 'undefined' && window.TELEMETRY_ENDPOINT) {
+    return new HttpBeaconProvider();
+  }
+  return new NoopProvider();
 }
 
 export class TelemetryService {
@@ -287,7 +287,7 @@ export class TelemetryService {
   flush() {
     if (!this.queue.length) return;
     const hasScript = typeof document !== 'undefined' && document.querySelector('script[data-website-id]');
-    if (this.provider instanceof HttpBeaconProvider && typeof window !== 'undefined' && (window.umami || window.UMAMI_WEBSITE_ID || hasScript)) {
+    if (this.provider instanceof NoopProvider && typeof window !== 'undefined' && (window.umami || window.UMAMI_WEBSITE_ID || hasScript)) {
       this.provider = new UmamiProvider();
     }
     if (!this.provider) return;

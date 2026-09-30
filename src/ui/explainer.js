@@ -143,7 +143,54 @@ export function nextPathway(p) {
   return pathways[(j + 1) % pathways.length];
 }
 
-export function renderPathway(p, step, playing) {
+export function renderPathwayMobile(p, step, playing) {
+  const st = p.steps[step];
+  const accent = colorOf(st.focus?.[0]);
+  const last = step === p.steps.length - 1;
+  const up = last ? nextPathway(p) : null;
+  return `<article class="ex ex-path-mobile" style="--accent:${accent}">
+    <div class="mobile-tour-progress" aria-hidden="true">
+      ${p.steps.map((_, i) => `<span class="${i < step ? 'is-done' : i === step ? 'is-on' : ''}"></span>`).join('')}
+    </div>
+    <div class="mobile-tour-header">
+      <a class="mobile-tour-back" href="#/pathways">${icon('prev', 14)}<span>Pathways</span></a>
+      <span class="mobile-tour-step-tag">Step ${step + 1} of ${p.steps.length}</span>
+    </div>
+    <div class="mobile-tour-path-name">${esc(p.name)}</div>
+    <h2 class="mobile-story-title">${esc(st.title)}</h2>
+    <div class="mobile-story-body">
+      ${st.text ? paragraphs(st.text) : ''}
+    </div>
+    <div class="chips">
+      ${(st.focus || []).map((id) => byId.has(id)
+        ? `<a class="chip" href="#/s/${id}" style="--c:${colorOf(id)}"><i></i>${esc(nameOf(id))}</a>`
+        : `<span class="chip" style="--c:${colorOf(id)}"><i></i>${esc(nameOf(id))}</span>`
+      ).join('')}
+    </div>
+    <div class="mobile-tour-controls">
+      <button class="mobile-tour-btn" data-act="prev" ${step === 0 ? 'disabled' : ''} aria-label="Previous step">
+        ${icon('prev', 16)}<span>Prev</span>
+      </button>
+      <button class="mobile-tour-btn is-play" data-act="play" aria-label="${playing ? 'Pause tour' : 'Play tour'}">
+        ${icon(playing ? 'pause' : 'play', 16)}<span>${playing ? 'Pause' : 'Play'}</span>
+      </button>
+      <button class="mobile-tour-btn" data-act="next" ${last ? 'disabled' : ''} aria-label="Next step">
+        <span>Next</span>${icon('next', 16)}
+      </button>
+    </div>
+    ${up ? `<a class="upnext" href="#/p/${up.id}" style="--c:${colorOf(up.steps[0]?.focus?.[0])}; margin-top: 14px;">
+      <span class="upnext-lead"><span>Up next</span>${icon('next', 15)}</span>
+      <span class="upnext-name">${esc(up.name)}</span>
+      <span class="upnext-tag">${fmt(up.tagline || '')}</span>
+      ${routeStrip(up)}
+    </a>` : ''}
+  </article>`;
+}
+
+export function renderPathway(p, step, playing, { isMobile = false } = {}) {
+  if (isMobile) {
+    return renderPathwayMobile(p, step, playing);
+  }
   const st = p.steps[step];
   const accent = colorOf(st.focus?.[0]);
   const last = step === p.steps.length - 1;
