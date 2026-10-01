@@ -334,9 +334,10 @@ export default [
         ],
       },
       connects: {
-        text: 'Day to day experience flows in both ways with the {{temporal-lobe}}. Emotional weight arrives both ways from the {{amygdala}}. Finished files go out to the {{hypothalamus}} and {{prefrontal-cortex}} for body regulation and long term keeping.',
+        text: 'Day to day experience flows in both ways with the {{temporal-lobe}}. Emotional weight arrives both ways from the {{amygdala}}. Finished files go out to the {{mammillary-bodies}}, {{hypothalamus}} and {{prefrontal-cortex}} for memory consolidation and long term keeping.',
         connections: [
           { id: 'temporal-lobe', dir: 'both', label: 'Daily experience traded both ways' },
+          { id: 'mammillary-bodies', dir: 'out', label: 'Memory highway sent along the fornix bundle' },
           { id: 'hypothalamus', dir: 'out', label: 'Memory signals passed for body rhythms' },
           { id: 'prefrontal-cortex', dir: 'out', label: 'Memories sent for long term keeping' },
           { id: 'amygdala', dir: 'both', label: 'Emotional weight added to memories' },
@@ -757,4 +758,175 @@ export default [
       ],
     },
   },
+  {
+    id: 'mammillary-bodies',
+    name: 'Mammillary bodies',
+    group: 'deep',
+    parent: 'hypothalamus',
+    color: '#fb923c',
+    shape: { type: 'ellipsoid', center: [0.022, -0.105, 0.02], radii: [0.026, 0.026, 0.026], count: 420, pattern: 'fine', mirror: true, fill: 0.3, pointScale: 9.0 },
+    view: 'medial',
+    slice: true,
+    tagline: 'Relays memory signals from the hippocampus to the thalamus.',
+    analogy: 'A relay station on a rail line, passing memory signals to the next stop.',
+    levels: {
+      where: {
+        text: 'The mammillary bodies are two small round bumps on the underside of the brain, at the back of the {{hypothalamus}}. They sit just ahead of the brainstem. Although small, they form a key waypoint for signals leaving the {{hippocampus}}.',
+        bullets: [
+          'Two round grey-matter nuclei on the underside of the posterior hypothalamus.',
+          'Receive the main fiber bundle from the [[fornix]].',
+          'Sit on the base of the brain behind the pituitary stalk.',
+        ],
+      },
+      does: {
+        text: 'The mammillary bodies relay signals in the memory loop known as the Papez circuit. They take outputs from the {{hippocampus}} and pass them up to the {{thalamus}}.\n\nRemembering what you ate for breakfast relies on this loop to pass retrieved details back to the cortex.',
+        bullets: [
+          'Memory relay: forwards hippocampal signals to the anterior thalamus.',
+          'Navigation: helps track head direction and orientation in space.',
+          'Consolidation: helps move temporary memories into permanent storage.',
+        ],
+      },
+      connects: {
+        text: 'Signals travel here from the {{hippocampus}} through the arching [[fornix]]. The mammillary bodies process them and send a bundle (the mammillothalamic tract) straight to the {{thalamus}}, which loops onward to the {{cingulate-cortex}}.',
+        connections: [
+          { id: 'hippocampus', dir: 'in', label: 'Memory signals received along the fornix' },
+          { id: 'thalamus', dir: 'out', label: 'Relayed upward to the anterior thalamus' },
+          { id: 'hypothalamus', dir: 'both', label: 'Connected with daily body rhythms' },
+        ],
+      },
+      cells: {
+        text: 'Relay neurons here fire in rhythm with hippocampal theta waves, helping keep memory signals in sync. These cells consume glucose rapidly and depend on thiamine (vitamin B1) to generate energy.',
+        diagram: 'hippocampal-loop',
+        synapse: 'glutamate',
+        bullets: [
+          'Fires in rhythmic bursts locked to the theta oscillations that coordinate memory storage.',
+          'Contains head direction cells that fire selectively when the head faces a specific direction.',
+        ],
+      },
+    },
+    tryIt: 'Think of what you ate for dinner two nights ago. As the memory reconstructs, signals sweep from your hippocampus, through your mammillary bodies, and up into the thalamus.',
+    breaks: {
+      text: 'Lack of thiamine (vitamin B1), often seen in chronic alcohol misuse or severe malnutrition, damages these nuclei and causes Korsakoff syndrome.',
+      bullets: [
+        'Korsakoff syndrome: severe memory loss where someone cannot form new long-term memories but keeps older ones.',
+        'Confabulation: inventing plausible stories to fill gaps in recent recall without realizing they are untrue.',
+        'Disorientation: trouble navigating familiar streets and rooms.',
+      ],
+    },
+  },
+  {
+    id: 'habenula',
+    name: 'Habenula',
+    group: 'deep',
+    parent: 'thalamus',
+    color: '#ef4444',
+    shape: { type: 'ellipsoid', center: [0.02, 0.075, -0.17], radii: [0.018, 0.018, 0.024], count: 260, pattern: 'fine', mirror: true, fill: 0.3, pointScale: 9.0 },
+    view: 'medial',
+    slice: true,
+    tagline: 'Signals disappointment and brakes dopamine when an expected reward fails.',
+    analogy: 'A brake pedal on reward: it fires when things go wrong and pauses the celebration.',
+    levels: {
+      where: {
+        text: 'The habenula is a tiny paired structure perched near the midline, on the upper back edge of the {{thalamus}}. It sits right above the {{midbrain}} and next to the {{pineal-gland}}. One sits on each side of the third ventricle.',
+        bullets: [
+          'Two tiny nuclei on the upper rear crest of the thalamus.',
+          'Sits directly beside the pineal stalk overlooking the midbrain.',
+          'Split into medial and lateral sections, each with different jobs.',
+        ],
+      },
+      does: {
+        text: 'The lateral habenula acts as a brake on reward. While dopamine neurons fire when outcomes beat expectations, the habenula fires when outcomes are worse than expected, or when you feel pain or defeat.\n\nPutting a coin in a vending machine and getting nothing triggers a burst from the habenula, quieting dopamine neurons.',
+        bullets: [
+          'Reward errors: fires when an expected reward does not appear.',
+          'Dopamine brake: quiets dopamine neurons in the VTA.',
+          'Avoidance learning: teaches the brain to steer clear of painful cues.',
+          'Mood tuning: high resting activity is linked to depression and feeling stuck.',
+        ],
+      },
+      connects: {
+        text: 'Signals about errors and missing rewards arrive from the {{globus-pallidus}} and basal ganglia, alongside context from the {{prefrontal-cortex}}. The habenula then sends fibres down to the {{vta}} and {{raphe-nuclei}} to quiet dopamine and serotonin release.',
+        connections: [
+          { id: 'globus-pallidus', dir: 'in', label: 'Missing reward and error signals from basal ganglia' },
+          { id: 'prefrontal-cortex', dir: 'in', label: 'Context and rule evaluation received' },
+          { id: 'vta', dir: 'out', label: 'Brake signal sent to quiet dopamine firing' },
+          { id: 'raphe-nuclei', dir: 'out', label: 'Brake signal sent to quiet serotonin firing' },
+        ],
+      },
+      cells: {
+        text: 'Lateral habenula cells use [[glutamate]] to excite local inhibitory cells in the midbrain, which in turn silence dopamine neurons. When a reward is missed, these cells fire rapid bursts.',
+        diagram: 'basal-ganglia',
+        synapse: 'glutamate',
+        bullets: [
+          'Increases firing frequency when disappointed, the exact inverse of dopamine neurons.',
+          'Deep brain stimulation targeting the lateral habenula is being investigated for treatment-resistant depression.',
+        ],
+      },
+    },
+    tryIt: 'Recall the sudden drop in your stomach when you checked your pocket and thought you lost your keys. That jolt of alarm and halted anticipation was your habenula firing.',
+    breaks: {
+      text: 'Hyperactivity in the lateral habenula is linked to depression, making it hard to feel pleasure or find motivation.',
+      bullets: [
+        'Depression: an overactive habenula continuously quiets dopamine, leaving everyday events feeling flat.',
+        'Learned helplessness: persistent firing can lead to giving up even when success is possible.',
+        'Withdrawal: high activity during drug withdrawal drives dysphoria, tempting relapse.',
+      ],
+    },
+  },
+  {
+    id: 'olfactory-bulb',
+    name: 'Olfactory bulb',
+    group: 'deep',
+    color: '#f472b6',
+    shape: { type: 'ellipsoid', center: [0.035, -0.17, 0.46], radii: [0.016, 0.014, 0.07], count: 340, pattern: 'fine', mirror: true, fill: 0.3, pointScale: 8.0 },
+    view: 'left-below',
+    slice: false,
+    tagline: 'The sensory station for smell, wired directly to memory and emotion.',
+    analogy: 'A direct phone line to memory that skips the central switchboard.',
+    levels: {
+      where: {
+        text: 'The olfactory bulbs are two matchstick-sized stalks resting on the skull floor, directly under the {{frontal-lobe}}. They sit right above the nasal cavity, separated only by a thin sheet of bone with tiny holes. Scent nerves from the nose pass straight through those holes into the bulbs. Smell is the only sense that reaches cortical circuits without relaying through the {{thalamus}} first.',
+        bullets: [
+          'Two slender stalks resting on the bone beneath each frontal lobe.',
+          'Positioned directly above the roof of the nasal passage.',
+          'The only sensory path that skips the thalamic relay.',
+        ],
+      },
+      does: {
+        text: 'The olfactory bulb receives scent signals from the nose and sorts them into recognizable odor patterns. It sends those patterns directly to the {{amygdala}} and {{hippocampus}}.\n\nCatching a whiff of sunscreen or woodsmoke triggers this loop, bringing back a childhood memory before your cortex even names the scent.',
+        bullets: [
+          'Odor sorting: maps thousands of airborne chemicals into recognizable scents.',
+          'Emotional routing: sends scent patterns straight to memory and emotion hubs.',
+          'Appetite: prompts salivation and hunger when food smells arrive.',
+          'Hazard warning: flags smoke, gas leaks and spoiled food.',
+        ],
+      },
+      connects: {
+        text: 'Sensory signals enter from the nose and leave directly for the {{amygdala}} and {{hippocampus}}. Relays through olfactory cortex then carry aroma information onward to the {{insula}} and {{prefrontal-cortex}}.',
+        connections: [
+          { id: 'amygdala', dir: 'out', label: 'Direct scent signals sent to emotion circuits' },
+          { id: 'hippocampus', dir: 'out', label: 'Scent patterns sent to retrieve episodic memories' },
+          { id: 'insula', dir: 'out', label: 'Aroma data relayed through olfactory cortex for flavor' },
+          { id: 'prefrontal-cortex', dir: 'out', label: 'Conscious scent naming via olfactory cortex' },
+        ],
+      },
+      cells: {
+        text: 'Sensory axons from the nose gather into dense round spheres called glomeruli. Relay cells receive these signals and carry them into the brain, while local [[inhibitory]] cells use [[GABA]] to sharpen the contrast between similar smells.',
+        synapse: 'glutamate',
+        bullets: [
+          'Contains glomeruli, where thousands of matching scent inputs converge onto single relay cells.',
+          'Local inhibitory circuits sharpen contrast so you can tell similar spices apart.',
+        ],
+      },
+    },
+    tryIt: 'Close your eyes, breathe in slowly through your nose, and identify three distinct scents in your room. Your olfactory bulbs are sorting those complex chemical blends into recognizable memories right now.',
+    breaks: {
+      text: 'Losing the sense of smell (anosmia) can follow head trauma, viral illness or neurodegenerative disease.',
+      bullets: [
+        'Anosmia: loss of smell, which flattens the flavor of food.',
+        'Early biomarker: subtle loss of odor discrimination often shows up early in Parkinson and Alzheimer diseases.',
+        'Nerve shearing: a knock to the head can snap the fragile nerve fibers passing through the skull floor.',
+      ],
+    },
+  },
 ];
+

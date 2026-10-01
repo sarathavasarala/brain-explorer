@@ -25,7 +25,7 @@ Brain Explorer treats the brain as an interactive visual canvas where explanatio
 
 ## Exploring Across Scales
 
-### 1. Brain Parts (34 Structures)
+### 1. Brain Parts (37 Structures)
 Every structure features an explainer with a four-level zoom ladder:
 1. **Where**: Spatial orientation, physical neighbours, and boundaries.
 2. **Does**: Real-world job with a concrete, physical analogy.
@@ -47,9 +47,9 @@ Procedurally generated 3D cells spanning excitatory neurons, inhibitory interneu
 - **Glia**: Astrocytes (blood-brain barrier, glutamate clearance), oligodendrocytes (saltatory myelin), and microglia (synaptic pruning, immune surveillance).
 - **Firing Sequencer**: An interactive step-through showing ion channel openings, voltage thresholds, and transmitter release.
 
-### 4. Guided Pathways (11 Tours)
+### 4. Guided Pathways (12 Tours)
 Narrative multi-step tours through brain systems:
-- **Actions**: How you see an object, reach for a cup, process pain and quiet the hurt, react to fear, or form a lasting memory.
+- **Actions**: How you see an object, pick up a scent, reach for a cup, process pain and quiet the hurt, react to fear, or form a lasting memory.
 - **Chemicals**: The dopamine reward loop, serotonin mood regulation, and noradrenaline alert broadcasting.
 - **Networks**: Default mode wandering, executive attention control, and salience switching.
 

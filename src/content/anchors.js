@@ -3,6 +3,7 @@
 // flipWhenSliced flips x when sliced so single-organ anchors stay visible on the cut face without duplicating in normal views.
 export default [
   { id: 'eye', name: 'Eye', position: [0.14, -0.13, 0.9], color: '#bfe9ff', mirror: true, size: 0.045 },
+  { id: 'nose', name: 'Nose', position: [0, -0.22, 0.88], color: '#ffb3c1', size: 0.045 },
   { id: 'ear', name: 'Inner ear', position: [0.74, -0.2, -0.02], color: '#c9fff1', flipWhenSliced: true, size: 0.035 },
   { id: 'hand', name: 'Hand', position: [0.9, -0.95, 0.35], color: '#ffe3c2', flipWhenSliced: true, size: 0.05 },
   { id: 'thyroid', name: 'Thyroid', position: [0, -1.2, 0.25], color: '#34d399', size: 0.06, body: true },

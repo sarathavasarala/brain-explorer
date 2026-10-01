@@ -22,6 +22,7 @@ const VIEWS = {
   medial: [1, 0.08, 0.02],
   'left-front': [1, 0.2, 0.6],
   'left-back': [1, 0.2, -0.6],
+  'left-below': [1, -0.18, 0.32],
   body: [1, 0.1, 0.35],
 };
 

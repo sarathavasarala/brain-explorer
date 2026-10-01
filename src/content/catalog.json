@@ -136,6 +136,21 @@
       "tagline": "Produces melatonin in the dark to set your daily sleep and wake rhythm."
     },
     {
+      "id": "mammillary-bodies",
+      "name": "Mammillary bodies",
+      "tagline": "Relays memory signals from the hippocampus to the thalamus."
+    },
+    {
+      "id": "habenula",
+      "name": "Habenula",
+      "tagline": "Signals disappointment and brakes dopamine when an expected reward fails."
+    },
+    {
+      "id": "olfactory-bulb",
+      "name": "Olfactory bulb",
+      "tagline": "The sensory station for smell, wired directly to memory and emotion."
+    },
+    {
       "id": "cerebellum",
       "name": "Cerebellum",
       "tagline": "Fine-tunes movement so it comes out smooth, timed and accurate."
@@ -175,6 +190,10 @@
     {
       "id": "eye",
       "name": "Eye"
+    },
+    {
+      "id": "nose",
+      "name": "Nose"
     },
     {
       "id": "ear",
@@ -424,7 +443,12 @@
     "retina",
     "eye",
     "cochlea",
-    "ear"
+    "ear",
+    "olfactory bulb",
+    "mammillary body",
+    "habenula",
+    "fornix",
+    "nose"
   ],
   "roles": [
     "more_active",
@@ -438,6 +462,7 @@
     "left",
     "left-front",
     "left-back",
+    "left-below",
     "medial",
     "back",
     "below",

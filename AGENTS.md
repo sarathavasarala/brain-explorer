@@ -151,6 +151,7 @@ Defined in `brain-scene.js`:
 - `'medial'`: Sliced sagittal view looking at inner wall from midline.
 - `'back'`: Occipital / posterior view.
 - `'below'`: Ventral / inferior view.
+- `'left-below'`: Low anterolateral view looking up at ventral frontal lobe.
 - `'body'`: Zoomed-out view framing the torso and body organs.
 
 ### Point-Cloud Shaders & Rendering
@@ -452,7 +453,7 @@ Scene scripts are declarative instructions for painting the 3D brain canvas. Gui
     {
       title: 'Drowsiness sets in',
       text: 'The [[vlpo]] begins firing [[gaba]] into wake centers...',
-      view: 'medial',                            // 'left' | 'left-front' | 'left-back' | 'medial' | 'back' | 'below' | 'body'
+      view: 'medial',                            // 'left' | 'left-front' | 'left-back' | 'medial' | 'back' | 'below' | 'left-below' | 'body'
       slice: true,                               // optional boolean
       body: false,                               // optional boolean: show body silhouette
       chemical: 'gaba',                          // optional chemical id for receptor density glow

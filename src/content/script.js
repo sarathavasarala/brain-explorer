@@ -15,6 +15,7 @@ export const VIEWS = [
   'left',
   'left-front',
   'left-back',
+  'left-below',
   'medial',
   'back',
   'below',

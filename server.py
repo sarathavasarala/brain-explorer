@@ -87,6 +87,9 @@ PARTS = {
     'spinal-cord': 'Spinal cord: carries movement commands and body sensations',
     'raphe-nuclei': 'Raphe nuclei: serotonin for mood, sleep and patience',
     'locus-coeruleus': 'Locus coeruleus: noradrenaline for alertness and alarm',
+    'olfactory-bulb': 'Olfactory bulb: detecting and sorting odors, routing scent directly to emotion and memory',
+    'mammillary-bodies': 'Mammillary bodies: relaying memory signals from hippocampus to thalamus, episodic recall',
+    'habenula': 'Habenula: anti-reward hub, signaling disappointment, defeat and braking dopamine',
 }
 
 ROLES = {
