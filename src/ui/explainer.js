@@ -235,7 +235,7 @@ export function renderHome({ canAsk = true } = {}) {
     .filter(Boolean);
   return `<article class="ex ex-home" style="--accent:#c77dff">
     <h1 class="ex-title">A map of the brain</h1>
-    <p class="tagline">Pick any part on the left, or click something glowing in the model.</p>
+    <p class="tagline">Pick a part to explore, or select something glowing in the model.</p>
     <p class="lede">The brain is roughly 86 billion neurons wired into regions that each do a few jobs well.
       Every part in this explorer can be seen at four levels, from the region you could point to on a scan,
       down to the cells and chemicals doing the work.</p>
