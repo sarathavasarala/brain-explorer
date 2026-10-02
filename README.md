@@ -6,7 +6,13 @@
 
 Brain Explorer is an interactive 3D atlas designed for curious adults and learners who want to understand the mind without drowning in sterile textbook jargon.
 
-[![Watch the video demo](https://img.youtube.com/vi/Nhp8mNPcGss/maxresdefault.jpg)](https://youtu.be/Nhp8mNPcGss)
+<p align="center">
+  <a href="https://youtu.be/Nhp8mNPcGss">
+    <img src="assets/preview.webp" width="720" alt="Brain Explorer interactive 3D demo">
+  </a>
+  <br>
+  <sub>Interactive 3D point-cloud atlas of the human brain · <a href="https://youtu.be/Nhp8mNPcGss">Watch full demo on YouTube (65 s)</a></sub>
+</p>
 
 ---
 
