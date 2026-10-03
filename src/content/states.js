@@ -6,38 +6,31 @@ export const STATE_KINDS = ['lesion', 'under', 'over', 'size'];
 export const STATE_METADATA = {
   lesion: {
     id: 'lesion',
-    label: 'Damaged or removed',
+    label: 'is damaged or removed',
     role: 'losing_cells',
-    color: '#8b9bb4',
-    symbol: '⊝',
-    tag: 'Lesion',
-    question: "What happens if this part is damaged, cut off, or surgically removed?",
+    question: 'What changes when this part is lost?',
   },
   under: {
     id: 'under',
-    label: 'Too quiet',
+    label: 'goes quiet',
     role: 'less_active',
-    color: '#5db0ff',
-    symbol: '▾',
-    tag: 'Hypoactive',
-    question: "What happens if firing slows down or chemical supply runs dry?",
+    question: 'What happens when firing slows down?',
   },
   over: {
     id: 'over',
-    label: 'Overdriven',
+    label: 'goes into overdrive',
     role: 'more_active',
-    color: '#ffaa33',
-    symbol: '▴',
-    tag: 'Hyperactive',
-    question: "What happens if signals fire uncontrollably or without normal brakes?",
+    question: 'What happens when signals fire uncontrollably?',
   },
   size: {
     id: 'size',
-    label: 'Bigger or smaller',
+    label: 'is reshaped',
     role: 'more_active',
-    color: '#c488ff',
-    symbol: '⤢',
-    tag: 'Plasticity',
-    question: "How does intensive training or atrophy physically reshape this area?",
+    question: 'How does intensive training or rewiring reshape this area?',
   },
 };
+
+export function roleForState(st) {
+  if (!st) return 'typical';
+  return st.look || STATE_METADATA[st.kind]?.role || 'more_active';
+}

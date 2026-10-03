@@ -1,5 +1,6 @@
 import { structures, byId, groups, levels, diagrams, synapses, pathways, anchorById, chemicals, cells } from '../content/index.js';
 import { STATE_METADATA } from '../content/states.js';
+import { ROLE_LABEL } from './ask.js';
 import { fmt, paragraphs, esc } from './format.js';
 import { renderCircuit, renderSynapse, LINK_COLORS } from './diagrams.js';
 import { icon } from './icons.js';
@@ -58,6 +59,11 @@ function cellsFigure(cells) {
   return html;
 }
 
+function formatPartQuestionName(name) {
+  if (name.startsWith("Broca") || name.startsWith("Wernicke")) return name;
+  return name.charAt(0).toLowerCase() + name.slice(1);
+}
+
 export function renderStateSwitcher(s, levelId, activeStateKind, file) {
   const states = s.breaks?.states || [];
   if (!states.length) {
@@ -66,95 +72,70 @@ export function renderStateSwitcher(s, levelId, activeStateKind, file) {
       : todo(`${file} → ${s.id}.breaks`);
   }
 
-  const activeState = states.find((st) => st.kind === activeStateKind);
+  const displayName = formatPartQuestionName(s.name);
 
-  const pillsHtml = `
-    <div class="state-pills" role="tablist" aria-label="What if perturbation states">
+  const rowsHtml = `
+    <h4 class="scenario-heading">What if the ${esc(displayName)}…</h4>
+    <div class="scenario-list">
       ${states.map((st) => {
-        const meta = STATE_METADATA[st.kind] || { label: st.kind, symbol: '•', color: '#8b9bb4' };
+        const meta = STATE_METADATA[st.kind] || { label: st.kind, question: st.kind };
         const isActive = st.kind === activeStateKind;
         const targetHref = isActive ? `#/s/${s.id}/${levelId}` : `#/s/${s.id}/${levelId}/${st.kind}`;
+        const rippleList = st.ripple || [];
+
         return `
-          <a class="state-pill ${isActive ? 'is-active' : ''} state-pill-${st.kind}"
-             href="${targetHref}"
-             role="tab"
-             aria-selected="${isActive}"
-             title="${esc(meta.question || meta.label)}"
-             style="--state-color:${meta.color}">
-            <span class="state-pill-dot" aria-hidden="true"></span>
-            <span class="state-pill-label">${esc(st.title || meta.label)}</span>
-            ${isActive ? `<span class="state-pill-close" title="Reset to baseline view" aria-hidden="true">&times;</span>` : ''}
-          </a>
+          <div class="scenario-row ${isActive ? 'is-open' : ''}">
+            <a class="scenario-header" href="${targetHref}" ${isActive ? 'aria-current="true"' : ''}>
+              <div class="scenario-titles">
+                <span class="scenario-label">${esc(st.title || meta.label)}</span>
+                <span class="scenario-teaser">${esc(st.teaser || meta.question)}</span>
+              </div>
+              <span class="scenario-chevron ${isActive ? 'is-open' : ''}" aria-hidden="true">›</span>
+            </a>
+            ${isActive ? `
+              <div class="scenario-detail">
+                <div class="state-body">
+                  ${paragraphs(st.text)}
+                </div>
+                ${st.signs?.length ? `
+                  <div class="state-signs">
+                    <h4 class="scenario-subhead">What you'd notice</h4>
+                    <ul class="bullets">${st.signs.map((b) => `<li>${fmt(b)}</li>`).join('')}</ul>
+                  </div>
+                ` : ''}
+                ${st.case ? `
+                  <div class="case-card">
+                    <span class="case-lead">A real case</span>
+                    <h4 class="case-title">${esc(st.case.name)}</h4>
+                    <p class="case-text">${fmt(st.case.text)}</p>
+                  </div>
+                ` : ''}
+                ${rippleList.length ? `
+                  <div class="ripple-section">
+                    <h4 class="scenario-subhead">Also affected</h4>
+                    <div class="chips">${rippleList.map((r) => {
+                      const rName = nameOf(r.id);
+                      const rColor = colorOf(r.id);
+                      const rRole = ROLE_LABEL[r.role] || r.role;
+                      return `<a class="chip" href="#/s/${r.id}/${levelId}" style="--c:${rColor}">
+                        <i class="dot"></i>
+                        <span>${esc(rName)}</span>
+                        <span class="chip-sub">${esc(rRole)}</span>
+                      </a>`;
+                    }).join('')}</div>
+                  </div>
+                ` : ''}
+              </div>
+            ` : ''}
+          </div>
         `;
       }).join('')}
     </div>
   `;
 
-  let detailsHtml = '';
-  if (activeState) {
-    const meta = STATE_METADATA[activeState.kind] || { label: activeState.kind, color: '#8b9bb4' };
-    const rippleList = activeState.ripple || [];
-    const roleLabels = {
-      cut_off: 'Cut off',
-      more_active: 'Hyperactive',
-      less_active: 'Hypoactive',
-      losing_cells: 'Losing cells',
-      involved: 'Involved',
-      typical: 'Baseline',
-    };
-
-    detailsHtml = `
-      <div class="state-card" style="--state-color:${meta.color}">
-        <div class="state-card-header">
-          <span class="state-badge"><i class="state-badge-dot"></i>${esc(meta.tag || meta.label)} in 3D</span>
-          <a class="state-reset-link" href="#/s/${s.id}/${levelId}">Reset view</a>
-        </div>
-        <div class="state-body">
-          ${paragraphs(activeState.text)}
-        </div>
-        ${activeState.signs?.length ? `
-          <div class="state-signs">
-            <h4 class="state-subhead">Observable signs</h4>
-            <ul class="bullets">${activeState.signs.map((b) => `<li>${fmt(b)}</li>`).join('')}</ul>
-          </div>
-        ` : ''}
-        ${activeState.case ? `
-          <div class="case-card">
-            <div class="case-badge">Case Record</div>
-            <h4 class="case-title">${esc(activeState.case.name)}</h4>
-            <p class="case-text">${fmt(activeState.case.text)}</p>
-          </div>
-        ` : ''}
-        ${rippleList.length ? `
-          <div class="ripple-section">
-            <h4 class="state-subhead">Circuit ripple</h4>
-            <div class="chips">${rippleList.map((r) => {
-              const rName = nameOf(r.id);
-              const rColor = colorOf(r.id);
-              const rRole = roleLabels[r.role] || r.role;
-              return `<a class="chip chip-ripple role-${r.role}" href="#/s/${r.id}/${levelId}" style="--c:${rColor}">
-                <i class="dot"></i>
-                <span class="ripple-name">${esc(rName)}</span>
-                <span class="ripple-role">${esc(rRole)}</span>
-              </a>`;
-            }).join('')}</div>
-          </div>
-        ` : ''}
-      </div>
-    `;
-  } else {
-    detailsHtml = `
-      <div class="state-idle">
-        <p class="state-idle-hint">Choose a condition above to observe how this region and its partners change in 3D:</p>
-        ${bullets(s.breaks?.bullets)}
-      </div>
-    `;
-  }
-
   return `
     ${s.breaks?.text ? `<p class="breaks-lead">${fmt(s.breaks.text)}</p>` : ''}
-    ${pillsHtml}
-    ${detailsHtml}
+    ${rowsHtml}
   `;
 }
 
@@ -168,6 +149,8 @@ export function renderStructure(s, levelId, source, activeStateKind = null) {
   const prev = structures[idx - 1], next = structures[idx + 1];
   const file = source || 'src/content/structures/…';
   const makes = chemicals.filter((c) => c.madeIn?.includes(s.id));
+  const activeState = (s.breaks?.states || []).find((st) => st.kind === activeStateKind);
+  const displayName = formatPartQuestionName(s.name);
 
   let body = L.text ? paragraphs(L.text) : todo(`${file} → ${s.id}.levels.${level.id}.text`);
   body += bullets(L.bullets);
@@ -199,14 +182,20 @@ export function renderStructure(s, levelId, source, activeStateKind = null) {
 
   return `<article class="ex" style="--accent:${s.color}">
     <nav class="crumbs">
-      <span>${esc(g?.label || '')}</span>
-      ${parent ? `<span class="sep">/</span><a href="#/s/${parent.id}/${level.id}">${esc(parent.name)}</a>` : ''}
+      ${activeState ? `
+        <span>Showing: what if the ${esc(displayName)} ${esc(activeState.title || (STATE_METADATA[activeState.kind]?.label || activeState.kind))}</span>
+        <span class="sep">·</span>
+        <a href="#/s/${s.id}/${level.id}">Back to normal view</a>
+      ` : `
+        <span>${esc(g?.label || '')}</span>
+        ${parent ? `<span class="sep">/</span><a href="#/s/${parent.id}/${level.id}">${esc(parent.name)}</a>` : ''}
+      `}
     </nav>
     <h1 class="ex-title">${esc(s.name)}</h1>
     <p class="tagline">${fmt(s.tagline || '')}</p>
     ${makes.length ? `<div class="part-makes-row"><span class="part-makes-lead">Makes:</span> <span class="chips">${makes.map((c) => `<a class="chip chip-sm" href="#/chem/${c.id}" style="--c:${c.color}"><i class="dot"></i>${esc(c.name)}</a>`).join('')}</span></div>` : ''}
     ${s.analogy ? `<p class="analogy"><span class="analogy-lead">Think of it as</span> ${fmt(s.analogy)}</p>` : ''}
-    ${ladder(level.id)}
+    ${ladder(activeState ? null : level.id)}
     <section class="level" data-level="${level.id}">
       <h2 class="level-title">${esc(level.label)} <span>${esc(level.size)}</span></h2>
       ${body}

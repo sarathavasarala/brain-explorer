@@ -1,4 +1,4 @@
-import { structures, byId, anchorById, groups, levels, pathways, anchors, validate, sourceOf, chemicals, chemicalGroups, cells, cellGroups, chemById, cellById } from './content/index.js';
+import { structures, byId, anchorById, groups, levels, pathways, anchors, validate, sourceOf, chemicals, chemicalGroups, cells, cellGroups, chemById, cellById, roleForState } from './content/index.js';
 import { createBrainScene } from './scene/brain-scene.js';
 import { playStep, chemLensConfig } from './scene/player.js';
 import { renderSidebar } from './ui/sidebar.js';
@@ -22,6 +22,7 @@ const libraryEl = $('#library');
 const hoverEl = $('#hover-label');
 const tipEl = $('#tip');
 const lensLegendEl = $('#lens-legend');
+const stateLegendEl = $('#state-legend');
 const cellInsetEl = $('#cell-inset');
 const sidebarToggleBtn = $('#sidebar-toggle');
 const sidebarBackdrop = $('#sidebar-backdrop');
@@ -223,6 +224,7 @@ function clearScene(key) {
   scene.focus([]);
   scene.setArcs([]);
   scene.forceSlice(false);
+  if (stateLegendEl) stateLegendEl.hidden = true;
   fly([], 'left', key);
 }
 
@@ -258,6 +260,9 @@ function apply() {
     scene.setBody(false);
     scene.showChemical(null);
     if (lensLegendEl) lensLegendEl.hidden = true;
+  }
+  if (r.type !== 's' && stateLegendEl) {
+    stateLegendEl.hidden = true;
   }
 
   if (r.type !== 'cell' || r.tab === 'lives') {
@@ -434,17 +439,15 @@ function apply() {
     const activeState = (s.breaks?.states || []).find((st) => st.kind === r.state);
 
     if (activeState) {
-      const role = activeState.kind === 'lesion' ? 'losing_cells'
-        : activeState.kind === 'under' ? 'less_active'
-        : activeState.kind === 'over' ? 'more_active'
-        : (activeState.look || 'more_active');
+      const role = roleForState(activeState);
       const ripple = (activeState.ripple || []).filter((rip) => byId.has(rip.id) || anchorById.has(rip.id));
       const parts = [{ id: s.id, role }, ...ripple];
       const context = [s.id, ...ripple.map((rip) => rip.id)];
       scene.paintSketch(parts, { context });
 
-      const cut = parts.filter((p) => p.role === 'cut_off').map((p) => p.id);
-      const cutArcs = cut.slice(1).map((id) => ({ from: cut[0], to: id, active: false }));
+      const cutArcs = ripple
+        .filter((rip) => rip.role === 'cut_off')
+        .map((rip) => ({ ...arcFor(s.id, { id: rip.id, dir: 'out' }), active: false, color: '#7a8599' }));
       scene.setArcs(cutArcs);
 
       const hasSlice = Boolean(s.slice || ripple.some((rip) => byId.get(rip.id)?.slice));
@@ -452,7 +455,24 @@ function apply() {
 
       const frameTargets = [s.id, ...ripple.map((rip) => rip.id)];
       fly(frameTargets, s.view, `${s.id}:state:${activeState.kind}`);
+
+      if (stateLegendEl) {
+        const roles = new Set(parts.map((p) => p.role));
+        const entries = [];
+        if (roles.has('more_active')) entries.push('Bright = busier');
+        if (roles.has('less_active')) entries.push('Faint = quieter');
+        if (roles.has('losing_cells')) entries.push('Barely visible = losing cells');
+        if (roles.has('cut_off') || cutArcs.length) entries.push('Grey line = cut off');
+
+        if (entries.length) {
+          stateLegendEl.innerHTML = entries.map((txt) => `<span>${txt}</span>`).join('<span class="sep">·</span>');
+          stateLegendEl.hidden = false;
+        } else {
+          stateLegendEl.hidden = true;
+        }
+      }
     } else {
+      if (stateLegendEl) stateLegendEl.hidden = true;
       const conns = s.levels?.connects?.connections || [];
       const wiring = lv.scene === 'wiring';
       scene.focus([s.id], { context: wiring ? conns.map((c) => c.id) : [], activity: lv.scene === 'activity' });
@@ -463,6 +483,9 @@ function apply() {
     }
     explainerEl.innerHTML = renderStructure(s, r.level, sourceOf.get(s.id), r.state);
     if (prev.type !== 's' || prev.id !== r.id) explainerEl.scrollTop = 0;
+    if (activeState && r.state !== prev.state) {
+      explainerEl.querySelector('.breaks-section')?.scrollIntoView({ block: 'start', behavior: 'smooth' });
+    }
   } else if (r.type === 'library') {
     clearScene('library');
     if (prev.type !== 'library') {

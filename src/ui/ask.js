@@ -5,7 +5,7 @@ import { icon } from './icons.js';
 
 const ACCENT = '#6f86ff';
 
-const ROLE_LABEL = {
+export const ROLE_LABEL = {
   more_active: 'Busier than usual',
   less_active: 'Quieter than usual',
   losing_cells: 'Losing cells',

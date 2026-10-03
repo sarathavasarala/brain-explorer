@@ -65,6 +65,7 @@ export default [
       states: [
         {
           kind: 'lesion',
+          teaser: 'Timing and balance break down into unsteady tremors.',
           text: 'Losing cerebellar calibration scrambles the fine timing and coordination needed for smooth physical movement. Muscle strength remains intact, but the brain can no longer predict momentum or smooth out trajectory errors in real time. Reaching for a cup produces wide tremors that worsen near the target, and walking turns into an unsteady stagger.',
           signs: [
             'Hand tremors that grow more pronounced as fingers approach a target.',
@@ -72,6 +73,7 @@ export default [
             'Slurred, scanning speech where syllables are delivered with irregular pacing and volume.',
           ],
           ripple: [
+            { id: 'thalamus', role: 'cut_off' },
             { id: 'motor-cortex', role: 'cut_off' },
           ],
         },

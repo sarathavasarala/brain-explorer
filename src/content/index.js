@@ -16,7 +16,7 @@ import chemicalGroups from './chemicals/groups.js';
 import cells from './cells/index.js';
 import cellGroups from './cells/groups.js';
 import { checkScript, sanitizeScript, ROLES, VIEWS } from './script.js';
-import { STATE_KINDS, STATE_METADATA } from './states.js';
+import { STATE_KINDS, STATE_METADATA, roleForState } from './states.js';
 
 const files = {
   'src/content/structures/cortex.js': cortex,
@@ -26,7 +26,7 @@ const files = {
 export const structures = Object.values(files).flat();
 // Which file each structure lives in, so the UI can point at where to add missing text.
 export const sourceOf = new Map(Object.entries(files).flatMap(([f, list]) => list.map((s) => [s.id, f])));
-export { groups, levels, anchors, synapses, diagrams, pathways, pathwayGroups, glossary, askPresets, chemicals, chemicalGroups, cells, cellGroups, checkScript, sanitizeScript, ROLES, VIEWS, STATE_KINDS, STATE_METADATA };
+export { groups, levels, anchors, synapses, diagrams, pathways, pathwayGroups, glossary, askPresets, chemicals, chemicalGroups, cells, cellGroups, checkScript, sanitizeScript, ROLES, VIEWS, STATE_KINDS, STATE_METADATA, roleForState };
 
 export const byId = new Map(structures.map((s) => [s.id, s]));
 export const anchorById = new Map(anchors.map((a) => [a.id, a]));
@@ -99,6 +99,10 @@ export function validate() {
           if (seenKinds.has(st.kind)) problems.push(`${sw}: duplicate state kind "${st.kind}"`);
           seenKinds.add(st.kind);
           if (!st.text || typeof st.text !== 'string') problems.push(`${sw}: missing text`);
+          if (st.teaser !== undefined) {
+            if (!st.teaser || typeof st.teaser !== 'string') problems.push(`${sw}: teaser must be a non-empty string`);
+            else if (st.teaser.includes('—')) problems.push(`${sw}: teaser contains em dash`);
+          }
           if (!Array.isArray(st.signs) || !st.signs.length) problems.push(`${sw}: signs must be a non-empty array of strings`);
           if (st.case) {
             if (!st.case.name || typeof st.case.name !== 'string') problems.push(`${sw}: case.name must be a string`);

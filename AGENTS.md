@@ -275,12 +275,12 @@ All content is beginner-accessible, rigorous, and formatted with tiny markup.
   breaks: {
     text: '1 to 2 sentences on what occurs when damaged.',
     bullets: ['2 to 3 symptoms or clinical conditions, plainly explained.'],
-    states: [                                    // Optional: 'What if' perturbation states
+    states: [                                    // Optional: 'What if' perturbation scenarios
       {
-        kind: 'lesion',                          // 'lesion' | 'under' | 'over' | 'size'
-        title: 'Damaged or removed',             // Optional override label
+        kind: 'lesion',                          // 'lesion' ('is damaged or removed') | 'under' ('goes quiet') | 'over' ('goes into overdrive') | 'size' ('is reshaped')
+        teaser: 'One-line teaser under 70 chars.', // Optional summary teaser
         text: '2 to 3 sentences explaining what changes and why.',
-        signs: ['2 to 3 plain bullets of observable signs.'],
+        signs: ['2 to 3 plain bullets of what you\'d notice.'],
         case: { name: 'Patient H.M.', text: 'Factual description of landmark case or study.' }, // Optional
         ripple: [{ id: 'striatum', role: 'cut_off' }], // Optional partner structure knock-on effects
         look: 'more_active',                     // Optional for 'size': 'more_active' | 'less_active'

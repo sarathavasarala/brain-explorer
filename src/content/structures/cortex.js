@@ -129,6 +129,7 @@ export default [
       states: [
         {
           kind: 'lesion',
+          teaser: 'Self-restraint and long-term planning collapse.',
           text: 'Damage to the front and lower prefrontal cortex strips away the brain\'s natural brakes on behavior. Memory, language, and physical movement remain intact, but social tact, emotional restraint, and the ability to organize long-term plans collapse. Without top-down guidance, emotional impulses from deeper structures go unchecked.',
           signs: [
             'Loss of social restraint, tact, and impulse control.',
@@ -137,7 +138,7 @@ export default [
           ],
           case: {
             name: 'Phineas Gage (Harlow, 1848)',
-            text: 'In 1848, an explosion drove an iron tamping rod through the frontal lobes of railroad foreman Phineas Gage. Physician John Martyn Harlow documented that while Gage survived with his intellect and memory intact, his personality changed completely. Formerly polite and dependable, he became profane, erratic, and unable to manage social impulses, demonstrating how the frontal lobes govern self-restraint.',
+            text: 'In 1848, an explosion drove an iron tamping rod through the frontal lobes of railroad foreman Phineas Gage. Physician John Martyn Harlow documented that while Gage survived with his intellect and memory intact, his personality changed sharply. Formerly polite and dependable, he became profane, erratic, and unable to manage social impulses. Later accounts note he partly adapted and later worked as a stagecoach driver in Chile, but the case remains a landmark in showing how frontal networks support self-restraint.',
           },
           ripple: [
             { id: 'amygdala', role: 'more_active' },
@@ -145,7 +146,8 @@ export default [
         },
         {
           kind: 'under',
-          text: 'Prolonged wakefulness or mental exhaustion starves the prefrontal cortex of energy, weakening its top-down control over attention. Distractions easily pull attention away from current goals because the filter that keeps irrelevant thoughts out stops working efficiently. As a result, juggling multiple steps in mind becomes frustrating and decision-making defaults to impulsive shortcuts.',
+          teaser: 'Exhaustion weakens top-down focus and impulse control.',
+          text: 'Sleep loss and exhaustion are linked to weaker prefrontal activity, loosening top-down control over attention. Distractions easily pull attention away from current goals because the filter that keeps irrelevant thoughts out stops working efficiently. As a result, juggling multiple steps in mind becomes frustrating and decision-making defaults to impulsive shortcuts.',
           signs: [
             'Frequent lapses in concentration and high vulnerability to minor distractions.',
             'Difficulty holding multi-step directions active in working memory.',
@@ -154,7 +156,8 @@ export default [
         },
         {
           kind: 'over',
-          text: 'When prefrontal error-monitoring networks become hyperactive, the brain gets trapped in continuous warning loops. Circuits repeatedly broadcast the feeling that something is wrong, even after a task has been completed and verified. This persistent alarm leads to endless mental rumination and makes it exhausting to disengage attention.',
+          teaser: 'Checking loops get stuck replaying false alarms.',
+          text: 'When prefrontal networks, especially orbitofrontal circuits linked with the {{striatum}}, become hyperactive, the brain gets trapped in continuous warning loops. Circuits repeatedly broadcast the feeling that something is wrong, even after a task has been completed and verified. These persistent loops are linked to obsessive-compulsive checking, making it exhausting to disengage attention.',
           signs: [
             'Relentless mental replaying of past mistakes or perceived flaws.',
             'An unshakeable feeling that something is incomplete, even after checking.',
@@ -280,7 +283,8 @@ export default [
       states: [
         {
           kind: 'lesion',
-          text: 'Damage to Broca\'s area strikes speech production while leaving language understanding largely preserved. People know exactly what they want to say, but coordinating the tongue, lips, and vocal cords into fluent sentences becomes an exhausting struggle. Spoken output shrinks to isolated words, short phrases, and simple gestures.',
+          teaser: 'Words stay clear in mind but become hard to speak.',
+          text: 'Damage to Broca\'s area and the frontal regions around it strikes speech production while leaving language understanding largely preserved. People know exactly what they want to say, but coordinating the tongue, lips, and vocal cords into fluent sentences becomes an exhausting struggle. Spoken output shrinks to isolated words, short phrases, and simple gestures.',
           signs: [
             'Halting, fragmented speech produced with noticeable physical and mental effort.',
             'Preserved ability to comprehend spoken sentences and follow complex directions.',
@@ -288,7 +292,7 @@ export default [
           ],
           case: {
             name: 'Patient Tan (Broca, 1861)',
-            text: 'In 1861, French physician Paul Broca evaluated Louis-Victor Leborgne, a patient who had lost the ability to speak two decades earlier. Leborgne could articulate only the single syllable tan, though he easily understood spoken questions and communicated through gestures. An autopsy revealed damage in the left inferior frontal gyrus, proving that speech articulation depends on this specialized region.',
+            text: 'In 1861, French physician Paul Broca evaluated Louis-Victor Leborgne, a patient who had lost the ability to speak two decades earlier. Leborgne could articulate only the single syllable tan, though he understood spoken questions and communicated through gestures. An autopsy revealed damage in the left inferior frontal gyrus, though later scans showed the damage reached deeper beyond Broca\'s area itself. The case helped show how this frontal network supports speech articulation.',
           },
         },
       ],
@@ -408,6 +412,7 @@ export default [
       states: [
         {
           kind: 'lesion',
+          teaser: 'Touch and body position on the opposite side fade.',
           text: 'Damage to the somatosensory cortex strips away fine tactile perception on the opposite side of the body. Light touch feels numb or muddy, and the fingers can no longer tell a key from a coin by feel alone. Because the brain loses its internal sense of joint position, limbs wander without visual guidance.',
           signs: [
             'Inability to distinguish two separate touch points on the skin from a single point.',
@@ -418,15 +423,16 @@ export default [
         {
           kind: 'size',
           look: 'more_active',
-          text: 'When an arm is lost, the patch of somatosensory cortex that once mapped the hand goes silent and begins reorganizing. Inputs from neighboring body maps, particularly the face, sprout into the quiet territory and wake up dormant connections. As a result, touching a patch on the cheek can vividly trigger the sensation of an amputated finger being stroked.',
+          teaser: 'Neighboring body maps move into silent territory.',
+          text: 'When an arm is lost, the patch of somatosensory cortex that once mapped the hand goes silent and begins reorganizing. Inputs from neighboring body maps, particularly the face, seem to take over the quiet territory and wake up dormant connections. As a result, touching a patch on the cheek can vividly trigger the sensation of an amputated finger being stroked.',
           signs: [
             'Vivid tactile feelings on missing fingers when specific spots on the cheek are stroked.',
             'Adjacent body maps expanding across boundaries into silenced sensory zones.',
             'Rapid cortical rewiring that creates physical sensory ghosts after an injury.',
           ],
           case: {
-            name: 'Phantom Limb Remapping (Ramachandran, 1993)',
-            text: 'Neuroscientist V.S. Ramachandran studied patients who experienced vivid phantom sensations following arm amputation. Because the facial touch map sits directly alongside the hand map in the somatosensory cortex, sensory fibers from the face sprouted into the silent hand territory. Stroking specific points on a patient\'s cheek reliably produced the sensation of individual missing fingers being touched.',
+            name: 'Phantom Limb Remapping (Ramachandran, 1990s)',
+            text: 'In the 1990s, neuroscientist V.S. Ramachandran studied patients who experienced vivid phantom sensations following arm amputation. Because the facial touch map sits directly alongside the hand map in the somatosensory cortex, the face\'s inputs seem to take over the silent hand territory. Stroking specific points on a patient\'s cheek reliably produced the sensation of individual missing fingers being touched. Whether this comes from new growth or from existing connections being unmasked is still debated.',
           },
         },
       ],
@@ -660,10 +666,11 @@ export default [
       states: [
         {
           kind: 'lesion',
-          text: 'Damage to Wernicke\'s area destroys the brain\'s ability to decode the meaning of words while leaving the mechanics of speaking intact. Speech flows effortlessly with normal rhythm and melody, but sentences are filled with made-up words and unintended substitutions that make no sense to listeners. Because the internal comprehension filter is damaged, speakers are usually unaware that their words lack meaning.',
+          teaser: 'Speech flows smoothly but loses its meaning.',
+          text: 'Damage to Wernicke\'s area and the temporal regions around it impairs the brain\'s ability to decode the meaning of words while leaving the mechanics of speaking intact. Speech flows effortlessly with normal rhythm and melody, but sentences are filled with made-up words and unintended substitutions that make no sense to listeners. Because the internal comprehension filter is damaged, speakers are usually unaware that their words lack meaning.',
           signs: [
             'Rapid, fluent speech that sounds grammatically natural but consists of meaningless word salad.',
-            'Inability to comprehend spoken or written sentences.',
+            'Poor understanding of spoken and written sentences.',
             'Lack of awareness that one\'s own speech is confusing or uninterpretable to others.',
           ],
           case: {
