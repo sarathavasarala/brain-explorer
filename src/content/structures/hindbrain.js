@@ -14,6 +14,7 @@ export default [
       ],
     },
     view: 'left-back',
+    size: 'about 10 cm across',
     tagline: 'Fine-tunes movement so it comes out smooth, timed and accurate.',
     analogy: 'A flight controller that compares what you meant to do with what your body is actually doing, and corrects the difference many times a second.',
     levels: {
@@ -79,6 +80,7 @@ export default [
     color: '#ffa94d',
     shape: { type: 'tube', path: [[0, -0.01, -0.1], [0, -0.1, -0.13], [0, -0.2, -0.17]], radius: 0.085, count: 1800, pattern: 'rings', fill: 0.18 },
     view: 'left',
+    size: 'about 2 cm long',
     slice: true,
     tagline: 'Reflex hub for eyes and ears, and home of the dopamine cells.',
     analogy: 'A night watchman who turns your head toward sudden sounds and sights before you decide to look.',
@@ -127,6 +129,7 @@ export default [
     color: '#ff9b3d',
     shape: { type: 'tube', path: [[0, -0.2, -0.155], [0, -0.3, -0.175], [0, -0.4, -0.215]], radius: [[0, 0.095], [0.5, 0.13], [1, 0.095]], count: 2200, pattern: 'rings', fill: 0.14 },
     view: 'left',
+    size: 'about 4 cm across',
     tagline: 'A bridge carrying signals between the cortex and the cerebellum.',
     analogy: 'A busy interchange where every lane from the cortex gets copied and sent south to the cerebellum.',
     levels: {
@@ -174,6 +177,7 @@ export default [
     color: '#ffc46b',
     shape: { type: 'tube', path: [[0, -0.4, -0.23], [0, -0.52, -0.27], [0, -0.64, -0.3]], radius: [[0, 0.085], [1, 0.058]], count: 1700, pattern: 'fibers', fill: 0.14 },
     view: 'left',
+    size: 'about 3 cm long',
     tagline: 'Keeps you alive on autopilot: breathing, heart rate, swallowing.',
     analogy: 'The building manager in the basement who keeps the power, water and air running while everyone upstairs works.',
     levels: {
@@ -222,6 +226,7 @@ export default [
     color: '#e8d7a8',
     shape: { type: 'tube', path: [[0, -0.64, -0.3], [0, -0.82, -0.33], [0, -1.02, -0.35]], radius: [[0, 0.058], [1, 0.045]], count: 1300, pattern: 'fibers', fill: 0.12 },
     view: 'left',
+    size: 'about 45 cm long',
     tagline: 'The main cable between brain and body.',
     analogy: 'A motorway with local slip roads: through traffic to the brain, plus quick local exits for reflexes.',
     levels: {
@@ -269,6 +274,7 @@ export default [
     color: '#00f5d4',
     shape: { type: 'ellipsoid', center: [0.0, -0.22, -0.2], radii: [0.018, 0.07, 0.024], count: 650, pattern: 'fine', fill: 0.8 },
     view: 'medial',
+    size: 'about 2 cm long',
     slice: true,
     tagline: 'Brainstem nuclei that send serotonin through widespread circuits.',
     analogy: 'A set of tuning controls whose effects depend on the receptor and circuit receiving the signal.',
@@ -318,6 +324,7 @@ export default [
     color: '#ff5722',
     shape: { type: 'ellipsoid', center: [0.035, -0.2, -0.21], radii: [0.016, 0.02, 0.022], count: 450, mirror: true, fill: 1 },
     view: 'left-back',
+    size: 'about 15 mm long',
     tagline: 'A small noradrenaline system that retunes alertness and attention.',
     analogy: 'A watchtower sentry who fires a flare when something unexpected happens, putting the whole city on alert.',
     levels: {

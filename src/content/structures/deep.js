@@ -11,6 +11,7 @@ export default [
     color: '#5fd4ff',
     shape: { type: 'ellipsoid', center: [0.075, 0.05, -0.07], radii: [0.065, 0.07, 0.125], count: 2600, pattern: 'fine', mirror: true, fill: 0.18 },
     view: 'left',
+    size: 'about 3 cm long',
     tagline: 'The relay station that passes almost every sense on to the cortex.',
     analogy: 'An airport hub where every incoming flight is sorted and sent on to the right city.',
     levels: {
@@ -61,6 +62,7 @@ export default [
     color: '#ff8fcf',
     shape: { type: 'ellipsoid', center: [0.028, -0.07, 0.06], radii: [0.03, 0.04, 0.055], count: 1100, pattern: 'fine', mirror: true, fill: 0.25 },
     view: 'left',
+    size: 'about 2 cm across',
     tagline: 'Runs the body: hunger, thirst, temperature, sleep and hormones.',
     analogy: 'A thermostat and caretaker that reads the blood and tells the body what to fix.',
     levels: {
@@ -120,6 +122,7 @@ export default [
       ],
     },
     view: 'left',
+    size: 'about 6 cm long',
     tagline: 'Learns habits and helps pick which action to do next.',
     analogy: 'A talent scout that watches everything the cortex suggests and backs the winner.',
     levels: {
@@ -174,6 +177,7 @@ export default [
       ],
     },
     view: 'left',
+    size: 'about 2 cm long',
     tagline: 'The brake pedal on movement, released only for the right action.',
     analogy: 'A security guard whose default answer is no, until the striatum shows the right pass.',
     levels: {
@@ -221,6 +225,7 @@ export default [
     color: '#ffcf5c',
     shape: { type: 'ellipsoid', center: [0.07, -0.14, -0.1], radii: [0.04, 0.014, 0.05], count: 700, mirror: true, fill: 1 },
     view: 'left',
+    size: 'about 1 cm long',
     tagline: 'Uses dopamine and inhibitory output to tune movement circuits.',
     analogy: 'A watering can that sprinkles dopamine over the movement circuits to keep them willing to move.',
     levels: {
@@ -301,6 +306,7 @@ export default [
       count: 2200, pattern: 'rings', mirror: true, fill: 0.15,
     },
     view: 'left',
+    size: 'about 5 cm long',
     tagline: 'Turns what happened today into memories you can recall later.',
     analogy: 'A librarian who files the day\'s loose pages overnight so you can find them later.',
     levels: {
@@ -394,6 +400,7 @@ export default [
     color: '#ff6b5e',
     shape: { type: 'ellipsoid', center: [0.27, -0.19, 0.18], radii: [0.045, 0.045, 0.05], count: 1000, pattern: 'fine', mirror: true, fill: 0.3 },
     view: 'left',
+    size: 'about 2 cm across',
     tagline: 'The alarm that flags danger and gives memories emotional weight.',
     analogy: 'A smoke detector: quick, loud and sometimes wrong, but worth having.',
     levels: {
@@ -478,6 +485,7 @@ export default [
       sag: 0.09, count: 3200, pattern: 'cross', fill: 0.05,
     },
     view: 'top',
+    size: 'about 10 cm long',
     tagline: 'A thick cable of fibres that lets the two halves talk.',
     analogy: 'A wide footbridge between two office towers so both sides work as one company.',
     levels: {
@@ -525,6 +533,7 @@ export default [
     color: '#ffb703',
     shape: { type: 'ellipsoid', center: [0.03, -0.13, -0.09], radii: [0.024, 0.016, 0.032], count: 500, mirror: true, fill: 1 },
     view: 'left',
+    size: 'about 1 cm across',
     tagline: 'Sends learning and motivation signals through several dopamine pathways.',
     analogy: 'A prediction updater that helps the brain revise what is worth pursuing.',
     levels: {
@@ -573,6 +582,7 @@ export default [
     color: '#10b981',
     shape: { type: 'ellipsoid', center: [0.08, -0.06, 0.08], radii: [0.035, 0.022, 0.038], count: 650, mirror: true, fill: 1 },
     view: 'left-front',
+    size: 'about 2 cm long',
     tagline: 'Sends acetylcholine widely to tune attention, learning and wakefulness.',
     analogy: 'A stage spotlight operator who turns up brightness on what matters so you can focus.',
     levels: {
@@ -622,6 +632,7 @@ export default [
     color: '#2ed9aa',
     shape: { type: 'ellipsoid', center: [0.12, -0.03, 0.24], radii: [0.035, 0.03, 0.04], count: 850, pattern: 'fine', mirror: true, fill: 0.2 },
     view: 'left-front',
+    size: 'about 1 cm across',
     tagline: 'Ventral striatum that translates reward signals and motivation into action.',
     analogy: 'A gateway where wanting meets doing.',
     levels: {
@@ -670,6 +681,7 @@ export default [
     color: '#ff9fd1',
     shape: { type: 'ellipsoid', center: [0, -0.17, 0.08], radii: [0.03, 0.025, 0.03], count: 800, pattern: 'fine', mirror: false, fill: 0.25 },
     view: 'medial',
+    size: 'about 1 cm across',
     slice: true,
     tagline: 'The master endocrine gland that releases hormones into the bloodstream.',
     analogy: 'A dispatcher that turns instructions from the brain into chemical packages for the body.',
@@ -717,6 +729,7 @@ export default [
     color: '#818cf8',
     shape: { type: 'ellipsoid', center: [0, 0.0, -0.22], radii: [0.024, 0.02, 0.024], count: 650, pattern: 'fine', mirror: false, fill: 0.3 },
     view: 'medial',
+    size: 'about 7 mm across',
     slice: true,
     tagline: 'Produces melatonin in the dark to set your daily sleep and wake rhythm.',
     analogy: 'A light-sensitive clock that marks the night and tells the brain when it is time to sleep.',
@@ -765,6 +778,7 @@ export default [
     color: '#fb923c',
     shape: { type: 'ellipsoid', center: [0.022, -0.105, 0.02], radii: [0.026, 0.026, 0.026], count: 420, pattern: 'fine', mirror: true, fill: 0.3, pointScale: 9.0 },
     view: 'medial',
+    size: 'about 5 mm across',
     slice: true,
     tagline: 'Relays memory signals from the hippocampus to the thalamus.',
     analogy: 'A relay station on a rail line, passing memory signals to the next stop.',
@@ -814,6 +828,7 @@ export default [
     color: '#ef4444',
     shape: { type: 'ellipsoid', center: [0.02, 0.075, -0.17], radii: [0.018, 0.018, 0.024], count: 260, pattern: 'fine', mirror: true, fill: 0.3, pointScale: 9.0 },
     view: 'medial',
+    size: 'about 3 mm across',
     slice: true,
     tagline: 'Signals disappointment and brakes dopamine when an expected reward fails.',
     analogy: 'A brake pedal on reward: it fires when things go wrong and pauses the celebration.',
@@ -863,6 +878,7 @@ export default [
     color: '#f472b6',
     shape: { type: 'ellipsoid', center: [0.035, -0.17, 0.46], radii: [0.016, 0.014, 0.07], count: 340, pattern: 'fine', mirror: true, fill: 0.3, pointScale: 8.0 },
     view: 'left-below',
+    size: 'about 1 cm long',
     slice: false,
     tagline: 'The sensory station for smell, wired directly to memory and emotion.',
     analogy: 'A direct phone line to memory that skips the central switchboard.',

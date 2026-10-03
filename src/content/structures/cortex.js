@@ -22,6 +22,7 @@ export default [
     color: '#e05cff',
     shape: { type: 'cortex', test: (p) => p.lobe === 'frontal' },
     view: 'left-front',
+    size: 'about 8 cm front to back',
     tagline: 'Planning, deciding and moving.',
     analogy: 'The office manager who sets the goal, makes the plan and tells the hands what to do.',
     levels: {
@@ -70,6 +71,7 @@ export default [
     color: '#ff6ad5',
     shape: { type: 'cortex', test: (p) => p.lobe === 'frontal' && p.z > 0.3 },
     view: 'left-front',
+    size: 'about 5 cm front to back',
     tagline: 'Keeps goals in mind and puts the brakes on impulses.',
     analogy: 'A patient coach who holds the game plan up while the crowd shouts.',
     levels: {
@@ -159,6 +161,7 @@ export default [
     color: '#ff4f7b',
     shape: { type: 'cortex', test: (p) => p.lobe === 'frontal' && p.z < p.central + 0.085 && p.y > -0.02 },
     view: 'left',
+    size: 'about 10 cm long strip',
     tagline: 'Shapes voluntary movement commands sent toward the spinal cord.',
     analogy: 'A piano keyboard for the body, with more keys for the fingers and lips than the back.',
     levels: {
@@ -211,6 +214,7 @@ export default [
       test: (p) => p.side === 'left' && p.lobe === 'frontal' && !p.medial && p.z > 0.16 && p.z < 0.42 && p.y > -0.1 && p.y < 0.13 && p.ax > 0.3,
     },
     view: 'left',
+    size: 'about 3 cm across',
     tagline: 'Helps plan speech, grammar and demanding language sequences.',
     analogy: 'One workshop in a larger language network, especially busy when speech needs careful assembly.',
     levels: {
@@ -275,6 +279,7 @@ export default [
     color: '#6f86ff',
     shape: { type: 'cortex', test: (p) => p.lobe === 'parietal' },
     view: 'left-back',
+    size: 'about 7 cm front to back',
     tagline: 'Touch, body sense and where things are in space.',
     analogy: 'A surveyor who keeps an updated map of your body and the space around it.',
     levels: {
@@ -323,6 +328,7 @@ export default [
     color: '#4fc3ff',
     shape: { type: 'cortex', test: (p) => p.lobe === 'parietal' && p.z > p.central - 0.085 && p.y > -0.02 },
     view: 'left',
+    size: 'about 10 cm long strip',
     tagline: 'Where touch, temperature and pain from your body arrive.',
     analogy: 'A switchboard where every patch of skin has its own blinking light.',
     levels: {
@@ -398,6 +404,7 @@ export default [
     color: '#8a9bff',
     shape: { type: 'cortex', test: (p) => p.lobe === 'parietal' && p.z < p.central - 0.085 && p.y > 0.08 },
     view: 'left-back',
+    size: 'about 5 cm across',
     tagline: 'Builds a map of space so you can reach and look.',
     analogy: 'A sat nav that keeps "you are here" updated while you move.',
     levels: {
@@ -448,6 +455,7 @@ export default [
     color: '#a67bff',
     shape: { type: 'cortex', test: (p) => p.lobe === 'temporal' },
     view: 'left',
+    size: 'about 8 cm front to back',
     tagline: 'Hearing, language and recognising what things are.',
     analogy: 'A librarian who knows every face, tune and word by heart.',
     levels: {
@@ -496,6 +504,7 @@ export default [
     color: '#5ce1e6',
     shape: { type: 'cortex', test: (p) => p.lobe === 'temporal' && p.y > -0.075 && p.z > -0.14 && p.z < 0.12 },
     view: 'left',
+    size: 'about 3 cm long',
     tagline: 'The first stop in the cortex for sound.',
     analogy: 'A sound engineer who splits incoming noise into pitch, timing and direction.',
     levels: {
@@ -544,6 +553,7 @@ export default [
     color: '#ffd166',
     shape: { type: 'cortex', test: (p) => p.side === 'left' && p.lobe === 'temporal' && p.y > -0.13 && p.z < -0.1 },
     view: 'left',
+    size: 'about 3 cm across',
     tagline: 'Helps you understand the words you hear and read.',
     analogy: 'A translator who turns sounds and letters back into meaning.',
     levels: {
@@ -609,6 +619,7 @@ export default [
     color: '#c46bff',
     shape: { type: 'cortex', test: (p) => p.lobe === 'occipital' },
     view: 'left-back',
+    size: 'about 5 cm front to back',
     tagline: 'The vision department at the back of your head.',
     analogy: 'A darkroom that develops the raw film from the eyes into pictures.',
     levels: {
@@ -657,6 +668,7 @@ export default [
     color: '#ff8ae2',
     shape: { type: 'cortex', test: (p) => p.lobe === 'occipital' && (p.z < -0.73 || (p.medial && p.y < 0.26 && p.y > -0.08)) },
     view: 'back',
+    size: 'about 4 cm across',
     tagline: 'Breaks what you see into edges, lines and motion.',
     analogy: 'A prism that splits white light into separate colours, but for lines and movement.',
     levels: {
@@ -709,6 +721,7 @@ export default [
       test: (p) => p.medial && p.z > -0.42 && p.z < 0.4 && p.y > callosumY(p.z) + 0.03 && p.y < callosumY(p.z) + 0.15,
     },
     view: 'medial',
+    size: 'about 10 cm front to back',
     slice: true,
     tagline: 'Notices mistakes and conflict, and links feelings to action.',
     analogy: 'A supervisor who spots when the plan and the feelings disagree and calls a pause.',
@@ -758,6 +771,7 @@ export default [
     color: '#ff7a8a',
     shape: { type: 'ellipsoid', center: [0.43, -0.01, 0.07], radii: [0.025, 0.075, 0.15], count: 1800, pattern: 'fine', mirror: true, fill: 0.2 },
     view: 'left',
+    size: 'about 5 cm across',
     tagline: 'Your sense of the inside of your body: heartbeat, hunger, disgust.',
     analogy: 'An inner weather station reporting how the body feels right now.',
     levels: {

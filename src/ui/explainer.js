@@ -197,7 +197,7 @@ export function renderStructure(s, levelId, source, activeStateKind = null) {
     ${s.analogy ? `<p class="analogy"><span class="analogy-lead">Think of it as</span> ${fmt(s.analogy)}</p>` : ''}
     ${ladder(activeState ? null : level.id)}
     <section class="level" data-level="${level.id}">
-      <h2 class="level-title">${esc(level.label)} <span>${esc(level.size)}</span></h2>
+      <h2 class="level-title">${esc(level.label)} <span>${esc(level.id === 'overview' && s.size ? s.size : level.size)}</span></h2>
       ${body}
     </section>
     ${(level.id === 'overview' || activeState) ? `

@@ -297,7 +297,7 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 /* zoom ladder */
 .ladder { position: relative; display: grid; grid-template-columns: repeat(var(--steps), minmax(0, 1fr)); margin: 28px -6px 6px; }
 .ladder::before {
-  content: ''; position: absolute; top: 25px; left: calc(50% / var(--steps)); right: calc(50% / var(--steps)); height: 1px;
+  content: ''; position: absolute; top: 25px; left: 6px; right: 6px; height: 1px;
   background: var(--line-2); pointer-events: none;
 }
 .rung {
@@ -1705,7 +1705,7 @@ kbd {
   .rung {
     padding: 4px 2px 8px;
   }
-  .ladder::before { top: 20px; }
+  .ladder::before { top: 20px; left: 4px; right: 4px; }
   .rung-icon {
     width: 32px;
     height: 32px;
