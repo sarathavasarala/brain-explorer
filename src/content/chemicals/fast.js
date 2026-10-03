@@ -16,7 +16,7 @@ export default [
       bullets: [
         'Main [[excitatory]] messenger across the entire cerebral [[cortex]] and {{hippocampus}}.',
         'Acts in less than a thousandth of a second through tiny molecular channels.',
-        'Rapidly cleared by partner cells so it does not build up to harmful levels.',
+        'Powers baseline communication for conscious perception, planning, and memory formation.',
       ],
     },
     tracts: [
@@ -93,7 +93,7 @@ export default [
         name: 'Memantine',
         acts: 'receptor-block',
         target: 'NMDA',
-        text: 'Blocks overactive NMDA channels to protect neurons from toxic calcium overload in Alzheimer disease.',
+        text: 'Gently dampens excessive background channel opening at NMDA receptors to help stabilize signaling in Alzheimer disease.',
       },
       {
         id: 'ampa',
@@ -124,10 +124,10 @@ export default [
     madeFrom: 'glutamate',
     madeIn: ['striatum', 'globus-pallidus', 'cerebellum'],
     overview: {
-      text: 'GABA is the chief inhibitory messenger in the adult brain. Released by local [[interneuron|interneurons]] and output cells, it puts precise pauses on circuits and keeps excitation in check. Without GABA, unchecked firing would rapidly spiral into continuous seizures.',
+      text: 'GABA is the chief inhibitory messenger in the adult brain. Released by local [[interneuron|interneurons]] and projection cells, it puts precise pauses on circuits and keeps excitation in check. Without GABA, electrical activity spreads unchecked and disrupts coherent thought.',
       bullets: [
         'Used at roughly one in five brain synapses, especially by local timing cells.',
-        'Opens molecular gates that let negative chloride ions in, quieting the receiving cell.',
+        'Lowers the likelihood that a receiving neuron will fire an [[action potential]].',
         'Shapes natural brain rhythms that help different areas coordinate their work.',
       ],
     },
@@ -205,7 +205,7 @@ export default [
         name: 'Tiagabine',
         acts: 'reuptake-block',
         target: 'GAT-1',
-        text: 'Blocks the GABA transporter, leaving natural GABA in the gap longer to curb seizures.',
+        text: 'Slows the reuptake transporter to leave natural GABA in the gap longer, helping steady runaway electrical circuits in epilepsy.',
       },
     ],
     breaks: {

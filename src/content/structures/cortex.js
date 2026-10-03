@@ -35,7 +35,7 @@ export default [
         ],
       },
       connects: {
-        text: 'It trades maps and body news both ways with the {{parietal-lobe}}. Attention and relay signals move both ways with the {{thalamus}}. Chosen actions go out to the {{striatum}} to become habits.',
+        text: 'Information cycles continuously between frontal executive circuits and the rest of the brain. Spatial maps and sensory updates arrive from parietal areas to guide decisions, while thalamic loops coordinate attention. Outgoing motor and cognitive plans pass into subcortical loops that select and reinforce winning actions.',
         connections: [
           { id: 'parietal-lobe', dir: 'both', label: 'Plans traded for space and body maps' },
           { id: 'thalamus', dir: 'both', label: 'Attention and relay shared both ways' },
@@ -83,7 +83,7 @@ export default [
         ],
       },
       connects: {
-        text: 'It trades attention signals both ways with the {{thalamus}} and space updates both ways with the {{posterior-parietal}}. Choices go out to the {{striatum}}. Feelings are negotiated both ways with the {{amygdala}}, while memory context arrives from the {{hippocampus}}.',
+        text: 'The prefrontal cortex acts as a central exchange where memory, emotion, and action meet. Context from the hippocampus and threat signals from the amygdala are evaluated against long-term goals. Once a choice is made, signals route to the striatum to release behavior, while ongoing thalamic loops sustain focus through distractions.',
         connections: [
           { id: 'thalamus', dir: 'both', label: 'Attention kept in sync both ways' },
           { id: 'striatum', dir: 'out', label: 'Choices sent for habit learning' },
@@ -172,7 +172,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Arousal and corrections arrive from the {{thalamus}}. Touch updates are traded both ways with the {{somatosensory-cortex}}. Finished orders leave for the {{spinal-cord}} and a copy goes to the {{pons}} for the {{cerebellum}} to check.',
+        text: 'Descending motor commands travel directly toward spinal motor neurons that contract muscles. At the same time, reciprocal links with somatosensory cortex provide instant tactile feedback, while an outgoing copy heads through the pons so the cerebellum can verify movement timing.',
         connections: [
           { id: 'spinal-cord', dir: 'out', label: 'Orders sent down to muscles' },
           { id: 'somatosensory-cortex', dir: 'both', label: 'Touch feedback traded both ways' },
@@ -224,7 +224,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Several fibre pathways link these frontal regions with temporal and parietal language areas, including {{wernickes-area}} as traditionally defined. Speech plans interact with the {{motor-cortex}} mouth zone and other motor regions before words are spoken.',
+        text: 'Language assembly relies on rapid bidirectional signaling with temporal regions such as {{wernickes-area}}, which supply word concepts and meanings. Once a sentence structure is formed, outgoing commands flow to adjacent motor cortex representations for the lips, tongue, and larynx to articulate sound.',
         connections: [
           { id: 'wernickes-area', dir: 'both', label: 'Meanings traded to build sentences' },
           { id: 'motor-cortex', dir: 'out', label: 'Speech plan sent to mouth muscles' },
@@ -288,7 +288,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Plans are traded both ways with the {{frontal-lobe}}. Fresh vision arrives from the {{occipital-lobe}}. Body touch is kept in sync both ways with the {{thalamus}}.',
+        text: 'The parietal lobe merges separate sensory streams into a common spatial frame. Visual coordinates arriving from the occipital lobe combine with skin and joint feedback from thalamic relays, providing frontal motor circuits with the precise target coordinates needed to guide physical actions.',
         connections: [
           { id: 'frontal-lobe', dir: 'both', label: 'Space maps traded for movement plans' },
           { id: 'occipital-lobe', dir: 'in', label: 'Vision arriving for locating objects' },
@@ -336,7 +336,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Fresh touch arrives from the {{thalamus}}. Movement and touch are compared both ways with the {{motor-cortex}}. The already read signal goes out to the {{posterior-parietal}} for reaching and grasping.',
+        text: 'Touch signals arrive from your skin through the {{thalamus}}, reporting pressure, vibration, and texture. This sensory map trades instant updates with the neighboring {{motor-cortex}} to adjust how tightly you hold a glass, while sending spatial layouts to the {{posterior-parietal}} cortex to guide reaching and catching.',
         connections: [
           { id: 'thalamus', dir: 'in', label: 'Touch arriving fresh from the body' },
           { id: 'motor-cortex', dir: 'both', label: 'Touch compared with movement plans' },
@@ -411,7 +411,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Seen layout arrives from the {{visual-cortex}} and felt layout from the {{somatosensory-cortex}}. Space plans are traded both ways with the {{prefrontal-cortex}}. The agreed target goes out to the {{motor-cortex}} as a reach or look.',
+        text: 'This area lines up what your eyes see with where your body is standing. When you spot a mug on a table, it calculates where the mug sits relative to your hand, trades goal plans with the {{prefrontal-cortex}}, and guides your arm movements through the {{motor-cortex}}.',
         connections: [
           { id: 'visual-cortex', dir: 'in', label: 'Seen layout arriving for aiming' },
           { id: 'somatosensory-cortex', dir: 'in', label: 'Felt body arriving for lining up' },
@@ -457,11 +457,10 @@ export default [
           'Hearing and speech: decodes sound waves into voices, music, and words.',
           'Visual recognition: identifies faces, objects, and familiar environments.',
           'Language memory: stores word meanings and vocabulary on the left side.',
-          'Memory doorway: feeds everyday experiences into the hippocampus.',
         ],
       },
       connects: {
-        text: 'Object vision flows in from the {{occipital-lobe}}. Day to day records are traded both ways with the {{hippocampus}} and feelings both ways with the {{amygdala}}. Plans and speech are traded both ways with the {{frontal-lobe}}.',
+        text: 'Recognition is a shared job. Visual details gain meaning here, and that meaning can shape memories, feelings, speech, and plans through different pathways.',
         connections: [
           { id: 'hippocampus', dir: 'both', label: 'Daily life traded for memory filing' },
           { id: 'amygdala', dir: 'both', label: 'Feelings tied to faces and sounds' },
@@ -510,7 +509,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Fresh sound arrives from the {{thalamus}}. The decoded stream goes out to {{wernickes-area}} for words and to the {{amygdala}} for a quick emotional check (a scream gets flagged fast).',
+        text: 'Sound waves captured by your ears travel up through the {{thalamus}} into this primary hearing strip. Clean sound patterns then branch outward: words and speech route to {{wernickes-area}} to be understood, while a sudden, startling noise like a scream alerts the {{amygdala}} before you even know what caused it.',
         connections: [
           { id: 'thalamus', dir: 'in', label: 'Fresh sound arriving from the ears' },
           { id: 'wernickes-area', dir: 'out', label: 'Cleaned sound sent for word meaning' },
@@ -558,7 +557,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Sound information arrives from the {{auditory-cortex}}, while reading reaches the language network through visual and temporal pathways. Multiple routes connect this region with {{brocas-area}} and other frontal, temporal and parietal areas.',
+        text: 'Heard speech arrives from the {{auditory-cortex}} to be decoded into meaningful words, while written words enter through visual pathways. Deep white-matter bundles connect this interpretive hub with {{brocas-area}} so that understood ideas can be turned into spoken sentences.',
         connections: [
           { id: 'auditory-cortex', dir: 'in', label: 'Heard words arriving for meaning' },
           { id: 'brocas-area', dir: 'both', label: 'Meanings traded to build replies' },
@@ -623,7 +622,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Fresh vision arrives from the {{thalamus}}. The built picture goes out to the {{parietal-lobe}} for reaching and to the {{temporal-lobe}} for recognising.',
+        text: 'Retinal signals relay through the thalamus into primary visual cortex before dividing into two massive processing streams. An upper dorsal stream flows into the parietal lobe to track movement and spatial location, while a lower ventral stream enters the temporal lobe to identify objects, text, and faces.',
         connections: [
           { id: 'thalamus', dir: 'in', label: 'Fresh vision arriving from the eyes' },
           { id: 'parietal-lobe', dir: 'out', label: 'Locations sent on for reaching' },
@@ -671,7 +670,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Raw sight arrives from the {{thalamus}}. Edge maps go out to the {{posterior-parietal}} for "where" and to the {{temporal-lobe}} for "what".',
+        text: 'Early visual features like edges and motion are detected here and broadcast onward. An upper route travels to the {{posterior-parietal}} cortex to guide reaching and catching, while a lower route heads into the {{temporal-lobe}} to recognize shapes, faces, and text.',
         connections: [
           { id: 'thalamus', dir: 'in', label: 'Raw sight arriving from the eyes' },
           { id: 'posterior-parietal', dir: 'out', label: 'Locations sent on for reaching' },
@@ -724,7 +723,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Plans are traded both ways with the {{prefrontal-cortex}} and feelings both ways with the {{amygdala}}. Body news arrives from the {{thalamus}}. Memory instructions go out to the {{hippocampus}} to note what mattered.',
+        text: 'Sitting like a collar between emotional centers and the thinking cortex, the cingulate notices when things go wrong. It links emotional alarms from the {{amygdala}} with plans in the {{prefrontal-cortex}}, flagging surprising mistakes to the {{hippocampus}} so you remember not to repeat them.',
         connections: [
           { id: 'prefrontal-cortex', dir: 'both', label: 'Control traded with planning areas' },
           { id: 'amygdala', dir: 'both', label: 'Feelings linked to actions' },
@@ -772,7 +771,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Body news arrives from the {{thalamus}}. Feelings are traded both ways with the {{amygdala}} and the {{cingulate-cortex}}. The read out goes to the {{prefrontal-cortex}} so plans can respect the body.',
+        text: 'Signals from your heart, lungs, and gut travel up through the {{thalamus}} to build a live picture of your body. The insula shares these gut feelings with the {{amygdala}} and {{cingulate-cortex}}, while telling the {{prefrontal-cortex}} how tired, hungry, or comfortable your body feels so your plans respect physical reality.',
         connections: [
           { id: 'amygdala', dir: 'both', label: 'Body feelings tied to alarms' },
           { id: 'cingulate-cortex', dir: 'both', label: 'Body state linked to actions' },

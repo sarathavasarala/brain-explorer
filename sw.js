@@ -1,11 +1,11 @@
 // Service Worker for Brain Explorer PWA
 // Provides offline shell caching and enables Add to Home Screen on mobile.
 
-const CACHE_NAME = 'brain-explorer-v2';
+const CACHE_NAME = 'brain-explorer-v3';
 const PRECACHE_URLS = [
   './',
   './index.html',
-  './styles.css?v=6',
+  './styles.css?v=7',
   './manifest.webmanifest',
   './favicon.svg',
   './icons/apple-touch-icon.png',
@@ -46,7 +46,20 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Network-first with cache fallback for HTML, stale-while-revalidate for assets
+  if (event.request.mode === 'navigate' || url.pathname === '/' || url.pathname === '/index.html') {
+    event.respondWith(
+      fetch(event.request).then((networkResponse) => {
+        if (networkResponse.status === 200) {
+          const responseToCache = networkResponse.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, responseToCache));
+        }
+        return networkResponse;
+      }).catch(() => caches.match(event.request).then((cachedResponse) => cachedResponse || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // Stale-while-revalidate for static assets
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       const fetchPromise = fetch(event.request).then((networkResponse) => {

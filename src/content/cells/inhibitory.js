@@ -57,7 +57,7 @@ export default [
     morph: { style: 'stellate', seed: 55 },
     landmarks: ['soma', 'dendrites', 'axon', 'terminals'],
     shape: {
-      text: 'Stellate cells are compact, star-like [[interneuron|interneurons]] with [[dendrite|dendrites]] that radiate outward in all directions like the rays of a star. In sensory areas of the [[cortex]], they reside in layer 4 to receive incoming thalamic signals and provide rapid feedforward inhibition. In the {{cerebellum}}, they inhabit the outer molecular layer, synapsing directly onto the distal branches of [[Purkinje cell|Purkinje cells]].',
+      text: 'Stellate cells are compact, star-like [[interneuron|interneurons]] with [[dendrite|dendrites]] that radiate outward in all directions like the rays of a star. In sensory areas of the [[cortex]], they reside in layer 4 to receive incoming thalamic signals and provide rapid feedforward inhibition that sharpens sensory borders. In the {{cerebellum}}, they synapse directly onto the branches of [[Purkinje cell|Purkinje cells]].',
       bullets: [
         'Small polygonal or spherical cell body without a preferred vertical orientation.',
         'Radiating dendrites extend symmetrically in a sphere around the cell body.',
@@ -106,7 +106,7 @@ export default [
       bullets: [
         'Medium-sized multipolar soma with smooth or sparsely branched dendrites.',
         'Axon arbor forms specialized basket-like terminal nests embracing target cell bodies.',
-        'Expresses parvalbumin and specialized potassium channels that permit fast-spiking behavior above 150 Hertz.',
+        'Long horizontal axon collaterals branch outward to embrace several neighboring target cells.',
         'In the {{cerebellum}}, forms specialized pinceau structures that wrap the axon initial segment of Purkinje cells.',
       ],
     },

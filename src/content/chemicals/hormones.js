@@ -40,7 +40,7 @@ export default [
         to: 'heart',
         carries: 'Cortisol',
         via: 'blood',
-        text: 'The adrenal cortex releases cortisol into general circulation, raising blood sugar, elevating blood pressure, and focusing attention.',
+        text: 'The adrenal cortex releases cortisol into general circulation, sustaining vascular tone and tuning brain networks for extended challenges.',
       },
     ],
     feedback: [
@@ -151,7 +151,7 @@ export default [
         to: 'heart',
         carries: 'Adrenaline',
         via: 'blood',
-        text: 'The adrenal medulla releases adrenaline into the bloodstream, accelerating cardiac contraction and dilating bronchioles.',
+        text: 'The adrenal medulla releases adrenaline into the bloodstream, increasing cardiac pumping volume and redirecting circulation toward active muscles.',
       },
     ],
     feedback: [
@@ -431,7 +431,7 @@ export default [
         to: 'thalamus',
         carries: 'Melatonin',
         via: 'blood',
-        text: 'The pineal gland releases melatonin into circulation and spinal fluid, lowering core body temperature and easing thalamic sleep gates.',
+        text: 'The pineal gland releases melatonin into circulation and spinal fluid, promoting blood vessel dilation in hands and feet while easing thalamic sleep gates.',
       },
     ],
     feedback: [
@@ -533,7 +533,7 @@ export default [
         to: 'heart',
         carries: 'T3 and T4',
         via: 'blood',
-        text: 'The thyroid gland secretes T4 and T3 into general circulation, raising basal metabolic rate, oxygen consumption, and cardiac output.',
+        text: 'The thyroid gland secretes T4 and T3 into general circulation, accelerating cellular metabolism and fueling mitochondrial activity across muscles and organs.',
       },
     ],
     feedback: [
@@ -611,7 +611,7 @@ export default [
       text: 'Leptin is an adipose-derived peptide hormone produced by white fat cells in proportion to total body energy stores. Carried through the bloodstream, it crosses into the {{hypothalamus}} to inform the brain that energy reserves are sufficient. High leptin levels quiet hunger signals and permit energy-demanding processes like puberty and immune defense, while falling leptin triggers intense appetite and conservation of calories.',
       bullets: [
         'Discovered in 1994, transforming fat tissue from passive insulation into an active endocrine organ.',
-        'Acts directly on pro-opiomelanocortin (POMC) neurons in the arcuate nucleus to suppress food intake.',
+        'Provides a long-term homeostatic baseline, helping defend steady body weight over weeks and months.',
         'Falling leptin during starvation shuts down reproductive fertility to prevent pregnancy when nutrients are scarce.',
       ],
     },
@@ -773,7 +773,7 @@ export default [
     overview: {
       text: 'Growth hormone (somatotropin) is a 191-amino-acid peptide secreted by somatotrope cells in the anterior {{pituitary}}. Governed by alternating hypothalamic commands, it is released in dramatic nocturnal pulses during stage 3 slow-wave sleep. Throughout childhood it drives bone lengthening and organ enlargement, while in adulthood it shifts metabolism toward fat burning, muscle repair, and collagen maintenance.',
       bullets: [
-        'Over half of total daily growth hormone is released in major pulses during deep slow-wave sleep.',
+        'Released in periodic bursts throughout the day, with peaks provoked by vigorous physical exercise and fasting.',
         'Acts partly by commanding the liver to produce insulin-like growth factor 1 (IGF-1), which drives cellular division.',
         'Saves muscle protein during fasting by switching metabolic fuel consumption to free fatty acids.',
       ],
@@ -886,7 +886,7 @@ export default [
         to: 'heart',
         carries: 'Estrogen, progesterone, or testosterone',
         via: 'blood',
-        text: 'The gonads release sex steroids into the bloodstream to regulate reproduction, secondary sexual traits, and bone density.',
+        text: 'The gonads release sex steroids into systemic circulation, carried by binding proteins to influence gene expression across distant tissues.',
       },
     ],
     feedback: [

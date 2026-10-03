@@ -1,4 +1,4 @@
-import { structures, byId, anchorById, groups, levels, pathways, anchors, validate, sourceOf, chemicals, chemicalGroups, cells, cellGroups, chemById, cellById, roleForState } from './content/index.js';
+import { structures, byId, anchorById, groups, levels, pathways, anchors, validate, sourceOf, chemicals, chemicalGroups, getChemTabs, cells, cellGroups, getCellTabs, chemById, cellById, roleForState } from './content/index.js';
 import { createBrainScene } from './scene/brain-scene.js';
 import { playStep, chemLensConfig } from './scene/player.js';
 import { renderSidebar } from './ui/sidebar.js';
@@ -927,8 +927,6 @@ function orderedCellIds() {
   return out;
 }
 
-const CHEM_TABS = ['overview', 'tracts', 'synapse', 'medicine'];
-const CELL_TABS = ['shape', 'fires', 'lives', 'chem'];
 
 window.addEventListener('keydown', (e) => {
   if (e.target.matches('input, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
@@ -966,15 +964,19 @@ window.addEventListener('keydown', (e) => {
   }
   if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && r.type === 'chem') {
     e.preventDefault();
-    const i = CHEM_TABS.indexOf(r.tab);
-    const n = Math.min(Math.max((i === -1 ? 0 : i) + (e.key === 'ArrowRight' ? 1 : -1), 0), CHEM_TABS.length - 1);
-    location.hash = `#/chem/${r.id}/${CHEM_TABS[n]}`;
+    const c = chemById.get(r.id);
+    const tabs = getChemTabs(c).map((t) => t.id);
+    const i = tabs.indexOf(r.tab);
+    const n = Math.min(Math.max((i === -1 ? 0 : i) + (e.key === 'ArrowRight' ? 1 : -1), 0), tabs.length - 1);
+    location.hash = `#/chem/${r.id}/${tabs[n]}`;
   }
   if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && r.type === 'cell') {
     e.preventDefault();
-    const i = CELL_TABS.indexOf(r.tab);
-    const n = Math.min(Math.max((i === -1 ? 0 : i) + (e.key === 'ArrowRight' ? 1 : -1), 0), CELL_TABS.length - 1);
-    location.hash = `#/cell/${r.id}/${CELL_TABS[n]}`;
+    const c = cellById.get(r.id);
+    const tabs = getCellTabs(c).map((t) => t.id);
+    const i = tabs.indexOf(r.tab);
+    const n = Math.min(Math.max((i === -1 ? 0 : i) + (e.key === 'ArrowRight' ? 1 : -1), 0), tabs.length - 1);
+    location.hash = `#/cell/${r.id}/${tabs[n]}`;
   }
   if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft' || e.key === ' ') && r.type === 'ask' && !r.query) {
     const latest = state.chat.turns.filter((t) => t.role === 'assistant' && t.script).pop();

@@ -154,7 +154,7 @@ export default [
         to: ['prefrontal-cortex', 'hippocampus', 'amygdala', 'striatum'],
         job: 'Balancing mood, buffering stress, and supporting patient decision-making',
         text: 'Fibres ascend from the {{raphe-nuclei}} into the {{prefrontal-cortex}}, {{hippocampus}}, and {{amygdala}}. Serotonin softens fear responses in the amygdala and helps you think through stressful choices calmly.',
-        whenItFails: 'Weakened signalling is linked to rumination, anxiety, low mood, and irritability.',
+        whenItFails: 'Weakens emotional buffering, leaving frontal networks prone to rigid worry and difficulty shifting focus away from threats.',
         whenBlocked: 'Blocking specific receptors can cause sensory distortion or stop nausea, depending on the target.',
       },
       {
@@ -165,7 +165,7 @@ export default [
         job: 'Dampening incoming pain signals in the spinal cord',
         text: 'Lower raphe cells send axons down into the {{spinal-cord}}. Serotonin released here acts as a natural gatekeeper, muting pain signals before they can travel up to conscious awareness.',
         whenItFails: 'Loss of this downward brake can lead to chronic body pain and tender points.',
-        whenBlocked: 'Sensitivity to aches and physical discomfort increases when these pathways are interrupted.',
+        whenBlocked: 'Interferes with descending pain control, reducing the pain-relieving effect of natural endorphins.',
       },
     ],
     density: {

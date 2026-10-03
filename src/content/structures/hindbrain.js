@@ -27,7 +27,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Information comes in from the cortex (a copy of the plan, relayed through the {{pons}}) and from the body (what actually happened, through the spinal cord and {{medulla}}). The output goes back up through the {{thalamus}} to the motor cortex, so the correction lands where the command started.',
+        text: 'Comparing an intended action with ongoing physical feedback requires steady two-way traffic. Input pathways supply both the intended motor plan and real-time reports of limb position, while return signals relay upward through the thalamus so timing corrections arrive before a movement finishes.',
         connections: [
           { id: 'pons', dir: 'in', label: 'A copy of the movement plan from the cortex' },
           { id: 'spinal-cord', dir: 'in', label: 'Feedback on where your limbs actually are' },
@@ -93,7 +93,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Alarm input arrives from the {{amygdala}} when something might matter. The midbrain adds its reflex and passes the news upward to the {{thalamus}}, which wakes up the cortex. It also trades signals down with the {{pons}} to coordinate the eyes, head and body.',
+        text: 'Alarm signals arrive from the {{amygdala}} when something unexpected occurs. The midbrain triggers an instant reflex to snap your eyes and head toward the surprise, while passing the alert upward to the {{thalamus}} to wake up the thinking cortex.',
         connections: [
           { id: 'thalamus', dir: 'out', label: 'Alert signals passed up toward the cortex' },
           { id: 'pons', dir: 'both', label: 'Eye and body signals shared down the brainstem' },
@@ -131,7 +131,7 @@ export default [
     analogy: 'A busy interchange where every lane from the cortex gets copied and sent south to the cerebellum.',
     levels: {
       overview: {
-        text: 'The pons is the rounded bulge on the front of the brainstem, between the {{midbrain}} above, the {{medulla}} below, and the {{cerebellum}} behind. Its Latin name means bridge, describing its thick bundle of crossing [[white matter]] fibres that wrap around the brainstem\'s front.\n\nIt copies movement plans leaving the {{motor-cortex}} and forwards them south to the {{cerebellum}} so movements can be checked and smoothed. It also coordinates sideways eye movements, chewing, face sensation, and the switches that govern dream sleep.',
+        text: 'The pons is the rounded bulge on the front of the brainstem, between the {{midbrain}} above, the {{medulla}} below, and the {{cerebellum}} behind. Its Latin name means bridge, describing the thick bundle of crossing [[white matter]] fibres on its front.\n\nIt helps movements come out smoothly and also supports sideways eye movements, chewing, face sensation, and the switches that govern dream sleep.',
         bullets: [
           'Cerebellar relay: sends a copy of cortical motor plans to the cerebellum.',
           'Eye coordination: coordinates both eyes to move sideways together.',
@@ -140,7 +140,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Plans flow in from the {{motor-cortex}} and out to the {{cerebellum}}, which is the pons\'s main job. It also talks both ways with the {{medulla}} to share breathing, sleep and heartbeat duties.',
+        text: 'The pons passes a copy of a movement plan toward the system that checks its timing. Its other exchanges help coordinate automatic functions such as breathing and sleep.',
         connections: [
           { id: 'motor-cortex', dir: 'in', label: 'A copy of each movement plan from the cortex' },
           { id: 'cerebellum', dir: 'out', label: 'Plans forwarded for smoothing and timing' },
@@ -187,7 +187,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Orders about body state arrive from the {{hypothalamus}}. The medulla acts on them and trades signals both ways with the {{spinal-cord}} below and the {{pons}} above. It also swaps balance and body feedback with the {{cerebellum}} to keep posture steady.',
+        text: 'Body signals travel up through the spinal cord reporting blood pressure and oxygen levels, while orders arrive from the {{hypothalamus}}. The medulla coordinates these signals to keep your lungs breathing and heart beating in rhythm, working with the {{cerebellum}} to keep your balance steady.',
         connections: [
           { id: 'spinal-cord', dir: 'both', label: 'Body signals up, orders down' },
           { id: 'hypothalamus', dir: 'in', label: 'Body-state orders such as hunger or heat' },
@@ -226,7 +226,7 @@ export default [
     analogy: 'A motorway with local slip roads: through traffic to the brain, plus quick local exits for reflexes.',
     levels: {
       overview: {
-        text: 'The spinal cord runs from the {{medulla}} down inside your backbone, measuring about 45 cm long in an adult and roughly as thick as your little finger. At each vertebra, paired spinal nerves branch off to serve a specific horizontal strip of the body.\n\nIt serves as the main information highway, carrying movement commands down from the {{motor-cortex}} to muscles and touch feedback up to the {{somatosensory-cortex}}. It also manages immediate reflex loops on its own, pulling your hand away from a hot stove before the brain even registers pain.',
+        text: 'The spinal cord runs from the {{medulla}} down inside your backbone, measuring about 45 cm long in an adult and roughly as thick as your little finger. At each level, paired spinal nerves branch off to serve parts of the body.\n\nIt carries information between brain and body and also manages local reflexes. Pulling your hand away from a hot stove can begin here before you consciously feel the pain.',
         bullets: [
           'Two-way highway: carries motor orders down and sensory signals up.',
           'Local reflex loops: snaps limbs away from danger without waiting for the brain.',
@@ -235,7 +235,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Movement plans arrive from the {{motor-cortex}} and travel down to muscles. Touch and position signals head the other way to the {{somatosensory-cortex}}. A copy of both streams goes to the {{cerebellum}} so it can fine tune movement.',
+        text: 'Traffic runs in both directions through the cord. Descending signals help start movement, while ascending signals report touch and body position. Side routes let movement be adjusted as it happens.',
         connections: [
           { id: 'motor-cortex', dir: 'in', label: 'Movement orders travelling down to muscles' },
           { id: 'somatosensory-cortex', dir: 'out', label: 'Touch and body signals travelling up' },
@@ -283,7 +283,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Ascending fibres reach the {{prefrontal-cortex}}, {{amygdala}} and {{hypothalamus}}, where their effects depend on local receptors and activity. Descending fibres run to the {{spinal-cord}} and can either reduce or facilitate pain in different conditions.',
+        text: 'Serotonin axons fan out across the {{prefrontal-cortex}}, {{amygdala}}, and {{hippocampus}} to soften stress responses and encourage calm focus. At the same time, descending fibres run down into the {{spinal-cord}} to act as a gatekeeper, dampening pain signals before they can travel up to conscious awareness.',
         connections: [
           { id: 'prefrontal-cortex', dir: 'out', label: 'Behaviour and learning tuned by serotonin' },
           { id: 'amygdala', dir: 'out', label: 'Emotional responses modulated by serotonin' },
@@ -331,7 +331,7 @@ export default [
         ],
       },
       connects: {
-        text: 'It broadcasts alarm signals up to the {{thalamus}} and {{amygdala}} for threat processing, to the {{prefrontal-cortex}} for urgent decision-making, and back to the {{cerebellum}} for fast motor readiness.',
+        text: 'When a sudden noise or surprise demands attention, the locus coeruleus broadcasts a wave of noradrenaline across the brain. These signals quiet down background mental chatter in the {{thalamus}} and focus the {{prefrontal-cortex}} so you can react quickly.',
         connections: [
           { id: 'thalamus', dir: 'out', label: 'Sensory relay responses retuned' },
           { id: 'amygdala', dir: 'out', label: 'Emotional learning and arousal modulated' },

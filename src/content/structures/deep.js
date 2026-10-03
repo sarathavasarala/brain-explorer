@@ -24,7 +24,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Touch, sight and hearing arrive from below and leave for the {{visual-cortex}}, {{somatosensory-cortex}} and {{auditory-cortex}}. Plans and feedback move both ways with the {{prefrontal-cortex}}. Movement corrections arrive from the {{globus-pallidus}} and go onward to the {{motor-cortex}}.',
+        text: 'Signals heading toward the cortex do not pass through unchanged. Sensory streams are sharpened or muffled depending on attention and arousal, while reciprocal loops with frontal areas help align incoming data with current goals. Output from the basal ganglia and cerebellum also relays here to coordinate movement timing.',
         connections: [
           { id: 'visual-cortex', dir: 'out', label: 'Vision relayed to the back of the brain' },
           { id: 'somatosensory-cortex', dir: 'out', label: 'Touch relayed to the top of the brain' },
@@ -74,7 +74,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Emotional and memory news arrives from the {{amygdala}} and {{hippocampus}}. The hypothalamus turns that into body action, sending orders down to the {{medulla}} and alerting the {{thalamus}} so the cortex knows how the body feels.',
+        text: 'This hub translates emotional and contextual signals into physical changes. When emotional circuits signal stress or urgency, descending pathways adjust heart rate and digestion, while ascending relays notify the cortex of shifts in internal comfort.',
         connections: [
           { id: 'amygdala', dir: 'in', label: 'Fear or stress news that needs a body response' },
           { id: 'hippocampus', dir: 'in', label: 'Memory context arriving for context' },
@@ -133,7 +133,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Plans flow in from the {{prefrontal-cortex}} and {{motor-cortex}}. [[Dopamine]] from the {{substantia-nigra}} changes how striatal pathways learn and respond. Inhibitory output then reaches the {{globus-pallidus}} and substantia nigra reticulata, influencing movement through thalamic and brainstem loops rather than carrying an order directly to muscles.',
+        text: 'Cortical inputs propose many potential movements at once. Dopamine arriving from midbrain centers modulates which striatal circuits become active, tilting the balance so selected plans can proceed while competing options are held back.',
         connections: [
           { id: 'prefrontal-cortex', dir: 'in', label: 'Goals and plans arriving for review' },
           { id: 'motor-cortex', dir: 'in', label: 'Movement options arriving for choice' },
@@ -178,7 +178,7 @@ export default [
     analogy: 'A security guard whose default answer is no, until the striatum shows the right pass.',
     levels: {
       overview: {
-        text: 'The globus pallidus is a pale, cone shaped nucleus nestled just inside the curve of the {{striatum}}, near the center of each [[hemisphere]]. It sits between the striatum on the outside and the {{thalamus}} below. Its pale appearance comes from tightly packed, [[myelin]] wrapped nerve fibres coursing through its inner and outer segments.\n\nThe globus pallidus acts as the brain\'s default brake pedal for physical movement. Its neurons fire continuously at rest, showering the {{thalamus}} with [[GABA]] to prevent random twitches and unwanted movements. When the {{striatum}} selects an intended action, it briefly silences a patch of pallidal cells, lifting the brake just enough to let the winning movement flow through smoothly.',
+        text: 'The globus pallidus is a pale, cone shaped nucleus nestled just inside the curve of the {{striatum}}, near the center of each [[hemisphere]]. Its pale appearance comes from tightly packed, [[myelin]] wrapped nerve fibres.\n\nIt acts like a brake on movement. Its cells are active even at rest, helping prevent unwanted motions. A brief reduction in that activity can help a chosen action proceed, such as lifting a cup without also moving your other hand.',
         bullets: [
           "Movement brake: continuously inhibits the thalamus to prevent spontaneous, unwanted twitches.",
           "Selective release: pauses its firing momentarily to let chosen movements proceed.",
@@ -234,7 +234,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Its main delivery goes up to the {{striatum}}. It swaps tuning signals both ways with the {{globus-pallidus}}. A smaller branch reaches the {{thalamus}}, keeping the whole loop supplied.',
+        text: 'Rather than driving movements directly, this region releases neuromodulatory signals that adjust responsiveness in motor circuits. A burst of dopamine lowers the threshold for starting an action, while inhibitory outputs help stabilize eye movements and posture.',
         connections: [
           { id: 'striatum', dir: 'out', label: 'Dopamine teaching signal sent upward' },
           { id: 'globus-pallidus', dir: 'both', label: 'Braking level tuned together' },
@@ -305,7 +305,7 @@ export default [
     analogy: 'A librarian who files the day\'s loose pages overnight so you can find them later.',
     levels: {
       overview: {
-        text: 'The hippocampus is a curved, seahorse shaped ridge nestled deep inside the medial {{temporal-lobe}}, one per hemisphere. It sits alongside the {{amygdala}} and connects intimately with the surrounding entorhinal cortex, which acts as its main information doorway. It occupies a prime intersection where streams of what, where, and when converge.\n\nThe hippocampus binds the loose threads of an experience into a unified memory. Faces, sounds, locations, and emotions arrive separately, and the hippocampus weaves them together so that encountering a single cue later revives the entire episode. It also creates flexible cognitive maps of physical space, which is why London taxi drivers expand their rear hippocampi while memorizing thousands of city streets.',
+        text: 'The hippocampus is a curved, seahorse shaped ridge nestled deep inside the medial {{temporal-lobe}}, one per hemisphere. It sits beside the {{amygdala}} and has a folded inner structure.\n\nThe hippocampus binds the loose threads of an experience into a unified memory. Faces, sounds, locations, and emotions become one event, so a single cue can later bring the episode back. It also creates flexible maps of physical space, which is why London taxi drivers show changes in their rear hippocampi after years of learning city streets.',
         bullets: [
           "Episodic binding: links sensory details, time, and places into coherent conscious memories.",
           "Spatial mapping: uses place cells to build and maintain internal navigation maps of your environment.",
@@ -314,7 +314,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Day to day experience flows in both ways with the {{temporal-lobe}}. Emotional weight arrives both ways from the {{amygdala}}. Finished files go out to the {{mammillary-bodies}}, {{hypothalamus}} and {{prefrontal-cortex}} for memory consolidation and long term keeping.',
+        text: 'An event is easier to remember when its sensory details, setting, and emotional meaning can be brought together. Memory circuits exchange signals in both directions, so a familiar cue can help reconstruct an earlier experience.',
         connections: [
           { id: 'temporal-lobe', dir: 'both', label: 'Daily experience traded both ways' },
           { id: 'mammillary-bodies', dir: 'out', label: 'Memory highway sent along the fornix bundle' },
@@ -398,7 +398,7 @@ export default [
     analogy: 'A smoke detector: quick, loud and sometimes wrong, but worth having.',
     levels: {
       overview: {
-        text: 'The amygdala is an almond shaped cluster of nuclei resting at the front tip of the {{hippocampus}}, deep within the medial {{temporal-lobe}}. There is one in each hemisphere, positioned where vision, hearing, smell, and visceral body sensations intersect. It links directly to the {{hypothalamus}} and {{midbrain}} to trigger immediate physical defense reactions.\n\nThe amygdala acts as an emotional threat detector and salience filter. When you glimpse a coiled garden hose on a trail, your amygdala triggers an instant freeze or jump before your cortex even identifies the object as harmless rubber. Beyond fear, it stamps emotional weight onto memories, ensuring that significant threats, social bonds, and valuable rewards are remembered vividly.',
+        text: 'The amygdala is an almond shaped cluster of nuclei at the front of each medial {{temporal-lobe}}, close to the {{hippocampus}}. There is one in each hemisphere.\n\nIt helps judge which experiences deserve attention, especially possible threats. A coiled garden hose on a trail might make you pause before you recognize it as harmless. The amygdala also helps emotionally significant experiences stand out in memory, including rewards and social encounters.',
         bullets: [
           "Threat detection: triggers instant freeze, flight, or fight responses within milliseconds of danger.",
           "Emotional stamping: works with the {{hippocampus}} to anchor vivid memories of emotionally charged events.",
@@ -407,7 +407,7 @@ export default [
         ],
       },
       connects: {
-        text: 'A quick rough sketch arrives from the {{thalamus}}, while detailed news is traded both ways with the {{prefrontal-cortex}} and {{hippocampus}}. Orders go out to the {{hypothalamus}} for stress hormones and to the {{midbrain}} for freezing or fleeing.',
+        text: 'A threat response changes as new evidence comes in. Sensory relays can raise alarm, while memory and frontal circuits help revise it. Outgoing pathways prepare the body to act.',
         connections: [
           { id: 'thalamus', dir: 'in', label: 'Fast rough sketch received early' },
           { id: 'hypothalamus', dir: 'out', label: 'Stress hormones ordered from the body' },
@@ -491,7 +491,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Fibres run both ways with the {{frontal-lobe}} for plans, the {{parietal-lobe}} for touch and space, and the {{occipital-lobe}} for vision. Almost every pair of matching areas talks through this bridge.',
+        text: 'By linking matching areas in each hemisphere, this bridge keeps perceptual maps and decisions unified. Sensorimotor information gathered by one side is shared across the midline within milliseconds, allowing both hands and both eyes to work in coordinated partnership.',
         connections: [
           { id: 'frontal-lobe', dir: 'both', label: 'Plans and decisions shared across sides' },
           { id: 'parietal-lobe', dir: 'both', label: 'Touch and space maps kept in sync' },
@@ -538,7 +538,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Its main branches go up to the {{striatum}} for reward pursuit, the {{prefrontal-cortex}} for planning, and the {{amygdala}} for emotional weight.',
+        text: 'Broad ascending projections carry dopamine pulses to frontal and limbic networks. Rather than carrying detailed sensory content, these signals tell downstream circuits whether an event exceeded expectations, updating the value of memories and strengthening the urge to pursue useful goals.',
         connections: [
           { id: 'striatum', dir: 'out', label: 'Learning and motivation signals sent to striatum' },
           { id: 'prefrontal-cortex', dir: 'out', label: 'Dopamine tunes working memory and planning' },
@@ -586,7 +586,7 @@ export default [
         ],
       },
       connects: {
-        text: 'It sends widespread projections up to the {{frontal-lobe}} for attention, the {{temporal-lobe}} for recognition, and the {{hippocampus}} for storing new facts.',
+        text: 'Widespread ascending fibres release acetylcholine across the cortex and limbic system. Rather than carrying specific sensory content, these diffuse signals enhance the signal-to-noise ratio in target areas, sharpening perception when something demands close attention and priming memory circuits to record the moment.',
         connections: [
           { id: 'frontal-lobe', dir: 'out', label: 'Acetylcholine sent to boost executive focus' },
           { id: 'hippocampus', dir: 'out', label: 'Rhythm and memory storage signals' },
@@ -626,16 +626,16 @@ export default [
     analogy: 'A gateway where wanting meets doing.',
     levels: {
       overview: {
-        text: 'The nucleus accumbens is a round, almond-sized structure nestled at the bottom front of the {{striatum}}, where the head of the caudate meets the putamen. Present in each hemisphere, it forms the core of the ventral striatum and sits at the prime crossroads between emotional limbic networks and motor planning circuits.\n\nThe nucleus accumbens translates motivational wanting into physical doing. When [[dopamine]] arrives from the {{vta}}, it signals that an upcoming goal is worth pursuing, prompting motor loops to initiate action. Whether walking toward the kitchen when hunger strikes or checking your phone after a chime, this gateway helps convert anticipation into movement.',
+        text: 'The nucleus accumbens is a round, almond-sized structure at the bottom front of the {{striatum}}. There is one in each hemisphere, within the ventral striatum.\n\nIt helps turn anticipation into action. When hunger makes a snack appealing, or a phone chime draws your attention, this area helps weigh whether the expected reward is worth the effort of moving toward it.',
         bullets: [
           "Wanting into doing: translates emotional desire and reward anticipation into goal-directed movement.",
           "Reward evaluation: registers unexpected positive outcomes to reinforce successful behaviors.",
           "Effort calculation: weighs whether an anticipated reward justifies the physical or mental effort required.",
-          "Limbic-motor bridge: connects the {{amygdala}} and {{hippocampus}} to downstream basal ganglia motor loops.",
+          "Action selection: helps translate motivation into a choice you can carry out.",
         ],
       },
       connects: {
-        text: 'Dopamine arrives from the {{vta}} along the mesolimbic pathway. Context and emotional cues arrive from the {{hippocampus}} and {{amygdala}}. Goals come from the {{prefrontal-cortex}}, and output leaves for the ventral pallidum and motor circuits.',
+        text: 'Emotional significance from the amygdala and spatial context from the hippocampus converge here alongside goal plans from prefrontal cortex. Dopamine pulses from the midbrain modulate this intersection, helping determine whether an anticipated reward is worth the physical effort to pursue.',
         connections: [
           { id: 'vta', dir: 'in', label: 'Dopamine reward signals from the midbrain' },
           { id: 'prefrontal-cortex', dir: 'in', label: 'Goal and value plans arriving from cortex' },
@@ -684,7 +684,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Direct neural and blood portal connections link it to the {{hypothalamus}}. Hormones produced here leave through capillary networks to circulate across the rest of the body.',
+        text: 'Direct nerve fibres and a tiny network of blood vessels connect the pituitary to the {{hypothalamus}}. In response to chemical orders from the brain, the pituitary releases hormones into the bloodstream to instruct distant glands throughout the body, with feedback signals returning to report on body balance.',
         connections: [
           { id: 'hypothalamus', dir: 'in', label: 'Releasing hormones and direct nerve axons' },
           { id: 'thalamus', dir: 'both', label: 'Feedback relayed through subcortical networks' },
@@ -731,7 +731,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Information about light and darkness arrives indirectly from the {{hypothalamus}} through a sympathetic nerve pathway looping down into the neck and back up. The pineal gland outputs its message chemically, pouring melatonin straight into blood capillaries and surrounding cerebrospinal fluid.',
+        text: 'Day and night cues arrive from the {{hypothalamus}} through a sympathetic nerve pathway. The resulting melatonin release enters the bloodstream and fluid spaces around the brain, acting as a chemical nightfall broadcast that prepares sleep centers for rest.',
         connections: [
           { id: 'hypothalamus', dir: 'in', label: 'Day and night timing cues from the master clock' },
           { id: 'thalamus', dir: 'out', label: 'Melatonin signals bathing sleep gating circuits' },
@@ -770,16 +770,16 @@ export default [
     analogy: 'A relay station on a rail line, passing memory signals to the next stop.',
     levels: {
       overview: {
-        text: 'The mammillary bodies are two small, rounded nuclei projecting from the underside of the posterior {{hypothalamus}}, positioned right behind the pituitary stalk and in front of the brainstem. Despite their modest size, they serve as an essential waystation for neural signals traveling along the memory loop known as the Papez circuit.\n\nThese nuclei receive a major bundle of nerve fibres called the [[fornix]] from the {{hippocampus}} and relay those signals straight to the anterior {{thalamus}}. This continuous relay loop is vital for recollecting past personal events. Without it, the brain can still retrieve older childhood memories but cannot stitch recently experienced details into permanent recall.',
+        text: 'The mammillary bodies are two small, rounded nuclei projecting from the underside of the posterior {{hypothalamus}}, behind the pituitary stalk and in front of the brainstem.\n\nThey help support memory for personal events. Damage here can make it hard to form or retrieve recent memories, even when older memories remain available. Their small size makes them easy to miss in a whole-brain view.',
         bullets: [
-          "Memory waystation: relays episodic memory signals from the {{hippocampus}} to the anterior {{thalamus}}.",
+          "Memory support: helps recent experiences become memories you can later recall.",
           "Spatial orientation: contains head-direction neurons that help track heading and trajectory in space.",
           "Rhythmic pacing: fires in synchrony with hippocampal theta rhythms to coordinate memory storage.",
           "Metabolic sensitivity: relies heavily on thiamine (vitamin B1) to fuel its high energy demands.",
         ],
       },
       connects: {
-        text: 'Signals travel here from the {{hippocampus}} through the arching [[fornix]]. The mammillary bodies process them and send a bundle (the mammillothalamic tract) straight to the {{thalamus}}, which loops onward to the {{cingulate-cortex}}.',
+        text: 'This is one stop in a wider memory circuit. Signals arrive along the [[fornix]] and leave through the mammillothalamic tract before continuing around the loop.',
         connections: [
           { id: 'hippocampus', dir: 'in', label: 'Memory signals received along the fornix' },
           { id: 'thalamus', dir: 'out', label: 'Relayed upward to the anterior thalamus' },
@@ -828,7 +828,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Signals about errors and missing rewards arrive from the {{globus-pallidus}} and basal ganglia, alongside context from the {{prefrontal-cortex}}. The habenula then sends fibres down to the {{vta}} and {{raphe-nuclei}} to quiet dopamine and serotonin release.',
+        text: 'When something you hoped for does not happen or a plan falls through, the habenula flags the disappointment. It receives error signals from the {{prefrontal-cortex}} and {{globus-pallidus}}, and immediately tells the {{vta}} and {{raphe-nuclei}} to pause dopamine release so you can learn from the mistake.',
         connections: [
           { id: 'globus-pallidus', dir: 'in', label: 'Missing reward and error signals from basal ganglia' },
           { id: 'prefrontal-cortex', dir: 'in', label: 'Context and rule evaluation received' },
@@ -868,16 +868,16 @@ export default [
     analogy: 'A direct phone line to memory that skips the central switchboard.',
     levels: {
       overview: {
-        text: 'The olfactory bulbs are two matchstick-sized stalks resting on the skull floor, directly beneath each {{frontal-lobe}} and just above the roof of the nasal cavity. They are separated from the nose only by a paper-thin perforated bone called the cribriform plate. Delicate scent nerve fibres pass through these perforations directly into the bulbs, making smell the only sense that bypasses the {{thalamus}} on its way to cortex.\n\nThe olfactory bulb receives chemical scent messages from nasal receptors and organizes them into recognizable odor patterns. It sends those patterns directly to the {{amygdala}} and {{hippocampus}}. This direct limbic wiring explains why catching the scent of woodsmoke, sunscreen, or rain can instantly revive a forgotten childhood memory before your conscious mind has even named the aroma.',
+        text: 'The olfactory bulbs are two matchstick-sized structures resting on the skull floor, beneath the {{frontal-lobe}} and above the nasal cavity. A thin, perforated bone separates them from the nose.\n\nEach bulb sorts incoming scent signals into patterns that the brain can recognize. A whiff of woodsmoke or sunscreen can bring back a memory before you have consciously named the smell.',
         bullets: [
           "Odor pattern sorting: organizes input from hundreds of olfactory receptor types into identifiable scent maps.",
-          "Direct limbic highway: projects straight to the {{amygdala}} and {{hippocampus}} without a thalamic detour.",
+          "Unusual route: smell reaches cortex without the thalamic relay used by other senses.",
           "Contrast sharpening: uses local inhibitory interneurons to distinguish between subtly different aromas.",
           "Hazard warning: triggers immediate alarm upon sensing smoke, spoiled food, or airborne chemical toxins.",
         ],
       },
       connects: {
-        text: 'Sensory signals enter from the nose and leave directly for the {{amygdala}} and {{hippocampus}}. Relays through olfactory cortex then carry aroma information onward to the {{insula}} and {{prefrontal-cortex}}.',
+        text: 'Smell takes a different early route from sight or hearing: its signals reach olfactory and limbic areas without first passing through a thalamic relay. Later processing helps attach flavor, emotion, memory, and names to an odor.',
         connections: [
           { id: 'amygdala', dir: 'out', label: 'Direct scent signals sent to emotion circuits' },
           { id: 'hippocampus', dir: 'out', label: 'Scent patterns sent to retrieve episodic memories' },
@@ -905,4 +905,3 @@ export default [
     },
   },
 ];
-

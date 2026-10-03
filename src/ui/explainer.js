@@ -90,7 +90,7 @@ export function renderStateSwitcher(s, levelId, activeStateKind, file) {
                 <span class="scenario-label">${esc(st.title || meta.label)}</span>
                 <span class="scenario-teaser">${esc(st.teaser || meta.question)}</span>
               </div>
-              <span class="scenario-chevron ${isActive ? 'is-open' : ''}" aria-hidden="true">›</span>
+              <span class="scenario-chevron ${isActive ? 'is-open' : ''}" aria-hidden="true">${icon('plus', 12)}</span>
             </a>
             ${isActive ? `
               <div class="scenario-detail">
@@ -200,14 +200,16 @@ export function renderStructure(s, levelId, source, activeStateKind = null) {
       <h2 class="level-title">${esc(level.label)} <span>${esc(level.size)}</span></h2>
       ${body}
     </section>
-    <section class="extra">
-      <h3>${icon('hand', 18)} Try it yourself</h3>
-      ${s.tryIt ? `<p>${fmt(s.tryIt)}</p>` : todo(`${file} → ${s.id}.tryIt`)}
-    </section>
-    <section class="extra breaks-section">
-      <h3>${icon('alert', 18)} When it goes wrong</h3>
-      ${renderStateSwitcher(s, level.id, activeStateKind, file)}
-    </section>
+    ${(level.id === 'overview' || activeState) ? `
+      <section class="extra">
+        <h3>${icon('hand', 18)} Try it yourself</h3>
+        ${s.tryIt ? `<p>${fmt(s.tryIt)}</p>` : todo(`${file} → ${s.id}.tryIt`)}
+      </section>
+      <section class="extra breaks-section">
+        <h3>${icon('alert', 18)} When it goes wrong</h3>
+        ${renderStateSwitcher(s, level.id, activeStateKind, file)}
+      </section>
+    ` : ''}
     <footer class="pager">
       ${prev ? `<a href="#/s/${prev.id}/${level.id}" class="pg">${icon('prev', 16)}<span>${esc(prev.name)}</span></a>` : '<span></span>'}
       ${next ? `<a href="#/s/${next.id}/${level.id}" class="pg pg-next"><span>${esc(next.name)}</span>${icon('next', 16)}</a>` : '<span></span>'}

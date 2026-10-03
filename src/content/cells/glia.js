@@ -12,7 +12,7 @@ export default [
     morph: { style: 'astrocyte', seed: 111 },
     landmarks: ['soma', 'processes', 'vessel'],
     shape: {
-      text: 'Astrocytes are bushy, star-shaped glial cells that fill the spaces between [[neuron|neurons]] across the whole brain. A central cell body sends out dozens of primary branches that divide into hundreds of thousands of sponge-like leaflets. Specialized end-feet completely wrap blood vessels, helping maintain the blood-brain barrier and regulating local blood flow to hungry neural circuits.',
+      text: 'Astrocytes are bushy, star-shaped cells that fill the spaces between neurons across the entire brain. A central cell body sends out dozens of primary branches that divide into hundreds of thousands of delicate, sponge-like leaflets. These fine leaflets wrap snugly around synapses to keep chemical messengers from spilling over, while vascular end-feet wrap tightly around capillaries to feed hungry circuits.',
       bullets: [
         'Star-shaped branching tree ending in hundreds of thousands of fine, cloud-like leaflet processes.',
         'Each astrocyte maintains an exclusive spatial territory that encompasses tens of thousands of [[synapses]].',
@@ -21,7 +21,7 @@ export default [
       ],
     },
     fires: {
-      text: 'Astrocytes do not fire electrical action potentials. Instead, they communicate and coordinate support using slow waves of intracellular calcium. When neighboring [[neuron|neurons]] fire intensely, astrocytes detect the chemical spillover and trigger calcium waves that dilate nearby blood vessels and increase sugar delivery.',
+      text: 'Astrocytes do not fire electrical action potentials. Instead, they communicate and coordinate support using slow waves of calcium traveling through their branches. When neighboring neurons work hard, astrocytes sense the chemical traffic and mobilize fuel stores, converting stored glycogen into lactate to feed working axons.',
       steps: [
         '1. Active neurons release [[glutamate]] and energy molecules like ATP into the synaptic gap.',
         '2. Astrocytic surface [[receptors]] detect these chemical messengers.',
@@ -56,7 +56,7 @@ export default [
     morph: { style: 'oligodendrocyte', seed: 121 },
     landmarks: ['soma', 'processes', 'myelin'],
     shape: {
-      text: 'Oligodendrocytes are the specialized myelin-producing glia of the central nervous system, heavily populating white matter tracts like the {{corpus-callosum}}. A compact cell body extends dozens of slender arms toward neighboring [[axon|axons]]. Each arm flattens into a broad sheet and wraps around an axon up to one hundred times, creating an insulated spiral sheath of [[myelin]].',
+      text: 'Oligodendrocytes are the living cable insulators of the central nervous system, heavily populating white matter tracts like the {{corpus-callosum}}. A compact cell body extends dozens of slender arms toward neighboring [[axon|axons]]. Each arm flattens into a broad sheet and wraps around an axon up to one hundred times, squeezing out water to form a tight, protective spiral sheath of [[myelin]].',
       bullets: [
         'Small rounded cell body with dense cytoplasm and slender radiating arms.',
         'A single oligodendrocyte extends 20 to 50 processes, myelinating segments on dozens of different axons.',
@@ -115,7 +115,7 @@ export default [
         '1. Healthy neurons display chemical safety signals to inform microglia that the circuit is sound.',
         '2. Cellular injury or infection causes sudden leakage of ATP into the extracellular fluid.',
         '3. Microglial surface [[receptors]] lock onto the ATP gradient and direct rapid branch growth toward the injury.',
-        '4. The microglia engulf damaged cellular material and prune away weak, unused [[synapses]] to keep circuits clean.',
+        '4. The microglia seal off the injured site, engulfing dead cellular debris and pruning away weak [[synapses]] to keep circuits clean.',
       ],
     },
     chem: {

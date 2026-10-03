@@ -12,7 +12,7 @@ export default [
     morph: { style: 'pyramidal', seed: 11 },
     landmarks: ['soma', 'dendrites', 'spines', 'axon', 'terminals'],
     shape: {
-      text: 'A pyramid-shaped cell body points its apex toward the surface of the [[cortex]]. A tall apical [[dendrite]] extends upward toward layer 1 to collect feedback, while a skirt of basal dendrites spreads outward around the base. Tens of thousands of dendritic spines stud these branches, capturing incoming [[glutamate]] signals. A single long [[axon]] emerges from the base to carry outgoing pulses across the {{corpus-callosum}} or down toward the {{spinal-cord}}.',
+      text: 'Pyramidal cells are built to combine different streams of information. Sensory evidence arrives on the lower basal branches near the cell body, while attentional context from distant brain areas lands on the tall apical tuft near the surface. Tens of thousands of spines process these inputs locally before the cell decides whether to send a pulse down its axon toward other cortical regions or the {{spinal-cord}}.',
       bullets: [
         'Triangular cell body with its apex oriented toward the brain surface.',
         'Prominent apical dendrite climbs vertically and fans into a delicate tuft in upper cortical layers.',
@@ -21,7 +21,7 @@ export default [
       ],
     },
     fires: {
-      text: 'Pyramidal cells integrate thousands of tiny electrical inputs arriving across their dendritic branches. When incoming positive charge depolarizes the cell body past its firing threshold, a sharp [[action potential]] erupts at the axon initial segment and travels at high speed to distant targets.',
+      text: 'Individual branches act as mini-processors, generating small local voltage shifts in response to incoming messages. When enough branches become active together, the combined electrical charge sweeps into the axon trigger zone, unleashing a spike that travels down the axon.',
       steps: [
         '1. [[Glutamate]] released from upstream axons binds to AMPA and NMDA [[receptors]] on dendritic spines.',
         '2. Sodium and calcium ions rush inward, creating localized electrical currents along the dendritic branches.',
@@ -57,7 +57,7 @@ export default [
     morph: { style: 'granule', seed: 23 },
     landmarks: ['soma', 'dendrites', 'axon', 'terminals'],
     shape: {
-      text: 'Granule cells are among the smallest and most numerous [[neuron|neurons]] in the human brain. Each tiny round cell body sprouts three to five short, claw-like [[dendrite|dendrites]] that receive sensory and motor messages. In the {{cerebellum}}, its slender [[axon]] travels upward into the outer layer, where it splits into a T-junction to run horizontally for several millimetres as a parallel fibre, passing through thousands of [[Purkinje cell|Purkinje cells]].',
+      text: 'Granule cells account for more than half of all the neurons in the human brain, packed together in tight rows like grains of sand. Their unusual geometry allows a massive expansion of incoming signals: a few thousand sensory fibres branch out to contact millions of granule cells, which then distribute synchronized timing pulses through long horizontal fibres.',
       bullets: [
         'Tiny spherical cell body measuring roughly 0.01 mm across.',
         'Three to five short dendrites ending in claw-like tips inside synaptic glomeruli.',
@@ -102,7 +102,7 @@ export default [
     morph: { style: 'relay', seed: 37 },
     landmarks: ['soma', 'dendrites', 'axon', 'terminals'],
     shape: {
-      text: 'Thalamic relay neurons are bushy, multipolar cells nestled within the specific sensory nuclei of the {{thalamus}}. Their radiating [[dendrite|dendrites]] form a dense spherical bush that receives sensory signals from the body and feedback from the [[cortex]]. A long, insulated [[axon]] travels upward through the white matter to deliver sensory information to layer 4 of sensory and motor regions.',
+      text: 'Positioned at the crossroads of perception, each thalamic relay cell is organized to receive two distinct inputs: sensory messages from peripheral nerves arrive on the inner branches, while top-down feedback from the cortex contacts the outer branches. This layout allows the cell to act as an adjustable gate, shaping sensory signals before sending them up to the cortex.',
       bullets: [
         'Rounded cell body with a dense, bush-like thicket of dendrites radiating in all directions.',
         'Dendritic branches possess complex appendages that receive primary sensory inputs.',
