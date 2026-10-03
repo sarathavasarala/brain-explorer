@@ -299,6 +299,33 @@ export default [
         'Too much dopamine signalling is linked to the false alarms of psychosis.',
         'Some Parkinson\'s drugs mimic dopamine but can cause impulsive habits like gambling.',
       ],
+      states: [
+        {
+          kind: 'lesion',
+          text: 'The gradual loss of dopamine-producing cells in the substantia nigra deprives movement circuits of their chemical starter signal. Without steady dopamine delivery to the striatum, the brain struggles to initiate and smooth voluntary physical actions. Muscles become stiff and slow, and hands tremble rhythmically when resting.',
+          signs: [
+            'Slowness and freezing when attempting to start walking or reaching.',
+            'Rhythmic resting tremor in the fingers that calms down during active movement.',
+            'Muscle stiffness that feels like moving against continuous resistance.',
+          ],
+          case: {
+            name: 'Parkinson\'s Disease (Parkinson, 1817)',
+            text: 'In 1817, British physician James Parkinson published the first detailed clinical account of the shaking palsy. Later researchers identified the underlying cause as the loss of dopamine-producing cells in the substantia nigra pars compacta. This chemical deficit cuts off signals to the striatum, producing resting tremors, muscle rigidity, and difficulty starting movements.',
+          },
+          ripple: [
+            { id: 'striatum', role: 'cut_off' },
+          ],
+        },
+        {
+          kind: 'over',
+          text: 'Flooding movement and reward networks with excessive dopamine activity causes motor circuits to fire without restraint. Instead of producing smooth coordination, the excess dopamine sparks involuntary twisting and dance-like gestures known as dyskinesias. At the same time, reward circuits become overstimulated, sparking sudden compulsive urges like gambling or shopping.',
+          signs: [
+            'Involuntary writhing or dance-like movements of the limbs and face.',
+            'Sudden compulsive urges to gamble, spend money, or repeat repetitive tasks.',
+            'Restless physical agitation and an inability to remain still.',
+          ],
+        },
+      ],
     },
   },
   {
@@ -361,6 +388,47 @@ export default [
         'A brief loss of blood or oxygen can wipe out hours around the event.',
         'Long-term stress and depression are associated with smaller hippocampal volume, but the causes and reversibility vary between people.',
       ],
+      states: [
+        {
+          kind: 'lesion',
+          text: 'Removing or destroying both hippocampi permanently stops the brain from creating new conscious memories of daily events, conversations, and places. Older memories formed long before the damage remain mostly intact, and immediate focus remains clear until attention shifts. Skills and habits can still be learned smoothly through motor circuits without any conscious memory of practicing them.',
+          signs: [
+            'Inability to form new lasting memories of events, conversations, or places.',
+            'Preserved ability to learn physical skills, such as mirror drawing, without remembering practice sessions.',
+            'Normal immediate short-term recall that vanishes the moment attention shifts.',
+          ],
+          case: {
+            name: 'Patient H.M. (Henry Molaison, 1953)',
+            text: 'In 1953, Henry Molaison underwent bilateral surgery removing his medial temporal lobes to relieve severe epilepsy. Psychologist Brenda Milner discovered he had dense anterograde amnesia, leaving him unable to store new conscious memories. Yet his working memory was preserved while rehearsing, and his motor circuits smoothly mastered mirror drawing across several days without any conscious recollection of the task.',
+          },
+          ripple: [
+            { id: 'temporal-lobe', role: 'cut_off' },
+          ],
+        },
+        {
+          kind: 'size',
+          look: 'more_active',
+          text: 'Years of intensive spatial navigation can physically reshape the hippocampus through neural plasticity. Navigating complex, flexible routes expands gray matter volume in the posterior hippocampus while slightly shrinking the anterior portion. This physical remodeling shows that adult brain maps grow and adapt to meet heavy everyday demands.',
+          signs: [
+            'Enlarged rear hippocampus storing a dense mental street atlas.',
+            'Smaller front hippocampus, showing structural trade-offs in memory networks.',
+            'Volume growth that scales directly with years spent practicing navigation.',
+          ],
+          case: {
+            name: 'London Taxi Drivers (Maguire et al., 2000)',
+            text: 'Neuroscientist Eleanor Maguire scanned London taxi drivers who spend years memorizing 25,000 streets to pass The Knowledge examination. Drivers showed significantly enlarged rear hippocampi and smaller front hippocampi compared to non-drivers and bus drivers following fixed routes. The growth in the posterior hippocampus correlated directly with the number of years spent navigating the city.',
+          },
+        },
+        {
+          kind: 'over',
+          text: 'When hippocampal circuits fire in sudden, uncontrolled electrical bursts, stored memory patterns trigger all at once. This unprovoked storm produces vivid sensory flashes, dreamlike memories, and sudden feelings of intense familiarity known as deja vu. Because the hippocampus connects directly to emotion hubs, these seizures often arrive alongside an overwhelming sense of dread or detachment.',
+          signs: [
+            'Intense waves of deja vu where unfamiliar settings feel completely recognized.',
+            'Sudden involuntary flashes of past memories and vivid sensory scenes.',
+            'Rising abdominal sensations accompanied by unprovoked dread or detachment.',
+          ],
+        },
+      ],
     },
   },
   {
@@ -417,6 +485,37 @@ export default [
         'Overactivity is linked to anxiety, phobias and post traumatic stress.',
         'Underactivity can flatten fear and risk sensing, so warnings are ignored.',
         'Seizures here can bring sudden waves of fear or deja vu for no reason.',
+      ],
+      states: [
+        {
+          kind: 'lesion',
+          text: 'Losing both amygdalae silences the brain\'s internal threat alarm, leaving a person unable to feel external fear or detect immediate danger. Everyday curiosity remains bright, but instincts that protect against dangerous animals, heights, or threatening people are absent. Reading subtle fear in other people\'s faces also becomes difficult because the brain no longer automatically scans their eyes.',
+          signs: [
+            'Complete absence of fear in dangerous physical and social situations.',
+            'Difficulty identifying fearful facial expressions unless reminded to look at the eyes.',
+            'Failure to learn caution or avoid situations that caused past harm.',
+          ],
+          case: {
+            name: 'Patient S.M. (Adolphs et al., 1994)',
+            text: 'Patient S.M. developed complete bilateral calcification of both amygdalae due to a rare genetic condition called Urbach-Wiethe disease. Researchers found that she felt no fear when handling venomous snakes, exploring haunted houses, or encountering real-world threats. She also struggled to recognize fear in photographs of faces, until eye-tracking experiments showed that prompting her to scan the eyes restored normal recognition.',
+          },
+          ripple: [
+            { id: 'prefrontal-cortex', role: 'cut_off' },
+          ],
+        },
+        {
+          kind: 'over',
+          text: 'When the amygdala fires uncontrollably, it launches the body\'s full emergency response without any real threat present. It floods the hypothalamus with alarm signals, triggering a pounding heartbeat, shallow breathing, and sudden trembling. Conscious reasoning from the prefrontal cortex is drowned out, leaving the mind consumed by sudden terror.',
+          signs: [
+            'Sudden surge of pounding heart rate, sweating, and shortness of breath.',
+            'Overwhelming sense of impending doom that resists logical reassurance.',
+            'High vigilance where harmless sensory cues trigger instant fight-or-flight reactions.',
+          ],
+          ripple: [
+            { id: 'hypothalamus', role: 'more_active' },
+            { id: 'prefrontal-cortex', role: 'less_active' },
+          ],
+        },
       ],
     },
   },

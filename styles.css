@@ -424,6 +424,234 @@ a.chip:hover { background: color-mix(in oklab, var(--c, var(--accent)) 20%, tran
 .extra h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font-size: 15px; font-weight: 600; letter-spacing: -0.01em; }
 .extra h3 .icon { color: color-mix(in oklab, var(--accent) 70%, white); }
 
+/* State Switcher (What if perturbation states) */
+.breaks-lead {
+  font-family: var(--read);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--ink);
+  margin: 0 0 14px;
+}
+
+.state-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 12px 0 16px;
+}
+
+.state-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(190, 200, 255, 0.04);
+  border: 1px solid var(--line);
+  color: var(--ink-2);
+  font-size: 13px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+  user-select: none;
+}
+
+.state-pill:hover {
+  background: rgba(190, 200, 255, 0.08);
+  border-color: color-mix(in oklab, var(--state-color, #fff) 35%, transparent);
+  color: var(--ink);
+  transform: translateY(-1px);
+}
+
+.state-pill.is-active {
+  background: color-mix(in oklab, var(--state-color, #fff) 14%, transparent);
+  border-color: color-mix(in oklab, var(--state-color, #fff) 65%, transparent);
+  color: #fff;
+  box-shadow: 0 0 12px color-mix(in oklab, var(--state-color, #fff) 20%, transparent);
+}
+
+.state-pill-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--state-color, var(--ink-3));
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.state-pill.is-active .state-pill-dot {
+  box-shadow: 0 0 6px var(--state-color);
+  transform: scale(1.15);
+}
+
+.state-pill-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  line-height: 1;
+  width: 14px;
+  height: 14px;
+  margin-left: 2px;
+  opacity: 0.65;
+  transition: opacity 0.15s ease;
+}
+
+.state-pill:hover .state-pill-close {
+  opacity: 1;
+}
+
+.state-card {
+  margin-top: 14px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: rgba(190, 200, 255, 0.03);
+  border: 1px solid color-mix(in oklab, var(--state-color, #fff) 22%, transparent);
+  animation: stateCardFade 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes stateCardFade {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.state-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.state-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--state-color);
+}
+
+.state-badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--state-color);
+  box-shadow: 0 0 6px var(--state-color);
+}
+
+.state-reset-link {
+  font-size: 12px;
+  color: var(--ink-3);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.state-reset-link:hover {
+  color: var(--ink);
+  text-decoration: underline;
+}
+
+.state-body p {
+  margin-bottom: 12px;
+}
+
+.state-subhead {
+  font-size: 11.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-3);
+  margin: 16px 0 8px;
+}
+
+.case-card {
+  margin: 16px 0 12px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.32);
+  border: 1px solid rgba(190, 200, 255, 0.12);
+}
+
+.case-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--state-color);
+  margin-bottom: 6px;
+}
+
+.case-title {
+  font-size: 14.5px;
+  font-weight: 600;
+  color: #fff;
+  margin: 0 0 6px;
+}
+
+.case-text {
+  font-family: var(--read);
+  font-size: 14.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+  margin: 0;
+}
+
+.ripple-section {
+  margin-top: 14px;
+}
+
+.chip-ripple {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+}
+
+.ripple-name {
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.ripple-role {
+  font-size: 10.5px;
+  font-weight: 600;
+  padding: 1px 6px;
+  border-radius: 4px;
+  letter-spacing: 0.02em;
+}
+
+.role-cut_off .ripple-role {
+  background: rgba(255, 107, 125, 0.16);
+  color: #ff8a98;
+}
+
+.role-more_active .ripple-role {
+  background: rgba(255, 170, 51, 0.16);
+  color: #ffbb44;
+}
+
+.role-less_active .ripple-role {
+  background: rgba(93, 176, 255, 0.16);
+  color: #7ec2ff;
+}
+
+.role-losing_cells .ripple-role {
+  background: rgba(180, 190, 210, 0.16);
+  color: #b0bcd0;
+}
+
+.state-idle-hint {
+  font-size: 13.5px;
+  color: var(--ink-3);
+  font-style: italic;
+  margin: 4px 0 10px;
+}
+
 .pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 34px; padding-top: 16px; border-top: 1px solid var(--line); }
 .pg { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-3); transition: color 0.2s; }
 .pg:hover { color: var(--ink); }

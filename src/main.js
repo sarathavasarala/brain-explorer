@@ -129,7 +129,7 @@ const scene = createBrainScene($('#brain'), {
 function parseHash() {
   const [type, id, extra, sub] = location.hash.replace(/^#\/?/, '').split('/');
   if (type === 's' && byId.has(id)) {
-    return { type: 's', id, level: levels.some((l) => l.id === extra) ? extra : levels[0].id };
+    return { type: 's', id, level: levels.some((l) => l.id === extra) ? extra : levels[0].id, state: sub || null };
   }
   if (type === 'p' && pathways.some((p) => p.id === id)) {
     const p = pathways.find((q) => q.id === id);
@@ -431,14 +431,37 @@ function apply() {
   } else if (r.type === 's') {
     const s = byId.get(r.id);
     const lv = levels.find((l) => l.id === r.level);
-    const conns = s.levels?.connects?.connections || [];
-    const wiring = lv.scene === 'wiring';
-    scene.focus([s.id], { context: wiring ? conns.map((c) => c.id) : [], activity: lv.scene === 'activity' });
-    scene.setArcs(wiring ? conns.map((c) => arcFor(s.id, c)) : []);
-    scene.forceSlice(!!s.slice);
-    if (wiring) fly([s.id, ...conns.map((c) => c.id)], s.view, `${s.id}:wiring`);
-    else fly([s.id], s.view, `${s.id}`);
-    explainerEl.innerHTML = renderStructure(s, r.level, sourceOf.get(s.id));
+    const activeState = (s.breaks?.states || []).find((st) => st.kind === r.state);
+
+    if (activeState) {
+      const role = activeState.kind === 'lesion' ? 'losing_cells'
+        : activeState.kind === 'under' ? 'less_active'
+        : activeState.kind === 'over' ? 'more_active'
+        : (activeState.look || 'more_active');
+      const ripple = (activeState.ripple || []).filter((rip) => byId.has(rip.id) || anchorById.has(rip.id));
+      const parts = [{ id: s.id, role }, ...ripple];
+      const context = [s.id, ...ripple.map((rip) => rip.id)];
+      scene.paintSketch(parts, { context });
+
+      const cut = parts.filter((p) => p.role === 'cut_off').map((p) => p.id);
+      const cutArcs = cut.slice(1).map((id) => ({ from: cut[0], to: id, active: false }));
+      scene.setArcs(cutArcs);
+
+      const hasSlice = Boolean(s.slice || ripple.some((rip) => byId.get(rip.id)?.slice));
+      scene.forceSlice(hasSlice);
+
+      const frameTargets = [s.id, ...ripple.map((rip) => rip.id)];
+      fly(frameTargets, s.view, `${s.id}:state:${activeState.kind}`);
+    } else {
+      const conns = s.levels?.connects?.connections || [];
+      const wiring = lv.scene === 'wiring';
+      scene.focus([s.id], { context: wiring ? conns.map((c) => c.id) : [], activity: lv.scene === 'activity' });
+      scene.setArcs(wiring ? conns.map((c) => arcFor(s.id, c)) : []);
+      scene.forceSlice(!!s.slice);
+      if (wiring) fly([s.id, ...conns.map((c) => c.id)], s.view, `${s.id}:wiring`);
+      else fly([s.id], s.view, `${s.id}`);
+    }
+    explainerEl.innerHTML = renderStructure(s, r.level, sourceOf.get(s.id), r.state);
     if (prev.type !== 's' || prev.id !== r.id) explainerEl.scrollTop = 0;
   } else if (r.type === 'library') {
     clearScene('library');
@@ -959,6 +982,7 @@ window.addEventListener('keydown', (e) => {
       clearScene('ask');
       explainerEl.innerHTML = renderChat(state.chat);
     }
+    else if (r.type === 's' && r.state) location.hash = `#/s/${r.id}/${r.level}`;
     else if (r.type === 'chem') location.hash = '#/chem';
     else if (r.type === 'cell') location.hash = '#/cell';
     else if (r.type === 'chemhome' || r.type === 'cellhome') location.hash = '#/';

@@ -1,4 +1,5 @@
 import { structures, byId, groups, levels, diagrams, synapses, pathways, anchorById, chemicals, cells } from '../content/index.js';
+import { STATE_METADATA } from '../content/states.js';
 import { fmt, paragraphs, esc } from './format.js';
 import { renderCircuit, renderSynapse, LINK_COLORS } from './diagrams.js';
 import { icon } from './icons.js';
@@ -57,7 +58,107 @@ function cellsFigure(cells) {
   return html;
 }
 
-export function renderStructure(s, levelId, source) {
+export function renderStateSwitcher(s, levelId, activeStateKind, file) {
+  const states = s.breaks?.states || [];
+  if (!states.length) {
+    return s.breaks?.text
+      ? paragraphs(s.breaks.text) + bullets(s.breaks.bullets)
+      : todo(`${file} → ${s.id}.breaks`);
+  }
+
+  const activeState = states.find((st) => st.kind === activeStateKind);
+
+  const pillsHtml = `
+    <div class="state-pills" role="tablist" aria-label="What if perturbation states">
+      ${states.map((st) => {
+        const meta = STATE_METADATA[st.kind] || { label: st.kind, symbol: '•', color: '#8b9bb4' };
+        const isActive = st.kind === activeStateKind;
+        const targetHref = isActive ? `#/s/${s.id}/${levelId}` : `#/s/${s.id}/${levelId}/${st.kind}`;
+        return `
+          <a class="state-pill ${isActive ? 'is-active' : ''} state-pill-${st.kind}"
+             href="${targetHref}"
+             role="tab"
+             aria-selected="${isActive}"
+             title="${esc(meta.question || meta.label)}"
+             style="--state-color:${meta.color}">
+            <span class="state-pill-dot" aria-hidden="true"></span>
+            <span class="state-pill-label">${esc(st.title || meta.label)}</span>
+            ${isActive ? `<span class="state-pill-close" title="Reset to baseline view" aria-hidden="true">&times;</span>` : ''}
+          </a>
+        `;
+      }).join('')}
+    </div>
+  `;
+
+  let detailsHtml = '';
+  if (activeState) {
+    const meta = STATE_METADATA[activeState.kind] || { label: activeState.kind, color: '#8b9bb4' };
+    const rippleList = activeState.ripple || [];
+    const roleLabels = {
+      cut_off: 'Cut off',
+      more_active: 'Hyperactive',
+      less_active: 'Hypoactive',
+      losing_cells: 'Losing cells',
+      involved: 'Involved',
+      typical: 'Baseline',
+    };
+
+    detailsHtml = `
+      <div class="state-card" style="--state-color:${meta.color}">
+        <div class="state-card-header">
+          <span class="state-badge"><i class="state-badge-dot"></i>${esc(meta.tag || meta.label)} in 3D</span>
+          <a class="state-reset-link" href="#/s/${s.id}/${levelId}">Reset view</a>
+        </div>
+        <div class="state-body">
+          ${paragraphs(activeState.text)}
+        </div>
+        ${activeState.signs?.length ? `
+          <div class="state-signs">
+            <h4 class="state-subhead">Observable signs</h4>
+            <ul class="bullets">${activeState.signs.map((b) => `<li>${fmt(b)}</li>`).join('')}</ul>
+          </div>
+        ` : ''}
+        ${activeState.case ? `
+          <div class="case-card">
+            <div class="case-badge">Case Record</div>
+            <h4 class="case-title">${esc(activeState.case.name)}</h4>
+            <p class="case-text">${fmt(activeState.case.text)}</p>
+          </div>
+        ` : ''}
+        ${rippleList.length ? `
+          <div class="ripple-section">
+            <h4 class="state-subhead">Circuit ripple</h4>
+            <div class="chips">${rippleList.map((r) => {
+              const rName = nameOf(r.id);
+              const rColor = colorOf(r.id);
+              const rRole = roleLabels[r.role] || r.role;
+              return `<a class="chip chip-ripple role-${r.role}" href="#/s/${r.id}/${levelId}" style="--c:${rColor}">
+                <i class="dot"></i>
+                <span class="ripple-name">${esc(rName)}</span>
+                <span class="ripple-role">${esc(rRole)}</span>
+              </a>`;
+            }).join('')}</div>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  } else {
+    detailsHtml = `
+      <div class="state-idle">
+        <p class="state-idle-hint">Choose a condition above to observe how this region and its partners change in 3D:</p>
+        ${bullets(s.breaks?.bullets)}
+      </div>
+    `;
+  }
+
+  return `
+    ${s.breaks?.text ? `<p class="breaks-lead">${fmt(s.breaks.text)}</p>` : ''}
+    ${pillsHtml}
+    ${detailsHtml}
+  `;
+}
+
+export function renderStructure(s, levelId, source, activeStateKind = null) {
   const level = levels.find((l) => l.id === levelId) || levels[0];
   const L = s.levels?.[level.id] || {};
   const g = groupOf(s);
@@ -114,9 +215,9 @@ export function renderStructure(s, levelId, source) {
       <h3>${icon('hand', 18)} Try it yourself</h3>
       ${s.tryIt ? `<p>${fmt(s.tryIt)}</p>` : todo(`${file} → ${s.id}.tryIt`)}
     </section>
-    <section class="extra">
+    <section class="extra breaks-section">
       <h3>${icon('alert', 18)} When it goes wrong</h3>
-      ${s.breaks?.text ? paragraphs(s.breaks.text) + bullets(s.breaks.bullets) : todo(`${file} → ${s.id}.breaks`)}
+      ${renderStateSwitcher(s, level.id, activeStateKind, file)}
     </section>
     <footer class="pager">
       ${prev ? `<a href="#/s/${prev.id}/${level.id}" class="pg">${icon('prev', 16)}<span>${esc(prev.name)}</span></a>` : '<span></span>'}

@@ -126,6 +126,42 @@ export default [
         'Depression: stuck on bleak thoughts, hard to shift plans.',
         'Dementia at the front: personality and manners change first.',
       ],
+      states: [
+        {
+          kind: 'lesion',
+          text: 'Damage to the front and lower prefrontal cortex strips away the brain\'s natural brakes on behavior. Memory, language, and physical movement remain intact, but social tact, emotional restraint, and the ability to organize long-term plans collapse. Without top-down guidance, emotional impulses from deeper structures go unchecked.',
+          signs: [
+            'Loss of social restraint, tact, and impulse control.',
+            'Intact memory and speech alongside an inability to follow through on plans.',
+            'Unpredictable emotional outbursts and extreme impatience.',
+          ],
+          case: {
+            name: 'Phineas Gage (Harlow, 1848)',
+            text: 'In 1848, an explosion drove an iron tamping rod through the frontal lobes of railroad foreman Phineas Gage. Physician John Martyn Harlow documented that while Gage survived with his intellect and memory intact, his personality changed completely. Formerly polite and dependable, he became profane, erratic, and unable to manage social impulses, demonstrating how the frontal lobes govern self-restraint.',
+          },
+          ripple: [
+            { id: 'amygdala', role: 'more_active' },
+          ],
+        },
+        {
+          kind: 'under',
+          text: 'Prolonged wakefulness or mental exhaustion starves the prefrontal cortex of energy, weakening its top-down control over attention. Distractions easily pull attention away from current goals because the filter that keeps irrelevant thoughts out stops working efficiently. As a result, juggling multiple steps in mind becomes frustrating and decision-making defaults to impulsive shortcuts.',
+          signs: [
+            'Frequent lapses in concentration and high vulnerability to minor distractions.',
+            'Difficulty holding multi-step directions active in working memory.',
+            'Defaulting to quick, impulsive choices instead of weighing long-term outcomes.',
+          ],
+        },
+        {
+          kind: 'over',
+          text: 'When prefrontal error-monitoring networks become hyperactive, the brain gets trapped in continuous warning loops. Circuits repeatedly broadcast the feeling that something is wrong, even after a task has been completed and verified. This persistent alarm leads to endless mental rumination and makes it exhausting to disengage attention.',
+          signs: [
+            'Relentless mental replaying of past mistakes or perceived flaws.',
+            'An unshakeable feeling that something is incomplete, even after checking.',
+            'Rigid thought loops that make shifting attention to new topics difficult.',
+          ],
+        },
+      ],
     },
   },
   {
@@ -235,11 +271,26 @@ export default [
     },
     tryIt: 'Say "the big brown bag" three times fast, then say it with "yesterday" tucked in: "yesterday\'s big brown bag". The extra planning load you feel is this area working.',
     breaks: {
-        text: 'Damage across the surrounding frontal language network can make speech short and effortful. Damage limited to the classic Broca\'s area does not always produce the full syndrome.',
+      text: 'Damage across the surrounding frontal language network can make speech short and effortful. Damage limited to the classic Broca\'s area does not always produce the full syndrome.',
       bullets: [
         'Broca\'s aphasia: few words, missing grammar, but the meaning is clear.',
         'Frustration is common because people know what they want to say.',
         'Singing or swearing sometimes survives, using routes on the right side.',
+      ],
+      states: [
+        {
+          kind: 'lesion',
+          text: 'Damage to Broca\'s area strikes speech production while leaving language understanding largely preserved. People know exactly what they want to say, but coordinating the tongue, lips, and vocal cords into fluent sentences becomes an exhausting struggle. Spoken output shrinks to isolated words, short phrases, and simple gestures.',
+          signs: [
+            'Halting, fragmented speech produced with noticeable physical and mental effort.',
+            'Preserved ability to comprehend spoken sentences and follow complex directions.',
+            'Clear awareness of speech errors, often causing understandable frustration.',
+          ],
+          case: {
+            name: 'Patient Tan (Broca, 1861)',
+            text: 'In 1861, French physician Paul Broca evaluated Louis-Victor Leborgne, a patient who had lost the ability to speak two decades earlier. Leborgne could articulate only the single syllable tan, though he easily understood spoken questions and communicated through gestures. An autopsy revealed damage in the left inferior frontal gyrus, proving that speech articulation depends on this specialized region.',
+          },
+        },
       ],
     },
   },
@@ -353,6 +404,31 @@ export default [
         'Numbness or clumsiness when buttoning or holding small things.',
         'Tingling or burning pain with no injury, after stroke.',
         'Losing joint sense, so the hand misses without vision to guide it.',
+      ],
+      states: [
+        {
+          kind: 'lesion',
+          text: 'Damage to the somatosensory cortex strips away fine tactile perception on the opposite side of the body. Light touch feels numb or muddy, and the fingers can no longer tell a key from a coin by feel alone. Because the brain loses its internal sense of joint position, limbs wander without visual guidance.',
+          signs: [
+            'Inability to distinguish two separate touch points on the skin from a single point.',
+            'Trouble identifying familiar objects by touch alone without looking at them.',
+            'Loss of joint position awareness, needing eyes on the limbs to guide them accurately.',
+          ],
+        },
+        {
+          kind: 'size',
+          look: 'more_active',
+          text: 'When an arm is lost, the patch of somatosensory cortex that once mapped the hand goes silent and begins reorganizing. Inputs from neighboring body maps, particularly the face, sprout into the quiet territory and wake up dormant connections. As a result, touching a patch on the cheek can vividly trigger the sensation of an amputated finger being stroked.',
+          signs: [
+            'Vivid tactile feelings on missing fingers when specific spots on the cheek are stroked.',
+            'Adjacent body maps expanding across boundaries into silenced sensory zones.',
+            'Rapid cortical rewiring that creates physical sensory ghosts after an injury.',
+          ],
+          case: {
+            name: 'Phantom Limb Remapping (Ramachandran, 1993)',
+            text: 'Neuroscientist V.S. Ramachandran studied patients who experienced vivid phantom sensations following arm amputation. Because the facial touch map sits directly alongside the hand map in the somatosensory cortex, sensory fibers from the face sprouted into the silent hand territory. Stroking specific points on a patient\'s cheek reliably produced the sensation of individual missing fingers being touched.',
+          },
+        },
       ],
     },
   },
@@ -575,11 +651,26 @@ export default [
     },
     tryIt: 'Listen to a sentence in a language you half know and catch the one word you recognise. The pop of meaning among noise is this area matching sound to memory.',
     breaks: {
-        text: 'Large injuries around the back left temporal language network can impair comprehension and produce fluent but hard to follow speech. The classic syndrome usually reflects damage beyond one small patch.',
+      text: 'Large injuries around the back left temporal language network can impair comprehension and produce fluent but hard to follow speech. The classic syndrome usually reflects damage beyond one small patch.',
       bullets: [
         'Wernicke\'s aphasia: fluent speech that makes little sense, with poor understanding.',
         'Trouble naming everyday things, though they can still be used.',
         'Reading aloud stays smooth while comprehension drops.',
+      ],
+      states: [
+        {
+          kind: 'lesion',
+          text: 'Damage to Wernicke\'s area destroys the brain\'s ability to decode the meaning of words while leaving the mechanics of speaking intact. Speech flows effortlessly with normal rhythm and melody, but sentences are filled with made-up words and unintended substitutions that make no sense to listeners. Because the internal comprehension filter is damaged, speakers are usually unaware that their words lack meaning.',
+          signs: [
+            'Rapid, fluent speech that sounds grammatically natural but consists of meaningless word salad.',
+            'Inability to comprehend spoken or written sentences.',
+            'Lack of awareness that one\'s own speech is confusing or uninterpretable to others.',
+          ],
+          case: {
+            name: 'Receptive Aphasia (Wernicke, 1874)',
+            text: 'In 1874, German physician Carl Wernicke documented a distinct form of language loss caused by damage to the left posterior temporal lobe. His patients spoke effortlessly with normal rhythm and grammar, but their sentences were loaded with invented words and made no sense. Furthermore, they could not understand spoken speech, demonstrating that this region serves as the brain\'s primary center for language comprehension.',
+          },
+        },
       ],
     },
   },

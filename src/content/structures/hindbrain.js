@@ -62,6 +62,20 @@ export default [
         'An "intention tremor": the hand shakes more the closer it gets to a target.',
         'Slurred, uneven speech, because speech muscles need precise timing too.',
       ],
+      states: [
+        {
+          kind: 'lesion',
+          text: 'Losing cerebellar calibration scrambles the fine timing and coordination needed for smooth physical movement. Muscle strength remains intact, but the brain can no longer predict momentum or smooth out trajectory errors in real time. Reaching for a cup produces wide tremors that worsen near the target, and walking turns into an unsteady stagger.',
+          signs: [
+            'Hand tremors that grow more pronounced as fingers approach a target.',
+            'Wide, unsteady footsteps resembling walking on a pitching ship.',
+            'Slurred, scanning speech where syllables are delivered with irregular pacing and volume.',
+          ],
+          ripple: [
+            { id: 'motor-cortex', role: 'cut_off' },
+          ],
+        },
+      ],
     },
   },
   {

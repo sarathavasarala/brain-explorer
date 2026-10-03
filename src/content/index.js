@@ -16,6 +16,7 @@ import chemicalGroups from './chemicals/groups.js';
 import cells from './cells/index.js';
 import cellGroups from './cells/groups.js';
 import { checkScript, sanitizeScript, ROLES, VIEWS } from './script.js';
+import { STATE_KINDS, STATE_METADATA } from './states.js';
 
 const files = {
   'src/content/structures/cortex.js': cortex,
@@ -25,7 +26,7 @@ const files = {
 export const structures = Object.values(files).flat();
 // Which file each structure lives in, so the UI can point at where to add missing text.
 export const sourceOf = new Map(Object.entries(files).flatMap(([f, list]) => list.map((s) => [s.id, f])));
-export { groups, levels, anchors, synapses, diagrams, pathways, pathwayGroups, glossary, askPresets, chemicals, chemicalGroups, cells, cellGroups, checkScript, sanitizeScript, ROLES, VIEWS };
+export { groups, levels, anchors, synapses, diagrams, pathways, pathwayGroups, glossary, askPresets, chemicals, chemicalGroups, cells, cellGroups, checkScript, sanitizeScript, ROLES, VIEWS, STATE_KINDS, STATE_METADATA };
 
 export const byId = new Map(structures.map((s) => [s.id, s]));
 export const anchorById = new Map(anchors.map((a) => [a.id, a]));
@@ -87,6 +88,37 @@ export function validate() {
     const cells = s.levels?.cells;
     if (cells?.diagram && !diagrams[cells.diagram]) problems.push(`${w}: unknown diagram "${cells.diagram}"`);
     if (cells?.synapse && !synapses[cells.synapse]) problems.push(`${w}: unknown synapse "${cells.synapse}"`);
+    if (s.breaks?.states) {
+      if (!Array.isArray(s.breaks.states)) {
+        problems.push(`${w}: breaks.states must be an array`);
+      } else {
+        const seenKinds = new Set();
+        s.breaks.states.forEach((st, sIdx) => {
+          const sw = `${w} breaks.states[${sIdx}]`;
+          if (!STATE_KINDS.includes(st.kind)) problems.push(`${sw}: unknown kind "${st.kind}"`);
+          if (seenKinds.has(st.kind)) problems.push(`${sw}: duplicate state kind "${st.kind}"`);
+          seenKinds.add(st.kind);
+          if (!st.text || typeof st.text !== 'string') problems.push(`${sw}: missing text`);
+          if (!Array.isArray(st.signs) || !st.signs.length) problems.push(`${sw}: signs must be a non-empty array of strings`);
+          if (st.case) {
+            if (!st.case.name || typeof st.case.name !== 'string') problems.push(`${sw}: case.name must be a string`);
+            if (!st.case.text || typeof st.case.text !== 'string') problems.push(`${sw}: case.text must be a string`);
+          }
+          if (st.ripple) {
+            if (!Array.isArray(st.ripple)) {
+              problems.push(`${sw}: ripple must be an array`);
+            } else {
+              st.ripple.forEach((rip, rIdx) => {
+                const rw = `${sw} ripple[${rIdx}]`;
+                if (!known(rip.id)) problems.push(`${rw}: unknown structure/anchor "${rip.id}"`);
+                if (!ROLES.includes(rip.role)) problems.push(`${rw}: unknown role "${rip.role}"`);
+              });
+            }
+          }
+          if (st.look && !ROLES.includes(st.look)) problems.push(`${sw}: unknown look role "${st.look}"`);
+        });
+      }
+    }
     scanDeep(w, s);
   }
   for (const [id, d] of Object.entries(diagrams)) {
