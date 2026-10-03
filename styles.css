@@ -1142,13 +1142,13 @@ kbd {
 }
 .tract-card.is-on {
   border-color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 8%, var(--panel-2));
+  background: rgba(190, 200, 255, 0.035);
 }
 .tract-card-head {
   display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px;
 }
 .tract-title { font-size: 14px; font-weight: 600; text-decoration: none; color: inherit; }
-.tract-card.is-on .tract-title { color: var(--accent); }
+.tract-card.is-on .tract-title { color: var(--ink); }
 .tract-act {
   font-size: 11.5px; opacity: 0; transition: opacity 0.15s;
 }
@@ -1158,9 +1158,10 @@ kbd {
 }
 .tract-arrow { color: var(--ink-3); }
 .tract-job { font-size: 13px; font-weight: 500; color: var(--ink); margin: 0 0 6px; }
-.tract-note { margin-top: 6px; font-size: 12px; line-height: 1.4; }
-.tract-note-fails { color: #ffcf6b; }
-.tract-note-blocked { color: var(--ink-3); }
+.tract-note { margin-top: 8px; font-size: 12px; line-height: 1.5; color: var(--ink-2); padding-left: 10px; border-left: 1px solid var(--line-2); }
+.tract-note strong { color: var(--ink); font-weight: 600; }
+.tract-note-fails { border-left-color: rgba(255, 207, 107, 0.35); }
+.tract-note-blocked { border-left-color: var(--line-2); }
 
 .receptors-section, .drugs-section, .breaks-section { margin-top: 24px; }
 .receptors-list, .drugs-list { display: grid; gap: 10px; margin-top: 10px; }

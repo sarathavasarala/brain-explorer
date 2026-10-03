@@ -549,7 +549,7 @@ export default [
       connects: {
         text: 'Broad ascending projections carry dopamine pulses to frontal and limbic networks. Rather than carrying detailed sensory content, these signals tell downstream circuits whether an event exceeded expectations, updating the value of memories and strengthening the urge to pursue useful goals.',
         connections: [
-          { id: 'striatum', dir: 'out', label: 'Learning and motivation signals sent to striatum' },
+          { id: 'nucleus-accumbens', dir: 'out', label: 'Dopamine reward signal to ventral striatum' },
           { id: 'prefrontal-cortex', dir: 'out', label: 'Dopamine tunes working memory and planning' },
           { id: 'amygdala', dir: 'out', label: 'Dopamine influences emotional learning' },
           { id: 'hippocampus', dir: 'out', label: 'Dopamine influences memory formation' },
