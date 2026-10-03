@@ -61,7 +61,7 @@ brain-explorer/
     │   ├── catalog.json        # Compiled machine-readable catalog of structures, anchors, chemicals, and glossary
     │   ├── script.js           # Scene script validation (checkScript) and runtime sanitization (sanitizeScript)
     │   ├── groups.js           # Structural groupings (Cortex, Deep, Hindbrain)
-    │   ├── levels.js           # 4 zoom levels (where, does, connects, cells)
+    │   ├── levels.js           # 3 zoom levels (overview, connects, cells)
     │   ├── anchors.js          # Sensory/motor and body organ endpoints for pathways and hormones
     │   ├── synapses.js         # Synapse types (glutamate, gaba, dopamine, etc.)
     │   ├── ask-presets.js      # Hand-verified fallback answers for Ask mode
@@ -89,12 +89,12 @@ brain-explorer/
     │   ├── ask.js              # Client-side Ask query service (presets -> /api/ask)
     │   └── chat.js             # Client-side Ask chat service (sendChat -> /api/chat)
     └── ui/
-        ├── explainer.js        # Right-side card: 4 zoom levels, try-it, breaks, cross-links
+        ├── explainer.js        # Right-side card: 3 zoom levels, try-it, breaks with states, cross-links
         ├── sidebar.js          # Left-side Parts/Chemicals/Cells tabs with global search
         ├── chem.js             # Chemical explainer: overview, tracts, synapse, medicine, axis chain
         ├── cell.js             # Cell explainer: shape, firing sequencer, lives in, chemistry
         ├── synapse-stepper.js  # Interactive synapse mechanism with drug condition toggles
-        ├── ladder.js           # 4-level zoom ladder widget
+        ├── ladder.js           # 3-level zoom ladder widget
         ├── library.js          # Full-width Pathways tour browser
         ├── ask.js              # Ask chat thread, answer cards, preset chips, pathway exporter
         ├── diagrams.js         # Interactive SVG circuit diagrams with animated action potentials
@@ -111,8 +111,9 @@ The app is a single-page application driven by hash navigation in [src/main.js](
 | Mode | Route Pattern | Description |
 |---|---|---|
 | **Parts** | `#/` | Default view (whole brain, left lateral view). |
-| **Parts** | `#/s/<structure-id>` | Selects structure, opens default zoom level (`where`). |
-| **Parts** | `#/s/<structure-id>/<level>` | Opens specific level (`where`, `does`, `connects`, `cells`). |
+| **Parts** | `#/s/<structure-id>` | Selects structure, opens default zoom level (`overview`). |
+| **Parts** | `#/s/<structure-id>/<level>` | Opens specific level (`overview`, `connects`, `cells`). |
+| **Parts** | `#/s/<structure-id>/<level>/<state>` | Opens specific perturbation scenario (`lesion`, `under`, `over`, `size`). |
 | **Chemicals** | `#/chem` | Chemical dictionary home with group overview. |
 | **Chemicals** | `#/chem/<chem-id>` | Chemical overview with receptor density glow and fibre arbors. |
 | **Chemicals** | `#/chem/<chem-id>/<tab>` | Opens specific chemical tab (`overview`, `tracts`, `synapse`, `medicine`, `axis`). |
@@ -129,7 +130,7 @@ The app is a single-page application driven by hash navigation in [src/main.js](
 - Unified search in the sidebar filters across all structures, chemicals, and cells simultaneously. Pressing Enter opens the top match.
 - `ArrowRight` / `ArrowLeft`: Navigate between zoom levels (Parts), tabs (Chemicals, Cells), or tour steps (Pathways).
 - `ArrowUp` / `ArrowDown`: Step to previous or next item in the active category.
-- `Escape`: Step up or go back (cells -> connects -> does -> where -> home; sub-tabs -> home).
+- `Escape`: Step up or go back (state -> level; cells -> connects -> overview -> home; sub-tabs -> home).
 - `Space`: Next step in active pathway tour.
 
 ---
@@ -245,12 +246,8 @@ All content is beginner-accessible, rigorous, and formatted with tiny markup.
   tagline: 'Forms new memories and maps space.', // Short 1-line summary
   analogy: 'The bookmark system for the library of your experiences.',
   levels: {
-    where: {
-      text: '2 to 4 sentences explaining location, size, and neighbors. Use {{id}} links.',
-      bullets: ['2 to 3 concise bullet points about physical features.'],
-    },
-    does: {
-      text: '3 to 5 sentences on everyday function with a concrete example.',
+    overview: {
+      text: 'Two paragraphs: (1) physical location, boundaries, and size; (2) everyday function with concrete example.',
       bullets: [
         'Job name: description of function',
         'Another job: description',

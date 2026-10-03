@@ -176,7 +176,7 @@ export function renderStructure(s, levelId, source, activeStateKind = null) {
     }
     body += cellsFigure(L);
   }
-  if (level.id === 'where' && kids.length) {
+  if (level.id === 'overview' && kids.length) {
     body += `<div class="kids"><h3>Areas inside</h3><div class="chips">${kids.map((k) => `<a class="chip" href="#/s/${k.id}/${level.id}" style="--c:${k.color}"><i></i>${esc(k.name)}</a>`).join('')}</div></div>`;
   }
 
@@ -327,11 +327,11 @@ export function renderHome({ canAsk = true } = {}) {
     <h1 class="ex-title">A map of the brain</h1>
     <p class="tagline">Pick a part to explore, or select something glowing in the model.</p>
     <p class="lede">The brain is roughly 86 billion neurons wired into regions that each do a few jobs well.
-      Every part in this explorer can be seen at four levels, from the region you could point to on a scan,
+      Every part in this explorer can be seen at three levels, from the region you could point to on a scan,
       down to the cells and chemicals doing the work.</p>
     ${ladder(null, { interactive: false })}
     <dl class="ladder-key">
-      ${levels.map((l) => `<div><dt>${esc(l.label)}</dt><dd>${esc({ where: 'Its location, shape and landmarks.', does: 'The jobs it handles and what you would notice without it.', connects: 'Who it talks to. The model animates the traffic.', cells: 'The cell types, wiring and chemical messengers inside.' }[l.id] || l.size)}</dd></div>`).join('')}
+      ${levels.map((l) => `<div><dt>${esc(l.label)}</dt><dd>${esc({ overview: 'Its location, shape, landmarks, and what it does in daily life.', connects: 'Who it talks to. The model animates the traffic.', cells: 'The cell types, wiring and chemical messengers inside.' }[l.id] || l.size)}</dd></div>`).join('')}
     </dl>
     <h3 class="home-h">Explore key brain regions</h3>
     <div class="chips">${starts.map((id) => { const s = byId.get(id); return `<a class="chip" href="#/s/${id}" style="--c:${s.color}"><i></i>${esc(s.name)}</a>`; }).join('')}</div>

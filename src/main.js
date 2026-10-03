@@ -116,7 +116,7 @@ const scene = createBrainScene($('#brain'), {
   },
   onPick(id) {
     if (!id || !byId.has(id)) return;
-    const level = state.route.type === 's' ? state.route.level : 'where';
+    const level = state.route.type === 's' ? state.route.level : levels[0].id;
     location.hash = `#/s/${id}/${level}`;
   },
 });
@@ -130,7 +130,8 @@ const scene = createBrainScene($('#brain'), {
 function parseHash() {
   const [type, id, extra, sub] = location.hash.replace(/^#\/?/, '').split('/');
   if (type === 's' && byId.has(id)) {
-    return { type: 's', id, level: levels.some((l) => l.id === extra) ? extra : levels[0].id, state: sub || null };
+    const mapped = (extra === 'where' || extra === 'does') ? 'overview' : extra;
+    return { type: 's', id, level: levels.some((l) => l.id === mapped) ? mapped : levels[0].id, state: sub || null };
   }
   if (type === 'p' && pathways.some((p) => p.id === id)) {
     const p = pathways.find((q) => q.id === id);

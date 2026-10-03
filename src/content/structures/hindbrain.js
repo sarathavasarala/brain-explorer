@@ -17,21 +17,13 @@ export default [
     tagline: 'Fine-tunes movement so it comes out smooth, timed and accurate.',
     analogy: 'A flight controller that compares what you meant to do with what your body is actually doing, and corrects the difference many times a second.',
     levels: {
-      where: {
-        text: 'The cerebellum ("little brain") sits at the back of your head, tucked under the {{occipital-lobe|occipital lobe}} and behind the {{pons}}. It is only about a tenth of the brain\'s volume, but it holds more than half of all its [[neuron|neurons]].',
+      overview: {
+        text: 'The cerebellum ("little brain") sits at the back of your head, tucked under the {{occipital-lobe|occipital lobe}} and behind the {{pons}}. It is only about a tenth of the brain\'s volume, but its tightly folded ridges hold more than half of all the brain\'s [[neuron|neurons]].\n\nIt prepares, times, and adjusts movements rather than starting them on its own. When you reach for a glass or step over a puddle, it constantly compares what you meant to do with what your limbs are actually doing, reducing errors on the fly.',
         bullets: [
-          'Two hemispheres joined by a narrow middle strip called the vermis.',
-          'Its surface is folded into thin, tightly packed ridges called folia, much finer than the folds of the cortex.',
-          'Three thick stalks (the cerebellar peduncles) attach it to the brainstem. Every signal in or out goes through them.',
-        ],
-      },
-      does: {
-        text: 'The cerebellum helps prepare, time and adjust movements rather than acting as their sole starting point. It combines copies of motor plans with feedback from muscles, joints and eyes, then helps reduce errors while movement unfolds. It also learns from repeated errors, which is one reason practice makes a skill smoother.',
-        bullets: [
-          'Balance and posture: keeps you upright without you thinking about it.',
-          'Timing and coordination: lets several joints move together, as in reaching or walking.',
-          'Motor learning: gradually improves skills like typing, cycling or playing an instrument.',
-          'Growing evidence says it also helps with the timing of thought and speech, not just movement.',
+          'Coordination and timing: lets multiple joints move together smoothly.',
+          'Balance and posture: keeps you steady and upright on autopilot.',
+          'Motor learning: gradually perfects physical skills through practice.',
+          'Physical landmarks: two hemispheres joined by a middle strip called the vermis.',
         ],
       },
       connects: {
@@ -91,21 +83,13 @@ export default [
     tagline: 'Reflex hub for eyes and ears, and home of the dopamine cells.',
     analogy: 'A night watchman who turns your head toward sudden sounds and sights before you decide to look.',
     levels: {
-      where: {
-        text: 'The midbrain is the top inch of the brainstem, sitting just below the {{thalamus}} and above the {{pons}}. It is short, about as long as the top joint of your thumb, and shaped like a stubby tube. A narrow fluid channel runs down its middle.',
+      overview: {
+        text: 'The midbrain is the top inch of the brainstem, sitting just below the {{thalamus}} and above the {{pons}}. About as long as the top joint of your thumb, all neural signals traveling between the forebrain and the rest of the body pass through or beside it.\n\nIt runs fast survival reflexes you do not choose. When something flashes at the edge of vision or a twig snaps behind you, it whips your eyes and head toward the surprise. At the same time, its {{substantia-nigra}} cells send steady [[dopamine]] that keeps voluntary movement smooth and ready to start.',
         bullets: [
-          'The roof has four small bumps (the colliculi): two for vision, two for hearing.',
-          'Tucked inside its base is the {{substantia-nigra}}, a dark stripe of [[dopamine]] cells.',
-          'All signals between the forebrain and the lower brainstem pass through or past it.',
-        ],
-      },
-      does: {
-        text: 'The midbrain runs fast reflexes you do not choose. When something flashes at the edge of vision or a twig snaps behind you, it turns your eyes and head toward it. A second job happens quietly in the background. Its dopamine cells send a steady signal that keeps body movement smooth and easy to start.\n\nThink of clapping loudly behind a friend. They flinch and turn before they recognise the sound. That first turn is the midbrain.',
-        bullets: [
-          'Visual orienting: moves the eyes and head toward sudden movement or light.',
-          'Auditory orienting: turns you toward unexpected sounds.',
-          'Movement support: dopamine from the substantia nigra helps the {{striatum}} pick and start actions.',
-          'Alertness and pain: nearby clusters adjust wakefulness and damp down pain.',
+          'Visual and sound reflexes: points the eyes and head toward sudden cues.',
+          'Movement support: dopamine from the substantia nigra helps start physical actions.',
+          'Alertness control: adjusts background wakefulness and dampens pain.',
+          'Physical landmarks: roof features four bumps (the colliculi) for sight and sound reflexes.',
         ],
       },
       connects: {
@@ -146,21 +130,13 @@ export default [
     tagline: 'A bridge carrying signals between the cortex and the cerebellum.',
     analogy: 'A busy interchange where every lane from the cortex gets copied and sent south to the cerebellum.',
     levels: {
-      where: {
-        text: 'The pons is the rounded bulge on the front of the brainstem, between the {{midbrain}} above and the {{medulla}} below. It sits just in front of the {{cerebellum}}. The name means bridge in Latin, and that is what it looks like, a thick bundle of fibres wrapping around the front.',
+      overview: {
+        text: 'The pons is the rounded bulge on the front of the brainstem, between the {{midbrain}} above, the {{medulla}} below, and the {{cerebellum}} behind. Its Latin name means bridge, describing its thick bundle of crossing [[white matter]] fibres that wrap around the brainstem\'s front.\n\nIt copies movement plans leaving the {{motor-cortex}} and forwards them south to the {{cerebellum}} so movements can be checked and smoothed. It also coordinates sideways eye movements, chewing, face sensation, and the switches that govern dream sleep.',
         bullets: [
-          'About 2 to 3 cm tall, the most prominent part of the brainstem from the front.',
-          'Its front is mostly [[white matter]]: crossing fibres heading to the cerebellum.',
-          'Inside are scattered clusters of relay [[neuron|neurons]] (the pontine nuclei) plus sleep and face-movement centres.',
-        ],
-      },
-      does: {
-        text: 'The pons copies movement plans from the {{motor-cortex}} and hands them to the {{cerebellum}} so it can check and smooth them. It also helps control side to side eye movements, sleep (especially dream sleep) and face sensation and chewing. If the cortex is the office writing the plan, the pons is the mailroom that makes sure the cerebellum gets its copy.',
-        bullets: [
-          'Relay to cerebellum: forwards a copy of cortical plans for correction.',
-          'Eye control: helps move both eyes sideways together.',
-          'Sleep and arousal: hosts cells that switch dream sleep on and off.',
-          'Face and mouth: carries signals for chewing, swallowing and face feeling.',
+          'Cerebellar relay: sends a copy of cortical motor plans to the cerebellum.',
+          'Eye coordination: coordinates both eyes to move sideways together.',
+          'Sleep rhythms: hosts circuits that trigger and regulate dream sleep.',
+          'Physical landmarks: prominent rounded bulge about 2 to 3 cm tall on the front of the brainstem.',
         ],
       },
       connects: {
@@ -201,21 +177,13 @@ export default [
     tagline: 'Keeps you alive on autopilot: breathing, heart rate, swallowing.',
     analogy: 'The building manager in the basement who keeps the power, water and air running while everyone upstairs works.',
     levels: {
-      where: {
-        text: 'The medulla is the lowest part of the brain, where the brain narrows into the {{spinal-cord}}. It sits just below the {{pons}} and in front of the {{cerebellum}}. About 3 cm long, it looks like a slightly swollen stalk. Almost everything going between brain and body passes through it.',
+      overview: {
+        text: 'The medulla oblongata is the lowest part of the brainstem, where the brain narrows into the {{spinal-cord}}. It sits beneath the {{pons}} and in front of the {{cerebellum}}, looking like a slightly swollen stalk about 3 cm long.\n\nIt runs the vital survival jobs you cannot pause. Sensors in your blood and body feed into the medulla, which fine-tunes your breathing rate, steadies blood pressure, and directs swallowing and coughing. When you try holding your breath, rising carbon dioxide triggers the medulla until it forces a breath in.',
         bullets: [
-          'The pyramids on its front are crossing motor fibres: left brain controls right body here.',
-          'Olives on its sides hold relay cells for the cerebellum.',
-          'Inside are tiny control centres for breathing, heart rate and blood pressure.',
-        ],
-      },
-      does: {
-        text: 'The medulla runs the jobs you cannot pause. It sets your breathing rate, steadies blood pressure and heart rate, and coordinates swallowing, coughing and vomiting. It does this using sensors in your blood and body, adjusting second by second without asking you.\n\nYou notice it when you hold your breath. Rising carbon dioxide nags you until the medulla forces a breath in.',
-        bullets: [
-          'Breathing: speeds up or slows down breaths based on blood chemistry.',
-          'Heart and vessels: fine tunes heart rate and blood pressure.',
-          'Swallow and cough: runs the throat sequence so food goes down the right tube.',
-          'Relay: passes touch and movement signals between body and brain.',
+          'Breathing control: speeds or slows respiration based on blood chemistry.',
+          'Heart and blood pressure: balances heart rate and vascular tone second by second.',
+          'Throat reflexes: coordinates swallowing, gagging, and coughing sequences.',
+          'Physical landmarks: front ridges called pyramids where motor cables cross sides.',
         ],
       },
       connects: {
@@ -257,21 +225,13 @@ export default [
     tagline: 'The main cable between brain and body.',
     analogy: 'A motorway with local slip roads: through traffic to the brain, plus quick local exits for reflexes.',
     levels: {
-      where: {
-        text: 'The spinal cord runs from the {{medulla}} down inside your backbone, about 45 cm long in an adult and roughly as thick as your little finger. Nerves branch off at each vertebra to serve one strip of the body. Inside, butterfly shaped [[grey matter]] sits in the middle with [[white matter]] highways around it.',
+      overview: {
+        text: 'The spinal cord runs from the {{medulla}} down inside your backbone, measuring about 45 cm long in an adult and roughly as thick as your little finger. At each vertebra, paired spinal nerves branch off to serve a specific horizontal strip of the body.\n\nIt serves as the main information highway, carrying movement commands down from the {{motor-cortex}} to muscles and touch feedback up to the {{somatosensory-cortex}}. It also manages immediate reflex loops on its own, pulling your hand away from a hot stove before the brain even registers pain.',
         bullets: [
-          '31 pairs of spinal nerves leave along its length, one pair per backbone level.',
-          'The top carries signals for the arms, the middle for the trunk, the bottom for the legs.',
-          'It ends around waist height. Below that, loose nerve roots (the cauda equina) continue down.',
-        ],
-      },
-      does: {
-        text: 'The spinal cord carries orders down from the {{motor-cortex}} and touch signals up to the {{somatosensory-cortex}}. It also handles quick reflexes on its own. Touch something hot and the hand pulls back before the feeling even reaches your brain.\n\nThat split is the point. Fast local loops protect you, while slower copies keep the brain informed.',
-        bullets: [
-          'Downward traffic: movement commands from the brain to muscles.',
-          'Upward traffic: touch, pain, temperature and body position to the brain.',
-          'Reflexes: local loops that pull away from pain or steady the knee jerk.',
-          'Automatic routines: helps run walking rhythm and bladder control.',
+          'Two-way highway: carries motor orders down and sensory signals up.',
+          'Local reflex loops: snaps limbs away from danger without waiting for the brain.',
+          'Rhythm generators: coordinates automatic walking cycles and bladder control.',
+          'Physical landmarks: 31 pairs of spinal nerves leaving along the vertebral column.',
         ],
       },
       connects: {
@@ -313,21 +273,13 @@ export default [
     tagline: 'Brainstem nuclei that send serotonin through widespread circuits.',
     analogy: 'A set of tuning controls whose effects depend on the receptor and circuit receiving the signal.',
     levels: {
-      where: {
-        text: 'The raphe nuclei are a narrow chain of neuron clusters running right down the midline seam of the brainstem, from the {{midbrain}} down through the {{pons}} and {{medulla}}. "Raphe" means seam in Greek, describing how they sit like stitches joining the two halves.',
+      overview: {
+        text: 'The raphe nuclei form a narrow chain of neuron clusters running down the midline seam of the brainstem, from the {{midbrain}} through the {{pons}} and {{medulla}}. The name comes from the Greek word for seam, describing how they sit like stitches joining the two halves.\n\nThese nuclei serve as the central nervous system\'s primary source of [[serotonin]]. They release serotonin into widespread forebrain and spinal circuits, shaping sleep cycles, appetite, pain sensitivity, and behavioral flexibility depending on the local receptors receiving the signal.',
         bullets: [
-          'Forms a midline column inside the core of the brainstem.',
-          'Upper clusters project upward into the forebrain; lower clusters project down the spinal cord.',
-          'The principal source of serotonin for the central nervous system.',
-        ],
-      },
-      does: {
-        text: 'The raphe nuclei release [[serotonin]] into widespread brain and spinal circuits. Its effects vary with receptor type and location, influencing sleep and waking, appetite, patience, learning, pain and mood. There is no single serotonin level that directly determines whether someone feels happy or depressed.',
-        bullets: [
-          'Mood and learning: changes how emotional outcomes shape behaviour.',
-          'Sleep and waking: raphe activity varies across wake, non-REM and REM sleep.',
-          'Impulse control: contributes to waiting and behavioural flexibility in some tasks.',
-          'Pain gating: descending projections quiet pain signals in the spinal cord.',
+          'Serotonin broadcast: sends neuromodulatory projections across the whole brain.',
+          'Sleep and wake cycles: changes firing rates across sleep, dream sleep, and waking.',
+          'Pain dampening: descending projections quiet pain signals in the spinal cord.',
+          'Physical landmarks: a thin column running along the midline core of the brainstem.',
         ],
       },
       connects: {
@@ -369,21 +321,13 @@ export default [
     tagline: 'A small noradrenaline system that retunes alertness and attention.',
     analogy: 'A watchtower sentry who fires a flare when something unexpected happens, putting the whole city on alert.',
     levels: {
-      where: {
-        text: 'The locus coeruleus ("blue spot") is a tiny pair of nuclei in the upper {{pons}}, on the floor of the fourth ventricle. Its bluish hue under a microscope comes from melanin granules formed as a byproduct of noradrenaline synthesis.',
+      overview: {
+        text: 'The locus coeruleus ("blue spot") is a tiny pair of nuclei in the upper {{pons}}, on the floor of the fourth ventricle. Its bluish hue under a microscope comes from melanin granules produced as a byproduct of synthesizing [[noradrenaline]].\n\nAlthough it contains only about 30,000 to 50,000 neurons, its branched axons reach almost every corner of the cortex, cerebellum, and spinal cord. It acts like a neural broadcast tower, firing in bursts during surprises or sudden danger to sharpen sensory focus and wake the brain up.',
         bullets: [
-          'Contains only around 30,000 to 50,000 neurons in the human brain.',
-          'Despite its miniature size, its axons touch almost every corner of the cortex, cerebellum and cord.',
-          'Sits near the back wall of the brainstem, right above the sensory trigeminal nuclei.',
-        ],
-      },
-      does: {
-        text: 'The locus coeruleus helps tune arousal and attention. Its background firing changes with waking state, while brief responses often follow surprising or behaviourally important events. [[Noradrenaline]] can alter sensory processing and the balance between focused work and scanning for new information.\n\nA sudden crash recruits this system together with sensory, autonomic and motor circuits.',
-        bullets: [
-          'Vigilance and alertness: contributes to changes from drowsy to highly alert.',
-          'Adaptive gain: changes how strongly neural circuits respond to competing inputs.',
-          'Uncertainty: responds when events suggest that current expectations need updating.',
-          'Memory modulation: can strengthen learning about important events.',
+          'Arousal broadcasting: releases noradrenaline to tune alertness across the brain.',
+          'Surprise response: fires bursts when unexpected events demand immediate attention.',
+          'Signal tuning: helps circuits focus on relevant cues and filter out noise.',
+          'Physical landmarks: tiny blue-pigmented nuclei on the upper rear wall of the pons.',
         ],
       },
       connects: {

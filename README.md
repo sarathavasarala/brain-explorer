@@ -32,11 +32,11 @@ Brain Explorer treats the brain as an interactive visual canvas where explanatio
 ## Exploring Across Scales
 
 ### 1. Brain Parts (37 Structures)
-Every structure features an explainer with a four-level zoom ladder:
-1. **Where**: Spatial orientation, physical neighbours, and boundaries.
-2. **Does**: Real-world job with a concrete, physical analogy.
-3. **Connects**: Animated 3D input and output arcs showing who talks to whom.
-4. **Cells**: Microscopic circuit architecture, synaptic mechanisms, and cell types.
+Every structure features an explainer with a three-level zoom ladder and perturbation scenarios:
+1. **The part** (`overview`): Spatial location, physical boundaries, and everyday function with concrete analogies.
+2. **How it connects** (`connects`): Animated 3D input and output arcs showing who talks to whom.
+3. **Down to cells** (`cells`): Microscopic circuit architecture, synaptic mechanisms, and cell types.
+- **What if scenarios**: Interactive perturbation states in "When it goes wrong" (damaged or removed, quiet, overdriven, reshaped) with 3D model reactions and real clinical cases.
 
 ### 2. Neurochemistry (17 Messengers)
 Spans fast neurotransmitters, neuromodulators, and circulating endocrine hormones:
@@ -114,7 +114,8 @@ npm run validate
 | Route | Description |
 |---|---|
 | `#/` | Whole brain overview (lateral view) |
-| `#/s/<structure-id>/<level>` | Focus structure at level (`where`, `does`, `connects`, `cells`) |
+| `#/s/<structure-id>/<level>` | Focus structure at level (`overview`, `connects`, `cells`) |
+| `#/s/<structure-id>/<level>/<state>` | View perturbation scenario in 3D (`lesion`, `under`, `over`, `size`) |
 | `#/chem/<chem-id>/<tab>` | Chemical lens (`overview`, `tracts`, `synapse`, `medicine`, `axis`) |
 | `#/cell/<cell-id>/<tab>` | 3D cell view (`shape`, `fires`, `lives`, `chem`) |
 | `#/pathways` or `#/p/<id>/<step>` | Guided pathway tours |

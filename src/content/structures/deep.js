@@ -14,21 +14,13 @@ export default [
     tagline: 'The relay station that passes almost every sense on to the cortex.',
     analogy: 'An airport hub where every incoming flight is sorted and sent on to the right city.',
     levels: {
-      where: {
-        text: 'The thalamus sits deep in the middle of the brain, one oval lump on each side, just above the {{midbrain}} and below the {{corpus-callosum}}. Each is about the size of a walnut. Most sensory signals heading to the [[cortex]] relay here, with smell as the main exception. The thalamus also participates in movement, attention and communication between cortical areas.',
+      overview: {
+        text: 'The thalamus sits deep in the middle of the brain, one oval lump on each side, just above the {{midbrain}} and below the {{corpus-callosum}}. Each is about the size of a walnut. Most sensory signals heading to the [[cortex]] relay here, with smell as the main exception. Wrapped in a thin shell of inhibitory cells, it acts as an active gatekeeper that sorts and reshapes incoming signals before passing them along.\n\nCatching your keys is a good example of this gateway in action. Visual, touch, and sound pathways all pass through distinct thalamic nuclei before reaching their cortical targets. By turning the volume up or down on competing streams, the thalamus helps you focus on the keys midair while muting background noise.',
         bullets: [
-          'Two thumb sized ovals joined by a small bridge across the middle.',
-          'Made of many small clusters (nucleus clusters), one per sense or job.',
-          'Wrapped in a thin shell of [[inhibitory]] cells that act like a gate.',
-        ],
-      },
-      does: {
-        text: 'The thalamus relays and reshapes touch, sight and sound while attention and cortical feedback alter how strongly those signals pass. It does not decide consciousness by itself, but thalamic activity helps keep the cortex awake and coordinated.\n\nCatching your keys is a good example. Visual, touch and sound pathways use different thalamic nuclei before reaching their cortical targets.',
-        bullets: [
-          'Sensory relay: forwards touch, vision and hearing to their cortical areas.',
-          'Attention filter: turns the volume up or down on what matters.',
-          'Movement loop: passes cerebellum and basal ganglia output on to the {{motor-cortex}}.',
-          'Sleep switch: changes firing mode to block the outside world when you sleep.',
+          "Sensory relay: forwards touch, vision, and hearing to dedicated cortical areas.",
+          "Attention filter: turns the volume up on relevant inputs while dampening background distractions.",
+          "Movement loop: passes coordination signals from the cerebellum and basal ganglia up to the {{motor-cortex}}.",
+          "Sleep switch: shifts into slow rhythmic bursts during sleep to block out the outside world.",
         ],
       },
       connects: {
@@ -72,21 +64,13 @@ export default [
     tagline: 'Runs the body: hunger, thirst, temperature, sleep and hormones.',
     analogy: 'A thermostat and caretaker that reads the blood and tells the body what to fix.',
     levels: {
-      where: {
-        text: 'The hypothalamus is a pea sized patch under the {{thalamus}}, right where the brain meets the body. It sits above the pituitary gland, which dangles below it and carries its orders into the blood. Small, but it reads temperature, salt, sugar and hormones directly.',
+      overview: {
+        text: 'The hypothalamus is a pea sized cluster tucked beneath the {{thalamus}}, right where the brain meets the body. It sits above the {{pituitary}} gland, which dangles below it and carries its chemical orders into the bloodstream. Small but mighty, this command center reads body temperature, blood sugar, salt balance, and circulating hormones directly.\n\nWhen you finish a run on a hot day, the hypothalamus detects the rise in blood warmth and salt concentration. It commands sweat glands to cool your skin, orders kidneys to conserve water, and triggers a strong urge for cold water. As soon as you drink, it counts your swallows and predicts relief long before the water reaches your blood.',
         bullets: [
-          'About the size of a pea, roughly 1 cm across.',
-          'Divided into a dozen tiny clusters, each with its own job.',
-          'Wired straight to the pituitary, the master hormone gland.',
-        ],
-      },
-      does: {
-        text: 'The hypothalamus helps keep your internal state steady. Hunger, thirst, temperature, daily rhythms and many hormone responses all involve its circuits. It also helps coordinate puberty, birth and nursing through hormones.\n\nAfter a run on a hot day, the hypothalamus contributes to sweating and thirst. Faster breathing is coordinated mainly by brainstem respiratory circuits, with input from the body and the rest of the brain.',
-        bullets: [
-          'Hunger and thirst: tells you to eat or drink, and what to crave.',
-          'Temperature and water: sweats, shivers and saves water as needed.',
-          'Sleep and daily rhythm: tracks light and time to set sleepiness.',
-          'Hormones and stress: commands the pituitary to release body wide signals.',
+          "Internal thermostat: commands sweating, shivering, and blood vessel dilation to stabilize temperature.",
+          "Hunger and thirst: senses nutrient and hydration levels to trigger appetites and cravings.",
+          "Master hormone controller: directs the {{pituitary}} to release body wide endocrine signals.",
+          "Daily biological clock: tracks light cycles to synchronize daily sleep and wake rhythms.",
         ],
       },
       connects: {
@@ -139,21 +123,13 @@ export default [
     tagline: 'Learns habits and helps pick which action to do next.',
     analogy: 'A talent scout that watches everything the cortex suggests and backs the winner.',
     levels: {
-      where: {
-        text: 'The striatum is a curved C shape deep in each [[hemisphere]], curling from the {{frontal-lobe}} back toward the {{temporal-lobe}}. It wraps around the front of the {{thalamus}}. Its striped look (which gives it its name) comes from fibres crossing through it.',
+      overview: {
+        text: 'The striatum is a large, curved C shaped structure deep within each [[hemisphere]], curling from behind the {{frontal-lobe}} toward the {{temporal-lobe}}. It wraps around the front of the {{thalamus}} and takes its name from the striped white-matter bundles crossing through it. Composed of the caudate nucleus and putamen, it serves as the primary receiving hub for the basal ganglia.\n\nThe striatum helps you choose what to do next. While the cortex proposes dozens of potential actions at once, the striatum weighs them against past habits and rewards, choosing the winner and quieting the rest. This selection process is how tying your shoes or typing on a keyboard evolves from slow deliberate effort into smooth automatic routine.',
         bullets: [
-          'The largest deep cluster, about the size of a small plum per side.',
-          'Two parts: the caudate (the tail of the C) and the putamen (the round base).',
-          'Receives input from almost the whole [[cortex]], so it sees every plan.',
-        ],
-      },
-      does: {
-        text: 'The striatum helps choose what to do. The cortex proposes many actions at once, and the striatum weighs them by habit and reward, then backs one. This is how tying shoelaces moves from slow thinking to automatic habit.\n\nIt learns from [[dopamine]]. Actions that turn out better than expected get strengthened, so they win faster next time.',
-        bullets: [
-          'Action choice: backs one movement plan and quiets the rest.',
-          'Habit learning: turns repeated rewarded actions into routines.',
-          'Reward tracking: records which actions paid off before.',
-          'Stopping: helps cancel an action that is no longer wanted.',
+          "Action selection: backs the most promising movement plan while suppressing competing impulses.",
+          "Habit learning: converts repeated, rewarded sequences of actions into automatic routines.",
+          "Reward evaluation: uses [[dopamine]] signals to record which actions yield positive outcomes.",
+          "Action cancellation: works with frontal circuits to hit the brakes on an action that is no longer helpful.",
         ],
       },
       connects: {
@@ -201,21 +177,13 @@ export default [
     tagline: 'The brake pedal on movement, released only for the right action.',
     analogy: 'A security guard whose default answer is no, until the striatum shows the right pass.',
     levels: {
-      where: {
-        text: 'The globus pallidus is a small pale wedge tucked just inside the {{striatum}}, near the middle of each [[hemisphere]]. It sits between the striatum outside and the {{thalamus}} below. Its paleness comes from many [[myelin]] wrapped fibres passing through.',
+      overview: {
+        text: 'The globus pallidus is a pale, cone shaped nucleus nestled just inside the curve of the {{striatum}}, near the center of each [[hemisphere]]. It sits between the striatum on the outside and the {{thalamus}} below. Its pale appearance comes from tightly packed, [[myelin]] wrapped nerve fibres coursing through its inner and outer segments.\n\nThe globus pallidus acts as the brain\'s default brake pedal for physical movement. Its neurons fire continuously at rest, showering the {{thalamus}} with [[GABA]] to prevent random twitches and unwanted movements. When the {{striatum}} selects an intended action, it briefly silences a patch of pallidal cells, lifting the brake just enough to let the winning movement flow through smoothly.',
         bullets: [
-          'About the size of a pea, with inner and outer segments.',
-          'Fires constantly at rest, unlike most brain areas.',
-          'Forms the main output of the basal ganglia toward the thalamus.',
-        ],
-      },
-      does: {
-        text: 'The pallidus keeps movement braked by default. It constantly inhibits the {{thalamus}}, stopping unwanted twitches before they start. When the {{striatum}} picks an action, it briefly hushes the pallidus, the brake lifts, and the chosen movement goes through.\n\nReaching for one cup among many on a shelf uses this. Everything else stays braked while one reach is released.',
-        bullets: [
-          'Default brake: hushes the thalamus to stop random movement.',
-          'Selective release: pauses briefly to let the chosen action through.',
-          ' competing actions: keeps the losers braked while the winner moves.',
-          'Posture background: steadies the body while you move one part.',
+          "Movement brake: continuously inhibits the thalamus to prevent spontaneous, unwanted twitches.",
+          "Selective release: pauses its firing momentarily to let chosen movements proceed.",
+          "Surround inhibition: keeps competing limb and muscle movements braked while the winner acts.",
+          "Postural background: stabilizes core posture so you can move your arms and hands with precision.",
         ],
       },
       connects: {
@@ -256,21 +224,13 @@ export default [
     tagline: 'Uses dopamine and inhibitory output to tune movement circuits.',
     analogy: 'A watering can that sprinkles dopamine over the movement circuits to keep them willing to move.',
     levels: {
-      where: {
-        text: 'The substantia nigra is a thin dark stripe in the {{midbrain}}, just above the {{pons}}. "Black substance" is what the name means, and it does look darker than nearby tissue. Although tiny, it reaches the whole {{striatum}} above it.',
+      overview: {
+        text: 'The substantia nigra is a dark, flattened band of cells nestled inside the {{midbrain}}, sitting just above the {{pons}} and alongside descending motor pathways. Its Latin name means "black substance," reflecting the dark neuromelanin pigment produced when making [[dopamine]]. Despite its tiny size, its sprawling nerve branches reach upward across the entire {{striatum}}.\n\nIts dopamine neurons provide the chemical green light that allows movement circuits to start and run smoothly. When you decide to stand up from a chair, these cells release a burst of dopamine into the striatum to facilitate the transition into motion. When these cells die away, movements become slow, rigid, and hesitant, as seen in Parkinson\'s disease.',
         bullets: [
-          'A flat band only a few millimetres thick, one per side.',
-          'Dark because its cells contain a pigment related to [[dopamine]] making.',
-          'Sits beside the movement fibres heading down to the body.',
-        ],
-      },
-      does: {
-        text: 'Dopamine neurons in the substantia nigra pars compacta tune how the {{striatum}} selects and learns actions. A neighbouring part, the pars reticulata, sends inhibitory output from the basal ganglia. When nigral dopamine is badly depleted, movements become slower and harder to start, as in Parkinson\'s disease.',
-        bullets: [
-          'Learning signal: helps update the value of actions and outcomes.',
-          'Pathway tuning: affects direct and indirect striatal pathways differently.',
-          'Movement vigour: helps scale how readily and forcefully actions are performed.',
-          'Eye moves too: a nearby part guides quick eye jumps.',
+          "Movement facilitation: delivers dopamine to the {{striatum}} to help initiate voluntary actions.",
+          "Action reinforcement: signals unexpected rewards to help motor circuits repeat successful efforts.",
+          "Motor tuning: balances the direct and indirect pathways of the basal ganglia to control physical vigour.",
+          "Inhibitory output: uses its pars reticulata segment to help guide rapid saccadic eye movements.",
         ],
       },
       connects: {
@@ -344,21 +304,13 @@ export default [
     tagline: 'Turns what happened today into memories you can recall later.',
     analogy: 'A librarian who files the day\'s loose pages overnight so you can find them later.',
     levels: {
-      where: {
-        text: 'The hippocampus curls inside the {{temporal-lobe}}, one per side, near the {{amygdala}}. It is about as long as your little finger and shaped a bit like a seahorse (which is what the name means). It sits where what, where and when streams meet.',
+      overview: {
+        text: 'The hippocampus is a curved, seahorse shaped ridge nestled deep inside the medial {{temporal-lobe}}, one per hemisphere. It sits alongside the {{amygdala}} and connects intimately with the surrounding entorhinal cortex, which acts as its main information doorway. It occupies a prime intersection where streams of what, where, and when converge.\n\nThe hippocampus binds the loose threads of an experience into a unified memory. Faces, sounds, locations, and emotions arrive separately, and the hippocampus weaves them together so that encountering a single cue later revives the entire episode. It also creates flexible cognitive maps of physical space, which is why London taxi drivers expand their rear hippocampi while memorizing thousands of city streets.',
         bullets: [
-          'A curved tube with a toothlike ridge (the dentate gyrus) along its edge.',
-          'Tightly linked to the nearby entorhinal [[cortex]], its main doorway (the entorhinal cortex).',
-          'New neuron birth in the adult human dentate gyrus remains actively debated.',
-        ],
-      },
-      does: {
-        text: 'The hippocampus binds the pieces of an experience into one memory. Faces, places, words and feelings arrive separately, and it links them so later one cue brings back the rest. It also maps space, which is why London taxi drivers famously grew larger rear hippocampi while learning the streets.\n\nSay you lose your keys. Picturing where you last saw them works because the hippocampus tied the keys to that place.',
-        bullets: [
-          'Binding: links who, what and where into one episode.',
-          'Space maps: tracks places and routes (place cells).',
-          'Recall: completes a whole memory from a small cue.',
-          'Handover: replays new memories to the cortex for long term storage.',
+          "Episodic binding: links sensory details, time, and places into coherent conscious memories.",
+          "Spatial mapping: uses place cells to build and maintain internal navigation maps of your environment.",
+          "Pattern completion: reconstructs an entire past event when prompted by a small sensory hint.",
+          "Memory consolidation: replays daily experiences to the cortex during rest for permanent storage.",
         ],
       },
       connects: {
@@ -445,21 +397,13 @@ export default [
     tagline: 'The alarm that flags danger and gives memories emotional weight.',
     analogy: 'A smoke detector: quick, loud and sometimes wrong, but worth having.',
     levels: {
-      where: {
-        text: 'The amygdala is an almond sized lump at the front tip of the {{hippocampus}}, deep inside the {{temporal-lobe}}. One sits on each side. Despite the single name it is really a cluster of about a dozen small nucleus clusters.',
+      overview: {
+        text: 'The amygdala is an almond shaped cluster of nuclei resting at the front tip of the {{hippocampus}}, deep within the medial {{temporal-lobe}}. There is one in each hemisphere, positioned where vision, hearing, smell, and visceral body sensations intersect. It links directly to the {{hypothalamus}} and {{midbrain}} to trigger immediate physical defense reactions.\n\nThe amygdala acts as an emotional threat detector and salience filter. When you glimpse a coiled garden hose on a trail, your amygdala triggers an instant freeze or jump before your cortex even identifies the object as harmless rubber. Beyond fear, it stamps emotional weight onto memories, ensuring that significant threats, social bonds, and valuable rewards are remembered vividly.',
         bullets: [
-          'About 1 to 2 cm across, shaped like an almond (hence the name).',
-          'Sits where smell, sight, sound and body signals converge.',
-          'Wired straight to the {{hypothalamus}} and {{midbrain}} for fast body action.',
-        ],
-      },
-      does: {
-        text: 'The amygdala flags what matters, especially threats and rewards. It learns fast: one bad meal or one scare can set a lasting warning. It then tells the body to react before you have words for it.\n\nWalking past a snake shaped stick on a path shows it. You jump first, then the cortex reports it is only a stick.',
-        bullets: [
-          'Threat alarm: triggers freeze, flight or fight within milliseconds.',
-          'Emotional memory: stamps strong feelings onto {{hippocampus}} memories.',
-          'Face reading: spots fear, anger and trustworthiness in faces.',
-          'Body arousal: raises heart rate, sweat and attention through the body.',
+          "Threat detection: triggers instant freeze, flight, or fight responses within milliseconds of danger.",
+          "Emotional stamping: works with the {{hippocampus}} to anchor vivid memories of emotionally charged events.",
+          "Social perception: decodes emotional expressions, trustworthiness, and subtle cues in human faces.",
+          "Autonomic arousal: drives sudden surges in heart rate, respiration, and adrenaline during acute stress.",
         ],
       },
       connects: {
@@ -537,21 +481,13 @@ export default [
     tagline: 'A thick cable of fibres that lets the two halves talk.',
     analogy: 'A wide footbridge between two office towers so both sides work as one company.',
     levels: {
-      where: {
-        text: 'The corpus callosum arches over the middle of the brain, just above the {{thalamus}} and under the {{cingulate-cortex}}. It is about 10 cm long front to back, the largest [[white matter]] bundle in the brain. You only see it if you gently pull the two hemispheres apart.',
+      overview: {
+        text: 'The corpus callosum is a thick, arched ribbon of nerve fibres bridging the midline of the brain, suspended directly beneath the {{cingulate-cortex}} and above the {{thalamus}}. Spanning roughly 10 centimetres front to back, it is the largest [[white matter]] tract in the human central nervous system, carrying over 200 million [[myelin]] wrapped [[axon|axons]].\n\nThis grand bridge lets the left and right cerebral hemispheres communicate and work as a single mind. When an object is held in your left hand out of sight, touch signals travel first to the right hemisphere. The corpus callosum whisks that information across to the left hemisphere within milliseconds so that language centers can name what you are holding.',
         bullets: [
-          'About 200 million [[axon|axons]] cross here, mostly linking matching spots.',
-          'Front part links planning areas, back part links seeing and hearing.',
-          'Still growing into your twenties as [[myelin]] builds up.',
-        ],
-      },
-      does: {
-        text: 'The callosum shares information between hemispheres. Language is usually weighted toward the left and spatial attention toward the right, but both tasks use networks on both sides. Signals cross in milliseconds.\n\nA classic split-brain test uses an object placed in the left hand without sight. Touch first reaches the right hemisphere, then normally crosses the callosum to left-sided language areas so the object can be named.',
-        bullets: [
-          'Sharing: sends a summary of each side to the other.',
-          'Teamwork: lets language and space systems combine.',
-          'One self: keeps attention and memory in sync across halves.',
-          'Learning: helps a skill learned on one side transfer to the other.',
+          "Interhemispheric bridge: shares information between mirrored cortical areas on left and right sides.",
+          "Unified perception: joins the left and right visual fields and spatial maps into a seamless panorama.",
+          "Motor coordination: harmonizes movements between both hands during two handed tasks like playing piano.",
+          "Skill transfer: helps motor skills learned with one hand transfer more readily to the opposite hand.",
         ],
       },
       connects: {
@@ -592,21 +528,13 @@ export default [
     tagline: 'Sends learning and motivation signals through several dopamine pathways.',
     analogy: 'A prediction updater that helps the brain revise what is worth pursuing.',
     levels: {
-      where: {
-        text: 'The ventral tegmental area (VTA) is a tiny cluster of cells in the {{midbrain}}, sitting just medial to the {{substantia-nigra}}. Although small enough to fit on the tip of a pencil, its branches reach right across the front half of the brain.',
+      overview: {
+        text: 'The ventral tegmental area (VTA) is a compact cluster of neurons nestled in the floor of the {{midbrain}}, situated immediately medial to the {{substantia-nigra}}. Although small enough to fit on the tip of a pencil, its ascending dopamine, GABA, and glutamate branches reach outward to illuminate the entire front of the brain.\n\nThe VTA computes reward prediction errors, signaling when an outcome turns out better or worse than anticipated. When a notification chimes or you catch an unexpected whiff of fresh coffee, VTA dopamine bursts highlight the cue and generate the motivational drive to pursue it. It does not generate raw pleasure on its own, but rather imbues goals with wanting and anticipation.',
         bullets: [
-          'Nested close to the midline in the floor of the midbrain.',
-          'Contains dopamine, GABA and glutamate neurons rather than one uniform cell type.',
-          'Sits next to the substantia nigra, with overlapping roles in motivation, learning and movement.',
-        ],
-      },
-      does: {
-        text: 'Many VTA dopamine neurons change their firing when an outcome is better or worse than expected. As learning develops, responses can shift toward cues that predict an outcome. These signals help update motivation, attention and memory, but VTA neurons are diverse and no single burst equals a feeling.\n\nA notification can become compelling after repeated learning. VTA dopamine may contribute to that learned pull alongside cortical, striatal and emotional circuits.',
-        bullets: [
-          'Prediction updates: many dopamine cells respond when outcomes differ from expectations.',
-          'Motivation: changes how much effort a goal seems worth.',
-          'Learning: helps cues and actions gain or lose value.',
-          'Memory modulation: influences hippocampal and amygdala plasticity.',
+          "Prediction error: fires when an outcome beats expectations, updating how much an action was worth.",
+          "Motivational drive: energizes the willingness to invest physical or mental effort toward a goal.",
+          "Mesolimbic pathway: sends dopamine to the {{nucleus-accumbens}} and {{amygdala}} for reward learning.",
+          "Mesocortical pathway: projects dopamine to the {{prefrontal-cortex}} to support goal focus and working memory.",
         ],
       },
       connects: {
@@ -648,21 +576,13 @@ export default [
     tagline: 'Sends acetylcholine widely to tune attention, learning and wakefulness.',
     analogy: 'A stage spotlight operator who turns up brightness on what matters so you can focus.',
     levels: {
-      where: {
-        text: 'The basal forebrain is a cluster of structures tucked below the {{striatum}} and just in front of the {{hypothalamus}}. It contains the nucleus basalis of Meynert, the brain\'s major acetylcholine manufacturing plant for the entire outer cortex.',
+      overview: {
+        text: 'The basal forebrain is a collection of structures tucked along the base of the brain, situated beneath the {{striatum}} and just in front of the {{hypothalamus}}. It houses the nucleus basalis of Meynert, the brain\'s primary manufacturing center for [[acetylcholine]] destined for the entire cerebral cortex.\n\nThis system acts like a stage spotlight operator, tuning cortical circuits during moments of focused attention, learning, and wakefulness. When you search a crowded room for a friend\'s face, basal forebrain acetylcholine sharpens sensory cortex firing, increasing the signal-to-noise ratio so relevant visual features stand out clearly against background clutter.',
         bullets: [
-          'Located near the base of the front of the brain, under the basal ganglia.',
-          'Sends direct fibres to all four lobes of the cerebral cortex.',
-          'Degenerates early in Alzheimer\'s disease alongside connected memory regions.',
-        ],
-      },
-      does: {
-        text: 'Basal-forebrain acetylcholine changes how cortical circuits respond during attention, learning and waking. Depending on the receptor and circuit, it can strengthen selected inputs and alter local activity rather than simply turning all cortex up.\n\nSearching for lost keys recruits a broad attention network, with this system helping sensory evidence gain weight as you look.',
-        bullets: [
-          'Selective attention: turns up signal-to-noise ratio in sensory areas.',
-          'Neuroplasticity: tells cortical circuits that right now is worth learning.',
-          'Arousal and waking: helps transition from groggy sleep to alert wakefulness.',
-          'Working memory: supports holding several numbers or names in mind.',
+          "Cortical spotlight: releases acetylcholine across the cortex to enhance sensory focus and clarity.",
+          "Plasticity gate: signals to cortical networks that the current moment contains important lessons worth storing.",
+          "Wakefulness drive: helps transition the brain from drowsy slow-wave states into alert consciousness.",
+          "Working memory support: assists the {{frontal-lobe}} in sustaining attention on complex mental tasks.",
         ],
       },
       connects: {
@@ -705,21 +625,13 @@ export default [
     tagline: 'Ventral striatum that translates reward signals and motivation into action.',
     analogy: 'A gateway where wanting meets doing.',
     levels: {
-      where: {
-        text: 'The nucleus accumbens sits at the bottom front of the {{striatum}}, where the head of the caudate meets the putamen. There is one in each [[hemisphere]]. Together with neighbouring tissue, it forms the ventral striatum.',
+      overview: {
+        text: 'The nucleus accumbens is a round, almond-sized structure nestled at the bottom front of the {{striatum}}, where the head of the caudate meets the putamen. Present in each hemisphere, it forms the core of the ventral striatum and sits at the prime crossroads between emotional limbic networks and motor planning circuits.\n\nThe nucleus accumbens translates motivational wanting into physical doing. When [[dopamine]] arrives from the {{vta}}, it signals that an upcoming goal is worth pursuing, prompting motor loops to initiate action. Whether walking toward the kitchen when hunger strikes or checking your phone after a chime, this gateway helps convert anticipation into movement.',
         bullets: [
-          'A round cluster about the size of a small almond on each side.',
-          'Sits right in front of the preoptic area and under the internal capsule.',
-          'Consists of two main sub-regions: a core and an outer shell.',
-        ],
-      },
-      does: {
-        text: 'The nucleus accumbens responds to rewarding cues and helps drive motivation. When [[dopamine]] arrives from the {{vta}}, it highlights opportunities and promotes effort to reach a goal.\n\nCatching the aroma of fresh baking and walking toward the bakery is a classic example of this circuit in action.',
-        bullets: [
-          'Motivation: helps turn wanting into physical movement.',
-          'Reward prediction: fires when unexpected good outcomes occur.',
-          'Reinforcement learning: strengthens associations between cues and rewards.',
-          'Effort allocation: decides whether a reward is worth the physical work.',
+          "Wanting into doing: translates emotional desire and reward anticipation into goal-directed movement.",
+          "Reward evaluation: registers unexpected positive outcomes to reinforce successful behaviors.",
+          "Effort calculation: weighs whether an anticipated reward justifies the physical or mental effort required.",
+          "Limbic-motor bridge: connects the {{amygdala}} and {{hippocampus}} to downstream basal ganglia motor loops.",
         ],
       },
       connects: {
@@ -762,21 +674,13 @@ export default [
     tagline: 'The master endocrine gland that releases hormones into the bloodstream.',
     analogy: 'A dispatcher that turns instructions from the brain into chemical packages for the body.',
     levels: {
-      where: {
-        text: 'The pituitary gland sits at the base of the skull in a small bony hollow called the sella turcica. It dangles just beneath the {{hypothalamus}}, connected by a thin stalk called the infundibulum. It lies on the midline behind the bridge of the nose.',
+      overview: {
+        text: 'The pituitary gland is a pea-sized organ nestled in a protective pocket of bone called the sella turcica, right at the base of the skull behind the bridge of the nose. It dangles beneath the {{hypothalamus}} on a delicate stalk called the infundibulum. Unlike most brain tissue, it sits outside the blood-brain barrier so its secretions can enter circulation directly.\n\nOften called the master endocrine gland, the pituitary translates neural instructions from the hypothalamus into hormonal messages that travel through the bloodstream. When stress strikes, it releases ACTH to prompt cortisol production by the adrenal glands. It also regulates thyroid metabolism, physical growth, water retention, and reproductive cycles across the entire body.',
         bullets: [
-          'About the size of a pea, roughly 1 cm across.',
-          'Split into an anterior lobe (hormone-producing gland) and posterior lobe (neural extension).',
-          'Sits outside the blood-brain barrier so its hormones can enter circulation quickly.',
-        ],
-      },
-      does: {
-        text: 'The pituitary gland converts neural commands from the hypothalamus into hormonal signals that travel through the blood. It regulates growth, metabolism, blood pressure, reproduction, and stress responses throughout the entire body.\n\nDuring a stressful moment, orders from the hypothalamus cause the pituitary to send ACTH to the adrenal glands, which in turn release cortisol.',
-        bullets: [
-          'Master control: coordinates thyroid, adrenal glands, and reproductive organs.',
-          'Growth and repair: secretes growth hormone to rebuild tissues.',
-          'Water balance: releases vasopressin from its posterior lobe to conserve body water.',
-          'Bonding and birth: releases oxytocin during social bonding, labour, and nursing.',
+          "Endocrine commander: coordinates peripheral glands including the thyroid, adrenals, and gonads.",
+          "Stress axis: releases ACTH to drive adrenal cortisol release during physical or mental emergencies.",
+          "Water conservation: releases vasopressin from its posterior lobe to help the kidneys retain water.",
+          "Growth and bonding: secretes growth hormone for tissue repair and oxytocin during birth and social bonding.",
         ],
       },
       connects: {
@@ -817,20 +721,13 @@ export default [
     tagline: 'Produces melatonin in the dark to set your daily sleep and wake rhythm.',
     analogy: 'A light-sensitive clock that marks the night and tells the brain when it is time to sleep.',
     levels: {
-      where: {
-        text: 'The pineal gland sits nestled deep near the center of the brain, on the midline just above the {{midbrain}} and behind the third ventricle. It is about the size of a grain of rice, roughly 8 millimetres long. Unlike most of the brain, it sits outside the blood-brain barrier with a direct window into the bloodstream.',
+      overview: {
+        text: 'The pineal gland is a tiny, pinecone-shaped structure perched on the midline deep near the center of the brain, sitting just above the {{midbrain}} and behind the third ventricle. Roughly the size of a grain of rice, this gland sits outside the blood-brain barrier and receives an exceptionally rich blood supply to distribute its chemical messages.\n\nThe pineal gland serves as the body\'s internal clock for darkness. Receiving light-dark timing cues relayed from the {{hypothalamus}}, it converts serotonin into melatonin during nighttime hours, signaling throughout the brain and body that night has arrived. Staring at bright screens late in the evening delays melatonin release because blue light tricks the circadian clock into assuming daytime continues.',
         bullets: [
-          'Small pinecone-shaped gland sitting on the midline behind the thalamus.',
-          'Receives a rich blood supply second only to the kidneys relative to its tiny size.',
-          'Often accumulates harmless calcium deposits (brain sand) as people age.',
-        ],
-      },
-      does: {
-        text: 'The pineal gland acts as the body\'s nocturnal timekeeper. In response to signals from the master circadian clock in the {{hypothalamus}}, it converts serotonin into melatonin during darkness, signaling to tissues and sleep centers that night has arrived.\n\nLooking at bright phone screens late in the evening delays melatonin release because blue light tricks the circadian clock into thinking the sun is still up.',
-        bullets: [
-          'Melatonin secretion: releases high levels of sleep hormone during darkness.',
-          'Circadian timing: works with the hypothalamic suprachiasmatic nucleus to synchronize daily cycles.',
-          'Seasonal adaptation: helps regulate seasonal biological rhythms in response to changing day length.',
+          "Melatonin release: synthesizes and secretes the primary hormone of darkness to induce drowsiness.",
+          "Circadian synchronization: works with hypothalamic pacemakers to harmonize internal daily rhythms.",
+          "Light sensitivity: halts melatonin production rapidly when morning light enters the eyes.",
+          "Seasonal regulation: helps adjust seasonal biological shifts in response to changing daylight hours.",
         ],
       },
       connects: {
@@ -872,20 +769,13 @@ export default [
     tagline: 'Relays memory signals from the hippocampus to the thalamus.',
     analogy: 'A relay station on a rail line, passing memory signals to the next stop.',
     levels: {
-      where: {
-        text: 'The mammillary bodies are two small round bumps on the underside of the brain, at the back of the {{hypothalamus}}. They sit just ahead of the brainstem. Although small, they form a key waypoint for signals leaving the {{hippocampus}}.',
+      overview: {
+        text: 'The mammillary bodies are two small, rounded nuclei projecting from the underside of the posterior {{hypothalamus}}, positioned right behind the pituitary stalk and in front of the brainstem. Despite their modest size, they serve as an essential waystation for neural signals traveling along the memory loop known as the Papez circuit.\n\nThese nuclei receive a major bundle of nerve fibres called the [[fornix]] from the {{hippocampus}} and relay those signals straight to the anterior {{thalamus}}. This continuous relay loop is vital for recollecting past personal events. Without it, the brain can still retrieve older childhood memories but cannot stitch recently experienced details into permanent recall.',
         bullets: [
-          'Two round grey-matter nuclei on the underside of the posterior hypothalamus.',
-          'Receive the main fiber bundle from the [[fornix]].',
-          'Sit on the base of the brain behind the pituitary stalk.',
-        ],
-      },
-      does: {
-        text: 'The mammillary bodies relay signals in the memory loop known as the Papez circuit. They take outputs from the {{hippocampus}} and pass them up to the {{thalamus}}.\n\nRemembering what you ate for breakfast relies on this loop to pass retrieved details back to the cortex.',
-        bullets: [
-          'Memory relay: forwards hippocampal signals to the anterior thalamus.',
-          'Navigation: helps track head direction and orientation in space.',
-          'Consolidation: helps move temporary memories into permanent storage.',
+          "Memory waystation: relays episodic memory signals from the {{hippocampus}} to the anterior {{thalamus}}.",
+          "Spatial orientation: contains head-direction neurons that help track heading and trajectory in space.",
+          "Rhythmic pacing: fires in synchrony with hippocampal theta rhythms to coordinate memory storage.",
+          "Metabolic sensitivity: relies heavily on thiamine (vitamin B1) to fuel its high energy demands.",
         ],
       },
       connects: {
@@ -928,21 +818,13 @@ export default [
     tagline: 'Signals disappointment and brakes dopamine when an expected reward fails.',
     analogy: 'A brake pedal on reward: it fires when things go wrong and pauses the celebration.',
     levels: {
-      where: {
-        text: 'The habenula is a tiny paired structure perched near the midline, on the upper back edge of the {{thalamus}}. It sits right above the {{midbrain}} and next to the {{pineal-gland}}. One sits on each side of the third ventricle.',
+      overview: {
+        text: 'The habenula is a tiny paired structure perched near the midline on the upper rear crest of the {{thalamus}}, overlooking the {{midbrain}} and nestled beside the {{pineal-gland}}. Split into medial and lateral halves, this compact hub acts as an emotional and motivational switchboard connecting the forebrain to midbrain monoamine centers.\n\nThe lateral habenula functions as the brain\'s disappointment detector and reward brake. While dopamine neurons fire when outcomes beat expectations, the habenula fires when outcomes fall short or when you experience defeat or pain. Its firing activates inhibitory gates that temporarily silence dopamine neurons in the {{vta}}, helping you learn to steer clear of disappointing choices.',
         bullets: [
-          'Two tiny nuclei on the upper rear crest of the thalamus.',
-          'Sits directly beside the pineal stalk overlooking the midbrain.',
-          'Split into medial and lateral sections, each with different jobs.',
-        ],
-      },
-      does: {
-        text: 'The lateral habenula acts as a brake on reward. While dopamine neurons fire when outcomes beat expectations, the habenula fires when outcomes are worse than expected, or when you feel pain or defeat.\n\nPutting a coin in a vending machine and getting nothing triggers a burst from the habenula, quieting dopamine neurons.',
-        bullets: [
-          'Reward errors: fires when an expected reward does not appear.',
-          'Dopamine brake: quiets dopamine neurons in the VTA.',
-          'Avoidance learning: teaches the brain to steer clear of painful cues.',
-          'Mood tuning: high resting activity is linked to depression and feeling stuck.',
+          "Disappointment detector: fires when an expected reward fails to appear, signaling negative prediction errors.",
+          "Dopamine brake: sends excitatory signals to midbrain inhibitory cells that shut down {{vta}} dopamine firing.",
+          "Avoidance learning: reinforces behaviors that help avoid painful, stressful, or unrewarding situations.",
+          "Mood regulation: chronic overactivity is strongly linked to the flat affect and lack of motivation in depression.",
         ],
       },
       connects: {
@@ -985,21 +867,13 @@ export default [
     tagline: 'The sensory station for smell, wired directly to memory and emotion.',
     analogy: 'A direct phone line to memory that skips the central switchboard.',
     levels: {
-      where: {
-        text: 'The olfactory bulbs are two matchstick-sized stalks resting on the skull floor, directly under the {{frontal-lobe}}. They sit right above the nasal cavity, separated only by a thin sheet of bone with tiny holes. Scent nerves from the nose pass straight through those holes into the bulbs. Smell is the only sense that reaches cortical circuits without relaying through the {{thalamus}} first.',
+      overview: {
+        text: 'The olfactory bulbs are two matchstick-sized stalks resting on the skull floor, directly beneath each {{frontal-lobe}} and just above the roof of the nasal cavity. They are separated from the nose only by a paper-thin perforated bone called the cribriform plate. Delicate scent nerve fibres pass through these perforations directly into the bulbs, making smell the only sense that bypasses the {{thalamus}} on its way to cortex.\n\nThe olfactory bulb receives chemical scent messages from nasal receptors and organizes them into recognizable odor patterns. It sends those patterns directly to the {{amygdala}} and {{hippocampus}}. This direct limbic wiring explains why catching the scent of woodsmoke, sunscreen, or rain can instantly revive a forgotten childhood memory before your conscious mind has even named the aroma.',
         bullets: [
-          'Two slender stalks resting on the bone beneath each frontal lobe.',
-          'Positioned directly above the roof of the nasal passage.',
-          'The only sensory path that skips the thalamic relay.',
-        ],
-      },
-      does: {
-        text: 'The olfactory bulb receives scent signals from the nose and sorts them into recognizable odor patterns. It sends those patterns directly to the {{amygdala}} and {{hippocampus}}.\n\nCatching a whiff of sunscreen or woodsmoke triggers this loop, bringing back a childhood memory before your cortex even names the scent.',
-        bullets: [
-          'Odor sorting: maps thousands of airborne chemicals into recognizable scents.',
-          'Emotional routing: sends scent patterns straight to memory and emotion hubs.',
-          'Appetite: prompts salivation and hunger when food smells arrive.',
-          'Hazard warning: flags smoke, gas leaks and spoiled food.',
+          "Odor pattern sorting: organizes input from hundreds of olfactory receptor types into identifiable scent maps.",
+          "Direct limbic highway: projects straight to the {{amygdala}} and {{hippocampus}} without a thalamic detour.",
+          "Contrast sharpening: uses local inhibitory interneurons to distinguish between subtly different aromas.",
+          "Hazard warning: triggers immediate alarm upon sensing smoke, spoiled food, or airborne chemical toxins.",
         ],
       },
       connects: {

@@ -22,7 +22,7 @@ if (currentCatalog !== expectedCatalog) {
 }
 
 const problems = validate();
-const levelKeys = ['where', 'does', 'connects', 'cells'];
+const levelKeys = ['overview', 'connects', 'cells'];
 const missing = [];
 for (const s of structures) {
   const gaps = [];

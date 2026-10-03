@@ -25,21 +25,13 @@ export default [
     tagline: 'Planning, deciding and moving.',
     analogy: 'The office manager who sets the goal, makes the plan and tells the hands what to do.',
     levels: {
-      where: {
-        text: 'The frontal lobe is the whole front third of each [[hemisphere]], from your forehead back to the central groove near the top. It is the largest [[lobe]], about a third of the [[cortex]]. Inside it sit the {{prefrontal-cortex}}, {{motor-cortex}} and {{brocas-area}}.',
+      overview: {
+        text: 'The frontal lobe spans the front third of each hemisphere, stretching from behind your forehead back to the central groove. It is the largest of the brain\'s four cortical lobes, bounded behind by the {{parietal-lobe}} and below by the {{temporal-lobe}}.\n\nIt turns goals into real-world action. When you decide to leave the couch, tie your shoes, and head outside for a run, the frontal lobe coordinates the sequence: holding the destination in mind, ignoring distractions, and firing movement commands to muscles.',
         bullets: [
-          'Front of the central [[sulcus]], above the temples.',
-          'Two sides joined by the {{corpus-callosum}} underneath.',
-          'Outer sheet is deeply folded into ridges (gyri) and grooves.',
-        ],
-      },
-      does: {
-        text: 'The frontal lobe turns goals into actions. It holds what you want in mind, picks a plan, then sends the order to move. Reading a recipe, gathering ingredients and starting to cook is a frontal morning.\n\nIt also holds back impulses. Stopping yourself from replying to a rude text is as frontal as sending one.',
-        bullets: [
-          'Goals and plans: holds intentions while you work toward them.',
-          'Decisions: weighs options with help from the {{striatum}}.',
-          'Movement: works with motor networks to turn plans into descending commands.',
-          'Self control: stops or delays actions that do not fit the goal.',
+          'Goal-directed action: turns conscious intentions into physical movements.',
+          'Executive control: holds plans active while filtering out distractions.',
+          'Speech construction: houses {{brocas-area}} on the left side for phrasing sentences.',
+          'Physical landmarks: spans from the front pole back to the central sulcus.',
         ],
       },
       connects: {
@@ -81,21 +73,13 @@ export default [
     tagline: 'Keeps goals in mind and puts the brakes on impulses.',
     analogy: 'A patient coach who holds the game plan up while the crowd shouts.',
     levels: {
-      where: {
-        text: 'The prefrontal [[cortex]] is the very front of the {{frontal-lobe}}, behind your forehead. It is especially extensive and richly connected in humans, although other primates also have a large prefrontal cortex. Its distance from the primary senses suits it to combining information for plans rather than reading raw sights or sounds.',
+      overview: {
+        text: 'The prefrontal [[cortex]] occupies the frontmost region of the {{frontal-lobe}}, sitting directly behind your forehead. Highly developed in humans, it is richly connected with sensory, memory, and emotional hubs across the entire brain.\n\nIt holds goals in mind while you work, letting you follow multi-step recipes, save money, or listen without interrupting. Packing a bag for a trip shows it in action: you picture the weather, remember the charger, and skip the extra shoes you do not need.',
         bullets: [
-          'Frontmost patch of [[cortex]], ahead of the {{motor-cortex}}.',
-          'Three faces: outer (plans), middle (memory), lower (feelings and rules).',
-          'Richly wired to the {{thalamus}}, {{striatum}} and {{amygdala}}.',
-        ],
-      },
-      does: {
-        text: 'The prefrontal [[cortex]] holds a goal in mind while you work. It lets you follow a recipe, save money or listen without interrupting. It does this by keeping the goal active and quieting distractions.\n\nPacking a bag for a weekend trip shows it. You picture the weather, remember the charger and skip the extra shoes. That juggling is prefrontal.',
-        bullets: [
-          'Working memory: holds a few items active for seconds.',
-          'Self control: stops the quick reply in favour of the better one.',
-          'Planning ahead: strings steps into the right order.',
-          'Social rules: adjusts behaviour for who is in the room.',
+          'Working memory: holds items active in mind for seconds or minutes.',
+          'Impulse control: puts the brakes on quick reactions in favor of better choices.',
+          'Planning ahead: strings complex tasks into the correct chronological order.',
+          'Physical landmarks: front pole of the cortex, sitting ahead of the motor strip.',
         ],
       },
       connects: {
@@ -178,21 +162,13 @@ export default [
     tagline: 'Shapes voluntary movement commands sent toward the spinal cord.',
     analogy: 'A piano keyboard for the body, with more keys for the fingers and lips than the back.',
     levels: {
-      where: {
-        text: 'The motor [[cortex]] is a narrow strip at the back of the {{frontal-lobe}}, just in front of the central groove. It runs from the top of the head down toward the ear. Each spot controls the opposite side of the body, laid out like a tiny upside down person (the homunculus).',
+      overview: {
+        text: 'The motor [[cortex]] is a narrow vertical strip about 2 cm wide at the back of the {{frontal-lobe}}, running from the top of the head toward the ear just in front of the central groove. The left side guides movements on the right side of the body, and vice versa.\n\nIt turns planned actions into descending motor commands. Body parts are mapped like an upside-down person (homunculus), with huge cortical territories dedicated to agile hands, lips, and tongue. Reaching for a cup shows it: populations of its [[pyramidal cell|pyramidal cells]] set the direction, force, and timing of several joints at once.',
         bullets: [
-          'A strip about 2 cm wide, one per [[hemisphere]].',
-          'Huge zones for hands, lips and tongue, tiny ones for trunk.',
-          'Lies directly across the groove from the {{somatosensory-cortex}}.',
-        ],
-      },
-      does: {
-        text: 'This strip helps turn a planned action into descending movement signals. When you reach for a cup, populations of its [[pyramidal cell|pyramidal cells]] contribute to the direction, force and timing of several joints at once. It works with premotor areas, the brainstem and the spinal cord rather than acting as a single final switch.\n\nCatching your keys shows the teamwork. The {{posterior-parietal}} helps locate the target while the {{motor-cortex}} helps shape the reach.',
-        bullets: [
-          'Descending signals: helps recruit the muscles needed for an action.',
-          'Force and direction: sets how hard and where to push.',
-          'Skill storage: with practice, patterns here run faster and cleaner.',
-          'Talk and face: lower end drives lips, tongue and jaw.',
+          'Movement commands: recruits the muscles needed for voluntary actions.',
+          'Motor body map: oversized zones dedicated to hands, lips, and tongue.',
+          'Force and direction: sets how hard and where limbs push.',
+          'Physical landmarks: vertical strip along the front bank of the central sulcus.',
         ],
       },
       connects: {
@@ -238,21 +214,13 @@ export default [
     tagline: 'Helps plan speech, grammar and demanding language sequences.',
     analogy: 'One workshop in a larger language network, especially busy when speech needs careful assembly.',
     levels: {
-      where: {
-        text: 'Broca\'s area is the traditional name for patches low on the left {{frontal-lobe}}, just above the temple and in front of the face zone of the {{motor-cortex}}. Language is left dominant in most people, including many left handed people, but it depends on a wider network across both hemispheres. These frontal patches lie near areas that help control the lips and tongue.',
+      overview: {
+        text: 'Broca\'s area sits on the lower outer edge of the left {{frontal-lobe}}, just above the temple and ahead of the mouth area of the motor strip. Modern neuroscience finds that fluent speech depends on this hub working alongside a wider frontal and temporal language network.\n\nIt coordinates the tongue, lips, breath, and vocal cords into fluent spoken words and sentences. It also manages grammatical rules and word order. When you silently rehearse what you want to say before speaking aloud, this area activates during your inner monologue.',
         bullets: [
-          'A patch a few centimetres across on the left side.',
-          'Next to face and mouth motor zones, ready to speak.',
-          'Linked by a long bundle to {{wernickes-area}} further back.',
-        ],
-      },
-      does: {
-        text: 'These frontal language regions help plan speech sounds and handle demanding grammar and sequence structure. They work with temporal and parietal regions that represent words and meanings, rather than receiving a finished thought from a single comprehension centre. They also respond during sign language and some complex action sequences.\n\nSaying "the dog I saw yesterday was huge" without pausing to plan each word recruits this wider network.',
-        bullets: [
-          'Word order: puts words into grammar that makes sense.',
-          'Speech plan: strings mouth movements into fluent phrases.',
-          'Understanding effort: helps with hard sentences, not just speaking.',
-          'Gesture too: supports sign and meaningful hand movements.',
+          'Speech articulation: coordinates motor sequences for spoken words.',
+          'Grammar structure: handles sentence syntax and word order.',
+          'Inner rehearsal: activates during silent internal speech.',
+          'Physical landmarks: lower left frontal convolution (inferior frontal gyrus).',
         ],
       },
       connects: {
@@ -310,21 +278,13 @@ export default [
     tagline: 'Touch, body sense and where things are in space.',
     analogy: 'A surveyor who keeps an updated map of your body and the space around it.',
     levels: {
-      where: {
-        text: 'The parietal lobe sits on top of the head, between the {{frontal-lobe}} in front and the {{occipital-lobe}} behind. The {{somatosensory-cortex}} forms its front edge, and the {{posterior-parietal}} fills the back. It meets vision, touch and movement streams in one place.',
+      overview: {
+        text: 'The parietal lobe covers the upper back of each [[hemisphere]], sitting behind the {{frontal-lobe}}, above the {{temporal-lobe}}, and in front of the {{occipital-lobe}}. The right side is especially important for mapping whole surrounding space.\n\nIt takes the felt body and the seen world and lines them up into a unified 3D map. Catching keys thrown toward you shows its teamwork: the parietal lobe calculates where your hand is and where the keys are moving so your fingers close at the exact right moment.',
         bullets: [
-          'Top middle patch of [[cortex]], behind the central groove.',
-          'Front half handles body feeling, back half handles space.',
-          'Right side leans toward space, left side toward numbers and skilled moves.',
-        ],
-      },
-      does: {
-        text: 'The parietal lobe answers where. Where are my hands without looking. Where is the cup. Which way is left. It blends touch, sight and body position into one working map.\n\nReaching into a bag to find keys by feel alone is pure parietal. No vision, just touch mapped onto hand shape.',
-        bullets: [
-          'Body map: tracks where each body part is right now.',
-          'Space map: guides reaches, looks and steps around objects.',
-          'Numbers and order: left side helps with counting and sequences.',
-          'Attention to space: right side notices things on both sides.',
+          'Spatial mapping: tracks where your body ends and surrounding space begins.',
+          'Touch interpretation: houses the somatosensory strip for bodily feeling.',
+          'Reaching coordination: aligns visual targets with physical motor reaches.',
+          'Physical landmarks: upper posterior cortex bounded in front by the central groove.',
         ],
       },
       connects: {
@@ -366,21 +326,13 @@ export default [
     tagline: 'Where touch, temperature and pain from your body arrive.',
     analogy: 'A switchboard where every patch of skin has its own blinking light.',
     levels: {
-      where: {
-        text: 'This strip runs along the front of the {{parietal-lobe}}, directly behind the {{motor-cortex}} across the central groove. Like its motor neighbour it holds a map of the opposite side of the body. Lips, hands and fingers take up far more room than the back or legs.',
+      overview: {
+        text: 'The somatosensory [[cortex]] is a vertical ribbon running down the front edge of the {{parietal-lobe}}, sitting directly across the central groove from the {{motor-cortex}}. It decodes touch, temperature, pain, and body position from the opposite side of the body.\n\nEach skin region is mapped to a specific spot along this strip. Sensitive zones like fingertips and lips have huge territories, letting you tell two points apart at 2 mm, while the back requires 40 mm. Buttoning a shirt without looking shows it: your fingers decode button edges and fabric feel from touch alone.',
         bullets: [
-          'A narrow strip from crown to ear, mirroring the motor strip.',
-          'Four thin sub strips, each handling a different touch flavour.',
-          'Both sides map the opposite half of the body.',
-        ],
-      },
-      does: {
-        text: 'It turns skin and joint signals into felt touch. Pressure, buzz, heat, cold and ache arrive separately and are combined here into "soft cat fur" or "rough denim". It also tells you where your joints are without looking.\n\nButtoning a shirt without looking shows it. You feel each button edge and hole line up through this strip.',
-        bullets: [
-          'Fine touch: reads texture, edges and shape for the hands.',
-          'Body position: reports joint angles so you know limb places.',
-          'Pain and temperature: flags harm and hot or cold.',
-          'Two point sense: tells one poke from two close together.',
+          'Touch discrimination: decodes textures, edges, pressure, and vibrations.',
+          'Body position: monitors joint angles so limbs do not wander without vision.',
+          'Sensory homunculus: huge cortical areas for hands, lips, and tongue.',
+          'Physical landmarks: vertical strip along the rear bank of the central sulcus.',
         ],
       },
       connects: {
@@ -449,21 +401,13 @@ export default [
     tagline: 'Builds a map of space so you can reach and look.',
     analogy: 'A sat nav that keeps "you are here" updated while you move.',
     levels: {
-      where: {
-        text: 'This is the back half of the {{parietal-lobe}}, sitting between the {{somatosensory-cortex}} in front and the {{visual-cortex}} behind. It takes the felt body and the seen world and lines them up. The right side is especially important for whole space.',
+      overview: {
+        text: 'The posterior parietal cortex forms the upper back half of the {{parietal-lobe}}, positioned between touch in front and vision behind. It brings together visual coordinates and body feedback into an internal navigation map.\n\nIt converts visual targets into reach-and-grasp commands. Pouring tea from a kettle into a small cup without spilling shows the quiet work: eye, cup, and pot stay aligned in space while your hand tilts.',
         bullets: [
-          'Upper back patch of [[cortex]], one per side.',
-          'Meets at the junction of touch, vision and movement streams.',
-          'Right side maps both sides of space, left side is more precise for one.',
-        ],
-      },
-      does: {
-        text: 'It guides the eyes and hands to targets. Catching a ball uses it twice: once to track where the ball is heading, once to move your hand there. It also shifts attention, like glancing at a sudden flash while keeping your place on the page.\n\nPouring tea without spilling shows the quiet work. Eye, cup and pot stay lined up while the hand tilts.',
-        bullets: [
-          'Reaching: turns "I see it" into "hand go there".',
-          'Looking: picks the next eye target and shifts attention.',
-          'Grasping: shapes fingers to the seen size and angle.',
-          'Routes: keeps track of turns when moving through rooms.',
+          'Visuomotor reaching: turns "I see it" into "hand go there".',
+          'Attention steering: picks the next visual target and shifts focus.',
+          'Grasp shaping: adjusts finger aperture to the seen size and angle of objects.',
+          'Route tracking: keeps track of turns when moving through rooms.',
         ],
       },
       connects: {
@@ -507,21 +451,13 @@ export default [
     tagline: 'Hearing, language and recognising what things are.',
     analogy: 'A librarian who knows every face, tune and word by heart.',
     levels: {
-      where: {
-        text: 'The temporal lobe sits low on the side of the head, under the temples, below the {{frontal-lobe}} and {{parietal-lobe}} and in front of the {{occipital-lobe}}. It houses the {{auditory-cortex}}, much of {{wernickes-area}}, and the {{hippocampus}} and {{amygdala}} buried inside. Each side handles the opposite ear most strongly.',
+      overview: {
+        text: 'The temporal lobe sits low on the side of the head under the temples, below the {{frontal-lobe}} and {{parietal-lobe}} and in front of the {{occipital-lobe}}. It houses the {{auditory-cortex}}, language hubs, and the {{hippocampus}} and {{amygdala}} buried inside.\n\nIt identifies what you hear and see, turning a bark into "neighbour\'s dog" and a face into "my friend". It also stores vocabulary and word meanings. Recognising a friend\'s face in a crowd before you recall their name is temporal processing: the recognition arrives first, the name follows.',
         bullets: [
-          'Side patch of [[cortex]] around and below the ear level.',
-          'Top edge handles sound, bottom edge handles faces and objects.',
-          'Inside edge holds the memory and feeling structures.',
-        ],
-      },
-      does: {
-        text: 'The temporal lobe identifies what you hear and see. A bark becomes "neighbour\'s dog", a face becomes "my friend". It also stores the vocabulary of things, so you can name them.\n\nRecognising a friend\'s face in a crowd before you recall their name is temporal. The "who is that" comes first, the name follows.',
-        bullets: [
-          'Hearing: turns tones into voices, music and words.',
-          'Seeing who and what: recognises faces, objects and places.',
-          'Language store: holds word meanings on the left side.',
-          'Memory doorway: feeds daily life into the {{hippocampus}}.',
+          'Hearing and speech: decodes sound waves into voices, music, and words.',
+          'Visual recognition: identifies faces, objects, and familiar environments.',
+          'Language memory: stores word meanings and vocabulary on the left side.',
+          'Memory doorway: feeds everyday experiences into the hippocampus.',
         ],
       },
       connects: {
@@ -564,21 +500,13 @@ export default [
     tagline: 'The first stop in the cortex for sound.',
     analogy: 'A sound engineer who splits incoming noise into pitch, timing and direction.',
     levels: {
-      where: {
-        text: 'The auditory [[cortex]] hides on the top of the {{temporal-lobe}}, tucked inside the fold above the ear. You would not see it from outside. It sits where fibres from the {{thalamus}} arrive, toned low to high like piano keys.',
+      overview: {
+        text: 'The auditory [[cortex]] hides on the upper shelf of the {{temporal-lobe}}, tucked inside the fold above the ear. It receives incoming acoustic signals relayed from the ears through the {{thalamus}}, laid out like piano keys from low to high pitches.\n\nIt breaks raw sound into usable pieces: pitch, loudness, timing, and ear-arrival differences are separated here before wider networks recognize voices or words. Following one friend\'s voice in a noisy cafe starts here as the split into pitches lets later areas lock onto that specific sound.',
         bullets: [
-          'Small patch on the upper surface of the temporal lobe.',
-          'Organised by pitch: high tones at one end, low at the other.',
-          'Surrounded by wider zones that read voices and music.',
-        ],
-      },
-      does: {
-        text: 'It breaks raw sound into usable parts. Pitch, loudness, timing and which ear heard it first are pulled apart here. Later areas turn those parts into a voice you know or a word you understand.\n\nFollowing one friend\'s voice in a noisy cafe starts here. The split into pitches lets later areas lock onto that voice.',
-        bullets: [
-          'Pitch and loudness: maps how high and how strong each part is.',
-          'Timing: spots gaps and rhythms that mark syllables.',
-          'Direction: compares ears to place a sound left or right.',
-          'Handoff: passes clean parts to {{wernickes-area}} and the {{amygdala}}.',
+          'Pitch and loudness: maps sound frequency and acoustic intensity.',
+          'Sound direction: compares millisecond timing between ears to locate sounds.',
+          'Rhythm tracking: detects syllable boundaries and acoustic rhythms.',
+          'Physical landmarks: tucked inside the lateral fissure on the temporal lobe\'s upper bank.',
         ],
       },
       connects: {
@@ -620,21 +548,13 @@ export default [
     tagline: 'Helps you understand the words you hear and read.',
     analogy: 'A translator who turns sounds and letters back into meaning.',
     levels: {
-      where: {
-        text: 'Wernicke\'s area is a traditional label for part of the back left {{temporal-lobe}}, near the junction with parietal cortex. Modern studies find that understanding words and sentences depends on a broader network across temporal, parietal and frontal regions, with contributions from both hemispheres.',
+      overview: {
+        text: 'Wernicke\'s area is a landmark region on the back left {{temporal-lobe}}, near the junction with parietal cortex. Modern studies show that understanding words and sentences depends on this hub working within a broader network across temporal, parietal, and frontal regions.\n\nIt links speech sounds with word ideas and sentence context. Hearing "keys" activates representations of their sound, appearance, and use. Understanding a sentence like "please grab the blue mug" is an achievement of this network, matching spoken syllables to stored concepts and grammatical roles.',
         bullets: [
-          'Back left patch where temporal meets parietal.',
-          'Between hearing below and reading vision behind.',
-          'Wired forward to {{brocas-area}} for speaking.',
-        ],
-      },
-      does: {
-        text: 'This region contributes to linking speech sounds with words and sentence context. Hearing "keys" also activates other temporal and parietal areas that represent its sound, appearance and use. Reading overlaps with parts of this system but also recruits specialised visual and language pathways.\n\nUnderstanding "please grab the blue mug" is therefore a network achievement, not the work of one comprehension centre.',
-        bullets: [
-          'Speech understanding: maps heard words onto ideas.',
-          'Reading support: links seen words to the same ideas.',
-          'Sentence sense: tracks who did what to whom.',
-          'Word finding: helps pick the right word when speaking.',
+          'Speech comprehension: matches spoken and written words to concepts.',
+          'Word retrieval: helps select the right word when expressing thoughts.',
+          'Grammar parsing: tracks sentence roles and who did what to whom.',
+          'Physical landmarks: back upper bank of the left temporal lobe.',
         ],
       },
       connects: {
@@ -693,21 +613,13 @@ export default [
     tagline: 'The vision department at the back of your head.',
     analogy: 'A darkroom that develops the raw film from the eyes into pictures.',
     levels: {
-      where: {
-        text: 'The occipital lobe is the back tip of each [[hemisphere]], tucked under the skull behind the {{parietal-lobe}} and {{temporal-lobe}} and above the {{cerebellum}}. It contains primary visual cortex and several early visual areas. Later visual processing continues into temporal and parietal cortex. The left half handles the right side of sight, and vice versa.',
+      overview: {
+        text: 'The occipital lobe forms the back tip of each [[hemisphere]], tucked under the skull behind the {{parietal-lobe}} and {{temporal-lobe}} and resting just above the {{cerebellum}}. The left half processes the right visual field, and vice versa.\n\nIt builds the brain\'s first visual representation, deconstructing light into edges, colors, motion, and depth. Spotting a friend\'s bright red coat across a busy train station starts here: color contrasts and motion pop out into awareness before you consciously identify who is wearing it.',
         bullets: [
-          'Back pole of the brain, about a fist sized sheet per side.',
-          'Folded around a deep groove (the calcarine [[sulcus]]).',
-          'Slightly overhangs the {{cerebellum}} below it.',
-        ],
-      },
-      does: {
-        text: 'The occipital lobe builds the first picture. Edges, colours, motion and depth are pulled apart and reassembled here. Later areas name what it built.\n\nSpotting a friend\'s red coat across a busy station starts here. Colour and motion pop out before you know whose coat it is.',
-        bullets: [
-          'Early vision: reads edges, lines, colour and movement.',
-          'Scene layout: maps where things sit relative to you.',
-          'Depth and motion: blends both eyes for 3D and speed.',
-          'Handoff: sends "where" to the {{parietal-lobe}} and "what" to the {{temporal-lobe}}.',
+          'Early visual parsing: extracts edges, orientations, color, and motion.',
+          'Depth calculation: blends input from both eyes for 3D stereoscopic vision.',
+          'Visual routing: sends spatial data to parietal and object data to temporal cortex.',
+          'Physical landmarks: posterior pole of each hemisphere, folded around the calcarine groove.',
         ],
       },
       connects: {
@@ -749,21 +661,13 @@ export default [
     tagline: 'Breaks what you see into edges, lines and motion.',
     analogy: 'A prism that splits white light into separate colours, but for lines and movement.',
     levels: {
-      where: {
-        text: 'The visual [[cortex]] lines the deep groove at the very back of the {{occipital-lobe}}, mostly on the inner walls where the hemispheres face each other. It is thin (a few millimetres) but densely packed. The centre of sight gets far more room than the edges.',
+      overview: {
+        text: 'The primary visual [[cortex]] lines the deep horizontal groove (calcarine [[sulcus]]) on the inner wall of each {{occipital-lobe}}, where the two hemispheres face each other. Thin but packed with neurons, the central few degrees of vision you read with receive disproportionately large cortical space.\n\nIt reads the visual fundamentals. Tiny columns of cells fire for one angle of line, one direction of motion, or one color boundary. Reading these words relies on rows of these columns: short vertical, horizontal, and curved line segments are detected before higher areas assemble them into letters.',
         bullets: [
-          'Back inner wall of [[cortex]], around the calcarine [[sulcus]].',
-          'Each side maps the opposite half of sight, upside down.',
-          'About half is devoted to the central few degrees you read with.',
-        ],
-      },
-      does: {
-        text: 'This strip reads the basics. Tiny patches of cells fire for one angle of line, one direction of motion or one colour pair. Together they tile the whole view.\n\nReading this sentence uses rows of them. Short vertical and curved pieces combine into letters before you notice.',
-        bullets: [
-          'Edges: reports which way each little line tilts.',
-          'Motion: flags which way each patch is moving.',
-          'Colour and depth: compares eyes and wavelengths.',
-          'Assembly: passes the pieces up for objects and places.',
+          'Edge detection: responds to specific line angles and borders.',
+          'Direction of motion: tracks the vector and speed of moving visual patches.',
+          'Central magnification: dedicates massive cortical space to high-detail central vision.',
+          'Physical landmarks: medial occipital walls lining the calcarine sulcus.',
         ],
       },
       connects: {
@@ -810,21 +714,13 @@ export default [
     tagline: 'Notices mistakes and conflict, and links feelings to action.',
     analogy: 'A supervisor who spots when the plan and the feelings disagree and calls a pause.',
     levels: {
-      where: {
-        text: 'The cingulate arches like a belt above the {{corpus-callosum}} on the inner wall of each [[hemisphere]]. It runs from the front (feelings and errors) to the back (memory and space). You only see it if you slice the brain down the middle.',
+      overview: {
+        text: 'The cingulate cortex arches like a belt over the {{corpus-callosum}} on the inner medial wall of each [[hemisphere]]. Running from front to back, it bridges deep emotional structures with the higher neocortex.\n\nIt tracks conflict, mistakes, and the cost of effort. When you type quickly and hit the wrong key, you immediately notice, pause, and hit backspace. That instant "oops" signal is the cingulate detecting a mismatch between your goal and what your fingers actually did.',
         bullets: [
-          'C shaped strip on the medial wall, above the great bridge.',
-          'Front half tied to feelings, back half tied to memory.',
-          'One of the most connected hubs in the [[cortex]].',
-        ],
-      },
-      does: {
-        text: 'The cingulate tracks trouble. Conflict between habit and goal, a slip of the hand, or a sad memory with a decision to make all wake it. It then calls for more control or more care.\n\nTyping fast and hitting the wrong key shows the quick part. You notice instantly, pause and fix it. That "oops" signal is cingulate.',
-        bullets: [
-          'Error watch: flags slips and asks for a fix.',
-          'Conflict check: notices when two answers compete.',
-          'Feeling to action: links mood and pain to what you do next.',
-          'Effort setting: decides if the goal is worth the push.',
+          'Error detection: spots slips and signals the need to pause and fix them.',
+          'Conflict monitoring: notices when automatic habits clash with current goals.',
+          'Effort evaluation: weighs whether a goal is worth the physical or mental push.',
+          'Physical landmarks: C-shaped ribbon wrapping above the great bridge of the brain.',
         ],
       },
       connects: {
@@ -866,21 +762,13 @@ export default [
     tagline: 'Your sense of the inside of your body: heartbeat, hunger, disgust.',
     analogy: 'An inner weather station reporting how the body feels right now.',
     levels: {
-      where: {
-        text: 'The insula hides inside the fold where the {{temporal-lobe}} meets the lower {{frontal-lobe}}, one island per side. Ribbons of [[cortex]] from above fold over it like lips. It sits where taste, gut, heart and lung signals arrive.',
+      overview: {
+        text: 'The insula is a buried island of [[cortex]] hidden inside the deep lateral fold where the {{temporal-lobe}} meets the lower {{frontal-lobe}}. Ribbons of cortex from above fold over it, keeping it unseen from the surface.\n\nIt turns internal bodily signals into conscious feelings you can act on. A fluttering heart becomes nerves, a full stomach becomes satisfaction, and a foul odor becomes disgust. Noticing your heart thump in your chest before speaking in public is the insula bringing your body state into awareness.',
         bullets: [
-          'Buried island about 5 cm long, unseen from outside.',
-          'Front half tied to feelings, back half tied to body sense.',
-          'Next door to the {{amygdala}} and taste [[cortex]].',
-        ],
-      },
-      does: {
-        text: 'The insula turns body signals into feelings you can act on. A fluttering heart becomes nerves, a full stomach becomes satisfaction, a bad smell becomes disgust. It also tastes and feels pain.\n\nNoticing your heart thump before speaking in public is insula. The beat was always there, now it reaches awareness.',
-        bullets: [
-          'Interoception: reports heartbeat, breath, hunger and fullness.',
-          'Taste and disgust: flags spoiled food and moral "yuck".',
-          'Pain and heat: marks how much it hurts, not just where.',
-          'Empathy echo: wakes when you see someone else in pain.',
+          'Interoception: monitors heartbeat, breathing, hunger, and gut sensations.',
+          'Visceral feeling: links physiological body states to emotions and mood.',
+          'Taste and disgust: flags spoiled food and moral repulsion.',
+          'Physical landmarks: buried cortical island tucked deep inside the lateral fissure.',
         ],
       },
       connects: {
