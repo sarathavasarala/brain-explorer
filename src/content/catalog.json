@@ -448,7 +448,9 @@
     "mammillary body",
     "habenula",
     "fornix",
-    "nose"
+    "nose",
+    "reward prediction error",
+    "incentive salience"
   ],
   "roles": [
     "more_active",

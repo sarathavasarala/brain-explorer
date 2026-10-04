@@ -16,7 +16,7 @@ export default [
       text: 'Dopamine comes from small clusters of [[neuron|neurons]] in the {{midbrain}} and {{hypothalamus}} that send fibres to vast areas of the brain. Instead of delivering quick sensory clicks, it acts as a [[neuromodulator]], changing how receptive circuits are to other messages. Surges of dopamine reward successful choices and help you start moving smoothly.',
       bullets: [
         'Made mainly by fewer than a million midbrain cells that broadcast to billions of connections.',
-        'Fires strongly when an outcome is unexpectedly good, and dips when an expected reward fails to appear.',
+        'Encodes a [[reward prediction error]]: fires strongly when an outcome beats expectations, and pauses when an expected reward is omitted.',
         'Helps turn deliberate, conscious efforts into smooth, automatic habits.',
       ],
     },
