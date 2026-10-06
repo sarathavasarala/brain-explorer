@@ -19,6 +19,8 @@ import cellGroups from './cells/groups.js';
 import { getCellTabs } from './cell-tabs.js';
 import { checkScript, sanitizeScript, ROLES, VIEWS } from './script.js';
 import { STATE_KINDS, STATE_METADATA, roleForState } from './states.js';
+import sources from './sources.js';
+import pathwayEvidence from './pathways/evidence.js';
 
 const files = {
   'src/content/structures/cortex.js': cortex,
@@ -28,7 +30,7 @@ const files = {
 export const structures = Object.values(files).flat();
 // Which file each structure lives in, so the UI can point at where to add missing text.
 export const sourceOf = new Map(Object.entries(files).flatMap(([f, list]) => list.map((s) => [s.id, f])));
-export { groups, levels, anchors, synapses, diagrams, pathways, pathwayGroups, glossary, askPresets, chemicals, chemicalGroups, getChemTabs, cells, cellGroups, getCellTabs, checkScript, sanitizeScript, ROLES, VIEWS, STATE_KINDS, STATE_METADATA, roleForState };
+export { groups, levels, anchors, synapses, diagrams, pathways, pathwayGroups, glossary, askPresets, chemicals, chemicalGroups, getChemTabs, cells, cellGroups, getCellTabs, checkScript, sanitizeScript, ROLES, VIEWS, STATE_KINDS, STATE_METADATA, roleForState, sources, pathwayEvidence };
 
 export const byId = new Map(structures.map((s) => [s.id, s]));
 export const anchorById = new Map(anchors.map((a) => [a.id, a]));

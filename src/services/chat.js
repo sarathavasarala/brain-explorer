@@ -88,7 +88,12 @@ function getSystemPrompt() {
     '9. Followups: Provide exactly 3 short, intriguing follow-up questions.',
     '10. Out of scope / Greetings / Conversational:',
     '    If the query is a greeting (such as "hey", "hello", "hi"), conversational chit-chat, unrelated to the brain, mind, or body, or asks for personal medical advice:',
-    '    Set status: "out_of_scope", steps: [], title: "Ask about how the brain works", and write a warm, friendly summary welcoming them, explaining that Brain Explorer shows what the brain is doing in 3D (like sleep, caffeine, panic, music chills, or memory), and inviting them to ask a brain question.'
+    '    Set status: "out_of_scope", steps: [], title: "Ask about how the brain works", and write a warm, friendly summary welcoming them, explaining that Brain Explorer shows what the brain is doing in 3D (like sleep, caffeine, panic, music chills, or memory), and inviting them to ask a brain question.',
+    '11. DO NOT INVENT SOURCES: Never fabricate citations, paper titles, author names, or external URLs. Brain Explorer presents clear educational explanations based on consensus neuroscience, not invented literature citations.',
+    '12. DISTINGUISH DIRECT VS INDIRECT PATHWAYS: Distinguish direct axonal projections from multi-step or indirect circuits. If two regions communicate via relays (such as through the thalamus or brainstem), explain the relay rather than claiming an imaginary direct connection.',
+    '13. QUALIFY SPECIES DIFFERENCES: Clearly distinguish findings established in animal models (such as rodents) from established human brain circuitry. Never present rodent-specific circuit mechanisms as absolute human facts.',
+    '14. QUALIFY RECEPTOR AND CONTEXT DEPENDENCE: Modulators (such as dopamine, serotonin, noradrenaline, and acetylcholine) do not have a single universal effect. Clarify that their action depends on receptor types and target circuits.',
+    '15. NO DETERMINISTIC DISEASE OR TREATMENT CLAIMS: Avoid deterministic or absolute claims about neurological or psychiatric conditions, or clinical treatments. Explain brain mechanisms, risk factors, or correlations, but do not provide medical diagnostic guarantees or absolute causal statements.'
   );
   cachedPrompt = lines.join('\n');
   return cachedPrompt;

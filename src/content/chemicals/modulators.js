@@ -125,7 +125,7 @@ export default [
         'ADHD: low dopamine tone in the {{prefrontal-cortex}} makes it hard to maintain focus on everyday tasks.',
       ],
     },
-    tryIt: 'Solve a puzzle or catch a falling pen. That brief burst of satisfaction when you succeed is your dopamine cells firing to reward a positive surprise.',
+    tryIt: 'Notice the sudden urge to check your phone when you hear an unexpected alert sound. That surge of anticipation is driven by dopamine tagging a potential cue for a reward.',
   },
   {
     id: 'serotonin',
@@ -162,10 +162,10 @@ export default [
         name: 'Descending raphe projection',
         from: 'raphe-nuclei',
         to: ['spinal-cord'],
-        job: 'Dampening incoming pain signals in the spinal cord',
-        text: 'Lower raphe cells send axons down into the {{spinal-cord}}. Serotonin released here acts as a natural gatekeeper, muting pain signals before they can travel up to conscious awareness.',
-        whenItFails: 'Loss of this downward brake can lead to chronic body pain and tender points.',
-        whenBlocked: 'Interferes with descending pain control, reducing the pain-relieving effect of natural endorphins.',
+        job: 'Modulating incoming pain signals in the spinal cord',
+        text: 'Lower raphe cells send axons down into the {{spinal-cord}}. Serotonin released here modulates spinal nociception, where it can suppress or facilitate pain signals depending on the receptor subtype engaged.',
+        whenItFails: 'Disruption of this descending control can alter pain sensitivity and contribute to chronic pain states.',
+        whenBlocked: 'Interferes with descending pain control, altering the pain-relieving effect of natural endorphins.',
       },
     ],
     density: {

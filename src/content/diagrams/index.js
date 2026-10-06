@@ -121,14 +121,14 @@ export default {
 
   'fear-circuit': {
     title: 'The fear and extinction circuit',
-    caption: 'Sensory inputs enter the basolateral amygdala. The infralimbic prefrontal cortex can engage intercalated (ITC) calming cells to release GABA onto the central amygdala, muting fear output when a situation is safe.',
+    caption: 'Sensory inputs enter the basolateral amygdala. Medial prefrontal cortex (studied as the infralimbic region in rodents) can recruit intercalated (ITC) interneurons to release GABA onto the central amygdala, dampening fear output when a situation is safe.',
     nodes: [
       { id: 'in', kind: 'input', label: 'Cue or context', x: 8, y: 50 },
       { id: 'th', kind: 'region', label: 'Thalamus', x: 26, y: 50 },
       { id: 'ctx', kind: 'region', label: 'Sensory cortex', x: 44, y: 14 },
       { id: 'bla', kind: 'pyramidal', label: 'Basolateral amygdala', x: 54, y: 56 },
-      { id: 'pfc', kind: 'region', label: 'Infralimbic mPFC', x: 84, y: 14 },
-      { id: 'itc', kind: 'interneuron', label: 'ITC calming cell', x: 74, y: 44 },
+      { id: 'pfc', kind: 'region', label: 'Medial PFC', x: 84, y: 14 },
+      { id: 'itc', kind: 'interneuron', label: 'ITC interneuron', x: 74, y: 44 },
       { id: 'cea', kind: 'neuron', label: 'Central amygdala', x: 74, y: 72 },
       { id: 'hy', kind: 'output', label: 'Stress hormones', x: 94, y: 68 },
       { id: 'pag', kind: 'output', label: 'Freeze reflex', x: 94, y: 88 },

@@ -63,7 +63,7 @@ export default [
         family: 'Glucocorticoid receptor',
         effect: 'modulate',
         where: ['hippocampus', 'prefrontal-cortex', 'amygdala'],
-        text: 'Low-affinity receptor activated during stress surges. In the basolateral amygdala it heightens synaptic plasticity and threat learning, while in the prefrontal cortex prolonged high occupancy impairs dendritic spines and blocks fear extinction.',
+        text: 'Low-affinity receptor activated during stress surges. In the basolateral amygdala it modulates synaptic plasticity and threat learning. In the prefrontal cortex, sustained high occupancy under chronic stress can alter dendritic organization and affect contextual regulation.',
       },
       {
         id: 'MR',
@@ -109,7 +109,7 @@ export default [
       bullets: [
         'Cushing syndrome: chronic cortisol excess causes central weight gain, skin thinning, high blood pressure, and mood swings.',
         'Addison disease: autoimmune destruction of the adrenal cortex leads to severe fatigue, low blood pressure, and life-threatening crises.',
-        'Chronic stress and trauma: elevated glucocorticoids sensitize amygdala threat learning while disrupting prefrontal safety memories, preventing fear extinction.',
+        'Chronic stress: prolonged glucocorticoid elevations alter the balance between amygdala threat responsiveness and prefrontal contextual regulation, making safety learning harder to consolidate.',
       ],
     },
     tryIt: 'Notice how your body reacts when startled by a near-miss while driving. While adrenaline causes the instant racing heartbeat, cortisol rises over the following twenty minutes to restore glucose and calm tissue inflammation.',

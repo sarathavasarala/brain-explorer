@@ -227,8 +227,8 @@ export default [
     name: 'Intercalated cell',
     group: 'inhibitory',
     color: '#f43f5e',
-    tagline: 'The GABAergic gatekeepers clamping central output neurons to allow fear extinction.',
-    analogy: 'The physical safety catch on an emergency alarm switch, keeping the siren quiet until danger is verified.',
+    tagline: 'GABAergic interneurons that regulate central amygdala output during safety learning.',
+    analogy: 'A selective gatekeeper quieting output from the alarm center when an environment is safe.',
     transmitter: 'gaba',
     where: ['amygdala'],
     size: 'About 10 to 15 micrometres (0.012 mm) across the cell body',
@@ -244,12 +244,12 @@ export default [
       ],
     },
     fires: {
-      text: 'Intercalated cells fire rapid bursts of action potentials when driven by top-down safety signals. When the [[infralimbic cortex]] detects that a formerly dangerous cue is now harmless, its excitatory projections activate these cells, triggering an immediate wave of [[GABA]] that silences outgoing fear signals.',
+      text: 'Intercalated cells fire action potentials when driven by top-down safety signals. When safety is learned, excitatory projections from medial prefrontal cortex (studied extensively as the infralimbic area in rodents) activate intercalated cells. They release [[GABA]] to inhibit central amygdala output neurons, dampening conditioned defensive reactions.',
       steps: [
         '1. Glutamate released from the prefrontal cortex binds AMPA and NMDA receptors on intercalated dendrites.',
         '2. Rapid depolarization triggers high-frequency action potentials across the compact soma.',
         '3. Impulses travel along short axons into the central amygdala.',
-        '4. Massive GABA release opens chloride channels on central output neurons, clamping the panic switch shut.',
+        '4. GABA release opens chloride channels on central output neurons, reducing defensive behavioral output.',
       ],
     },
     chem: {
@@ -258,10 +258,10 @@ export default [
       modulatedBy: ['dopamine', 'cortisol', 'noradrenaline'],
     },
     breaks: {
-      text: 'Failure or suppression of intercalated cell inhibition removes the primary safety brake on fear output, keeping panic alarms blaring even in safe settings.',
+      text: 'Reduced intercalated cell inhibition weakens top-down regulation over fear output, impairing safety learning in secure settings.',
       bullets: [
-        'Chronic stress elevates glucocorticoids that weaken prefrontal inputs, preventing intercalated cells from engaging the fear brake.',
-        'Impaired extinction learning leaves traumatic memories permanently active, a core mechanism of post-traumatic stress disorder.',
+        'High or prolonged stress can weaken prefrontal recruitment of intercalated cells, impairing extinction recall.',
+        'Deficits in safety learning contribute to persistent fear renewal, a mechanism studied in anxiety and trauma-related conditions.',
         'Deficits in intercalated GABA release contribute to generalized anxiety and persistent phobias.',
       ],
     },
