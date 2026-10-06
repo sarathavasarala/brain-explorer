@@ -1932,6 +1932,9 @@ kbd {
   }
   .mode-tour .explainer {
     flex: 1 1 48%;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
   }
   .ex-path {
     display: none;
@@ -1939,14 +1942,23 @@ kbd {
   .ex-path-mobile {
     display: flex;
     flex-direction: column;
-    padding: 16px 18px 30px;
+    height: 100%;
+    min-height: 0;
+    padding: 0;
     box-sizing: border-box;
-    min-height: 100%;
+    overflow: hidden;
+  }
+  .mobile-tour-top {
+    flex: 0 0 auto;
+    padding: 14px 18px 8px;
+    background: var(--panel);
+    border-bottom: 1px solid rgba(190, 200, 255, 0.06);
+    z-index: 2;
   }
   .mobile-tour-progress {
     display: flex;
     gap: 4px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
   .mobile-tour-progress span {
     flex: 1;
@@ -1966,7 +1978,6 @@ kbd {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 6px;
   }
   .mobile-tour-back {
     display: inline-flex;
@@ -1993,6 +2004,13 @@ kbd {
     text-transform: uppercase;
     letter-spacing: 0.05em;
   }
+  .mobile-tour-content {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 12px 18px 16px;
+  }
   .mobile-tour-path-name {
     font-size: 12px;
     font-weight: 500;
@@ -2017,16 +2035,18 @@ kbd {
     color: var(--ink);
     margin: 0 0 10px;
   }
+  .ex-path-mobile .evidence-details {
+    margin-top: 12px;
+  }
   .mobile-tour-controls {
+    flex: 0 0 auto;
     display: grid;
     grid-template-columns: 1fr 1.25fr 1fr;
     gap: 8px;
-    margin-top: 14px;
-    padding-top: 12px;
+    padding: 10px 18px calc(10px + env(safe-area-inset-bottom, 0px));
     border-top: 1px solid var(--line);
-  }
-  .ex-path-mobile .evidence-details {
-    margin-top: 12px;
+    background: var(--panel);
+    z-index: 2;
   }
   .mobile-tour-btn {
     height: 44px;
