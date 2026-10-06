@@ -85,11 +85,11 @@ export default [
         ],
       },
       connects: {
-        text: 'The prefrontal cortex acts as a central exchange where memory, emotion, and action meet. Context from the hippocampus and threat signals from the amygdala are evaluated against long-term goals. Once a choice is made, signals route to the striatum to release behavior, while ongoing thalamic loops sustain focus through distractions.',
+        text: 'The prefrontal cortex acts as a central exchange where memory, emotion, and action meet. Context from the hippocampus and threat signals from the amygdala are evaluated against long-term goals. Its infralimbic projections send top-down safety signals to intercalated cells inside the amygdala to extinguish fear, while striatal outputs guide chosen actions.',
         connections: [
           { id: 'thalamus', dir: 'both', label: 'Attention kept in sync both ways' },
           { id: 'striatum', dir: 'out', label: 'Choices sent for habit learning' },
-          { id: 'amygdala', dir: 'both', label: 'Feelings weighed against goals' },
+          { id: 'amygdala', dir: 'both', label: 'Safety signals and fear appraisal traded' },
           { id: 'hippocampus', dir: 'in', label: 'Memory context arriving for plans' },
           { id: 'posterior-parietal', dir: 'both', label: 'Space maps traded for actions' },
         ],

@@ -222,4 +222,49 @@ export default [
     },
     diagram: 'basal-ganglia',
   },
+  {
+    id: 'itc',
+    name: 'Intercalated cell',
+    group: 'inhibitory',
+    color: '#f43f5e',
+    tagline: 'The GABAergic gatekeepers clamping central output neurons to allow fear extinction.',
+    analogy: 'The physical safety catch on an emergency alarm switch, keeping the siren quiet until danger is verified.',
+    transmitter: 'gaba',
+    where: ['amygdala'],
+    size: 'About 10 to 15 micrometres (0.012 mm) across the cell body',
+    morph: { style: 'stellate', seed: 68 },
+    landmarks: ['soma', 'dendrites', 'axon', 'terminals'],
+    shape: {
+      text: 'Intercalated cells are densely packed inhibitory [[interneuron|interneurons]] clustered in thin fibrous capsules between the basolateral and central nuclei of the {{amygdala}}. Their compact, radiating [[dendrite|dendrites]] capture incoming signals from the [[prefrontal cortex]], while dense local [[axon|axons]] project directly onto central amygdala projection cells.',
+      bullets: [
+        'Small spherical soma nested within white matter paracapsular islands.',
+        'Compact dendritic arbor radiating locally to catch prefrontal and basolateral inputs.',
+        'Dense inhibitory axonal projections that terminate on central amygdala output neurons.',
+        'Organized in clusters that act as a gatekeeper between threat assessment and panic execution.',
+      ],
+    },
+    fires: {
+      text: 'Intercalated cells fire rapid bursts of action potentials when driven by top-down safety signals. When the [[infralimbic cortex]] detects that a formerly dangerous cue is now harmless, its excitatory projections activate these cells, triggering an immediate wave of [[GABA]] that silences outgoing fear signals.',
+      steps: [
+        '1. Glutamate released from the prefrontal cortex binds AMPA and NMDA receptors on intercalated dendrites.',
+        '2. Rapid depolarization triggers high-frequency action potentials across the compact soma.',
+        '3. Impulses travel along short axons into the central amygdala.',
+        '4. Massive GABA release opens chloride channels on central output neurons, clamping the panic switch shut.',
+      ],
+    },
+    chem: {
+      text: 'Intercalated cells release [[GABA]] to inhibit central amygdala targets. They express high-affinity AMPA and NMDA [[receptors]] to capture cortical inputs, dopamine D1 receptors that tune their excitability, and are sensitive to circulating [[glucocorticoid|glucocorticoids]].',
+      receptors: ['AMPA', 'NMDA', 'GABA-A', 'D1'],
+      modulatedBy: ['dopamine', 'cortisol', 'noradrenaline'],
+    },
+    breaks: {
+      text: 'Failure or suppression of intercalated cell inhibition removes the primary safety brake on fear output, keeping panic alarms blaring even in safe settings.',
+      bullets: [
+        'Chronic stress elevates glucocorticoids that weaken prefrontal inputs, preventing intercalated cells from engaging the fear brake.',
+        'Impaired extinction learning leaves traumatic memories permanently active, a core mechanism of post-traumatic stress disorder.',
+        'Deficits in intercalated GABA release contribute to generalized anxiety and persistent phobias.',
+      ],
+    },
+    diagram: 'fear-circuit',
+  },
 ];

@@ -13,10 +13,11 @@ export default [
     madeIn: ['adrenal'],
     timescale: '20 minutes to several hours',
     overview: {
-      text: 'Cortisol is the primary glucocorticoid stress hormone in humans, released by the adrenal cortex above the kidneys. While adrenaline prepares the body for split-second reflexes, cortisol coordinates the prolonged metabolic response to physical and psychological challenges. It liberates stored sugar into the bloodstream, sharpens mental vigilance, and temporarily dials down energy-expensive systems like digestion, tissue repair, and immune swelling.',
+      text: 'Cortisol is the primary glucocorticoid stress hormone in humans, released by the adrenal cortex above the kidneys. While adrenaline prepares the body for split-second reflexes, cortisol coordinates the prolonged metabolic and neural response to challenges. It liberates glucose into circulation, crosses the blood-brain barrier to prime amygdala threat encoding, and temporarily dials down energy-expensive maintenance like digestion and immune swelling.',
       bullets: [
         'Follows a daily circadian rhythm, peaking roughly 30 to 45 minutes after waking to help you start the day.',
-        'Mobilizes glucose from liver stores and breaks down fatty acids to provide steady muscular and neural fuel.',
+        'Mobilizes glucose from liver stores and fatty acids to provide steady muscular and neural fuel.',
+        'Crosses the blood-brain barrier to bind receptors in the amygdala, lowering firing thresholds and accelerating threat conditioning.',
         'Suppresses non-essential inflammation and immune cell proliferation during acute stress emergencies.',
       ],
     },
@@ -62,7 +63,7 @@ export default [
         family: 'Glucocorticoid receptor',
         effect: 'modulate',
         where: ['hippocampus', 'prefrontal-cortex', 'amygdala'],
-        text: 'Low-affinity receptor activated during stress peaks and morning surges, redirecting gene expression and curbing inflammation.',
+        text: 'Low-affinity receptor activated during stress surges. In the basolateral amygdala it heightens synaptic plasticity and threat learning, while in the prefrontal cortex prolonged high occupancy impairs dendritic spines and blocks fear extinction.',
       },
       {
         id: 'MR',
@@ -108,7 +109,7 @@ export default [
       bullets: [
         'Cushing syndrome: chronic cortisol excess causes central weight gain, skin thinning, high blood pressure, and mood swings.',
         'Addison disease: autoimmune destruction of the adrenal cortex leads to severe fatigue, low blood pressure, and life-threatening crises.',
-        'Chronic stress burnout: prolonged elevated cortisol damages hippocampal dendrites, impairing memory and emotional regulation.',
+        'Chronic stress and trauma: elevated glucocorticoids sensitize amygdala threat learning while disrupting prefrontal safety memories, preventing fear extinction.',
       ],
     },
     tryIt: 'Notice how your body reacts when startled by a near-miss while driving. While adrenaline causes the instant racing heartbeat, cortisol rises over the following twenty minutes to restore glucose and calm tissue inflammation.',

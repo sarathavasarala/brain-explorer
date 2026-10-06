@@ -128,6 +128,7 @@ export default [
       bullets: [
         'Used at roughly one in five brain synapses, especially by local timing cells.',
         'Lowers the likelihood that a receiving neuron will fire an [[action potential]].',
+        'Released by [[intercalated cells]] inside the {{amygdala}} to clamp panic output during [[extinction learning]].',
         'Shapes natural brain rhythms that help different areas coordinate their work.',
       ],
     },

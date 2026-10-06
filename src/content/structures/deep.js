@@ -76,10 +76,11 @@ export default [
         ],
       },
       connects: {
-        text: 'This hub translates emotional and contextual signals into physical changes. When emotional circuits signal stress or urgency, descending pathways adjust heart rate and digestion, while ascending relays notify the cortex of shifts in internal comfort.',
+        text: 'This hub translates emotional and contextual signals into physical changes. When emotional circuits signal threat or anticipated challenge, it sparks the [[HPA axis]] by releasing CRH into portal capillaries, while descending nerve pathways accelerate heart rate and prepare muscles for action.',
         connections: [
           { id: 'amygdala', dir: 'in', label: 'Fear or stress news that needs a body response' },
           { id: 'hippocampus', dir: 'in', label: 'Memory context arriving for context' },
+          { id: 'pituitary', dir: 'out', label: 'Releasing hormones sent to master gland' },
           { id: 'medulla', dir: 'out', label: 'Orders for heart, breath and gut' },
           { id: 'thalamus', dir: 'out', label: 'Body state passed up to the cortex' },
         ],
@@ -424,12 +425,12 @@ export default [
         ],
       },
       cells: {
-        text: 'Sensory information can reach the amygdala through both thalamic and cortical routes, but the old picture of one fast unconscious road and one slow conscious road is too simple, especially in humans. Frontal, hippocampal and local [[GABA]] circuits all help update or reduce a threat response when the situation proves safe.',
+        text: 'Sensory information enters the [[basolateral amygdala]], where principal [[pyramidal cell|pyramidal cells]] receive fast thalamic alerts and detailed cortical patterns. Threat associations are gated by clusters of inhibitory [[intercalated cells]], which release [[GABA]] directly onto central amygdala output neurons to extinguish fear once safe.',
         diagram: 'fear-circuit',
         synapse: 'glutamate',
         bullets: [
-          'Some strong threat associations form after one event, while others develop or fade across repeated experiences.',
-          'Calming cells can be strengthened by therapy, which is partly how exposure therapy works.',
+          'The basolateral nucleus acts as the sensory gateway, while the central nucleus drives autonomic panic and freeze reflexes.',
+          'Intercalated cells act like physical safety catches, recruited by prefrontal safety signals to clamp fear output.',
         ],
       },
     },
