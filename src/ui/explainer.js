@@ -260,7 +260,6 @@ export function renderPathwayMobile(p, step, playing) {
         : `<span class="chip" style="--c:${colorOf(id)}"><i></i>${esc(nameOf(id))}</span>`
       ).join('')}
     </div>
-    ${renderEvidence(p, step)}
     <div class="mobile-tour-controls">
       <button class="mobile-tour-btn" data-act="prev" ${step === 0 ? 'disabled' : ''} aria-label="Previous step">
         ${icon('prev', 16)}<span>Prev</span>
@@ -272,6 +271,7 @@ export function renderPathwayMobile(p, step, playing) {
         <span>Next</span>${icon('next', 16)}
       </button>
     </div>
+    ${renderEvidence(p, step)}
     ${up ? `<a class="upnext" href="#/p/${up.id}" style="--c:${colorOf(up.steps[0]?.focus?.[0])}; margin-top: 14px;">
       <span class="upnext-lead"><span>Up next</span>${icon('next', 15)}</span>
       <span class="upnext-name">${esc(up.name)}</span>
