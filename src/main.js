@@ -13,11 +13,19 @@ import { sendChat, getAiConfig, saveAiConfig, clearAiConfig, hasAiKey } from './
 import { telemetry } from './services/telemetry.js';
 import { findTerm, esc } from './ui/format.js';
 import { icon } from './ui/icons.js';
+import { initBottomSheet } from './ui/sheet.js';
 
 const $ = (sel) => document.querySelector(sel);
 const appEl = $('.app');
 const listEl = $('#list');
+const explainerSheetEl = $('#explainer-sheet');
+const sheetHandleEl = $('#sheet-handle');
 const explainerEl = $('#explainer');
+const bottomSheet = initBottomSheet({
+  sheetEl: explainerSheetEl,
+  handleEl: sheetHandleEl,
+  contentEl: explainerEl,
+});
 const libraryEl = $('#library');
 const hoverEl = $('#hover-label');
 const tipEl = $('#tip');
@@ -256,6 +264,9 @@ function apply() {
   if (r.type !== 'chem') stopStepperPlay();
   setMode(r.type);
   setMobileSidebar(false);
+  if (bottomSheet && prev.id !== r.id && bottomSheet.getState() === 'peek') {
+    bottomSheet.snapTo('half');
+  }
 
   if (r.type !== 'chem') {
     scene.setBody(false);

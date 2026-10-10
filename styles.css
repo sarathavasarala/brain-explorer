@@ -265,11 +265,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 
 /* ------------------------------------------------------------ explainer */
 .explainer {
-  min-height: 0; min-width: 0; overflow-y: auto; overflow-x: hidden;
+  min-height: 0; min-width: 0;
+  display: flex; flex-direction: column;
   background: var(--panel);
   border-left: 1px solid var(--line);
 }
 .mode-library .explainer { border-left-color: transparent; }
+.sheet-handle { display: none; }
+.explainer-body {
+  flex: 1 1 auto;
+  min-height: 0; min-width: 0;
+  overflow-y: auto; overflow-x: hidden;
+}
 .ex { width: 540px; padding: 30px 36px 40px; animation: ex-in 0.5s var(--ease); }
 @keyframes ex-in { from { opacity: 0.001; transform: translateY(6px); filter: blur(2px); } to { opacity: 1; transform: none; filter: none; } }
 
@@ -1803,8 +1810,8 @@ kbd {
 
   /* 3D stage */
   .stage {
-    flex: 1 1 50%;
-    min-height: 220px;
+    flex: 1 1 auto;
+    min-height: 120px;
     position: relative;
   }
   .stage canvas {
@@ -1850,22 +1857,74 @@ kbd {
     gap: 4px;
   }
 
+  /* bottom sheet handle */
+  .sheet-handle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 32px;
+    padding: 10px 0 6px;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+    -webkit-user-select: none;
+    flex: 0 0 auto;
+    z-index: 5;
+    background: transparent;
+  }
+  .sheet-handle:active,
+  .explainer.is-dragging .sheet-handle {
+    cursor: grabbing;
+  }
+  .sheet-handle-pill {
+    width: 42px;
+    height: 4.5px;
+    border-radius: 999px;
+    background: rgba(190, 200, 255, 0.28);
+    transition: background 0.2s, transform 0.2s, box-shadow 0.2s;
+  }
+  .sheet-handle:hover .sheet-handle-pill,
+  .sheet-handle:focus-visible .sheet-handle-pill {
+    background: rgba(190, 200, 255, 0.65);
+    box-shadow: 0 0 10px rgba(190, 200, 255, 0.35);
+  }
+  .explainer.is-dragging .sheet-handle-pill {
+    background: color-mix(in oklab, var(--accent, #c77dff) 75%, white);
+    box-shadow: 0 0 12px var(--accent, #c77dff);
+    transform: scaleX(1.1);
+  }
+
   /* explainer card */
   .explainer {
-    flex: 1 1 50%;
-    min-height: 0;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    flex: 0 0 var(--sheet-height, 50%);
+    height: var(--sheet-height, 50%);
+    max-height: calc(100dvh - 52px);
+    min-height: 74px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     border-radius: 20px 20px 0 0;
     border-top: 1px solid var(--line-2);
     border-left: none;
     box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.5);
     background: var(--panel);
+    transition: flex-basis 0.32s var(--ease), height 0.32s var(--ease);
+    will-change: flex-basis, height;
+  }
+  .explainer.is-dragging {
+    transition: none !important;
+  }
+  .explainer-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .ex {
     width: 100%;
     max-width: 100%;
-    padding: 18px 18px 48px;
+    padding: 8px 18px 48px;
     box-sizing: border-box;
   }
   .ex-title {
@@ -1927,11 +1986,12 @@ kbd {
 
   /* guided pathways tour: mobile story player */
   .mode-tour .stage {
-    flex: 1 1 52%;
-    min-height: 230px;
+    flex: 1 1 auto;
+    min-height: 120px;
   }
   .mode-tour .explainer {
-    flex: 1 1 48%;
+    flex: 0 0 var(--sheet-height, 48%);
+    height: var(--sheet-height, 48%);
     overflow: hidden;
     display: flex;
     flex-direction: column;
