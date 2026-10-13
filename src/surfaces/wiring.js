@@ -6,8 +6,8 @@ export default {
   mount(container, props = {}, ctx = {}) {
     const { world, clock, scene, setControls } = ctx;
 
-    let width = container.clientWidth || 800;
-    let height = container.clientHeight || 240;
+    const width = 800;
+    const height = props.layout === 'focus' ? 320 : 230;
 
     const svg = el('svg', {
       viewBox: `0 0 ${width} ${height}`,
@@ -16,8 +16,8 @@ export default {
 
     const glowUrl = glowFilter(svg);
 
-    // Header controls (e.g. "Juice arrives" toggle in step 9, and Play/Pause)
-    let toggles = { juice: true, noJuice: false };
+    // Header controls (e.g. "Message arrives" toggle in step 8, and Play/Pause)
+    let toggles = { msg: true, noMsg: false, juice: true, noJuice: false };
 
     if (setControls) {
       const ctrls = document.createElement('div');
@@ -27,18 +27,20 @@ export default {
       ctrls.style.gap = '10px';
 
       const perturb = props.operators?.perturb || [];
-      const juicePerturb = perturb.find((p) => p.id === 'juice');
-      if (juicePerturb) {
+      const msgPerturb = perturb.find((p) => p.id === 'msg' || p.id === 'message' || p.id === 'juice');
+      if (msgPerturb) {
         const toggleBtn = document.createElement('button');
         toggleBtn.type = 'button';
         toggleBtn.className = 'dock-btn';
         toggleBtn.setAttribute('aria-pressed', 'true');
-        toggleBtn.textContent = juicePerturb.label || 'Juice arrives';
+        toggleBtn.textContent = msgPerturb.label || 'Message arrives';
 
         toggleBtn.addEventListener('click', () => {
-          toggles.juice = !toggles.juice;
-          toggles.noJuice = !toggles.juice;
-          toggleBtn.setAttribute('aria-pressed', toggles.juice ? 'true' : 'false');
+          toggles.msg = !toggles.msg;
+          toggles.juice = toggles.msg;
+          toggles.noMsg = !toggles.msg;
+          toggles.noJuice = !toggles.msg;
+          toggleBtn.setAttribute('aria-pressed', toggles.msg ? 'true' : 'false');
           updateSparkline();
         });
 
@@ -359,7 +361,8 @@ export default {
 
     function updateSparkline() {
       if (!sparklinePath || !world) return;
-      const trial = { chime: true, juice: toggles.juice, V: 1 };
+      const hasMsg = toggles.msg ?? toggles.juice;
+      const trial = { buzz: true, msg: hasMsg, chime: true, juice: hasMsg, V: 1 };
       const spW = 120;
       const spH = 40;
       const spRateToY = lin(0, 32, spH, 0);
@@ -379,16 +382,6 @@ export default {
     }
 
     buildGraph();
-
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        width = Math.max(300, entry.contentRect.width);
-        height = Math.max(160, entry.contentRect.height);
-        svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-        buildGraph();
-      }
-    });
-    ro.observe(container);
 
     return {
       render(t) {
@@ -453,16 +446,16 @@ export default {
           sparklinePlayhead.setAttribute('x2', px.toFixed(1));
         }
 
-        // Drive VTA in step 9
+        // Drive VTA in step 8
         if (scene && traceDef) {
-          const trial = { chime: true, juice: toggles.juice, V: 1 };
+          const hasMsg = toggles.msg ?? toggles.juice;
+          const trial = { buzz: true, msg: hasMsg, chime: true, juice: hasMsg, V: 1 };
           const rate = world.daRate(t, trial);
           scene.setDrive('vta', (rate - 5) / 26);
         }
       },
 
       destroy() {
-        ro.disconnect();
         if (scene) scene.setDrive('vta', 0);
         if (svg.parentElement) svg.parentElement.removeChild(svg);
       },

@@ -7,25 +7,25 @@ export default {
     const { world, setControls } = ctx;
     const kind = props.kind || 'weights';
 
-    let width = container.clientWidth || 800;
-    let height = container.clientHeight || 240;
+    const width = 800;
+    const height = 220;
 
     const svg = el('svg', {
       viewBox: `0 0 ${width} ${height}`,
       preserveAspectRatio: 'xMidYMid meet',
     }, container);
 
-    const padLeft = 44;
-    const padRight = kind === 'window' ? 190 : 80;
-    const padTop = 24;
-    const padBottom = 28;
+    const padLeft = 48;
+    const padRight = kind === 'window' ? 200 : 80;
+    const padTop = 22;
+    const padBottom = 30;
 
     let cleanup = () => {};
 
     if (kind === 'weights') {
-      // ------------------------------------------------ WEIGHTS PLOT
-      let insectAloneVal = 0.25;
-      let insectAlways = false;
+      // ------------------------------------------------ WEIGHTS PLOT (step 4)
+      let noiseAloneVal = 0.25;
+      let noiseAlways = false;
       let drawnTrials = 30;
       let animInterval = null;
 
@@ -33,11 +33,11 @@ export default {
       let historyList = [];
 
       function recompute() {
-        const insectRate = insectAlways ? 1 : 0.3;
-        const insectAloneEvery = insectAlways
+        const noiseRate = noiseAlways ? 1 : 0.3;
+        const noiseAloneEvery = noiseAlways
           ? 0
-          : (insectAloneVal <= 0 ? 0 : Math.max(1, Math.round(1 / insectAloneVal)));
-        scheduleList = world.schedule({ n: 30, insectRate, insectAloneEvery, seed: 11 });
+          : (noiseAloneVal <= 0 ? 0 : Math.max(1, Math.round(1 / noiseAloneVal)));
+        scheduleList = world.schedule({ n: 30, noiseRate, noiseAloneEvery, seed: 11 });
         historyList = world.learn(scheduleList, { want: 1 });
       }
 
@@ -53,7 +53,7 @@ export default {
 
         const sliderLabel = document.createElement('span');
         sliderLabel.className = 'dock-label';
-        sliderLabel.textContent = `Insect without juice ${Math.round(insectAloneVal * 100)}%`;
+        sliderLabel.textContent = `Background noise alone: ${Math.round(noiseAloneVal * 100)}%`;
 
         const slider = document.createElement('input');
         slider.type = 'range';
@@ -61,10 +61,10 @@ export default {
         slider.min = '0';
         slider.max = '0.5';
         slider.step = '0.05';
-        slider.value = String(insectAloneVal);
+        slider.value = String(noiseAloneVal);
         slider.addEventListener('input', (e) => {
-          insectAloneVal = parseFloat(e.target.value);
-          sliderLabel.textContent = `Insect without juice ${Math.round(insectAloneVal * 100)}%`;
+          noiseAloneVal = parseFloat(e.target.value);
+          sliderLabel.textContent = `Background noise alone: ${Math.round(noiseAloneVal * 100)}%`;
           recompute();
           drawnTrials = 30;
           renderPlot();
@@ -74,12 +74,12 @@ export default {
         toggleBtn.type = 'button';
         toggleBtn.className = 'dock-btn';
         toggleBtn.setAttribute('aria-pressed', 'false');
-        toggleBtn.textContent = 'Always with chime';
+        toggleBtn.textContent = 'Always with buzz';
         toggleBtn.addEventListener('click', () => {
-          insectAlways = !insectAlways;
-          toggleBtn.setAttribute('aria-pressed', insectAlways ? 'true' : 'false');
-          slider.disabled = insectAlways;
-          slider.style.opacity = insectAlways ? '0.4' : '1';
+          noiseAlways = !noiseAlways;
+          toggleBtn.setAttribute('aria-pressed', noiseAlways ? 'true' : 'false');
+          slider.disabled = noiseAlways;
+          slider.style.opacity = noiseAlways ? '0.4' : '1';
           recompute();
           drawnTrials = 30;
           renderPlot();
@@ -88,7 +88,7 @@ export default {
         const runBtn = document.createElement('button');
         runBtn.type = 'button';
         runBtn.className = 'dock-btn';
-        runBtn.textContent = 'Run trials';
+        runBtn.textContent = 'Simulate 30 alerts';
         runBtn.addEventListener('click', () => {
           if (animInterval) clearInterval(animInterval);
           drawnTrials = 1;
@@ -101,7 +101,7 @@ export default {
               clearInterval(animInterval);
               animInterval = null;
             }
-          }, 120);
+          }, 100);
         });
 
         ctrls.appendChild(sliderLabel);
@@ -122,7 +122,7 @@ export default {
         const xToPx = lin(1, 30, padLeft, width - padRight);
         const yToPx = lin(0, 1.05, height - padBottom, padTop);
 
-        // Y-axis grid & labels
+        // Y-axis grid and labels
         for (const yv of [0, 0.5, 1.0]) {
           const y = yToPx(yv);
           el('line', {
@@ -171,7 +171,7 @@ export default {
         }
 
         const xTitle = el('text', {
-          x: width - padRight + 12,
+          x: width - padRight + 10,
           y: height - padBottom + 14,
           'text-anchor': 'start',
           fill: C.muted,
@@ -180,31 +180,30 @@ export default {
           'letter-spacing': '0.08em',
           'text-transform': 'uppercase',
         }, axesGroup);
-        xTitle.textContent = 'trial';
+        xTitle.textContent = 'alert';
 
-        // Lines for chime and insect
         const count = Math.min(drawnTrials, historyList.length);
         if (count < 1) return;
 
-        let dChime = `M ${xToPx(1).toFixed(1)} ${yToPx(historyList[0].wChime).toFixed(1)}`;
-        let dInsect = `M ${xToPx(1).toFixed(1)} ${yToPx(historyList[0].wInsect).toFixed(1)}`;
+        let dBuzz = `M ${xToPx(1).toFixed(1)} ${yToPx(historyList[0].wBuzz).toFixed(1)}`;
+        let dNoise = `M ${xToPx(1).toFixed(1)} ${yToPx(historyList[0].wNoise).toFixed(1)}`;
 
         for (let i = 1; i < count; i++) {
           const x = xToPx(i + 1).toFixed(1);
-          dChime += ` L ${x} ${yToPx(historyList[i].wChime).toFixed(1)}`;
-          dInsect += ` L ${x} ${yToPx(historyList[i].wInsect).toFixed(1)}`;
+          dBuzz += ` L ${x} ${yToPx(historyList[i].wBuzz).toFixed(1)}`;
+          dNoise += ` L ${x} ${yToPx(historyList[i].wNoise).toFixed(1)}`;
         }
 
         el('path', {
-          d: dChime,
+          d: dBuzz,
           fill: 'none',
           stroke: C.excite,
-          'stroke-width': '1.75',
+          'stroke-width': '2',
           'stroke-linecap': 'round',
         }, plotGroup);
 
         el('path', {
-          d: dInsect,
+          d: dNoise,
           fill: 'none',
           stroke: C.cell,
           'stroke-width': '1.75',
@@ -214,41 +213,41 @@ export default {
         // End labels
         const lastIdx = count - 1;
         const lastX = xToPx(count) + 8;
-        const chimeY = yToPx(historyList[lastIdx].wChime);
-        const insectY = yToPx(historyList[lastIdx].wInsect);
+        const buzzY = yToPx(historyList[lastIdx].wBuzz);
+        const noiseY = yToPx(historyList[lastIdx].wNoise);
 
-        const cLbl = el('text', {
+        const bLbl = el('text', {
           x: lastX,
-          y: chimeY + 4,
+          y: buzzY + 4,
           fill: C.excite,
           'font-family': 'var(--display)',
           'font-size': '11',
           'font-weight': '600',
         }, plotGroup);
-        cLbl.textContent = 'chime';
+        bLbl.textContent = 'phone buzz';
 
-        const iLbl = el('text', {
+        const nLbl = el('text', {
           x: lastX,
-          y: Math.abs(insectY - chimeY) < 14 ? insectY + 16 : insectY + 4,
+          y: Math.abs(noiseY - buzzY) < 14 ? noiseY + 16 : noiseY + 4,
           fill: C.cell,
           'font-family': 'var(--display)',
           'font-size': '11',
           'font-weight': '600',
         }, plotGroup);
-        iLbl.textContent = 'insect';
+        nLbl.textContent = 'background noise';
       }
 
       renderPlot();
       cleanup = () => { if (animInterval) clearInterval(animInterval); };
 
     } else if (kind === 'window') {
-      // ------------------------------------------------ WINDOW PLOT (step 8)
+      // ------------------------------------------------ WINDOW PLOT (step 7)
       let tDA = props.tDA ?? 1.0;
 
       const xToPx = lin(0, 3.0, padLeft, width - padRight);
       const yToPx = lin(0, 1.05, height - padBottom, padTop);
 
-      // Axes & grid
+      // Axes and grid
       const axesGroup = el('g', { class: 'axes' }, svg);
       for (const yv of [0, 0.5, 1.0]) {
         const y = yToPx(yv);
@@ -306,9 +305,9 @@ export default {
         'letter-spacing': '0.08em',
         'text-transform': 'uppercase',
       }, axesGroup);
-      xTitle.textContent = 's after chime';
+      xTitle.textContent = 'seconds after buzz';
 
-      // Untagged curve (flat 0)
+      // Untagged synapse baseline (0)
       el('line', {
         x1: padLeft,
         y1: yToPx(0),
@@ -320,7 +319,7 @@ export default {
       }, axesGroup);
 
       const untaggedLbl = el('text', {
-        x: xToPx(2.4),
+        x: xToPx(2.3),
         y: yToPx(0) - 6,
         fill: C.muted,
         'font-family': 'var(--display)',
@@ -328,7 +327,7 @@ export default {
       }, axesGroup);
       untaggedLbl.textContent = 'untagged synapse';
 
-      // Tag curve
+      // Tag decay curve
       const tagSteps = 60;
       let dTag = `M ${xToPx(0).toFixed(1)} ${yToPx(world.tag(0)).toFixed(1)}`;
       for (let s = 1; s <= tagSteps; s++) {
@@ -347,7 +346,7 @@ export default {
         d: dTag,
         fill: 'none',
         stroke: C.calcium,
-        'stroke-width': '1.75',
+        'stroke-width': '2',
         'stroke-linecap': 'round',
       }, svg);
 
@@ -382,7 +381,7 @@ export default {
 
       // Readouts panel on the right
       const readoutGroup = el('g', { class: 'readouts' }, svg);
-      const roX = width - padRight + 16;
+      const roX = width - padRight + 18;
 
       const strengthTitle = el('text', {
         x: roX,
@@ -482,24 +481,28 @@ export default {
 
       updateMarker(tDA);
 
-      // Drag interaction
+      // Drag interaction mapped to logical coordinate system
       let dragging = false;
+      const getTargetT = (clientX) => {
+        const rect = svg.getBoundingClientRect();
+        const scaleX = width / rect.width;
+        const px = (clientX - rect.left) * scaleX;
+        return ((px - padLeft) / (width - padRight - padLeft)) * 3.0;
+      };
+
       const onPointerMove = (e) => {
         if (!dragging) return;
-        const rect = svg.getBoundingClientRect();
-        const px = e.clientX - rect.left;
-        const targetT = ((px - padLeft) / (width - padRight - padLeft)) * 3.0;
-        updateMarker(targetT);
+        updateMarker(getTargetT(e.clientX));
       };
       const onPointerUp = () => { dragging = false; };
 
       svg.addEventListener('pointerdown', (e) => {
         const rect = svg.getBoundingClientRect();
-        const px = e.clientX - rect.left;
+        const scaleX = width / rect.width;
+        const px = (e.clientX - rect.left) * scaleX;
         if (px >= padLeft - 10 && px <= width - padRight + 10) {
           dragging = true;
-          const targetT = ((px - padLeft) / (width - padRight - padLeft)) * 3.0;
-          updateMarker(targetT);
+          updateMarker(getTargetT(e.clientX));
         }
       });
       window.addEventListener('pointermove', onPointerMove);
@@ -521,19 +524,9 @@ export default {
       };
     }
 
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        width = Math.max(300, entry.contentRect.width);
-        height = Math.max(160, entry.contentRect.height);
-        svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-      }
-    });
-    ro.observe(container);
-
     return {
       render(_t) {},
       destroy() {
-        ro.disconnect();
         cleanup();
         if (svg.parentElement) svg.parentElement.removeChild(svg);
       },

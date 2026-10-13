@@ -6,8 +6,8 @@ export default {
   mount(container, props = {}, ctx = {}) {
     const { world, clock, setControls } = ctx;
 
-    let width = container.clientWidth || 800;
-    let height = container.clientHeight || 240;
+    const width = 800;
+    const height = 280;
 
     const svg = el('svg', {
       viewBox: `0 0 ${width} ${height}`,
@@ -332,15 +332,6 @@ export default {
 
     updateTagSparkline(0);
 
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        width = Math.max(300, entry.contentRect.width);
-        height = Math.max(160, entry.contentRect.height);
-        svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-      }
-    });
-    ro.observe(container);
-
     return {
       render(t) {
         const state = world.nmda({ glutamate: glutamateOn, depolarized: depolarizedOn });
@@ -407,7 +398,6 @@ export default {
       },
 
       destroy() {
-        ro.disconnect();
         if (svg.parentElement) svg.parentElement.removeChild(svg);
       },
     };

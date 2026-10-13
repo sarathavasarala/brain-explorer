@@ -7,8 +7,8 @@ export default {
     const { world, clock, scene, setControls } = ctx;
     const mode = props.mode || 'single';
 
-    let width = container.clientWidth || 800;
-    let height = container.clientHeight || 240;
+    const width = 800;
+    const height = 230;
 
     const svg = el('svg', {
       viewBox: `0 0 ${width} ${height}`,
@@ -65,27 +65,29 @@ export default {
       ctrls.style.gap = '10px';
 
       if (mode === 'learning') {
+        const h0 = conditions[0].history[visibleRows - 1];
+        const val = h0.wBuzz ?? h0.wChime ?? 0;
         readoutEl = document.createElement('span');
         readoutEl.className = 'dock-label';
-        readoutEl.textContent = `chime predicts ${conditions[0].history[visibleRows - 1].wChime.toFixed(2)}`;
+        readoutEl.textContent = `buzz predicts ${val.toFixed(2)}`;
         ctrls.appendChild(readoutEl);
 
         runTrialsBtn = document.createElement('button');
         runTrialsBtn.type = 'button';
         runTrialsBtn.className = 'dock-btn';
-        runTrialsBtn.textContent = 'Run trials';
+        runTrialsBtn.textContent = 'Run alerts';
         runTrialsBtn.addEventListener('click', () => {
           if (isRunningTrials) {
             clearInterval(trialInterval);
             isRunningTrials = false;
-            runTrialsBtn.textContent = 'Run trials';
+            runTrialsBtn.textContent = 'Run alerts';
             return;
           }
           if (visibleRows >= (props.rows || 30)) {
             visibleRows = 1;
           }
           isRunningTrials = true;
-          runTrialsBtn.textContent = 'Pause trials';
+          runTrialsBtn.textContent = 'Pause alerts';
           trialInterval = setInterval(() => {
             if (visibleRows < (props.rows || 30)) {
               visibleRows++;
@@ -93,7 +95,7 @@ export default {
             } else {
               clearInterval(trialInterval);
               isRunningTrials = false;
-              runTrialsBtn.textContent = 'Run trials';
+              runTrialsBtn.textContent = 'Run alerts';
             }
           }, 120);
         });
@@ -175,13 +177,13 @@ export default {
       'stroke-width': '1',
     }, playheadGroup);
 
-    // Events (chime at 0, juice at 1.0)
+    // Events (buzz at 0, message at 1.0)
     const eventLines = [];
     const eventLabels = [];
 
     const events = [
-      { t: world.CHIME_T, label: 'chime' },
-      { t: world.JUICE_T, label: 'juice' },
+      { t: world.BUZZ_T ?? world.CHIME_T ?? 0, label: 'buzz' },
+      { t: world.MSG_T ?? world.JUICE_T ?? 1.0, label: 'message' },
     ];
 
     for (const ev of events) {
@@ -422,7 +424,9 @@ export default {
 
     function updateLearningVisibility() {
       if (readoutEl && conditions[0].history[visibleRows - 1]) {
-        readoutEl.textContent = `chime predicts ${conditions[0].history[visibleRows - 1].wChime.toFixed(2)}`;
+        const h = conditions[0].history[visibleRows - 1];
+        const val = h.wBuzz ?? h.wChime ?? 0;
+        readoutEl.textContent = `buzz predicts ${val.toFixed(2)}`;
       }
     }
 
@@ -548,16 +552,6 @@ export default {
 
     rebuildLayout();
 
-    const ro = new ResizeObserver((entries) => {
-      for (const entry of entries) {
-        width = Math.max(300, entry.contentRect.width);
-        height = Math.max(160, entry.contentRect.height);
-        svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-        rebuildLayout();
-      }
-    });
-    ro.observe(container);
-
     return {
       runTrial() {
         if (mode === 'learning' && visibleRows < (props.rows || 30)) {
@@ -630,7 +624,6 @@ export default {
       },
 
       destroy() {
-        ro.disconnect();
         if (trialInterval) clearInterval(trialInterval);
         if (scene) scene.setDrive('vta', 0);
         if (svg.parentElement) svg.parentElement.removeChild(svg);
