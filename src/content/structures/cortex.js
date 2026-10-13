@@ -342,7 +342,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Touch signals arrive from your skin through the {{thalamus}}, reporting pressure, vibration, and texture. This sensory map trades instant updates with the neighboring {{motor-cortex}} to adjust how tightly you hold a glass, while sending spatial layouts to the {{posterior-parietal}} cortex to guide reaching and catching.',
+        text: 'Touch signals arrive from your skin through the {{thalamus}}, reporting pressure, vibration, and texture. This sensory map trades instant updates with the neighboring {{motor-cortex}} to adjust how tightly you hold a glass, while sending spatial layouts to the {{posterior-parietal}} to guide reaching and catching.',
         connections: [
           { id: 'thalamus', dir: 'in', label: 'Touch arriving fresh from the body' },
           { id: 'motor-cortex', dir: 'both', label: 'Touch compared with movement plans' },
@@ -682,7 +682,7 @@ export default [
         ],
       },
       connects: {
-        text: 'Early visual features like edges and motion are detected here and broadcast onward. An upper route travels to the {{posterior-parietal}} cortex to guide reaching and catching, while a lower route heads into the {{temporal-lobe}} to recognize shapes, faces, and text.',
+        text: 'Early visual features like edges and motion are detected here and broadcast onward. An upper route travels to the {{posterior-parietal}} to guide reaching and catching, while a lower route heads into the {{temporal-lobe}} to recognize shapes, faces, and text.',
         connections: [
           { id: 'thalamus', dir: 'in', label: 'Raw sight arriving from the eyes' },
           { id: 'posterior-parietal', dir: 'out', label: 'Locations sent on for reaching' },

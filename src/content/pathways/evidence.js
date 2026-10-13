@@ -78,7 +78,7 @@ export default {
         claim: 'Smell bypasses an initial thalamic relay to reach primary olfactory cortex, though thalamic circuits participate in downstream processing.',
         sourceIds: ['pmc5362339-olfactory'],
         basis: 'established-anatomy',
-        limits: 'PMC5362339 introduction: primary sensory station bypasses thalamus, but mediodorsal thalamus is recruited in subsequent networks. Current tagline needs qualification.',
+        limits: 'PMC5362339 introduction: primary sensory station bypasses an initial thalamic relay, but mediodorsal thalamus is recruited in downstream flavor and evaluation networks.',
       },
       {
         id: 'smell-nasal-binding',
@@ -499,7 +499,7 @@ export default {
         claim: 'Descending pathways from midbrain PAG and raphe nuclei modulate spinal nociception, with serotonin capable of suppressing or facilitating transmission depending on receptor subtypes.',
         sourceIds: ['pmc5883380-5ht-pain'],
         basis: 'mixed',
-        limits: 'PMC5883380 abstract and review: 5-HT1A/B mediate antinociception while 5-HT2 and 5-HT3 can promote pronociceptive facilitation. Current text oversimplifies descending serotonin as a uniform brake.',
+        limits: 'PMC5883380 abstract and review: 5-HT1A/B mediate antinociception while 5-HT2 and 5-HT3 can promote pronociceptive facilitation, reflecting bidirectional receptor-dependent modulation.',
       },
     ],
     routeNotes: [
@@ -728,6 +728,7 @@ export default {
     ],
     routeNotes: [
       { stepId: 'sharper-senses', from: 'locus-coeruleus', to: 'thalamus', semantics: 'direct', sourceIds: ['purves-neuroscience-6e'], note: 'Ascending noradrenergic projection to sensory thalamus.' },
+      { stepId: 'sharper-senses', from: 'locus-coeruleus', to: 'auditory-cortex', semantics: 'direct', sourceIds: ['purves-neuroscience-6e'], note: 'Ascending noradrenergic projection to primary auditory cortex enhancing signal-to-noise ratio.' },
       { stepId: 'focused-attention', from: 'locus-coeruleus', to: 'prefrontal-cortex', semantics: 'direct', sourceIds: ['purves-neuroscience-6e'], note: 'Dorsal noradrenergic bundle to prefrontal cortex.' },
       { stepId: 'focused-attention', from: 'locus-coeruleus', to: 'posterior-parietal', semantics: 'direct', sourceIds: ['purves-neuroscience-6e'], note: 'Projection to posterior parietal attention networks.' },
       { stepId: 'motor-readiness', from: 'locus-coeruleus', to: 'cerebellum', semantics: 'direct', sourceIds: ['purves-neuroscience-6e'], note: 'Noradrenergic projection to cerebellar cortex and deep nuclei.' },
@@ -860,7 +861,7 @@ export default {
         claim: 'Anticipatory psychological stress engages the HPA axis, promoting glucocorticoid release alongside rapid sympathetic adrenaline release.',
         sourceIds: ['frontiers2015-fear-extinction'],
         basis: 'human',
-        limits: 'Frontiers 2015 section 3: acute anticipation activates sympathetic and HPA components on different timescales (seconds vs 15-30 minutes). Current text mixes these into a single instantaneous flood.',
+        limits: 'Frontiers 2015 section 3: acute anticipation activates sympathetic adrenaline in seconds, whereas endocrine HPA cortisol release builds over minutes.',
       },
       {
         id: 'stress-amygdala-priming',
