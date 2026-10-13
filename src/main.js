@@ -14,6 +14,7 @@ import { telemetry } from './services/telemetry.js';
 import { findTerm, esc } from './ui/format.js';
 import { icon } from './ui/icons.js';
 import { initBottomSheet } from './ui/sheet.js';
+import { createRunner } from './stage/run.js';
 
 const $ = (sel) => document.querySelector(sel);
 const appEl = $('.app');
@@ -127,6 +128,12 @@ const scene = createBrainScene($('#brain'), {
     const level = state.route.type === 's' ? state.route.level : levels[0].id;
     location.hash = `#/s/${id}/${level}`;
   },
+});
+
+const runner = createRunner({
+  scene,
+  stageEl: $('.stage'),
+  dockEl: $('#dock'),
 });
 
 // ---------------------------------------------------------------- routing
@@ -260,7 +267,10 @@ function showSketch(r, key) {
 function apply() {
   const prev = state.route;
   const r = (state.route = parseHash());
-  if (r.type !== 'p') stopPlay();
+  if (r.type !== 'p') {
+    stopPlay();
+    runner.stop();
+  }
   if (r.type !== 'chem') stopStepperPlay();
   setMode(r.type);
   setMobileSidebar(false);
@@ -507,6 +517,7 @@ function apply() {
   } else if (r.type === 'p') {
     const p = pathways.find((q) => q.id === r.id);
     playStep(scene, playerDeps, p, r.step);
+    runner.run(p.steps[r.step], { key: `${p.id}:${r.step}` });
     explainerEl.innerHTML = renderPathway(p, r.step, state.playing, { isMobile: window.innerWidth <= 860 });
     if (prev.type !== 'p' || prev.id !== r.id) explainerEl.scrollTop = 0;
   } else if (r.type === 'ask') {
@@ -794,6 +805,33 @@ explainerEl.addEventListener('click', (e) => {
     return;
   }
 
+  const checkChoice = e.target.closest('.check-choice');
+  if (checkChoice) {
+    const card = checkChoice.closest('.check-card');
+    if (card) {
+      const choiceIdx = Number(checkChoice.dataset.choice);
+      const ans = Number(card.dataset.checkAnswer);
+      let feedback = [];
+      try { feedback = JSON.parse(card.dataset.feedback || '[]'); } catch {}
+      card.querySelectorAll('.check-choice').forEach((btn, i) => {
+        btn.disabled = true;
+        if (i === choiceIdx) {
+          btn.classList.add('is-chosen');
+          if (i === ans) btn.classList.add('is-correct');
+          else btn.classList.add('is-wrong');
+        }
+      });
+      const fbEl = card.querySelector('.check-feedback');
+      if (fbEl && feedback[choiceIdx]) {
+        fbEl.textContent = feedback[choiceIdx];
+        fbEl.hidden = false;
+      }
+      const nextEl = card.querySelector('.check-next');
+      if (nextEl) nextEl.hidden = false;
+    }
+    return;
+  }
+
   const act = e.target.closest('[data-act]')?.dataset.act;
   if (act === 'prev') stepTo(state.route.step - 1);
   if (act === 'next') stepTo(state.route.step + 1);
@@ -941,6 +979,16 @@ function orderedCellIds() {
 
 window.addEventListener('keydown', (e) => {
   if (e.target.matches('input, textarea') || e.metaKey || e.ctrlKey || e.altKey) return;
+  if ((e.key === 'k' || e.key === 'K') && runner.isDockOpen()) {
+    e.preventDefault();
+    runner.togglePlay();
+    return;
+  }
+  if ((e.key === 't' || e.key === 'T') && runner.isDockOpen()) {
+    e.preventDefault();
+    runner.runTrial();
+    return;
+  }
   const r = state.route;
   if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && ['home', 's', 'p', 'chem', 'chemhome', 'cell', 'cellhome'].includes(r.type)) {
     e.preventDefault();

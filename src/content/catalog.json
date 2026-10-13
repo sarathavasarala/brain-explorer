@@ -464,7 +464,13 @@
     "long-term potentiation",
     "LTP",
     "infralimbic cortex",
-    "mPFC"
+    "mPFC",
+    "gaba",
+    "synaptic plasticity",
+    "eligibility trace",
+    "ampa receptor",
+    "nmda receptor",
+    "depolarized"
   ],
   "roles": [
     "more_active",

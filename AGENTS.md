@@ -549,7 +549,61 @@ This updates `src/content/catalog.json`, which is consumed by `server.py` to bui
 
 ---
 
-## 9. Verification & Quality Checklist
+## 9. Surfaces Platform
+
+The surfaces platform extends Brain Explorer to show how mechanisms work in real time across scales. A shared stage clock and deterministic world simulation drive both 3D anatomy and docked interactive surface panels in lockstep.
+
+### Shared Architecture
+1. **Clock (`src/stage/clock.js`)**: Single clock managing time `t`, playback, rates, and window bounds `[t0, t1]`.
+2. **Worlds (`src/worlds/`)**: Pure deterministic JS simulations with no DOM dependencies (such as `rpe.js` for Rescorla-Wagner learning, spike generation, NMDA gating).
+3. **Stage Runner (`src/stage/run.js`)**: Coordinates the dock, active surface, clock subscription, anatomy drive values, and pulse triggers.
+4. **Dock (`src/stage/dock.js`)**: Responsive bottom or focus panel hosting the surface SVG or HTML card.
+
+### Surface Contract (`src/surfaces/`)
+Each surface module implements:
+```js
+export default {
+  type: 'activity', // 'activity' | 'quantity' | 'wiring' | 'machinery' | 'model'
+  mount(containerEl, props, ctx) {
+    // ctx: { world, clock, scene, setControls }
+    return {
+      render(t) {},
+      runTrial() {}, // optional
+      destroy() {},
+    };
+  },
+};
+```
+
+### Layouts
+- `'brain'`: Default view, 3D point cloud only, dock hidden.
+- `'dock'`: Brain stays live and shifts up (`setFrameOffset`); surface panel docked at bottom.
+- `'focus'`: Surface is primary focus; 3D brain dims as background (`.stage.is-focus`).
+
+### Extended Step Schema
+Guided tour pathway steps can include:
+```js
+{
+  layout: 'dock', // 'brain' | 'dock' | 'focus'
+  world: 'rpe',   // registered world key
+  surface: {
+    type: 'activity', // surface type
+    title: 'Recording title',
+    props: { ... },
+  },
+  operators: { play: true, trials: 30, perturb: [...] },
+  check: {
+    ask: 'Question prompt',
+    choices: ['Choice 1', 'Choice 2', 'Choice 3'],
+    answer: 0,
+    feedback: ['Feedback 1', 'Feedback 2', 'Feedback 3'],
+  },
+}
+```
+
+---
+
+## 10. Verification & Quality Checklist
 
 Before submitting any code or content changes, execute this verification sequence:
 

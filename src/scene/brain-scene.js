@@ -1466,6 +1466,14 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
 
   // ------------------------------------------------------------ loop
   let width = 1, height = 1;
+  let frameOffset = 0;
+  function applyFrameOffset() {
+    if (frameOffset) camera.setViewOffset(width, height, 0, frameOffset, width, height);
+    else camera.clearViewOffset();
+    camera.updateProjectionMatrix();
+  }
+  function setFrameOffset(px) { frameOffset = Math.round(px || 0); applyFrameOffset(); }
+
   function resize() {
     const box = canvas.parentElement.getBoundingClientRect();
     width = Math.max(1, box.width); height = Math.max(1, box.height);
@@ -1478,6 +1486,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     bloom.threshold = mobile ? 0.36 : 0.26;
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
+    applyFrameOffset();
   }
   new ResizeObserver(resize).observe(canvas.parentElement);
   resize();
@@ -1488,6 +1497,56 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   focus([]);
 
   const clock = new THREE.Clock();
+
+  const drive = new Map();
+  function setDrive(id, v) {
+    if (!v) drive.delete(id);
+    else drive.set(id, Math.max(-1, Math.min(1, v)));
+  }
+  function clearDrive() { drive.clear(); }
+
+  const MAX_PULSES = 32;
+  const pulseMat = makeMaterial(14);
+  pulseMat.uniforms.uBase.value = 1.6;
+  const pulseGeo = makeGeometry(
+    new Float32Array(MAX_PULSES * 3),
+    new Float32Array(MAX_PULSES).fill(0),
+    new Float32Array(MAX_PULSES * 3),
+    new Float32Array(MAX_PULSES * 3),
+  );
+  pulseGeo.getAttribute('position').setUsage(THREE.DynamicDrawUsage);
+  const pulseObj = new THREE.Points(pulseGeo, pulseMat);
+  pulseObj.frustumCulled = false;
+  scene.add(pulseObj);
+  let pulses = [];
+
+  function firePulse(from, to, { color, dur = 0.7, size = 2.6 } = {}) {
+    const s = visibleSide();
+    const a = sideCenterOf(from, s), b = sideCenterOf(to, s);
+    if (!a || !b) return;
+    const c = new THREE.Color(color || recs.get(from)?.color || '#ffffff');
+    pulses.push({ curve: buildArc(a, b, 1, s), t0: clock.elapsedTime, dur, c, size });
+    if (pulses.length > MAX_PULSES) pulses.shift();
+  }
+
+  function updatePulses(time) {
+    const pos = pulseGeo.getAttribute('position');
+    const col = pulseGeo.getAttribute('aColor');
+    const siz = pulseGeo.getAttribute('aSize');
+    pulses = pulses.filter((p) => time - p.t0 < p.dur);
+    for (let i = 0; i < MAX_PULSES; i++) {
+      const p = pulses[i];
+      if (!p) { siz.setX(i, 0); continue; }
+      const u = (time - p.t0) / p.dur;
+      const pt = p.curve.getPoint(u);
+      pos.setXYZ(i, pt.x, pt.y, pt.z);
+      const fade = Math.sin(Math.PI * u);
+      col.setXYZ(i, p.c.r * fade, p.c.g * fade, p.c.b * fade);
+      siz.setX(i, p.size);
+    }
+    pos.needsUpdate = col.needsUpdate = siz.needsUpdate = true;
+  }
+
   function approach(u, target, k) { u.value += (target - u.value) * k; }
   function frame() {
     const dt = Math.min(clock.getDelta(), 0.05);
@@ -1532,10 +1591,13 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     approach(cortexMat.uniforms.uMix, 1, 1 - Math.exp(-dt * 4));
     approach(cortexMat.uniforms.uActivity, cortexRec.activity, k);
     for (const r of [...deepRecs, ...anchorRecs]) {
-      approach(r.mat.uniforms.uBase, r.base, k);
       const beat = isLensActive && lensSources.includes(r.id) ? 0.3 * Math.sin(time * 2.4) : 0;
-      approach(r.mat.uniforms.uHi, r.hi + beat, k);
-      approach(r.mat.uniforms.uActivity, r.activity, k);
+      const d = drive.get(r.id) || 0;
+      const fast = d !== 0 ? 1 - Math.exp(-dt * 18) : k;
+      const dim = d < 0 ? 1 + d * 0.85 : 1;
+      approach(r.mat.uniforms.uBase, r.base * dim, fast);
+      approach(r.mat.uniforms.uHi, (r.hi + beat) * dim + Math.max(d, 0) * 0.9, fast);
+      approach(r.mat.uniforms.uActivity, r.activity + Math.max(d, 0), k);
       approach(r.mat.uniforms.uMix, 1, 1 - Math.exp(-dt * 4));
       approach(r.mat.uniforms.uHover, hoverId === r.id && !focusIds.includes(r.id) ? 0.35 : 0, 1 - Math.exp(-dt * 10));
       if (r.kind === 'anchor' && r.hi === 0 && r.mat.uniforms.uHi.value < 0.01) r.obj.visible = false;
@@ -1545,6 +1607,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     if (bodyCurrent < 0.005 && bodyTarget === 0) bodyObj.visible = false;
     approach(arcDotMat.uniforms.uHi, 1, k);
     updateArcDots(time);
+    updatePulses(time);
     updateTreePulses(time);
     updateLabels(width, height);
     composer.render();
@@ -1561,9 +1624,15 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     showCell,
     setCellFire,
     setBody,
+    setDrive,
+    clearDrive,
+    firePulse,
+    setFrameOffset,
     has: (id) => recs.has(id),
     reset() {
       if (isLensActive) restoreLens();
+      clearDrive();
+      setFrameOffset(0);
       setBody(false);
       lastArcList = [];
       focus([]); setArcs([]); flyTo([]); forcedSlice = false; applySlice();

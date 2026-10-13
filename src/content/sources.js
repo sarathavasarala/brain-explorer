@@ -51,4 +51,25 @@ export default {
     url: 'https://global.oup.com/academic/product/neuroscience-9781605353807',
     kind: 'textbook',
   },
+  'cohen2012-vta': {
+    title: 'Neuron-type-specific signals for reward and punishment in the ventral tegmental area',
+    authors: 'Cohen JY, Haesler S, Vachez L, Uchida N',
+    year: 2012,
+    url: 'https://doi.org/10.1038/nature10754',
+    kind: 'primary',
+  },
+  'eshel2015-rpe-circuit': {
+    title: 'Arithmetic and local circuitry underlying dopamine prediction errors',
+    authors: 'Eshel N, Bukwich M, Rao VD, Hemmelder V, Tian J, Uchida N',
+    year: 2015,
+    url: 'https://doi.org/10.1038/nature14855',
+    kind: 'primary',
+  },
+  'matsumoto2007-habenula': {
+    title: 'Lateral habenula as a source of negative reward signals in dopamine neurons',
+    authors: 'Matsumoto M, Hikosaka O',
+    year: 2007,
+    url: 'https://doi.org/10.1038/nature05860',
+    kind: 'primary',
+  },
 };

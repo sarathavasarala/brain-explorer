@@ -134,5 +134,11 @@ export default {
   LTP: 'A persistent strengthening of synapses based on recent patterns of activity, serving as a primary cellular foundation for learning and memory formation.\n\nAbbreviation for long-term potentiation.',
   'infralimbic cortex': 'A rodent medial prefrontal region whose excitatory projections recruit intercalated cells in the amygdala to support fear extinction. Functional equivalents in humans include ventromedial prefrontal areas.\n\nFrom Latin infra (below or beneath) and limbus (border or hem).',
   mPFC: 'The medial aspect of the prefrontal cortex involved in executive control, emotional regulation, and safety memory retrieval.\n\nAbbreviation for medial prefrontal cortex.',
+  gaba: 'The brain\'s main calming (inhibitory) messenger.\n\nShort for gamma-aminobutyric acid, synthesized from glutamate by glutamate decarboxylase.',
+  'synaptic plasticity': 'Connections between neurons getting stronger or weaker with use.\n\nFrom Greek synapsis (junction) and plastikos (capable of being shaped or molded).',
+  'eligibility trace': 'A short-lived chemical mark left at a recently active synapse that makes it able to change if a learning signal arrives soon.\n\nA foundational concept in reinforcement learning and synaptic tagging.',
+  'ampa receptor': 'A glutamate receptor that opens quickly and lets positive ions in, nudging the cell toward firing.\n\nShort for alpha-amino-3-hydroxy-5-methyl-4-isoxazolepropionic acid, an ionotropic glutamate receptor.',
+  'nmda receptor': 'A glutamate receptor that only passes current when glutamate is bound and the cell is already depolarized, because a magnesium ion blocks it at rest. When open it lets calcium in.\n\nShort for N-methyl-D-aspartate, an ionotropic receptor essential for synaptic plasticity.',
+  depolarized: 'When the inside of a neuron becomes less negative, moving it closer to firing.\n\nFrom Latin de- (removal) and polarization, referring to the reduction of membrane voltage toward zero.',
 };
 

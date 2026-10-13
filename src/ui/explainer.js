@@ -5,6 +5,7 @@ import { fmt, paragraphs, esc } from './format.js';
 import { renderCircuit, renderSynapse, LINK_COLORS } from './diagrams.js';
 import { icon } from './icons.js';
 import { renderEvidence } from './evidence.js';
+import { renderCheck } from './check.js';
 
 const groupOf = (s) => groups.find((g) => g.id === s.group);
 const childrenOf = (id) => structures.filter((s) => s.parent === id);
@@ -256,6 +257,7 @@ export function renderPathwayMobile(p, step, playing) {
       <h2 class="mobile-story-title">${esc(st.title)}</h2>
       <div class="mobile-story-body">
         ${st.text ? paragraphs(st.text) : ''}
+        ${renderCheck(st.check, step, p.id, last)}
       </div>
       <div class="chips">
         ${(st.focus || []).map((id) => byId.has(id)
@@ -313,6 +315,7 @@ export function renderPathway(p, step, playing, { isMobile = false } = {}) {
           </button>
           ${i === step ? `<div class="step-body">
             ${s.text ? paragraphs(s.text) : todo(`src/content/pathways/index.js → ${p.id}.steps[${i}].text`)}
+            ${renderCheck(s.check, i, p.id, i === p.steps.length - 1)}
             <div class="chips">${(s.focus || []).map((id) => byId.has(id) ? `<a class="chip" href="#/s/${id}" style="--c:${colorOf(id)}"><i></i>${esc(nameOf(id))}</a>` : `<span class="chip" style="--c:${colorOf(id)}"><i></i>${esc(nameOf(id))}</span>`).join('')}</div>
             ${renderEvidence(p, i)}
           </div>` : ''}

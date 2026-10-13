@@ -111,6 +111,71 @@ export function checkScript(script, { prefix = 'script' } = {}) {
     if (st.chemical && !chemById.has(st.chemical)) {
       problems.push(`${w}: unknown chemical "${st.chemical}"`);
     }
+
+    if (st.layout && !['brain', 'dock', 'focus'].includes(st.layout)) {
+      problems.push(`${w}: unknown layout "${st.layout}"`);
+    }
+
+    if (st.world && !['rpe'].includes(st.world)) {
+      problems.push(`${w}: unknown world "${st.world}"`);
+    }
+
+    if (st.surface) {
+      if (typeof st.surface !== 'object') {
+        problems.push(`${w}: surface must be an object`);
+      } else {
+        if (!['activity', 'quantity', 'wiring', 'machinery', 'model'].includes(st.surface.type)) {
+          problems.push(`${w}: unknown surface type "${st.surface.type}"`);
+        }
+        if (typeof st.surface.title === 'string' && st.surface.title.includes('\u2014')) {
+          problems.push(`${w}: surface title contains em dash`);
+        }
+      }
+    }
+
+    if (st.check) {
+      if (typeof st.check !== 'object') {
+        problems.push(`${w}: check must be an object`);
+      } else {
+        if (!st.check.ask || typeof st.check.ask !== 'string') {
+          problems.push(`${w}: check.ask must be a string`);
+        } else if (st.check.ask.includes('\u2014')) {
+          problems.push(`${w}: check.ask contains em dash`);
+        }
+
+        if (!Array.isArray(st.check.choices) || st.check.choices.length < 2 || st.check.choices.length > 4) {
+          problems.push(`${w}: check.choices must be an array of 2 to 4 strings`);
+        } else {
+          for (let cIdx = 0; cIdx < st.check.choices.length; cIdx++) {
+            const ch = st.check.choices[cIdx];
+            if (typeof ch !== 'string') {
+              problems.push(`${w}: check.choices[${cIdx}] must be a string`);
+            } else if (ch.includes('\u2014')) {
+              problems.push(`${w}: check.choices[${cIdx}] contains em dash`);
+            }
+          }
+        }
+
+        if (typeof st.check.answer !== 'number' || st.check.answer < 0 || (Array.isArray(st.check.choices) && st.check.answer >= st.check.choices.length)) {
+          problems.push(`${w}: check.answer must be a valid choice index`);
+        }
+
+        if (st.check.feedback) {
+          const feedbackList = Array.isArray(st.check.feedback)
+            ? st.check.feedback
+            : Object.values(st.check.feedback);
+          if (Array.isArray(st.check.choices) && feedbackList.length !== st.check.choices.length) {
+            problems.push(`${w}: check.feedback length does not match choices`);
+          }
+          for (let fIdx = 0; fIdx < feedbackList.length; fIdx++) {
+            const fb = feedbackList[fIdx];
+            if (typeof fb === 'string' && fb.includes('\u2014')) {
+              problems.push(`${w}: check.feedback[${fIdx}] contains em dash`);
+            }
+          }
+        }
+      }
+    }
   });
 
   return problems;
