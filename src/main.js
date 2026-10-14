@@ -516,6 +516,10 @@ function apply() {
     }
   } else if (r.type === 'p') {
     const p = pathways.find((q) => q.id === r.id);
+    if (p?.category === 'labs' && window.innerWidth <= 900) {
+      location.hash = '#/pathways';
+      return;
+    }
     playStep(scene, playerDeps, p, r.step);
     runner.run(p.steps[r.step], { key: `${p.id}:${r.step}` });
     explainerEl.innerHTML = renderPathway(p, r.step, state.playing, { isMobile: window.innerWidth <= 860 });

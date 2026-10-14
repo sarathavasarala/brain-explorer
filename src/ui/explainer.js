@@ -294,9 +294,9 @@ export function renderPathway(p, step, playing, { isMobile = false } = {}) {
   const st = p.steps[step];
   const accent = colorOf(st.focus?.[0]);
   const last = step === p.steps.length - 1;
-  const up = last ? nextPathway(p) : null;
+  const isLab = p.category === 'labs';
   return `<article class="ex ex-path" style="--accent:${accent}">
-    <nav class="crumbs"><a class="back" href="#/pathways">${icon('prev', 15)}All pathways</a><span class="sep">/</span><span>${p.steps.length} steps</span></nav>
+    <nav class="crumbs"><a class="back" href="#/pathways">${icon('prev', 15)}${isLab ? 'All labs' : 'All pathways'}</a><span class="sep">/</span><span>${isLab ? 'Lab · ' : ''}${p.steps.length} steps</span></nav>
     <h1 class="ex-title">${esc(p.name)}</h1>
     <p class="tagline">${fmt(p.tagline || '')}</p>
     ${p.summary ? paragraphs(p.summary) : todo(`src/content/pathways/index.js → ${p.id}.summary`)}

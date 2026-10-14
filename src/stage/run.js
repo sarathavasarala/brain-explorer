@@ -58,7 +58,7 @@ export function createRunner({ scene, stageEl, dockEl }) {
       if (layout === 'focus') stageEl.classList.add('is-focus');
     }
 
-    if (layout === 'brain' || !step.surface) {
+    if (layout === 'brain' || !step.surface || (typeof window !== 'undefined' && window.innerWidth <= 900)) {
       dock.hide();
       isDockVisible = false;
       if (scene) {

@@ -26,18 +26,18 @@ export function renderLibraryBody(query = '') {
   const html = pathwayGroups.map((g) => {
     const list = pathways.filter((p) => p.category === g.id && match(p));
     if (!list.length) return '';
-    return `<section class="lib-section">
+    return `<section class="lib-section${g.id === 'labs' ? ' is-labs' : ''}">
       <div>
         <h2 class="lib-section-h">${esc(g.label)}</h2>
         <p class="lib-section-blurb">${esc(g.blurb)}</p>
       </div>
       <ul class="lib-list">${list.map((p) => `
         <li>
-          <a class="lib-item" href="#/p/${p.id}" style="--c:${firstColor(p)}">
+          <a class="lib-item${p.category === 'labs' ? ' is-lab' : ''}" href="#/p/${p.id}" style="--c:${firstColor(p)}">
             ${routeStrip(p)}
             <span class="lib-name">${esc(p.name)}</span>
             <span class="lib-tag">${fmt(p.tagline || '')}</span>
-            <span class="lib-meta">${p.steps.length} steps</span>
+            <span class="lib-meta">${p.category === 'labs' ? 'Lab · ' : ''}${p.steps.length} steps</span>
           </a>
         </li>`).join('')}
       </ul>

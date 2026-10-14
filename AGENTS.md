@@ -549,9 +549,20 @@ This updates `src/content/catalog.json`, which is consumed by `server.py` to bui
 
 ---
 
-## 9. Surfaces Platform
+## 9. Interactive Labs & Surfaces Platform
 
-The surfaces platform extends Brain Explorer to show how mechanisms work in real time across scales. A shared stage clock and deterministic world simulation drive both 3D anatomy and docked interactive surface panels in lockstep.
+The surfaces platform extends Brain Explorer to show how dynamic neural mechanisms operate in real time across biological scales. A shared stage clock and deterministic world simulation drive both 3D anatomy and docked interactive surface panels in lockstep.
+
+### What Counts as a Lab vs a Pathway
+- **Pathways**: Guided storytelling journeys through 3D anatomy. The user reads paragraphs, follows camera flights, and observes neural routes between structures.
+- **Labs**: Interactive, computational sandboxes that model a dynamic neuroscience phenomenon across scales.
+
+### The 5 Lab Principles
+1. **Active Manipulation over Passive Reading**: Every lab must include at least one live parameter the user can manipulate (sliders, toggles, draggable timing handles, trial generators) to test a hypothesis.
+2. **Multi-Scale Depth**: A lab spans multiple levels of organization: starting from whole-brain circuits, zooming into millisecond electrophysiology (`activity`), descending into microcircuits (`wiring`), and drilling down to receptor kinetics (`machinery`).
+3. **Relatable Everyday Framing**: Never introduce a lab through sterile animal psychophysics or isolated laboratory rigs. Ground the question in a visceral human sensation (e.g. a phone vibration, the aroma of morning coffee, the release of a free throw).
+4. **Falsifiable Check-In**: Include an inline prediction challenge (`check`) on a pivotal step. The user must commit to a prediction before seeing the simulated outcome.
+5. **Desktop Exclusivity**: Labs require visual breathing room to present multi-row rasters, parameter controls, 3D anatomy, and explanatory reading in parallel. On mobile screens (`max-width: 900px`), Labs are cleanly hidden from the library and navigation.
 
 ### Shared Architecture
 1. **Clock (`src/stage/clock.js`)**: Single clock managing time `t`, playback, rates, and window bounds `[t0, t1]`.
@@ -574,32 +585,36 @@ export default {
   },
 };
 ```
+*Note on vector scaling*: Always use fixed logical coordinate spaces (e.g. `viewBox="0 0 800 220"`) and `preserveAspectRatio="xMidYMid meet"` so that SVGs scale smoothly without clipping or resizing artifacts during CSS transitions.
 
 ### Layouts
 - `'brain'`: Default view, 3D point cloud only, dock hidden.
 - `'dock'`: Brain stays live and shifts up (`setFrameOffset`); surface panel docked at bottom.
 - `'focus'`: Surface is primary focus; 3D brain dims as background (`.stage.is-focus`).
 
-### Extended Step Schema
-Guided tour pathway steps can include:
-```js
-{
-  layout: 'dock', // 'brain' | 'dock' | 'focus'
-  world: 'rpe',   // registered world key
-  surface: {
-    type: 'activity', // surface type
-    title: 'Recording title',
-    props: { ... },
-  },
-  operators: { play: true, trials: 30, perturb: [...] },
-  check: {
-    ask: 'Question prompt',
-    choices: ['Choice 1', 'Choice 2', 'Choice 3'],
-    answer: 0,
-    feedback: ['Feedback 1', 'Feedback 2', 'Feedback 3'],
-  },
-}
-```
+### Step-by-Step: How to Create a New Lab Entry
+1. **Define the World (`src/worlds/<lab-name>.js`)**:
+   - Write pure, deterministic simulation functions for firing rates, trial signals, or mathematical updates.
+   - Keep the world free of DOM or Three.js references so it is testable in isolation.
+   - Register the world in `src/worlds/index.js`.
+2. **Assemble the Surfaces (`src/surfaces/`)**:
+   - Reuse existing surfaces (`activity`, `quantity`, `wiring`, `machinery`, `model`) or add a new module.
+   - Use fixed logical coordinate boxes (`viewBox="0 0 800 220"` for dock mode, `viewBox="0 0 800 320"` for focus mode).
+3. **Script the 10-Step Narrative (`src/content/pathways/index.js`)**:
+   - Set `category: 'labs'`.
+   - Progress the story through a coherent arc:
+     - Steps 1-2: Establish the everyday sensory cue and unconditioned state (`layout: 'brain'` -> `'dock'`).
+     - Steps 3-5: Conditioned transfer, learning dynamics, and credit assignment (`layout: 'dock'`).
+     - Steps 6-8: Synaptic convergence, coincidence detection, and molecular gating (`layout: 'focus'` -> `'dock'`).
+     - Steps 9-10: Inhibitory cancellation and model synthesis (`layout: 'focus'` -> `'dock'`).
+4. **Embed a Check-In Question**:
+   - On a critical prediction step (e.g. step 3 or 4), add a `check` object with a question, 3 options, the correct index, and tailored feedback for each choice.
+5. **Document Primary Evidence**:
+   - Add verified primary literature citations to `src/content/sources.js`.
+   - Add a claim audit entry and route notes to `src/content/pathways/evidence.js`.
+6. **Rebuild & Validate**:
+   - Run `npm run catalog` to sync `catalog.json`.
+   - Run `npm run validate` to ensure zero broken references. Verify with `git diff | grep '\u2014'` that no em dashes exist.
 
 ---
 

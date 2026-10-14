@@ -229,7 +229,7 @@ export default [
   },
   {
     id: 'learning-from-surprise',
-    category: 'chemistry',
+    category: 'labs',
     name: 'Learning from surprise',
     tagline: 'How your phone hacked your dopamine system, one buzz and one message at a time.',
     summary: 'Your pocket buzzes, and a second later you read an exciting message. Repeat that a few dozen times and the buzz itself gives you a jolt before you even unlock your screen. This tour follows that learning from the whole brain down to a single synapse, using live spike recordings, a circuit, and a close-up of the receptors involved. It is a simplified model of a well-studied pattern, and we point out where the simplification stops working.',
