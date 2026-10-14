@@ -43,7 +43,9 @@ const vertexShader = /* glsl */ `
   attribute float aRand;
   attribute float aHi;
   attribute float aHiPrev;
+  attribute float aHover;
   attribute vec3 aColor;
+  attribute vec3 aHoverColor;
   attribute vec3 aHiColor;
   attribute vec3 aHiColorPrev;
   uniform float uTime, uPixel, uScale, uBase, uHi, uMix, uHiSize, uClip, uActivity, uHover, uGlobal;
@@ -57,18 +59,20 @@ const vertexShader = /* glsl */ `
     float hi = (hNew + hOld) * uHi;
     vec3 col = mix(aColor, aHiColorPrev, clamp(hOld * uHi, 0.0, 1.0));
     col = mix(col, aHiColor, clamp(hNew * uHi, 0.0, 1.0));
+    float hov = max(uHover, aHover);
+    col = mix(col, aHoverColor, clamp(aHover * 0.75, 0.0, 1.0));
     float twinkle = 0.78 + 0.22 * sin(uTime * 1.6 + aRand * 43.0);
     float wave = 0.0;
     if (uActivity > 0.001) {
       float w = sin(dot(position, vec3(10.0, 14.0, 8.0)) - uTime * 3.2 + aRand * 0.9);
       wave = pow(max(w, 0.0), 10.0) * uActivity * clamp(hi, 0.0, 1.0);
     }
-    float b = (uBase + hi + uHover) * twinkle + wave * 1.6;
+    float b = (uBase + hi + hov) * twinkle + wave * 1.6;
     vColor = col;
     vAlpha = b * mix(0.5, 1.0, aSize) * uGlobal;
     if (uClip > 0.5 && world.x > 0.004) vAlpha = 0.0;
     vAlpha *= smoothstep(0.35, 1.1, -mv.z);
-    gl_PointSize = min(uScale * aSize * (1.0 + clamp(hi, 0.0, 1.0) * uHiSize + wave * 0.8) * uPixel / -mv.z, 26.0 * uPixel);
+    gl_PointSize = min(uScale * aSize * (1.0 + clamp(hi, 0.0, 1.0) * uHiSize + wave * 0.8 + hov * 0.35) * uPixel / -mv.z, 26.0 * uPixel);
     gl_Position = projectionMatrix * mv;
   }
 `;
@@ -232,7 +236,7 @@ const arcLineFragmentShader = /* glsl */ `
 const easeOutExpo = (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
 
 export function createBrainScene(canvas, { structures, anchors = [], chemicals = [], labelsEl, onHover, onPick }) {
-  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 860;
+  const isMobile = typeof window !== 'undefined' && window.innerWidth <= 900;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
   const pixel = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
   renderer.setPixelRatio(pixel);
@@ -287,6 +291,8 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     g.setAttribute('aSize', new THREE.BufferAttribute(sizes, 1));
     g.setAttribute('aRand', new THREE.BufferAttribute(rand, 1));
     g.setAttribute('aColor', new THREE.BufferAttribute(baseColors, 3));
+    g.setAttribute('aHoverColor', new THREE.BufferAttribute(baseColors.slice(), 3));
+    g.setAttribute('aHover', new THREE.BufferAttribute(new Float32Array(n), 1));
     g.setAttribute('aHiColor', new THREE.BufferAttribute(hiColors, 3));
     g.setAttribute('aHiColorPrev', new THREE.BufferAttribute(hiColors.slice(), 3));
     g.setAttribute('aHi', new THREE.BufferAttribute(new Float32Array(n).fill(1), 1));
@@ -469,7 +475,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   // With the slice on, the camera looks at the cut face of the right half (x < 0),
   // which is the classic textbook sagittal view of these pathways. Without it, the left half (x > 0).
   function visibleSide() {
-    return userSlice || forcedSlice ? -1 : 1;
+    return sliced ? -1 : 1;
   }
 
   function centroidOf(arr, idxs, s, fallback) {
@@ -639,6 +645,64 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   let focusIds = [];
   let hoverId = null;
 
+  const aHoverAttr = cortexGeo.getAttribute('aHover');
+  const aHoverColorAttr = cortexGeo.getAttribute('aHoverColor');
+  let currentCortexHoverId = null;
+
+  function paintCortexHover(id) {
+    const r = id ? recs.get(id) : null;
+    const nextId = (r && r.kind === 'region' && !focusIds.includes(id)) ? id : null;
+    if (nextId === currentCortexHoverId) return;
+    currentCortexHoverId = nextId;
+    aHoverAttr.array.fill(0);
+    if (nextId) {
+      const rec = recs.get(nextId);
+      for (let i = 0; i < nC; i++) {
+        if (rec.mask[i]) {
+          aHoverAttr.array[i] = 0.38;
+          aHoverColorAttr.array[i * 3] = rec.color.r;
+          aHoverColorAttr.array[i * 3 + 1] = rec.color.g;
+          aHoverColorAttr.array[i * 3 + 2] = rec.color.b;
+        }
+      }
+      aHoverColorAttr.needsUpdate = true;
+    }
+    aHoverAttr.needsUpdate = true;
+  }
+
+  let structureLabels = [];
+  function syncStructureLabels(ids = []) {
+    for (const item of structureLabels) {
+      item.el.remove();
+    }
+    structureLabels = [];
+
+    const uniqueIds = [];
+    for (const id of ids) {
+      if (id && !uniqueIds.includes(id)) {
+        const rec = recs.get(id);
+        if (rec && (rec.kind === 'region' || rec.kind === 'deep')) {
+          uniqueIds.push(id);
+        }
+      }
+    }
+
+    if (uniqueIds.length < 2) return;
+    const targetIds = uniqueIds.slice(0, 6);
+
+    for (const id of targetIds) {
+      const rec = recs.get(id);
+      const el = document.createElement('a');
+      el.className = 'anchor-label structure-label';
+      el.href = `#/s/${rec.id}`;
+      el.style.setProperty('--c', rec.structure.color || '#fff');
+      el.style.opacity = '0';
+      el.innerHTML = `<i></i><span>${rec.structure.name}</span>`;
+      labelsEl?.appendChild(el);
+      structureLabels.push({ id: rec.id, el });
+    }
+  }
+
   function focus(ids = [], { context = [], activity = false, ambient = true } = {}) {
     if (isLensActive) restoreLens();
     focusIds = ids.filter((id) => recs.has(id));
@@ -690,6 +754,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       r.activity = f && activity ? 1 : (c && activity && ambient ? 0.35 : 0);
       r.obj.visible = r.hi > 0;
     }
+    syncStructureLabels([...focusIds, ...ctx]);
   }
 
   // Ask sketches: light each part by how it is involved.
@@ -758,6 +823,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       r.activity = look ? look.activity : (c ? 0.2 : 0);
       r.obj.visible = r.hi > 0;
     }
+    syncStructureLabels([...focusIds, ...ctx]);
   }
 
   // ------------------------------------------------------------ chemical lens in 3D
@@ -981,6 +1047,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     isLensActive = false;
     lensSources = [];
     clearTrees();
+    syncStructureLabels([]);
 
     for (const r of deepRecs) {
       if (r.hiOrig) {
@@ -1231,6 +1298,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     }
 
     if (isLensActive) restoreLens();
+    syncStructureLabels([]);
     setHover(null, 0, 0);
     const same = activeCellObj && activeCellEntry?.id === cellEntry.id;
     const at = !same && from && zoomPointOf(from);
@@ -1319,9 +1387,9 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   }
 
   // ------------------------------------------------------------ slicing
-  let userSlice = false, forcedSlice = false;
+  let sliced = false;
   function applySlice() {
-    const v = userSlice || forcedSlice ? 1 : 0;
+    const v = sliced ? 1 : 0;
     materials.forEach((m) => { if (m.uniforms?.uClip) m.uniforms.uClip.value = v; });
     const s = visibleSide();
     for (const r of anchorRecs) {
@@ -1337,7 +1405,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
 
   // ------------------------------------------------------------ picking
   const raycaster = new THREE.Raycaster();
-  raycaster.params.Points.threshold = (typeof window !== 'undefined' && window.innerWidth <= 860) ? 0.026 : 0.014;
+  raycaster.params.Points.threshold = (typeof window !== 'undefined' && window.innerWidth <= 900) ? 0.026 : 0.014;
   const mouse = new THREE.Vector2();
   let pendingPick = null;
   let lastHover = null;
@@ -1347,7 +1415,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     const rect = canvas.getBoundingClientRect();
     mouse.set(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
     raycaster.setFromCamera(mouse, camera);
-    const clip = userSlice || forcedSlice;
+    const clip = sliced;
     const targets = [cortexPoints, ...deepRecs.map((r) => r.obj), ...anchorRecs.filter((r) => r.obj.visible && r.hi > 0).map((r) => r.obj)];
     const hits = raycaster.intersectObjects(targets, false);
     let best = null, ghost = null;
@@ -1390,6 +1458,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     if (id !== lastHover) {
       lastHover = id;
       hoverId = id;
+      paintCortexHover(id);
       canvas.style.cursor = id ? 'pointer' : '';
     }
     onHover?.(id, x, y);
@@ -1442,6 +1511,17 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       el.style.opacity = showLabel ? String(Math.min(1, Math.max(r.hi, r.base || 0.7))) : '0';
     }
     // Tract labels sit just above their targets; cell labels sit on their landmark.
+    const s = visibleSide();
+    const structureLabelsWithPos = [];
+    for (const item of structureLabels) {
+      const pos = sideCenterOf(item.id, s);
+      if (pos) {
+        structureLabelsWithPos.push({ el: item.el, pos });
+      } else {
+        item.el.style.opacity = '0';
+      }
+    }
+    spreadLabels(structureLabelsWithPos, w, h, -14, !activeCellObj && !isLensActive);
     spreadLabels(tractLabels, w, h, -18, !activeCellObj);
     spreadLabels(cellLandmarkLabels, w, h, 0, !!activeCellObj && !zoom);
   }
@@ -1480,7 +1560,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     renderer.setSize(width, height, false);
     composer.setSize(width, height);
     bloom.setSize(width * pixel, height * pixel);
-    const mobile = window.innerWidth <= 860;
+    const mobile = window.innerWidth <= 900;
     bloom.strength = mobile ? 0.38 : 0.72;
     bloom.radius = mobile ? 0.14 : 0.20;
     bloom.threshold = mobile ? 0.36 : 0.26;
@@ -1635,12 +1715,16 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       setFrameOffset(0);
       setBody(false);
       lastArcList = [];
-      focus([]); setArcs([]); flyTo([]); forcedSlice = false; applySlice();
+      focus([]); setArcs([]); flyTo([]); sliced = false; applySlice();
     },
-    setSlice(on) { userSlice = on; applySlice(); },
-    forceSlice(on) { forcedSlice = on; applySlice(); },
-    get slice() { return userSlice; },
+    setSlice(on) { sliced = Boolean(on); applySlice(); },
+    forceSlice(on) { sliced = Boolean(on); applySlice(); },
+    get slice() { return sliced; },
     setSpin(on) { controls.autoRotate = on; },
     get spin() { return controls.autoRotate; },
+    previewHover(id) {
+      hoverId = id && recs.has(id) ? id : null;
+      paintCortexHover(hoverId);
+    },
   };
 }

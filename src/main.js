@@ -522,7 +522,7 @@ function apply() {
     }
     playStep(scene, playerDeps, p, r.step);
     runner.run(p.steps[r.step], { key: `${p.id}:${r.step}` });
-    const isMobile = window.innerWidth <= 860;
+    const isMobile = window.innerWidth <= 900;
     explainerEl.innerHTML = renderPathway(p, r.step, state.playing, { isMobile });
     if (prev.type !== 'p' || prev.id !== r.id) {
       if (r.step > 0 && !isMobile) {
@@ -543,6 +543,7 @@ function apply() {
     applyAsk(r);
   }
   if (['home', 's', 'chemhome', 'chem', 'cellhome', 'cell'].includes(r.type)) drawSidebar();
+  syncToolbar();
 
   let viewTitle = 'Brain Explorer';
   if (r.type === 'home') viewTitle = 'Whole Brain Atlas';
@@ -855,6 +856,8 @@ explainerEl.addEventListener('click', (e) => {
   if (act === 'prev') stepTo(state.route.step - 1);
   if (act === 'next') stepTo(state.route.step + 1);
   if (act === 'play') togglePlay();
+  const trackStep = e.target.closest('.pl-track [data-step]');
+  if (trackStep) { stopPlay(); stepTo(Number(trackStep.dataset.step)); }
   const head = e.target.closest('.step-head');
   if (head) { stopPlay(); stepTo(Number(head.dataset.step)); }
   const stageBtn = e.target.closest('[data-stage]');
@@ -942,6 +945,38 @@ document.addEventListener('focusout', (e) => {
 });
 window.addEventListener('scroll', () => tipEl.classList.remove('is-on'), { passive: true });
 explainerEl.addEventListener('scroll', () => tipEl.classList.remove('is-on'), { passive: true });
+
+// Hover previews in 3D stage from sidebar items, chips, and cross-links
+function getStructureHoverId(target) {
+  if (!target || typeof target.closest !== 'function') return null;
+  const el = target.closest('.item[data-id], .chip[href^="#/s/"], .xref[href^="#/s/"]');
+  if (!el) return null;
+  const href = el.getAttribute('href') || '';
+  const match = href.match(/^#\/s\/([^/?#]+)/);
+  if (match && scene.has(match[1])) return match[1];
+  if (el.dataset.id && scene.has(el.dataset.id)) return el.dataset.id;
+  return null;
+}
+
+function bindHoverPreview(container) {
+  container.addEventListener('mouseover', (e) => {
+    const id = getStructureHoverId(e.target);
+    const prevId = getStructureHoverId(e.relatedTarget);
+    if (id && id !== prevId) {
+      scene.previewHover(id);
+    }
+  });
+  container.addEventListener('mouseout', (e) => {
+    const id = getStructureHoverId(e.target);
+    const nextId = getStructureHoverId(e.relatedTarget);
+    if (id && id !== nextId) {
+      scene.previewHover(nextId || null);
+    }
+  });
+  container.addEventListener('pointerleave', () => scene.previewHover(null));
+}
+bindHoverPreview(listEl);
+bindHoverPreview(explainerEl);
 
 // Toolbar
 const toolbar = $('#toolbar');
@@ -1226,14 +1261,14 @@ let touchStartX = 0;
 let touchStartY = 0;
 
 explainerEl.addEventListener('touchstart', (e) => {
-  if (state.route.type !== 'p' || window.innerWidth > 860) return;
+  if (state.route.type !== 'p' || window.innerWidth > 900) return;
   const touch = e.touches[0];
   touchStartX = touch.clientX;
   touchStartY = touch.clientY;
 }, { passive: true });
 
 explainerEl.addEventListener('touchend', (e) => {
-  if (state.route.type !== 'p' || window.innerWidth > 860) return;
+  if (state.route.type !== 'p' || window.innerWidth > 900) return;
   const touch = e.changedTouches[0];
   const diffX = touch.clientX - touchStartX;
   const diffY = touch.clientY - touchStartY;
@@ -1246,9 +1281,9 @@ explainerEl.addEventListener('touchend', (e) => {
   }
 }, { passive: true });
 
-let prevWasMobile = window.innerWidth <= 860;
+let prevWasMobile = window.innerWidth <= 900;
 window.addEventListener('resize', () => {
-  const nowMobile = window.innerWidth <= 860;
+  const nowMobile = window.innerWidth <= 900;
   if (nowMobile !== prevWasMobile) {
     prevWasMobile = nowMobile;
     if (state.route.type === 'p') {

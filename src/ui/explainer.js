@@ -305,7 +305,7 @@ export function renderPathway(p, step, playing, { isMobile = false } = {}) {
       <button class="pl-btn" data-act="prev" ${step === 0 ? 'disabled' : ''} aria-label="Previous step">${icon('prev', 18)}</button>
       <button class="pl-btn pl-play" data-act="play" aria-label="${playing ? 'Pause' : 'Play'}">${icon(playing ? 'pause' : 'play', 18)}<span>${playing ? 'Pause' : 'Play'}</span></button>
       <button class="pl-btn" data-act="next" ${step === p.steps.length - 1 ? 'disabled' : ''} aria-label="Next step">${icon('next', 18)}</button>
-      <div class="pl-track">${p.steps.map((_, i) => `<span class="${i < step ? 'done' : i === step ? 'on' : ''}"></span>`).join('')}</div>
+      <div class="pl-track">${p.steps.map((s, i) => `<span class="${i < step ? 'done' : i === step ? 'on' : ''}" data-step="${i}" title="Step ${i + 1}: ${esc(s.title)}" aria-label="Step ${i + 1}: ${esc(s.title)}"></span>`).join('')}</div>
     </div>
     <ol class="steps">
       ${p.steps.map((s, i) => `
@@ -319,14 +319,6 @@ export function renderPathway(p, step, playing, { isMobile = false } = {}) {
             ${renderCheck(s.check, i, p.id, i === p.steps.length - 1)}
             <div class="chips">${(s.focus || []).map((id) => byId.has(id) ? `<a class="chip" href="#/s/${id}" style="--c:${colorOf(id)}"><i></i>${esc(nameOf(id))}</a>` : `<span class="chip" style="--c:${colorOf(id)}"><i></i>${esc(nameOf(id))}</span>`).join('')}</div>
             ${renderEvidence(p, i)}
-            ${!s.check && i < p.steps.length - 1 ? `
-              <div class="step-nav">
-                <button type="button" class="step-nav-btn" data-act="next">
-                  <span>Next: ${esc(p.steps[i + 1].title)}</span>
-                  ${icon('next', 16)}
-                </button>
-              </div>
-            ` : ''}
           </div>` : ''}
         </li>`).join('')}
     </ol>
