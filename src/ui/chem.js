@@ -134,16 +134,16 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
                 ${partChips(t.to)}
               </div>
               <p class="tract-job">
-                ${esc(t.job)}
+                ${fmt(t.job)}
               </p>
               ${paragraphs(t.text)}
               ${t.whenItFails ? `
                 <div class="tract-note tract-note-fails">
-                  <strong>When it fails:</strong> ${esc(t.whenItFails)}
+                  <strong>When it fails:</strong> ${fmt(t.whenItFails)}
                 </div>` : ''}
               ${t.whenBlocked ? `
                 <div class="tract-note tract-note-blocked">
-                  <strong>When blocked:</strong> ${esc(t.whenBlocked)}
+                  <strong>When blocked:</strong> ${fmt(t.whenBlocked)}
                 </div>` : ''}
             </div>`;
           }).join('')}
@@ -232,7 +232,7 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
                     <span class="step-title">${esc(cleanLabel)} (${esc(cleanShort)})</span>
                   </button>
                   <div class="step-body" ${isCurrent ? '' : 'hidden'}>
-                    <p class="step-text">${esc(text)}</p>
+                    <p class="step-text">${fmt(text)}</p>
                     ${drugNote ? `<div class="syn-life-drug-note"><i class="drug-stage-dot"></i> <strong>${esc(drug.name)}:</strong> ${esc(drugNote)}</div>` : ''}
                   </div>
                 </li>
@@ -255,7 +255,7 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
                     </span>
                   </div>
                   <div class="receptor-where">${partChips(r.where)}</div>
-                  <p class="receptor-desc">${esc(r.text)}</p>
+                  <p class="receptor-desc">${fmt(r.text)}</p>
                 </div>
               `;
             }).join('')}
@@ -286,7 +286,7 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
                     <span class="drug-target">Target: ${esc(d.target)}</span>
                   </div>
                 </div>
-                <p class="drug-desc">${esc(d.text)}</p>
+                <p class="drug-desc">${fmt(d.text)}</p>
                 <div class="drug-card-actions">
                   ${isOn ? `
                     <span class="chip drug-link is-active"><i class="dot" style="--c:${chem.color}"></i> Simulating on stage</span>

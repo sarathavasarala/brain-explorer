@@ -1,6 +1,4 @@
-// Synapse Theater: widescreen center-stage microscopic lifecycle visualization.
-// Stages: 1. Made (Synthesis), 2. Packed (Vesicle Loading), 3. Released (Fusion), 4. Binds (Receptors), 5. Cleared (Clearance).
-import { esc } from './format.js';
+import { esc, fmt } from './format.js';
 
 const CELL = 'rgba(205, 213, 255, 0.3)';
 
@@ -183,7 +181,7 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
     drugBanner = `<div class="stepper-drug-banner">
       <div class="drug-banner-main">
         <span class="drug-tag">Drug active: <strong>${esc(drug.name)}</strong> (Target: ${esc(drug.target)})</span>
-        <span class="drug-note">${esc(drug.text)}</span>
+        <span class="drug-note">${fmt(drug.text)}</span>
       </div>
       <div class="drug-mode-row">
         <div class="drug-mode-toggle" role="group" aria-label="Drug condition">
@@ -608,7 +606,7 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
 
     <!-- Bottom HUD zone -->
     <footer class="syn-hud-bottom">
-      ${tab === 'medicine' ? `<p class="fig-caption stepper-caption">${esc(stageCaption)}</p>` : ''}
+      ${tab === 'medicine' ? `<p class="fig-caption stepper-caption">${fmt(stageCaption)}</p>` : ''}
 
       <div class="stepper-controls" role="group" aria-label="Synapse stages">
         <div class="stepper-buttons">
