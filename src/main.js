@@ -966,7 +966,7 @@ explainerEl.addEventListener('click', (e) => {
   if (act === 'prev') stepTo(state.route.step - 1);
   if (act === 'next') stepTo(state.route.step + 1);
   if (act === 'play') togglePlay();
-  const trackStep = e.target.closest('.pl-track [data-step]');
+  const trackStep = e.target.closest('.pl-track [data-step], .lab-progress-track [data-step]');
   if (trackStep) { stopPlay(); stepTo(Number(trackStep.dataset.step)); }
   const head = e.target.closest('.step-head[data-step]');
   if (head && state.route.type === 'p') { stopPlay(); stepTo(Number(head.dataset.step)); }

@@ -705,6 +705,157 @@ kbd {
 .step-head:hover .step-title { color: var(--ink); }
 .step-body { padding: 0 0 16px 36px; animation: ex-in 0.45s var(--ease); }
 
+/* focused lab card reader */
+.ex-lab-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  animation: ex-in 0.3s var(--ease);
+}
+.lab-card-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  padding: 2px 0 14px;
+  background: color-mix(in oklab, var(--panel, #06070b) 88%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border-bottom: 1px solid rgba(190, 200, 255, 0.07);
+  margin-bottom: 20px;
+}
+.lab-card-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.lab-card-topbar .lab-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-2);
+  transition: color 0.15s;
+}
+.lab-card-topbar .lab-back:hover {
+  color: var(--ink);
+}
+.lab-step-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+.lab-step-num {
+  font-family: var(--display);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink-2);
+  letter-spacing: 0.02em;
+}
+.lab-nav-arrows {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(190, 200, 255, 0.05);
+  border: 1px solid rgba(190, 200, 255, 0.1);
+  border-radius: 8px;
+  padding: 2px;
+}
+.lab-arrow-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  color: var(--ink-2);
+  transition: background 0.15s, color 0.15s;
+}
+.lab-arrow-btn:hover:not(:disabled) {
+  background: rgba(190, 200, 255, 0.12);
+  color: var(--ink);
+}
+.lab-arrow-btn:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.lab-progress-track {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+}
+.lab-progress-segment {
+  flex: 1;
+  height: 5px;
+  border-radius: 4px;
+  background: rgba(190, 200, 255, 0.12);
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.25s, transform 0.15s;
+}
+.lab-progress-segment::before {
+  content: '';
+  position: absolute;
+  inset: -8px 0;
+}
+.lab-progress-segment:hover {
+  background: rgba(190, 200, 255, 0.35);
+}
+.lab-progress-segment.is-past {
+  background: color-mix(in oklab, var(--accent) 55%, transparent);
+}
+.lab-progress-segment.is-active {
+  background: var(--accent);
+  box-shadow: 0 0 10px var(--accent);
+}
+
+.lab-card-body {
+  flex: 1;
+}
+.lab-series-tag {
+  display: inline-block;
+  font-family: var(--display);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+  margin-bottom: 8px;
+}
+.lab-step-title {
+  font-family: var(--display);
+  font-size: 23px;
+  line-height: 1.25;
+  font-weight: 700;
+  color: #fff;
+  margin: 0 0 18px;
+  letter-spacing: -0.015em;
+}
+.lab-step-prose {
+  font-family: var(--reading);
+  font-size: 16px;
+  line-height: 1.68;
+  color: #d8deee;
+  margin-bottom: 24px;
+}
+.lab-step-prose p {
+  margin: 0 0 16px;
+}
+.lab-step-prose p:last-child {
+  margin-bottom: 0;
+}
+.lab-card-footer {
+  margin-top: auto;
+  padding-top: 18px;
+  border-top: 1px solid rgba(190, 200, 255, 0.07);
+}
+.lab-card-footer .chips {
+  margin-bottom: 12px;
+}
+
 
 
 /* tooltip */
@@ -2574,11 +2725,19 @@ kbd {
   background: rgba(7, 9, 17, 0.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
   border: 1px solid var(--line); border-radius: 14px;
   box-shadow: 0 0 0 1px rgba(0,0,0,.4);
-  transition: opacity .28s var(--ease), transform .32s var(--ease);
+  transition: opacity .28s var(--ease), transform .32s var(--ease), bottom .32s var(--ease), height .32s var(--ease), width .32s var(--ease);
   z-index: 4;
 }
 .dock[hidden] { display: grid; opacity: 0; pointer-events: none; transform: translate(-50%, 16px); }
-.stage.is-focus .dock { height: clamp(300px, 58vh, 520px); }
+.stage.is-focus .dock {
+  bottom: 50%;
+  transform: translate(-50%, 50%);
+  height: clamp(320px, 62vh, 520px);
+  width: min(920px, calc(100% - 48px));
+}
+.stage.is-focus .dock[hidden] {
+  transform: translate(-50%, calc(50% + 16px));
+}
 .stage.is-focus #brain { opacity: .28; transition: opacity .4s var(--ease); }
 .stage.is-dock .toolbar,
 .stage.is-focus .toolbar {

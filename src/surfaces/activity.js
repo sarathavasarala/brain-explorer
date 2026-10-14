@@ -31,6 +31,19 @@ export default {
     let burstFired = false;
     let lastT = clock.t;
 
+    // Feed simulation state
+    let feedIndex = 0;
+    let runningV = 0.45;
+    let feedSwipes = 0;
+    let feedBurstCount = 0;
+    let feedDipCount = 0;
+    let feedAutoInterval = null;
+    let isAutoScrolling = false;
+    let feedReadout = null;
+    let feedSlideStart = 0;
+
+    const learnBaseHz = props.baseHz !== undefined ? props.baseHz : 5;
+
     // Conditions data
     let conditions = [];
     if (mode === 'single') {
@@ -40,13 +53,17 @@ export default {
         rows: props.rows || 8,
       }];
     } else if (mode === 'learning') {
-      const schedule = world.schedule({ n: props.rows || 30, insectRate: 0, insectAloneEvery: 0, seed: 11 });
-      const history = world.learn(schedule, { want: 1 });
+      const totalRows = props.rows || 20;
+      const schedule = world.schedule({ n: totalRows, insectRate: 0, insectAloneEvery: 0, seed: 11 });
+      const history = world.learn(schedule, { want: 1 }).map((tr) => ({
+        ...tr,
+        baseHz: learnBaseHz,
+      }));
       conditions = [{
-        label: 'Thirty trials',
+        label: `${totalRows} trials`,
         schedule,
         history,
-        rows: props.rows || 30,
+        rows: totalRows,
       }];
     } else if (mode === 'compare') {
       conditions = (props.conditions || []).map((c) => ({
@@ -54,6 +71,60 @@ export default {
         trial: { ...c.trial, want: wantValue },
         rows: c.rows || 4,
       }));
+    } else if (mode === 'baseline-contrast') {
+      conditions = [
+        {
+          label: 'Burst-only (0 Hz base)',
+          trial: { buzz: true, msg: false, V: 1, baseHz: 0 },
+          badge: 'Cannot fire negative spikes · Blind to letdown',
+          rows: 4,
+        },
+        {
+          label: 'Tonic hum (4.5 Hz base)',
+          trial: { buzz: true, msg: false, V: 1, baseHz: 4.5 },
+          badge: 'Silent pause (4.5 Hz -> 0 Hz) encodes disappointment',
+          rows: 4,
+        },
+      ];
+    } else if (mode === 'feed') {
+      const reels = world.FEED_REELS || [{ id: 1, title: 'Viral hit', reward: 1.0, type: 'viral' }];
+      const reel = reels[0];
+      conditions = [{
+        label: reel.title,
+        trial: { buzz: true, msg: true, want: reel.reward, V: runningV, baseHz: 4.5 },
+        rows: 5,
+      }];
+    }
+
+    let feedSlideGroup = null;
+    let prevReelData = null;
+
+    function advanceFeed() {
+      const reels = world.FEED_REELS || [{ id: 1, reward: 0.5, title: 'Reel', text: '' }];
+      prevReelData = reels[feedIndex];
+      feedIndex = (feedIndex + 1) % reels.length;
+      const reel = reels[feedIndex];
+      feedSwipes++;
+      const delta = reel.reward - runningV;
+      const usedV = runningV;
+      runningV = Math.max(0.2, Math.min(0.85, runningV + 0.22 * delta));
+      if (delta > 0.25) {
+        feedBurstCount++;
+        if (scene) scene.firePulse('vta', 'nucleus-accumbens', { color: '#b98cff' });
+      } else if (delta < -0.08) {
+        feedDipCount++;
+        if (scene) scene.firePulse('habenula', 'vta', { color: '#ff6b7d' });
+      }
+      conditions[0].label = reel.title;
+      conditions[0].trial = { buzz: true, msg: true, want: reel.reward, V: usedV, baseHz: 4.5 };
+      if (feedReadout) {
+        feedReadout.textContent = `Reel #${feedSwipes + 1} · RPE ${delta >= 0 ? '+' : ''}${delta.toFixed(2)} (${delta > 0.25 ? 'Viral burst!' : delta < -0.08 ? 'Boring dip' : 'Mild'})`;
+      }
+      feedSlideStart = performance.now();
+      clock.reset(world.WINDOW);
+      clock.play();
+      rebuildStaticSpikes();
+      rebuildRateGroup();
     }
 
     function setupControls() {
@@ -65,44 +136,104 @@ export default {
       ctrls.style.gap = '10px';
 
       if (mode === 'learning') {
+        const totalRows = props.rows || 20;
         const h0 = conditions[0].history[visibleRows - 1];
         const val = h0.wBuzz ?? h0.wChime ?? 0;
         readoutEl = document.createElement('span');
         readoutEl.className = 'dock-label';
-        readoutEl.textContent = `buzz predicts ${val.toFixed(2)}`;
+        readoutEl.textContent = `Trip ${visibleRows} of ${totalRows} · Scent expectation: ${Math.round(val * 100)}%`;
         ctrls.appendChild(readoutEl);
 
         runTrialsBtn = document.createElement('button');
         runTrialsBtn.type = 'button';
         runTrialsBtn.className = 'dock-btn';
-        runTrialsBtn.textContent = 'Run alerts';
+        runTrialsBtn.textContent = `Run ${totalRows} foraging trips`;
         runTrialsBtn.addEventListener('click', () => {
           if (isRunningTrials) {
             clearInterval(trialInterval);
             isRunningTrials = false;
-            runTrialsBtn.textContent = 'Run alerts';
+            runTrialsBtn.textContent = `Run ${totalRows} foraging trips`;
             return;
           }
-          if (visibleRows >= (props.rows || 30)) {
+          if (visibleRows >= totalRows) {
             visibleRows = 1;
             updateLearningVisibility();
-            updateRatePaths();
+            rebuildRateGroup();
           }
           isRunningTrials = true;
-          runTrialsBtn.textContent = 'Pause alerts';
+          runTrialsBtn.textContent = 'Pause foraging trips';
           trialInterval = setInterval(() => {
-            if (visibleRows < (props.rows || 30)) {
+            if (visibleRows < totalRows) {
               visibleRows++;
               updateLearningVisibility();
-              updateRatePaths();
+              rebuildRateGroup();
             } else {
               clearInterval(trialInterval);
               isRunningTrials = false;
-              runTrialsBtn.textContent = 'Run alerts';
+              runTrialsBtn.textContent = `Run ${totalRows} foraging trips`;
             }
           }, 120);
         });
         ctrls.appendChild(runTrialsBtn);
+      }
+
+      if (mode === 'baseline-contrast') {
+        let isMissing = true;
+        const toggleBtn = document.createElement('button');
+        toggleBtn.type = 'button';
+        toggleBtn.className = 'dock-btn';
+        toggleBtn.setAttribute('aria-pressed', 'true');
+        toggleBtn.textContent = 'Bush: Empty (Missing berries)';
+        toggleBtn.addEventListener('click', () => {
+          isMissing = !isMissing;
+          toggleBtn.setAttribute('aria-pressed', isMissing ? 'true' : 'false');
+          toggleBtn.textContent = isMissing
+            ? 'Bush: Empty (Missing berries)'
+            : 'Bush: Has berries';
+          if (isMissing) {
+            conditions[0].trial = { buzz: true, msg: false, V: 1, baseHz: 0 };
+            conditions[1].trial = { buzz: true, msg: false, V: 1, baseHz: 4.5 };
+          } else {
+            conditions[0].trial = { buzz: true, msg: true, V: 1, baseHz: 0 };
+            conditions[1].trial = { buzz: true, msg: true, V: 1, baseHz: 4.5 };
+          }
+          rebuildStaticSpikes();
+          rebuildRateGroup();
+        });
+        ctrls.appendChild(toggleBtn);
+      }
+
+      if (mode === 'feed') {
+        feedReadout = document.createElement('span');
+        feedReadout.className = 'dock-label';
+        feedReadout.textContent = 'Click ↓ on the phone reel to swipe';
+
+        const swipeBtn = document.createElement('button');
+        swipeBtn.type = 'button';
+        swipeBtn.className = 'dock-btn';
+        swipeBtn.textContent = '↓ Next Reel';
+
+        const autoBtn = document.createElement('button');
+        autoBtn.type = 'button';
+        autoBtn.className = 'dock-btn';
+        autoBtn.setAttribute('aria-pressed', 'false');
+        autoBtn.textContent = 'Auto-swipe';
+
+        swipeBtn.addEventListener('click', advanceFeed);
+        autoBtn.addEventListener('click', () => {
+          isAutoScrolling = !isAutoScrolling;
+          autoBtn.setAttribute('aria-pressed', isAutoScrolling ? 'true' : 'false');
+          if (isAutoScrolling) {
+            advanceFeed();
+            feedAutoInterval = setInterval(advanceFeed, 2400);
+          } else {
+            if (feedAutoInterval) clearInterval(feedAutoInterval);
+          }
+        });
+
+        ctrls.appendChild(feedReadout);
+        ctrls.appendChild(swipeBtn);
+        ctrls.appendChild(autoBtn);
       }
 
       if (mode === 'compare') {
@@ -135,28 +266,14 @@ export default {
         }
       }
 
-      const playBtn = document.createElement('button');
-      playBtn.type = 'button';
-      playBtn.className = 'dock-btn';
-      playBtn.setAttribute('aria-pressed', clock.playing ? 'true' : 'false');
-      playBtn.textContent = clock.playing ? 'Pause' : 'Play';
-      playBtn.addEventListener('click', () => {
-        if (clock.playing) clock.pause(); else clock.play();
-      });
-      ctrls.appendChild(playBtn);
-
-      clock.subscribe((_t, clk) => {
-        playBtn.setAttribute('aria-pressed', clk.playing ? 'true' : 'false');
-        playBtn.textContent = clk.playing ? 'Pause' : 'Play';
-      });
-
       setControls(ctrls);
     }
 
     setupControls();
 
     // Visual layout elements
-    const leftPad = mode === 'compare' ? 120 : 54;
+    const isMulti = mode === 'compare' || mode === 'baseline-contrast';
+    const leftPad = isMulti ? 152 : (mode === 'feed' ? 234 : 54);
     const rightPad = 32;
     const topPad = 24;
     const bottomPad = 26;
@@ -180,13 +297,16 @@ export default {
       'stroke-width': '1',
     }, playheadGroup);
 
-    // Events (buzz at 0, message at 1.0)
+    // Events
     const eventLines = [];
     const eventLabels = [];
 
+    const cueText = props.cueLabel || (mode === 'feed' ? 'swipe' : (mode === 'learning' || mode === 'baseline-contrast' ? 'scent (cue)' : 'buzz'));
+    const rewardText = props.rewardLabel || (mode === 'feed' ? 'clip' : (mode === 'learning' || mode === 'baseline-contrast' ? 'berries (reward)' : 'message'));
+
     const events = [
-      { t: world.BUZZ_T ?? world.CHIME_T ?? 0, label: 'buzz' },
-      { t: world.MSG_T ?? world.JUICE_T ?? 1.0, label: 'message' },
+      { t: world.BUZZ_T ?? world.CHIME_T ?? 0, label: cueText },
+      { t: world.MSG_T ?? world.JUICE_T ?? 1.0, label: rewardText },
     ];
 
     for (const ev of events) {
@@ -341,7 +461,7 @@ export default {
             spikeItems.push({ t: st, el: line, row: i });
           }
         }
-      } else if (mode === 'compare') {
+      } else if (mode === 'compare' || mode === 'baseline-contrast') {
         compareBands = [];
         const nConds = conditions.length;
         const bandH = rasterH / nConds;
@@ -378,7 +498,7 @@ export default {
           // Band label
           const bandLbl = el('text', {
             x: leftPad - 12,
-            y: bY0 + bandH * 0.55,
+            y: bY0 + (cond.badge ? bandH * 0.42 : bandH * 0.55),
             'text-anchor': 'end',
             fill: isActive ? C.ink : C.muted,
             'font-family': 'var(--display)',
@@ -386,6 +506,19 @@ export default {
             'font-weight': isActive ? '600' : '500',
           }, rasterGroup);
           bandLbl.textContent = cond.label;
+
+          if (cond.badge) {
+            const bTxt = el('text', {
+              x: leftPad - 12,
+              y: bY0 + bandH * 0.74,
+              'text-anchor': 'end',
+              fill: cIdx === 0 ? '#ff6b7d' : '#6be4ff',
+              'font-family': 'var(--display)',
+              'font-size': '8.5',
+              'letter-spacing': '0.01em',
+            }, rasterGroup);
+            bTxt.textContent = cond.badge;
+          }
 
           const selectBand = () => {
             highlightedConditionIndex = cIdx;
@@ -426,6 +559,227 @@ export default {
             }
           }
         }
+      } else if (mode === 'feed') {
+        const totalRows = props.rows || 5;
+        const rowH = rasterH / totalRows;
+
+        const curReel = (world.FEED_REELS && world.FEED_REELS[feedIndex]) || { reward: 0.5, title: 'Reel', text: '' };
+        const usedV = conditions[0].trial.V ?? runningV;
+        const delta = curReel.reward - usedV;
+        const isViral = delta > 0.25;
+        const isDip = delta < -0.08;
+        const accentCol = isViral ? '#ffcf6b' : isDip ? '#ff6b7d' : '#b98cff';
+
+        // Ensure clipPath exists in defs
+        let defs = svg.querySelector('defs');
+        if (!defs) {
+          defs = el('defs', {}, svg);
+        }
+        let clip = defs.querySelector('#reel-viewport-clip');
+        if (!clip) {
+          clip = el('clipPath', { id: 'reel-viewport-clip' }, defs);
+          el('rect', { x: 8, y: 20, width: 138, height: 150, rx: '10' }, clip);
+        }
+
+        // Phone outer frame (x: 2 to 152, y: 6 to 218, center x = 77)
+        const phoneGroup = el('g', { class: 'phone-reel-widget' }, rasterGroup);
+        el('rect', {
+          x: 2,
+          y: 6,
+          width: 150,
+          height: 212,
+          rx: '16',
+          fill: 'rgba(10, 12, 22, 0.92)',
+          stroke: isViral ? 'rgba(255, 207, 107, 0.55)' : isDip ? 'rgba(255, 107, 125, 0.45)' : 'rgba(185, 140, 255, 0.3)',
+          'stroke-width': '1.5',
+        }, phoneGroup);
+
+        // Speaker notch
+        el('rect', {
+          x: 60,
+          y: 12,
+          width: 34,
+          height: 3.5,
+          rx: '1.75',
+          fill: 'rgba(233, 235, 245, 0.22)',
+        }, phoneGroup);
+
+        // Clipped screen viewport
+        const viewport = el('g', { 'clip-path': 'url(#reel-viewport-clip)', style: 'cursor: pointer;' }, phoneGroup);
+        viewport.addEventListener('click', advanceFeed);
+
+        feedSlideGroup = el('g', { class: 'reel-slide-group' }, viewport);
+
+        function drawReelCard(parent, reelObj, swipeNum, rpeDelta, yOffset) {
+          const g = el('g', { transform: `translate(0, ${yOffset})` }, parent);
+          const viral = rpeDelta > 0.25;
+          const dip = rpeDelta < -0.08;
+          const col = viral ? '#ffcf6b' : dip ? '#ff6b7d' : '#b98cff';
+
+          // Screen background
+          el('rect', {
+            x: 8,
+            y: 20,
+            width: 138,
+            height: 150,
+            rx: '10',
+            fill: viral ? 'rgba(255, 207, 107, 0.08)' : dip ? 'rgba(255, 107, 125, 0.06)' : 'rgba(185, 140, 255, 0.06)',
+          }, g);
+
+          // Top reel counter & badge
+          el('text', {
+            x: 16,
+            y: 36,
+            fill: C.muted,
+            'font-family': 'var(--display)',
+            'font-size': '8.5',
+            'font-weight': '600',
+            'letter-spacing': '0.08em',
+            'text-transform': 'uppercase',
+          }, g).textContent = `REEL #${swipeNum}`;
+
+          // Visual icon in center-top of reel (cx = 77)
+          if (viral) {
+            el('circle', { cx: 77, cy: 64, r: '16', fill: 'rgba(255, 207, 107, 0.16)', stroke: '#ffcf6b', 'stroke-width': '1.25' }, g);
+            el('path', { d: 'M 77 52 L 80 60 L 88 61 L 82 66 L 84 74 L 77 69 L 70 74 L 72 66 L 66 61 L 74 60 Z', fill: '#ffcf6b' }, g);
+          } else if (dip) {
+            el('circle', { cx: 77, cy: 64, r: '15', fill: 'rgba(255, 107, 125, 0.12)', stroke: '#ff6b7d', 'stroke-width': '1.25' }, g);
+            el('line', { x1: 69, y1: 64, x2: 85, y2: 64, stroke: '#ff6b7d', 'stroke-width': '2', 'stroke-linecap': 'round' }, g);
+          } else {
+            el('circle', { cx: 77, cy: 64, r: '15', fill: 'rgba(185, 140, 255, 0.12)', stroke: '#b98cff', 'stroke-width': '1.25' }, g);
+            el('path', { d: 'M 73 58 L 83 64 L 73 70 Z', fill: '#b98cff' }, g);
+          }
+
+          // Reel Title
+          el('text', {
+            x: 77,
+            y: 98,
+            'text-anchor': 'middle',
+            fill: C.ink,
+            'font-family': 'var(--display)',
+            'font-size': '11',
+            'font-weight': '700',
+          }, g).textContent = reelObj.title;
+
+          // Reel short description
+          el('text', {
+            x: 77,
+            y: 113,
+            'text-anchor': 'middle',
+            fill: C.muted,
+            'font-family': 'var(--display)',
+            'font-size': '8.5',
+          }, g).textContent = reelObj.text || '';
+
+          // RPE Pill inside reel card
+          el('rect', {
+            x: 15,
+            y: 124,
+            width: 124,
+            height: 22,
+            rx: '6',
+            fill: viral ? 'rgba(255, 207, 107, 0.18)' : dip ? 'rgba(255, 107, 125, 0.18)' : 'rgba(185, 140, 255, 0.14)',
+            stroke: col,
+            'stroke-width': '1',
+          }, g);
+
+          el('text', {
+            x: 77,
+            y: 138,
+            'text-anchor': 'middle',
+            fill: col,
+            'font-family': 'var(--display)',
+            'font-size': '9.5',
+            'font-weight': '700',
+          }, g).textContent = `RPE: ${rpeDelta >= 0 ? '+' : ''}${rpeDelta.toFixed(2)} · ${viral ? 'SURGE!' : dip ? 'DIP PAUSE' : 'MILD'}`;
+
+          // Zero-friction footnote
+          el('text', {
+            x: 77,
+            y: 161,
+            'text-anchor': 'middle',
+            fill: 'rgba(233,235,245,0.45)',
+            'font-family': 'var(--display)',
+            'font-size': '8',
+          }, g).textContent = '1 thumb flick · 0 sec wait';
+        }
+
+        if (prevReelData && feedSwipes > 0) {
+          drawReelCard(feedSlideGroup, prevReelData, feedSwipes, (prevReelData.reward - 0.45), -152);
+        }
+        drawReelCard(feedSlideGroup, curReel, feedSwipes + 1, delta, 0);
+
+        // Down-Arrow Swipe Button at bottom of phone (y: 178 to 208)
+        const downBtnGroup = el('g', { class: 'phone-down-btn', style: 'cursor: pointer;' }, phoneGroup);
+        const downBtnRect = el('rect', {
+          x: 11,
+          y: 178,
+          width: 132,
+          height: 30,
+          rx: '15',
+          fill: 'rgba(185, 140, 255, 0.18)',
+          stroke: '#b98cff',
+          'stroke-width': '1.25',
+        }, downBtnGroup);
+
+        // Down arrow icon + label
+        el('path', {
+          d: 'M 32 188 L 32 198 M 28 194 L 32 198 L 36 194',
+          fill: 'none',
+          stroke: '#fff',
+          'stroke-width': '1.75',
+          'stroke-linecap': 'round',
+          'stroke-linejoin': 'round',
+        }, downBtnGroup);
+
+        el('text', {
+          x: 84,
+          y: 197,
+          'text-anchor': 'middle',
+          fill: '#fff',
+          'font-family': 'var(--display)',
+          'font-size': '10',
+          'font-weight': '700',
+        }, downBtnGroup).textContent = 'Swipe Next Reel';
+
+        downBtnGroup.addEventListener('pointerenter', () => {
+          downBtnRect.setAttribute('fill', 'rgba(185, 140, 255, 0.32)');
+        });
+        downBtnGroup.addEventListener('pointerleave', () => {
+          downBtnRect.setAttribute('fill', 'rgba(185, 140, 255, 0.18)');
+        });
+        downBtnGroup.addEventListener('click', advanceFeed);
+
+        for (let i = 0; i < totalRows; i++) {
+          const seed = (feedSwipes + 1) * 10 + i;
+          const yMid = rasterY0 + i * rowH + rowH * 0.5;
+          const spikeH = rowH * 0.7;
+
+          el('line', {
+            x1: leftPad,
+            y1: rasterY0 + (i + 1) * rowH,
+            x2: width - rightPad,
+            y2: rasterY0 + (i + 1) * rowH,
+            stroke: C.faint,
+            'stroke-width': '1',
+          }, rasterGroup);
+
+          const spkTimes = world.spikes(conditions[0].trial, seed);
+          for (const st of spkTimes) {
+            const sx = timeToX(st);
+            const line = el('line', {
+              x1: sx,
+              y1: yMid - spikeH / 2,
+              x2: sx,
+              y2: yMid + spikeH / 2,
+              stroke: accentCol,
+              'stroke-width': '1.5',
+              'stroke-linecap': 'round',
+              opacity: '0',
+            }, rasterGroup);
+            spikeItems.push({ t: st, el: line, row: i });
+          }
+        }
       }
     }
 
@@ -445,10 +799,11 @@ export default {
     }
 
     function updateLearningVisibility() {
+      const totalRows = props.rows || 20;
       if (readoutEl && conditions[0].history[visibleRows - 1]) {
         const h = conditions[0].history[visibleRows - 1];
         const val = h.wBuzz ?? h.wChime ?? 0;
-        readoutEl.textContent = `buzz predicts ${val.toFixed(2)}`;
+        readoutEl.textContent = `Trip ${visibleRows} of ${totalRows} · Scent expectation: ${Math.round(val * 100)}%`;
       }
     }
 
@@ -461,15 +816,16 @@ export default {
       while (rateGroup.firstChild) rateGroup.removeChild(rateGroup.firstChild);
       compareRatePaths = [];
 
-      // Rate baseline at 5 Hz
       const rateToY = lin(0, 36, rateY0 + rateH, rateY0);
-      const base5Y = rateToY(5);
+      const isZeroBaseLearning = mode === 'learning' && learnBaseHz === 0;
+      const refHz = isZeroBaseLearning ? 0 : (mode === 'baseline-contrast' || mode === 'feed' ? 4.5 : 5);
+      const baseRefY = rateToY(refHz);
 
       el('line', {
         x1: leftPad,
-        y1: base5Y,
+        y1: baseRefY,
         x2: width - rightPad,
-        y2: base5Y,
+        y2: baseRefY,
         stroke: C.faint,
         'stroke-width': '1',
         'stroke-dasharray': '2 3',
@@ -477,13 +833,15 @@ export default {
 
       const steadyLbl = el('text', {
         x: leftPad - 8,
-        y: base5Y + 3,
+        y: baseRefY + 3,
         'text-anchor': 'end',
         fill: C.muted,
         'font-family': 'var(--display)',
         'font-size': '10',
       }, rateGroup);
-      steadyLbl.textContent = 'steady (5 Hz)';
+      steadyLbl.textContent = isZeroBaseLearning
+        ? 'silent (0 Hz)'
+        : (refHz === 4.5 ? 'tonic (4.5 Hz)' : 'steady (5 Hz)');
 
       const rateAxisLbl = el('text', {
         x: leftPad - 8,
@@ -497,7 +855,7 @@ export default {
       }, rateGroup);
       rateAxisLbl.textContent = 'spikes/s';
 
-      if (mode === 'compare') {
+      if (mode === 'compare' || mode === 'baseline-contrast') {
         for (let i = 0; i < conditions.length; i++) {
           const area = el('path', {
             fill: C.dopamine,
@@ -515,17 +873,62 @@ export default {
           compareRatePaths.push({ area, path, condIndex: i });
         }
       } else {
+        const isFeed = mode === 'feed';
+        const curReel = isFeed && world.FEED_REELS ? world.FEED_REELS[feedIndex] : null;
+        const usedV = isFeed ? (conditions[0].trial.V ?? runningV) : 0;
+        const delta = curReel ? (curReel.reward - usedV) : 0;
+        const strokeCol = isFeed
+          ? (delta > 0.25 ? '#ffcf6b' : delta < -0.08 ? '#ff6b7d' : C.dopamine)
+          : C.dopamine;
+
         rateAreaEl = el('path', {
-          fill: C.dopamine,
-          opacity: '0.12',
+          fill: strokeCol,
+          opacity: '0.14',
         }, rateGroup);
 
         ratePathEl = el('path', {
           fill: 'none',
-          stroke: C.dopamine,
-          'stroke-width': '1.75',
+          stroke: strokeCol,
+          'stroke-width': '2',
           'stroke-linecap': 'round',
         }, rateGroup);
+
+        if (mode === 'learning') {
+          const isEarly = visibleRows <= 3;
+          const badgeX = timeToX(isEarly ? 1.1 : 0.1);
+          const badgeY = rateY0 + 12;
+          const callout = el('text', {
+            x: badgeX,
+            y: badgeY,
+            'text-anchor': 'middle',
+            fill: '#ffcf6b',
+            'font-family': 'var(--display)',
+            'font-size': '9.5',
+            'font-weight': '600',
+          }, rateGroup);
+          callout.textContent = isEarly
+            ? `Trip ${visibleRows}: Surprise burst at BERRIES (1.0s)`
+            : `Trip ${visibleRows}: Burst shifted to SCENT (0.0s)!`;
+        }
+
+        if (isFeed && curReel) {
+          const badgeX = timeToX(1.1);
+          const badgeY = rateY0 + 10;
+          const callout = el('text', {
+            x: badgeX,
+            y: badgeY,
+            'text-anchor': 'middle',
+            fill: strokeCol,
+            'font-family': 'var(--display)',
+            'font-size': '9.5',
+            'font-weight': '700',
+          }, rateGroup);
+          callout.textContent = delta > 0.25
+            ? `+${delta.toFixed(2)} RPE BURST! (Jackpot exceeds expectation)`
+            : delta < -0.08
+              ? `${delta.toFixed(2)} RPE DIP! (Pause below 4.5 Hz triggers urge to swipe)`
+              : `RPE near zero (Matches expectation)`;
+        }
       }
 
       updateRatePaths();
@@ -554,7 +957,7 @@ export default {
     }
 
     function updateRatePaths() {
-      if (mode === 'compare') {
+      if (mode === 'compare' || mode === 'baseline-contrast') {
         for (let i = 0; i < conditions.length; i++) {
           const { dLine, dArea } = buildRatePathD(conditions[i].trial);
           compareRatePaths[i].path.setAttribute('d', dLine);
@@ -576,10 +979,12 @@ export default {
 
     return {
       runTrial() {
-        if (mode === 'learning' && visibleRows < (props.rows || 30)) {
+        if (mode === 'learning' && visibleRows < (props.rows || 20)) {
           visibleRows++;
           updateLearningVisibility();
-          updateRatePaths();
+          rebuildRateGroup();
+        } else if (mode === 'feed') {
+          advanceFeed();
         }
       },
 
@@ -588,6 +993,20 @@ export default {
           burstFired = false;
         }
         lastT = t;
+
+        if (mode === 'feed' && feedSlideGroup && feedSlideStart > 0) {
+          const elapsed = performance.now() - feedSlideStart;
+          const dur = 260;
+          if (elapsed < dur) {
+            const p = elapsed / dur;
+            const ease = 1 - Math.pow(1 - p, 3);
+            const yShift = (1 - ease) * 152;
+            feedSlideGroup.setAttribute('transform', `translate(0, ${yShift.toFixed(1)})`);
+          } else {
+            feedSlideGroup.setAttribute('transform', 'translate(0, 0)');
+            feedSlideStart = 0;
+          }
+        }
 
         const curX = timeToX(t);
         playheadLine.setAttribute('x1', curX);
@@ -622,7 +1041,7 @@ export default {
 
         // Active condition for driving VTA and pulse
         let activeTrial;
-        if (mode === 'compare') {
+        if (mode === 'compare' || mode === 'baseline-contrast') {
           activeTrial = conditions[highlightedConditionIndex].trial;
         } else if (mode === 'learning') {
           activeTrial = conditions[0].history[visibleRows - 1] || conditions[0].history[0];
@@ -647,6 +1066,7 @@ export default {
 
       destroy() {
         if (trialInterval) clearInterval(trialInterval);
+        if (feedAutoInterval) clearInterval(feedAutoInterval);
         if (scene) scene.setDrive('vta', 0);
         if (svg.parentElement) svg.parentElement.removeChild(svg);
       },

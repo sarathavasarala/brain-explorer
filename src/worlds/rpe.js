@@ -16,7 +16,7 @@ const bump = (t, t0, w = 0.07) => {
 };
 
 // Prediction error at reward time and dopamine rate over a trial.
-// trial: { buzz: bool, msg: bool, want: 0..1, V: learned buzz value 0..1 }
+// trial: { buzz: bool, msg: bool, want: 0..1, V: learned buzz value 0..1, baseHz: number }
 export function trialSignals(trial = {}) {
   const buzz = (trial.buzz ?? trial.chime ?? trial.cue) !== false;
   const V = buzz ? (trial.V ?? 0) : 0;
@@ -28,7 +28,8 @@ export function trialSignals(trial = {}) {
 
 export function daRate(t, trial = {}) {
   const s = trialSignals(trial);
-  let r = BASE_HZ;
+  const base = trial.baseHz !== undefined ? trial.baseHz : BASE_HZ;
+  let r = base;
   r += GAIN_HZ * s.deltaBuzz * bump(t, BUZZ_T + 0.1);
   const w = s.deltaReward < 0 ? 0.16 : 0.07; // pauses are a bit wider than bursts
   r += GAIN_HZ * s.deltaReward * bump(t, MSG_T + 0.1, w);
@@ -43,6 +44,70 @@ export function daInputs(t, trial = {}) {
   const inhibit = s.V * bump(t, MSG_T + 0.1, 0.12);
   return { excite, inhibit };
 }
+
+// ------------------------------------------------ Receptor & Effort Dynamics
+// D2 is high affinity (activated by quiet tonic hum ~4.5 Hz, releases striatal No-Go brake)
+// D1 is low affinity (activated by intense phasic bursts ~25 Hz, drives striatal Go pathway)
+export function d2Occupancy(hz, d2Density = 1.0) {
+  const kd = 2.0; // Hz
+  const raw = hz / (hz + kd);
+  return Math.max(0, Math.min(1.0, raw * d2Density));
+}
+
+export function d1Occupancy(hz) {
+  const kd = 16.0; // Hz threshold
+  const raw = Math.pow(hz, 2) / (Math.pow(hz, 2) + Math.pow(kd, 2));
+  return Math.max(0, Math.min(1.0, raw));
+}
+
+export function brakeRelease(d2Occ) {
+  // 0% = brakes clamped (movement/effort feels heavy); 100% = brakes fully off
+  return Math.max(0, Math.min(100, Math.round(d2Occ * 130)));
+}
+
+export function dopamineSynapseState({ hz = 5, d2Density = 1.0 } = {}) {
+  const d2Occ = d2Occupancy(hz, d2Density);
+  const d1Occ = d1Occupancy(hz);
+  const brakeRel = brakeRelease(d2Occ);
+  const goSignal = Math.max(0, Math.min(100, Math.round(d1Occ * 100)));
+  return {
+    hz,
+    d2Density,
+    d2Occupancy: d2Occ,
+    d1Occupancy: d1Occ,
+    brakeReleasePercent: brakeRel,
+    goSignalPercent: goSignal,
+    brakesOn: brakeRel < 50,
+  };
+}
+
+// Environmental Richness & Opportunity Cost (Niv et al. 2007)
+export function throttleState(richness = 0.5) {
+  const rClamped = Math.max(0, Math.min(1, richness));
+  const tonicHz = 1.5 + rClamped * 6.0; // 1.5 Hz (winter) to 7.5 Hz (summer)
+  const d2Occ = d2Occupancy(tonicHz, 1.0);
+  const vigor = brakeRelease(d2Occ);
+  const oppCost = Math.round(rClamped * 100);
+  return {
+    richness: rClamped,
+    tonicHz: Number(tonicHz.toFixed(1)),
+    vigor,
+    oppCost,
+    label: rClamped < 0.35 ? 'Dead of winter (scarce)' : rClamped > 0.65 ? 'High summer (abundant)' : 'Moderate environment',
+  };
+}
+
+// Variable-Ratio Feed Schedule (Short-form video feeds)
+export const FEED_REELS = [
+  { id: 1, type: 'meh', title: 'Mediocre clip', reward: 0.15, text: 'Bland clip, slight letdown' },
+  { id: 2, type: 'meh', title: 'Boring filler', reward: 0.1, text: 'No surprise, dip pause' },
+  { id: 3, type: 'okay', title: 'Mildly amusing', reward: 0.35, text: 'Mild interest, low V' },
+  { id: 4, type: 'viral', title: '10/10 Viral hit', reward: 1.0, text: 'Huge unexpected laugh!' },
+  { id: 5, type: 'meh', title: 'Sponsored ad', reward: 0.05, text: 'Instant skip, restless' },
+  { id: 6, type: 'meh', title: 'Slow monologue', reward: 0.15, text: 'Letdown, thumb flicks' },
+  { id: 7, type: 'okay', title: 'Satisfying craft', reward: 0.4, text: 'Decent clip, hooked' },
+  { id: 8, type: 'viral', title: 'Insane trick', reward: 0.95, text: 'Massive surprise surge!' },
+];
 
 // Deterministic spikes for one sweep (seeded, stable across frames).
 export function spikes(trial, seed) {

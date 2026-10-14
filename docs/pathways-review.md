@@ -24,7 +24,7 @@ All 13 curated guided tours and their 70 steps are listed below. Each step has a
 | `acetylcholine-pathways` | Acetylcholine: attention and memory | chemistry | 4 | Reviewed & Disclosed | E5 (Boundaries) |
 | `default-mode-network` | Default mode: the wandering mind | network | 4 | Reviewed & Disclosed | E5 (Boundaries) |
 | `stress-and-fear` | Stress and fear: how threat learning changes | function | 6 | Reviewed & Disclosed | E5 (Boundaries) |
-| `learning-from-surprise` | Learning from surprise | labs | 10 | Draft (Evidentiary claims mapped) | E4/E5 Complete |
+| `learning-from-surprise` | Dopamine: from first principles to the feed | labs | 8 | Reviewed & Disclosed | Complete |
 
 ---
 
@@ -126,17 +126,15 @@ All 13 curated guided tours and their 70 steps are listed below. Each step has a
 5. `safety-brake-circuit`: Learning that a cue is now safe
 6. `extinction-impairment`: Stress can make safety harder to recall
 
-### learning-from-surprise (10 steps)
-1. `chime-and-juice`: A buzz in your pocket
-2. `surprise-sip`: The first text is a surprise
-3. `burst-moves`: The burst moves to the buzz
-4. `three-outcomes`: A great text, an ordinary one, or spam
-5. `which-cue`: Why the buzz, not the background noise?
-6. `where-they-meet`: Where the buzz and the message meet
-7. `the-tag`: The tag: a lock with two keys
-8. `timing-window`: Dopamine has to arrive in time
-9. `why-flat`: Why the expected text stays flat
-10. `whole-loop`: The whole loop
+### learning-from-surprise (8 steps)
+1. `energy-trap`: The energy trap and the bridge of anticipation
+2. `first-attempt-burst`: First attempt: a burst-only system
+3. `problem-of-zero`: Failure mode 1: the problem of zero
+4. `striatal-brake`: Failure mode 2: the ten-minute hill climb
+5. `smart-throttle`: The smart throttle: summer vs. winter
+6. `slot-machine-feed`: The slot machine in your pocket
+7. `homeostasis-defense`: Homeostasis: the synapse puts in earplugs
+8. `winter-crash`: The "dead of winter" crash (and how it recovers)
 
 ---
 

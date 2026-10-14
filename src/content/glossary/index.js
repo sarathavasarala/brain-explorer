@@ -140,5 +140,15 @@ export default {
   'ampa receptor': 'A glutamate receptor that opens quickly and lets positive ions in, nudging the cell toward firing.\n\nShort for alpha-amino-3-hydroxy-5-methyl-4-isoxazolepropionic acid, an ionotropic glutamate receptor.',
   'nmda receptor': 'A glutamate receptor that only passes current when glutamate is bound and the cell is already depolarized, because a magnesium ion blocks it at rest. When open it lets calcium in.\n\nShort for N-methyl-D-aspartate, an ionotropic receptor essential for synaptic plasticity.',
   depolarized: 'When the inside of a neuron becomes less negative, moving it closer to firing.\n\nFrom Latin de- (removal) and polarization, referring to the reduction of membrane voltage toward zero.',
+  'tonic dopamine': 'The steady, low-frequency background firing (roughly 1 to 5 spikes per second) of dopamine neurons that maintains an ambient level of transmitter in the brain, keeping the striatal brake on sustained effort released.\n\nFrom Greek tonikos (of or for stretching), referring to a continuous baseline tension.',
+  'tonic baseline': 'The continuous resting firing rate of dopamine neurons, providing a baseline from which neurons can burst upward to signal surprise or pause downward to signal disappointment.',
+  'phasic dopamine': 'Brief, rapid bursts (over 15 to 30 spikes per second) or sudden pauses in dopamine firing that signal reward prediction errors when an outcome is better or worse than expected.\n\nFrom Greek phasis (appearance or phase), describing a transient event that appears against the background tone.',
+  'd1 receptor': 'A low-affinity dopamine receptor that ignores quiet background dopamine and activates only during large phasic bursts to drive the striatal direct "Go" pathway.',
+  'd2 receptor': 'A high-affinity dopamine receptor sensitive enough to detect the quiet tonic dopamine hum, quieting the striatal indirect "No-Go" brake so sustained effort feels manageable.',
+  autoreceptor: 'A receptor located on the sending neuron\'s own membrane that detects excess neurotransmitter in the gap and acts as a thermostat brake to slow further synthesis and release.\n\nFrom Greek autos (self) and Latin receptor (receiver).',
+  homeostasis: 'The self-balancing process where cells adjust their sensitivity and production to keep signaling within a safe operating range.\n\nFrom Greek homoios (similar) and stasis (standing still).',
+  downregulation: 'When an overstimulated cell pulls receptors inside its membrane so fewer receivers remain on the surface, dulling sensitivity to normal signals.',
+  anhedonia: 'A flat, unmotivated state where everyday activities lose their pull, often linked to a suppressed tonic dopamine baseline and reduced D2 receptor sensitivity.\n\nFrom Greek an- (without) and hedone (pleasure).',
+  'variable-ratio schedule': 'A reward schedule where rewards arrive after an unpredictable number of actions, like a slot machine or algorithmic video feed, preventing expectations from settling and driving relentless repetition.',
 };
 

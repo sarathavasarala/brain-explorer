@@ -277,9 +277,11 @@ export function renderPathwayMobile(p, step, playing) {
       <button class="mobile-tour-btn" data-act="prev" ${step === 0 ? 'disabled' : ''} aria-label="Previous step">
         ${icon('prev', 16)}<span>Prev</span>
       </button>
+      ${p.category !== 'labs' ? `
       <button class="mobile-tour-btn is-play" data-act="play" aria-label="${playing ? 'Pause tour' : 'Play tour'}">
         ${icon(playing ? 'pause' : 'play', 16)}<span>${playing ? 'Pause' : 'Play'}</span>
       </button>
+      ` : ''}
       <button class="mobile-tour-btn" data-act="next" ${last ? 'disabled' : ''} aria-label="Next step">
         <span>Next</span>${icon('next', 16)}
       </button>
@@ -287,9 +289,71 @@ export function renderPathwayMobile(p, step, playing) {
   </article>`;
 }
 
+export function renderLabCard(p, step) {
+  const st = p.steps[step];
+  const accent = colorOf(st.focus?.[0]);
+  const last = step === p.steps.length - 1;
+  const total = p.steps.length;
+  const up = last ? nextPathway(p) : null;
+
+  return `<article class="ex ex-lab-card" style="--accent:${accent}">
+    <header class="lab-card-header">
+      <div class="lab-card-topbar">
+        <a class="back lab-back" href="#/pathways">${icon('prev', 14)}<span>All labs</span></a>
+        <div class="lab-step-indicator">
+          <span class="lab-step-num">Step ${step + 1} of ${total}</span>
+          <div class="lab-nav-arrows">
+            <button class="lab-arrow-btn" data-act="prev" ${step === 0 ? 'disabled' : ''} aria-label="Previous step">
+              ${icon('prev', 14)}
+            </button>
+            <button class="lab-arrow-btn" data-act="next" ${last ? 'disabled' : ''} aria-label="Next step">
+              ${icon('next', 14)}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="lab-progress-track" aria-label="Lab step progress">
+        ${p.steps.map((s, i) => `
+          <button class="lab-progress-segment ${i === step ? 'is-active' : i < step ? 'is-past' : ''}" data-step="${i}" title="Step ${i + 1}: ${esc(s.title)}" aria-label="Step ${i + 1}: ${esc(s.title)}">
+            <span class="segment-fill"></span>
+          </button>
+        `).join('')}
+      </div>
+    </header>
+
+    <div class="lab-card-body">
+      <div class="lab-series-tag">${esc(p.name)}</div>
+      <h1 class="lab-step-title">${esc(st.title)}</h1>
+      <div class="lab-step-prose">
+        ${st.text ? paragraphs(st.text) : ''}
+      </div>
+      ${renderCheck(st.check, step, p.id, last)}
+    </div>
+
+    <footer class="lab-card-footer">
+      <div class="chips">
+        ${(st.focus || []).map((id) => byId.has(id)
+          ? `<a class="chip" href="#/s/${id}" style="--c:${colorOf(id)}"><i></i>${esc(nameOf(id))}</a>`
+          : `<span class="chip" style="--c:${colorOf(id)}"><i></i>${esc(nameOf(id))}</span>`
+        ).join('')}
+      </div>
+      ${renderEvidence(p, step)}
+      ${up ? `<a class="upnext" href="#/p/${up.id}" style="--c:${colorOf(up.steps[0]?.focus?.[0])}; margin-top: 18px;">
+        <span class="upnext-lead"><span>Up next</span>${icon('next', 16)}</span>
+        <span class="upnext-name">${esc(up.name)}</span>
+        <span class="upnext-tag">${fmt(up.tagline || '')}</span>
+        ${routeStrip(up)}
+      </a>` : ''}
+    </footer>
+  </article>`;
+}
+
 export function renderPathway(p, step, playing, { isMobile = false } = {}) {
   if (isMobile) {
     return renderPathwayMobile(p, step, playing);
+  }
+  if (p.category === 'labs') {
+    return renderLabCard(p, step);
   }
   const st = p.steps[step];
   const accent = colorOf(st.focus?.[0]);

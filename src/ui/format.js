@@ -47,7 +47,19 @@ export function fmt(text = '') {
 }
 
 export function paragraphs(text = '') {
-  return text.split(/\n\s*\n/).map((p) => `<p>${fmt(p)}</p>`).join('');
+  const blocks = text.split(/\n\s*\n/);
+  return blocks.map((block) => {
+    const lines = block.trim().split('\n');
+    const isBulletList = lines.length > 0 && lines.every((l) => /^\s*[-*]\s+/.test(l));
+    const isNumberedList = lines.length > 0 && lines.every((l) => /^\s*\d+\.\s+/.test(l));
+    if (isBulletList) {
+      return `<ul class="bullets">${lines.map((l) => `<li>${fmt(l.replace(/^\s*[-*]\s+/, ''))}</li>`).join('')}</ul>`;
+    }
+    if (isNumberedList) {
+      return `<ol class="numbers">${lines.map((l) => `<li>${fmt(l.replace(/^\s*\d+\.\s+/, ''))}</li>`).join('')}</ol>`;
+    }
+    return `<p>${lines.map((l) => fmt(l)).join(' ')}</p>`;
+  }).join('');
 }
 
 export { esc };

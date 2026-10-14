@@ -1,13 +1,18 @@
 import { NS, C, el, glowFilter, lin } from './svg.js';
+import { mountDopamineSynapse } from './synapse-machinery.js';
 
 export default {
   type: 'machinery',
 
   mount(container, props = {}, ctx = {}) {
+    if (props.kind === 'dopamine-synapse') {
+      return mountDopamineSynapse(container, props, ctx);
+    }
+
     const { world, clock, setControls } = ctx;
 
     const width = 800;
-    const height = 280;
+    const height = 300;
 
     const svg = el('svg', {
       viewBox: `0 0 ${width} ${height}`,
@@ -20,14 +25,17 @@ export default {
     let glutamateOn = false;
     let depolarizedOn = false;
     let lastToggleTime = 0;
+    let tDA = props.tDA ?? 0.8;
 
     // Header controls
+    let outcomeBadge = null;
+
     if (setControls) {
       const ctrls = document.createElement('div');
       ctrls.className = 'dock-ctrl-group';
       ctrls.style.display = 'flex';
       ctrls.style.alignItems = 'center';
-      ctrls.style.gap = '10px';
+      ctrls.style.gap = '8px';
 
       const gluBtn = document.createElement('button');
       gluBtn.type = 'button';
@@ -38,6 +46,7 @@ export default {
         glutamateOn = !glutamateOn;
         gluBtn.setAttribute('aria-pressed', glutamateOn ? 'true' : 'false');
         lastToggleTime = clock.t;
+        updateOutcome();
       });
 
       const depBtn = document.createElement('button');
@@ -49,6 +58,24 @@ export default {
         depolarizedOn = !depolarizedOn;
         depBtn.setAttribute('aria-pressed', depolarizedOn ? 'true' : 'false');
         lastToggleTime = clock.t;
+        updateOutcome();
+      });
+
+      const daLbl = document.createElement('span');
+      daLbl.className = 'dock-label';
+      daLbl.textContent = `Dopamine: ${tDA.toFixed(1)}s`;
+
+      const daSlider = document.createElement('input');
+      daSlider.type = 'range';
+      daSlider.className = 'dock-range';
+      daSlider.min = '0.2';
+      daSlider.max = '2.8';
+      daSlider.step = '0.1';
+      daSlider.value = String(tDA);
+      daSlider.addEventListener('input', (e) => {
+        tDA = parseFloat(e.target.value);
+        daLbl.textContent = `Dopamine: ${tDA.toFixed(1)}s`;
+        updateOutcome();
       });
 
       const playBtn = document.createElement('button');
@@ -67,6 +94,8 @@ export default {
 
       ctrls.appendChild(gluBtn);
       ctrls.appendChild(depBtn);
+      ctrls.appendChild(daLbl);
+      ctrls.appendChild(daSlider);
       ctrls.appendChild(playBtn);
       setControls(ctrls);
     }
@@ -330,7 +359,51 @@ export default {
       tagSparklineArea.setAttribute('d', `${d} L ${spX + spW} ${spY} L ${spX} ${spY} Z`);
     }
 
-    updateTagSparkline(0);
+    // Extra inserted AMPA receptor (channel 3, inserted when coincidence + dopamine in time)
+    const extraAmpaX = midX + 160;
+    const extraAmpaGroup = el('g', { class: 'extra-ampa', opacity: '0' }, mainGroup);
+    el('rect', { x: extraAmpaX - 10, y: postMembraneY - 6, width: 6, height: 22, rx: '3', fill: '#ffcf6b' }, extraAmpaGroup);
+    el('rect', { x: extraAmpaX + 4, y: postMembraneY - 6, width: 6, height: 22, rx: '3', fill: '#ffcf6b' }, extraAmpaGroup);
+    const extraAmpaLbl = el('text', {
+      x: extraAmpaX,
+      y: postMembraneY + 28,
+      'text-anchor': 'middle',
+      fill: '#ffcf6b',
+      'font-family': 'var(--display)',
+      'font-size': '10',
+      'font-weight': '600',
+    }, extraAmpaGroup);
+    extraAmpaLbl.textContent = '+AMPA';
+
+    // Outcome banner at bottom
+    const outcomeText = el('text', {
+      x: midX,
+      y: height - 12,
+      'text-anchor': 'middle',
+      fill: C.muted,
+      'font-family': 'var(--display)',
+      'font-size': '10',
+      'font-weight': '500',
+    }, mainGroup);
+
+    function updateOutcome() {
+      const state = world.nmda({ glutamate: glutamateOn, depolarized: depolarizedOn });
+      if (state.open && tDA <= 1.2) {
+        extraAmpaGroup.setAttribute('opacity', '1');
+        outcomeText.setAttribute('fill', '#ffcf6b');
+        outcomeText.textContent = `Coincidence detected: Dopamine arrived at ${tDA.toFixed(1)}s (within tag window) -> Extra AMPA inserted, synapse strengthened!`;
+      } else if (state.open && tDA > 1.2) {
+        extraAmpaGroup.setAttribute('opacity', '0');
+        outcomeText.setAttribute('fill', '#ff6b7d');
+        outcomeText.textContent = `Tag expired: Dopamine arrived at ${tDA.toFixed(1)}s (too late) -> No AMPA insertion, connection remains unchanged.`;
+      } else {
+        extraAmpaGroup.setAttribute('opacity', '0');
+        outcomeText.setAttribute('fill', C.muted);
+        outcomeText.textContent = 'Two keys required: Glutamate opens the gate, Depolarization pops the magnesium plug.';
+      }
+    }
+
+    updateOutcome();
 
     return {
       render(t) {

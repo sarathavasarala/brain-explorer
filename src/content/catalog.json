@@ -470,7 +470,17 @@
     "eligibility trace",
     "ampa receptor",
     "nmda receptor",
-    "depolarized"
+    "depolarized",
+    "tonic dopamine",
+    "tonic baseline",
+    "phasic dopamine",
+    "d1 receptor",
+    "d2 receptor",
+    "autoreceptor",
+    "homeostasis",
+    "downregulation",
+    "anhedonia",
+    "variable-ratio schedule"
   ],
   "roles": [
     "more_active",
