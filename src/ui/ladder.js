@@ -26,8 +26,9 @@ export function renderLadder(items, activeId, { hrefPrefix = null, attr = 'data-
         <span class="rung-label">${esc(item.label)}</span>
         ${item.scale ? `<span class="rung-scale">${esc(item.scale)}</span>` : ''}`;
 
-      if (hrefPrefix) {
-        return `<a class="rung ${on ? 'is-on' : ''}" role="tab" aria-selected="${on}" href="${hrefPrefix}/${item.id}" ${attr}="${item.id}">
+      const href = item.href || (hrefPrefix ? `${hrefPrefix}/${item.id}` : null);
+      if (href) {
+        return `<a class="rung ${on ? 'is-on' : ''}" role="tab" aria-selected="${on}" href="${href}" ${attr}="${item.id}">
           ${content}
         </a>`;
       }

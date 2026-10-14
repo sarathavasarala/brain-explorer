@@ -7,7 +7,7 @@ import { renderAsk, renderChat, scriptToPathwayJs } from './ui/ask.js';
 import { renderLibraryShell, renderLibraryBody } from './ui/library.js';
 import { renderChemHome, renderChem } from './ui/chem.js';
 import { renderCellHome, renderCell } from './ui/cell.js';
-import { setStepperStage, getStepperStage, setDrugMode, toggleStepperPlay, stopStepperPlay, renderSynapseStepper } from './ui/synapse-stepper.js';
+import { setStepperStage, getStepperStage, setDrugMode, toggleStepperPlay, stopStepperPlay, renderSynapseStepper, stageForDrug, setHighlightedReceptor, getHighlightedReceptor } from './ui/synapse-stepper.js';
 import { ask, cached, normalise } from './services/ask.js';
 import { sendChat, getAiConfig, saveAiConfig, clearAiConfig, hasAiKey } from './services/chat.js';
 import { telemetry } from './services/telemetry.js';
@@ -33,6 +33,8 @@ const tipEl = $('#tip');
 const lensLegendEl = $('#lens-legend');
 const stateLegendEl = $('#state-legend');
 const cellInsetEl = $('#cell-inset');
+const synapseStageEl = $('#synapse-stage');
+const stageEl = $('.stage');
 const sidebarToggleBtn = $('#sidebar-toggle');
 const sidebarBackdrop = $('#sidebar-backdrop');
 const sidebarEl = $('.sidebar');
@@ -264,6 +266,38 @@ function showSketch(r, key) {
   playStep(scene, playerDeps, script, 0, { key });
 }
 
+function syncSynapseStage() {
+  if (!synapseStageEl || !stageEl) return;
+  const r = state.route;
+  const isSynapseView = r.type === 'chem' && (r.tab === 'synapse' || r.tab === 'medicine');
+  stageEl.classList.toggle('is-synapse', isSynapseView);
+  synapseStageEl.hidden = !isSynapseView;
+  if (!isSynapseView) return;
+
+  const chem = chemById.get(r.id);
+  if (!chem) return;
+  synapseStageEl.style.setProperty('--accent', chem.color);
+  synapseStageEl.innerHTML = renderSynapseStepper(chem, {
+    stage: getStepperStage(),
+    drugId: r.sub,
+    tab: r.tab,
+  });
+
+  // Sync active stage highlight in sidebar if on synapse tab
+  explainerEl.querySelectorAll('.syn-life-card[data-stage]').forEach((card) => {
+    const on = Number(card.dataset.stage) === getStepperStage();
+    card.classList.toggle('is-on', on);
+    const status = card.querySelector('.syn-life-status');
+    if (status) status.textContent = on ? 'Showing on stage' : 'View stage';
+  });
+
+  // Sync active receptor highlight in sidebar if on synapse tab
+  const hiRec = getHighlightedReceptor();
+  explainerEl.querySelectorAll('.receptor-card[data-receptor-card]').forEach((card) => {
+    card.classList.toggle('is-on', card.dataset.receptorCard === hiRec);
+  });
+}
+
 function apply() {
   const prev = state.route;
   const r = (state.route = parseHash());
@@ -271,7 +305,11 @@ function apply() {
     stopPlay();
     runner.stop();
   }
-  if (r.type !== 'chem') stopStepperPlay();
+  if (r.type !== 'chem' || (r.tab !== 'synapse' && r.tab !== 'medicine')) {
+    stopStepperPlay();
+    setHighlightedReceptor(null);
+    syncSynapseStage();
+  }
   setMode(r.type);
   setMobileSidebar(false);
   if (bottomSheet && prev.id !== r.id && bottomSheet.getState() === 'peek') {
@@ -416,12 +454,27 @@ function apply() {
       }
 
       if (lensLegendEl) {
-        lensLegendEl.hidden = false;
-        lensLegendEl.style.setProperty('--accent', chem.color);
+        const isSynapseView = (r.tab === 'synapse' || r.tab === 'medicine');
+        lensLegendEl.hidden = isSynapseView;
+        if (!isSynapseView) lensLegendEl.style.setProperty('--accent', chem.color);
+      }
+    }
+
+    if (prev.type !== 'chem' || prev.id !== r.id) {
+      setStepperStage(0);
+      setHighlightedReceptor(null);
+    }
+
+    if ((r.tab === 'synapse' || r.tab === 'medicine') && r.sub && (r.sub !== prev.sub || prev.id !== r.id)) {
+      const drug = (chem.drugs || []).find((d) => d.id === r.sub);
+      if (drug) {
+        setDrugMode(true);
+        setStepperStage(stageForDrug(drug));
       }
     }
 
     explainerEl.innerHTML = renderChem(chem, r.tab, r.sub);
+    syncSynapseStage();
     if (prev.type !== 'chem' || prev.id !== r.id) explainerEl.scrollTop = 0;
     if (r.tab === 'tracts' && r.sub) {
       const activeCard = explainerEl.querySelector(`.tract-card[data-tract="${r.sub}"]`);
@@ -429,6 +482,9 @@ function apply() {
     } else if (r.tab === 'axis' && r.sub != null) {
       const activeCard = explainerEl.querySelector(`.axis-card[data-step="${r.sub}"]`);
       if (activeCard) activeCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    } else if (r.tab === 'medicine' && r.sub) {
+      const activeDrugCard = explainerEl.querySelector(`.drug-card[data-drug-card="${r.sub}"]`);
+      if (activeDrugCard) activeDrugCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     }
   } else if (r.type === 'cellhome') {
     clearScene('cellhome');
@@ -749,6 +805,59 @@ explainerEl.addEventListener('submit', (e) => {
   }
 });
 
+function handleSynapseInteraction(e) {
+  if (state.route.type !== 'chem') return false;
+
+  const stageBtn = e.target.closest('[data-stage]');
+  if (stageBtn) {
+    stopStepperPlay();
+    setHighlightedReceptor(null);
+    const stageNum = Number(stageBtn.dataset.stage);
+    setStepperStage(stageNum);
+    syncSynapseStage();
+    return true;
+  }
+
+  const drugModeBtn = e.target.closest('[data-drug-mode]');
+  if (drugModeBtn) {
+    const isAct = drugModeBtn.dataset.drugMode === 'active';
+    setDrugMode(isAct);
+    syncSynapseStage();
+    return true;
+  }
+
+  const playStepperBtn = e.target.closest('[data-play-stepper]');
+  if (playStepperBtn) {
+    toggleStepperPlay(() => {
+      syncSynapseStage();
+    });
+    syncSynapseStage();
+    return true;
+  }
+
+  const synRec = e.target.closest('.syn-receptor[data-receptor]');
+  if (synRec) {
+    setStepperStage(3);
+    const recId = synRec.dataset.receptor;
+    const isAlreadyHi = getHighlightedReceptor() === recId;
+    setHighlightedReceptor(isAlreadyHi ? null : recId);
+    syncSynapseStage();
+    if (!isAlreadyHi) {
+      const targetCard = explainerEl.querySelector(`.receptor-card[data-receptor-card="${recId}"]`);
+      if (targetCard) targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    return true;
+  }
+
+  return false;
+}
+
+if (synapseStageEl) {
+  synapseStageEl.addEventListener('click', (e) => {
+    handleSynapseInteraction(e);
+  });
+}
+
 explainerEl.addEventListener('click', (e) => {
   const rung = e.target.closest('.rung');
   if (rung && state.route.type === 's') {
@@ -860,38 +969,31 @@ explainerEl.addEventListener('click', (e) => {
   if (trackStep) { stopPlay(); stepTo(Number(trackStep.dataset.step)); }
   const head = e.target.closest('.step-head');
   if (head) { stopPlay(); stepTo(Number(head.dataset.step)); }
-  const stageBtn = e.target.closest('[data-stage]');
-  if (stageBtn && state.route.type === 'chem') {
-    const stageNum = Number(stageBtn.dataset.stage);
-    setStepperStage(stageNum);
-    const chem = chemById.get(state.route.id);
-    const stepperEl = explainerEl.querySelector('.stepper');
-    if (chem && stepperEl) {
-      stepperEl.outerHTML = renderSynapseStepper(chem, { stage: stageNum, drugId: state.route.sub });
-    }
+  if (handleSynapseInteraction(e)) return;
+
+  const recCard = e.target.closest('.receptor-card[data-receptor-card]');
+  if (recCard && state.route.type === 'chem' && !e.target.closest('a')) {
+    setStepperStage(3);
+    const recId = recCard.dataset.receptorCard;
+    const isAlreadyHi = getHighlightedReceptor() === recId;
+    setHighlightedReceptor(isAlreadyHi ? null : recId);
+    syncSynapseStage();
     return;
   }
-  const drugModeBtn = e.target.closest('[data-drug-mode]');
-  if (drugModeBtn && state.route.type === 'chem') {
-    const isAct = drugModeBtn.dataset.drugMode === 'active';
-    setDrugMode(isAct);
-    const chem = chemById.get(state.route.id);
-    const stepperEl = explainerEl.querySelector('.stepper');
-    if (chem && stepperEl) {
-      stepperEl.outerHTML = renderSynapseStepper(chem, { stage: getStepperStage(), drugId: state.route.sub });
+
+  const drugCard = e.target.closest('.drug-card[data-drug-card]');
+  if (drugCard && state.route.type === 'chem') {
+    const resetLink = e.target.closest('a.drug-reset-link');
+    if (resetLink) return;
+    const drugId = drugCard.dataset.drugCard;
+    if (drugId) {
+      e.preventDefault();
+      const isAlreadyOn = state.route.sub === drugId;
+      location.hash = isAlreadyOn
+        ? `#/chem/${state.route.id}/medicine`
+        : `#/chem/${state.route.id}/medicine/${drugId}`;
+      return;
     }
-    return;
-  }
-  const playStepperBtn = e.target.closest('[data-play-stepper]');
-  if (playStepperBtn && state.route.type === 'chem') {
-    const chem = chemById.get(state.route.id);
-    toggleStepperPlay((nextStage) => {
-      const stepperEl = explainerEl.querySelector('.stepper');
-      if (chem && stepperEl) {
-        stepperEl.outerHTML = renderSynapseStepper(chem, { stage: nextStage, drugId: state.route.sub });
-      }
-    });
-    return;
   }
   if (act === 'cell-fire' && state.route.type === 'cell') {
     cellFireActive = !cellFireActive;
@@ -926,11 +1028,24 @@ function showTip(el) {
 document.addEventListener('mouseover', (e) => {
   const t = e.target.closest('.term');
   if (t) showTip(t);
+  const recCard = e.target.closest('.receptor-card[data-receptor-card]');
+  if (recCard && synapseStageEl && !synapseStageEl.hidden) {
+    const synRec = synapseStageEl.querySelector(`.syn-receptor[data-receptor="${recCard.dataset.receptorCard}"]`);
+    if (synRec) synRec.classList.add('is-hi');
+  }
 });
 document.addEventListener('mouseout', (e) => {
   const t = e.target.closest('.term');
   if (t && !t.contains(e.relatedTarget)) {
     tipEl.classList.remove('is-on');
+  }
+  const recCard = e.target.closest('.receptor-card[data-receptor-card]');
+  if (recCard && synapseStageEl && !synapseStageEl.hidden) {
+    const recId = recCard.dataset.receptorCard;
+    if (getHighlightedReceptor() !== recId) {
+      const synRec = synapseStageEl.querySelector(`.syn-receptor[data-receptor="${recId}"]`);
+      if (synRec) synRec.classList.remove('is-hi');
+    }
   }
 });
 document.addEventListener('focusin', (e) => {
@@ -1044,6 +1159,24 @@ window.addEventListener('keydown', (e) => {
     return;
   }
   const r = state.route;
+  if (r.type === 'chem' && (r.tab === 'synapse' || r.tab === 'medicine')) {
+    if (['1', '2', '3', '4', '5'].includes(e.key)) {
+      e.preventDefault();
+      stopStepperPlay();
+      setHighlightedReceptor(null);
+      setStepperStage(Number(e.key) - 1);
+      syncSynapseStage();
+      return;
+    }
+    if (e.key === ' ') {
+      e.preventDefault();
+      toggleStepperPlay(() => {
+        syncSynapseStage();
+      });
+      syncSynapseStage();
+      return;
+    }
+  }
   if ((e.key === 'ArrowDown' || e.key === 'ArrowUp') && ['home', 's', 'p', 'chem', 'chemhome', 'cell', 'cellhome'].includes(r.type)) {
     e.preventDefault();
     const d = e.key === 'ArrowDown' ? 1 : -1;

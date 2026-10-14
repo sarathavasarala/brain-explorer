@@ -4,7 +4,7 @@ import { getChemTabs } from '../content/chem-tabs.js';
 import { fmt, paragraphs, esc } from './format.js';
 import { renderLadder } from './ladder.js';
 import { renderSpeedWidget } from './speed.js';
-import { renderSynapseStepper, getStepperStage } from './synapse-stepper.js';
+import { STAGES, getStepperStage, getHighlightedReceptor, getDrugMode, stageForDrug, getDrugStageNote } from './synapse-stepper.js';
 import { icon } from './icons.js';
 
 function bullets(list) {
@@ -209,47 +209,83 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
     `;
   } else if (activeTab === 'synapse') {
     const receptors = chem.receptors || [];
+    const currentStage = getStepperStage();
+    const drug = sub ? (chem.drugs || []).find((d) => d.id === sub) : null;
+    const isDrugActive = !!(drug && getDrugMode());
+    const drugTargetStage = isDrugActive ? stageForDrug(drug) : -1;
+    const hiRec = getHighlightedReceptor();
     body = `
       <div class="level">
-        ${renderSynapseStepper(chem, { stage: getStepperStage(), drugId: sub })}
+        <div class="syn-life-section">
+          <h3 class="fig-title">Synapse Lifecycle</h3>
+          <ol class="syn-life-list">
+            ${STAGES.map((st) => {
+              const isCurrent = st.id === currentStage;
+              const text = chem.life?.[st.key] || '';
+              const drugNote = (isDrugActive && st.id === drugTargetStage) ? getDrugStageNote(drug) : '';
+              return `<li class="fig syn-life-card ${isCurrent ? 'is-on' : ''}" data-stage="${st.id}">
+                <div class="syn-life-head">
+                  <span class="syn-life-num">${esc(st.short)}</span>
+                  <span class="syn-life-status">${isCurrent ? 'Showing on stage' : 'View stage'}</span>
+                </div>
+                <p class="syn-life-text">${esc(text)}</p>
+                ${drugNote ? `<div class="syn-life-drug-note"><i class="drug-stage-dot"></i> <strong>${esc(drug.name)}:</strong> ${esc(drugNote)}</div>` : ''}
+              </li>`;
+            }).join('')}
+          </ol>
+        </div>
 
         <div class="receptors-section">
           <h3 class="fig-title">Receptors</h3>
           <div class="receptors-list">
-            ${receptors.map((r) => `
-              <div class="fig receptor-card">
-                <div class="receptor-head">
-                  <span class="receptor-name">${esc(r.id)} <span class="receptor-family">(${esc(r.family)})</span></span>
-                  <span class="badge badge-${r.effect}">
-                    ${{ excite: 'Excites', inhibit: 'Quiets', modulate: 'Tunes' }[r.effect] || r.effect}
-                  </span>
+            ${receptors.map((r) => {
+              const isHi = hiRec === r.id;
+              return `
+                <div class="fig receptor-card ${isHi ? 'is-on' : ''}" data-receptor-card="${esc(r.id)}">
+                  <div class="receptor-head">
+                    <span class="receptor-name">${esc(r.id)} <span class="receptor-family">(${esc(r.family)})</span></span>
+                    <span class="badge badge-${r.effect}">
+                      ${{ excite: 'Excites', inhibit: 'Quiets', modulate: 'Tunes' }[r.effect] || r.effect}
+                    </span>
+                  </div>
+                  <div class="receptor-where">${partChips(r.where)}</div>
+                  <p class="receptor-desc">${esc(r.text)}</p>
                 </div>
-                <div class="receptor-where">${partChips(r.where)}</div>
-                <p class="receptor-desc">${esc(r.text)}</p>
-              </div>
-            `).join('')}
+              `;
+            }).join('')}
           </div>
         </div>
       </div>
     `;
   } else if (activeTab === 'medicine') {
     const drugs = chem.drugs || [];
+    const activeDrugId = sub;
     body = `
       <div class="level">
         <h3 class="fig-title">Key Drugs and Clinical Agents</h3>
         <div class="drugs-list">
-          ${drugs.map((d) => `
-            <div class="fig drug-card">
-              <div class="drug-head">
-                <span class="drug-name">${esc(d.name)}</span>
-                <span class="drug-target">Target: ${esc(d.target)}</span>
+          ${drugs.map((d) => {
+            const isOn = d.id === activeDrugId;
+            return `
+              <div class="fig drug-card ${isOn ? 'is-on' : ''}" data-drug-card="${esc(d.id)}">
+                <div class="drug-head">
+                  <span class="drug-name">${esc(d.name)}</span>
+                  <span class="drug-target">Target: ${esc(d.target)}</span>
+                </div>
+                <p class="drug-desc">${esc(d.text)}</p>
+                <div class="drug-card-actions">
+                  ${isOn ? `
+                    <span class="chip drug-link is-active"><i class="dot" style="--c:${chem.color}"></i> Simulating on stage</span>
+                    <a class="drug-reset-link" href="#/chem/${esc(chem.id)}/medicine">Clear</a>
+                  ` : `
+                    <a class="chip drug-link" href="#/chem/${esc(chem.id)}/medicine/${esc(d.id)}">
+                      Simulate on synapse &rarr;
+                    </a>
+                  `}
+                </div>
               </div>
-              <p class="drug-desc">${esc(d.text)}</p>
-              <a class="chip drug-link" href="#/chem/${chem.id}/synapse/${d.id}">
-                See action in synapse stepper &rarr;
-              </a>
-            </div>
-          `).join('')}
+            `;
+          }).join('')}
         </div>
 
         <div class="breaks-section">
@@ -268,6 +304,14 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
     `;
   }
 
+  const hasActiveDrug = (activeTab === 'synapse' || activeTab === 'medicine') && sub && (chem.drugs || []).some((d) => d.id === sub);
+  const ladderTabs = tabs.map((t) => {
+    if (hasActiveDrug && (t.id === 'synapse' || t.id === 'medicine')) {
+      return { ...t, href: `#/chem/${chem.id}/${t.id}/${sub}` };
+    }
+    return t;
+  });
+
   return `<article class="ex" style="--accent:${chem.color}">
     <header class="ex-head">
       <nav class="crumbs">
@@ -283,7 +327,7 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
       <p class="analogy"><span class="analogy-lead">Think of it as</span> ${fmt(chem.analogy)}</p>
     ` : ''}
 
-    ${renderLadder(tabs, activeTab, { hrefPrefix: `#/chem/${chem.id}`, attr: 'data-tab' })}
+    ${renderLadder(ladderTabs, activeTab, { hrefPrefix: `#/chem/${chem.id}`, attr: 'data-tab' })}
 
     ${body}
 

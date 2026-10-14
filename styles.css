@@ -161,6 +161,23 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background: radial-gradient(ellipse 70% 65% at 50% 48%, transparent 55%, rgba(2, 3, 7, 0.75) 100%);
 }
 .labels { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
+/* stage dimming in synapse theater mode */
+.stage canvas#brain {
+  transition: opacity 0.4s var(--ease), filter 0.4s var(--ease);
+}
+.stage.is-synapse canvas#brain {
+  opacity: 0.14;
+  filter: blur(2px);
+  pointer-events: none;
+}
+.stage.is-synapse .toolbar,
+.stage.is-synapse .stage-note,
+.stage.is-synapse .lens-legend,
+.stage.is-synapse .labels {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s var(--ease);
+}
 .orient-label {
   position: absolute; left: 0; top: 0; white-space: nowrap;
   font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase;
@@ -1100,10 +1117,93 @@ kbd {
   color: #fff;
 }
 
-/* ------------------------------------------------------------ chemical & stepper styles */
+/* ------------------------------------------------------------ Center-Stage Synapse Theater */
+.synapse-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 32px;
+  pointer-events: auto;
+}
+.synapse-stage[hidden] {
+  display: none;
+}
+
+.synapse-theater {
+  width: min(860px, 100%);
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(8, 10, 18, 0.84);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(190, 200, 255, 0.14);
+  border-radius: 18px;
+  padding: 16px 20px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65), 0 0 40px color-mix(in oklab, var(--accent, #b98cff) 10%, transparent);
+}
+
+.syn-hud-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.syn-context {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.syn-back-brain {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(190, 200, 255, 0.08);
+  border: 1px solid var(--line);
+  transition: background 0.2s, color 0.2s;
+  text-decoration: none;
+}
+.syn-back-brain:hover {
+  background: rgba(190, 200, 255, 0.16);
+  color: #fff;
+}
+.syn-scale-pill {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.syn-hud-meters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.post-meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent, #b98cff);
+  padding: 3px 10px;
+  border-radius: 6px;
+  background: color-mix(in oklab, var(--accent, #b98cff) 12%, transparent);
+  border: 1px solid color-mix(in oklab, var(--accent, #b98cff) 25%, transparent);
+}
+
 .stepper-drug-banner {
   display: flex; flex-direction: column; gap: 8px;
-  padding: 10px 14px; margin-bottom: 12px; border-radius: 10px;
+  padding: 10px 14px; border-radius: 10px;
   background: rgba(185, 140, 255, 0.1); border: 1px solid rgba(185, 140, 255, 0.28);
   font-size: 12.5px; color: var(--ink);
 }
@@ -1130,9 +1230,35 @@ kbd {
 .drug-clear { color: var(--ink-3); text-decoration: underline; font-size: 11px; }
 .drug-clear:hover { color: var(--ink); }
 
+.synapse-svg {
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+  display: block;
+  border-radius: 12px;
+  background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(18, 22, 38, 0.6) 0%, rgba(8, 10, 18, 0.8) 100%);
+  border: 1px solid rgba(190, 200, 255, 0.08);
+}
+
+.syn-receptor {
+  transition: filter 0.2s var(--ease);
+}
+.syn-receptor.is-hi {
+  filter: drop-shadow(0 0 10px var(--accent, #b98cff));
+}
+.syn-rec-name, .syn-rec-family {
+  font-family: var(--display);
+}
+
+.syn-hud-bottom {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 2px;
+}
+
 .stepper-controls {
   display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
-  margin-top: 10px;
 }
 .stepper-buttons { display: flex; gap: 4px; flex-wrap: wrap; }
 .step-btn {
@@ -1143,6 +1269,22 @@ kbd {
 .step-btn:hover { background: rgba(190, 200, 255, 0.12); color: var(--ink); }
 .step-btn.is-on { background: rgba(190, 200, 255, 0.18); color: #fff; border-color: var(--line-2); }
 
+.drug-stage-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ffcf6b;
+  box-shadow: 0 0 6px #ffcf6b;
+  margin-left: 5px;
+  vertical-align: middle;
+  animation: syn-pulse-dot 1.5s infinite;
+}
+@keyframes syn-pulse-dot {
+  0%, 100% { opacity: 0.6; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.25); }
+}
+
 .stepper-play-btn {
   padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
   background: rgba(190, 200, 255, 0.08); color: var(--ink-2);
@@ -1151,9 +1293,6 @@ kbd {
 .stepper-play-btn:hover { background: rgba(190, 200, 255, 0.14); color: var(--ink); }
 .stepper-play-btn.is-playing { background: color-mix(in oklab, var(--accent) 30%, transparent); color: #fff; }
 
-.stepper-head {
-  display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap;
-}
 .gap-meter {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 11.5px; font-weight: 500; color: var(--ink-2);
@@ -1163,6 +1302,70 @@ kbd {
 .gap-dot {
   width: 6px; height: 6px; border-radius: 50%; background: var(--accent, #b98cff);
   box-shadow: 0 0 6px var(--accent, #b98cff);
+}
+
+.stepper-caption {
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--ink-2);
+  margin: 0;
+}
+
+/* Sidebar Synapse Lifecycle List */
+.syn-life-section {
+  margin-top: 20px;
+}
+.syn-life-list {
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0;
+  display: grid;
+  gap: 8px;
+}
+.syn-life-card {
+  position: relative;
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s var(--ease);
+  border: 1px solid var(--line);
+  background: rgba(190, 200, 255, 0.03);
+}
+.syn-life-card:hover {
+  background: rgba(190, 200, 255, 0.07);
+  border-color: var(--line-2);
+}
+.syn-life-card.is-on {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 8%, rgba(190, 200, 255, 0.03));
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.syn-life-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 4px;
+}
+.syn-life-num {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.syn-life-status {
+  font-size: 11px;
+  color: var(--ink-3);
+  font-weight: 500;
+}
+.syn-life-card.is-on .syn-life-status {
+  color: var(--accent);
+  font-weight: 600;
+}
+.syn-life-text {
+  font-size: 12px;
+  color: var(--ink-2);
+  line-height: 1.45;
+  margin: 0;
 }
 
 .speed-widget { margin-top: 20px; }
@@ -1217,8 +1420,34 @@ kbd {
 .tract-note-blocked { border-left-color: var(--line-2); }
 
 .receptors-section, .drugs-section, .breaks-section { margin-top: 24px; }
-.receptors-list, .drugs-list { display: grid; gap: 10px; margin-top: 10px; }
-.receptor-card, .drug-card { margin: 0; padding: 12px 14px; border-radius: 10px; }
+.receptor-card, .drug-card {
+  margin: 0; padding: 12px 14px; border-radius: 10px;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+.receptor-card:hover, .drug-card:hover {
+  border-color: var(--line-2);
+  background: rgba(190, 200, 255, 0.05);
+}
+.receptor-card.is-on, .drug-card.is-on {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 8%, rgba(190, 200, 255, 0.03));
+  box-shadow: inset 3px 0 0 var(--accent);
+}
+.syn-life-drug-note {
+  margin-top: 8px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: rgba(255, 207, 107, 0.1);
+  border: 1px solid rgba(255, 207, 107, 0.28);
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--ink);
+}
+.syn-life-drug-note .drug-stage-dot {
+  margin-left: 0;
+  margin-right: 5px;
+}
 .receptor-head, .drug-head {
   display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;
 }
@@ -1227,6 +1456,29 @@ kbd {
 .receptor-where { margin: 4px 0 6px; }
 .receptor-desc, .drug-desc { font-size: 12.5px; color: var(--ink-2); margin: 0; line-height: 1.45; }
 .drug-link { margin-top: 8px; font-size: 11.5px; padding: 4px 10px; align-self: flex-start; display: inline-flex; }
+.drug-card-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+  gap: 8px;
+}
+.drug-card-actions .drug-link {
+  margin-top: 0;
+}
+.drug-link.is-active {
+  background: color-mix(in oklab, var(--accent) 18%, rgba(190, 200, 255, 0.08));
+  border-color: var(--accent);
+  color: #fff;
+}
+.drug-reset-link {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  text-decoration: underline;
+}
+.drug-reset-link:hover {
+  color: var(--ink);
+}
 
 .badge-excite {
   font-size: 11px; padding: 2px 7px; border-radius: 6px; font-weight: 500;
@@ -2244,6 +2496,33 @@ kbd {
     min-height: 38px;
     padding: 6px 10px;
     font-size: 11.5px;
+  }
+
+  /* Center-Stage Synapse Theater on mobile */
+  .synapse-stage {
+    padding: 8px 10px;
+  }
+  .synapse-theater {
+    padding: 10px 12px;
+    gap: 6px;
+    border-radius: 12px;
+  }
+  .synapse-svg {
+    max-height: 28vh;
+  }
+  .syn-hud-top {
+    gap: 6px;
+  }
+  .syn-scale-pill {
+    display: none;
+  }
+  .step-btn {
+    padding: 3px 8px;
+    font-size: 11px;
+  }
+  .stepper-caption {
+    font-size: 11.5px;
+    line-height: 1.4;
   }
 
   .dock { display: none !important; }
