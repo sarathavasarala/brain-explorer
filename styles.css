@@ -2500,25 +2500,53 @@ kbd {
 
   /* Center-Stage Synapse Theater on mobile */
   .synapse-stage {
-    padding: 8px 10px;
+    padding: 6px 8px;
+    align-items: flex-start;
   }
   .synapse-theater {
-    padding: 10px 12px;
+    padding: 8px 10px;
     gap: 6px;
     border-radius: 12px;
+    max-height: 100%;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
   }
   .synapse-svg {
-    max-height: 28vh;
+    max-height: clamp(140px, 26vh, 220px);
   }
   .syn-hud-top {
-    gap: 6px;
+    gap: 5px;
   }
   .syn-scale-pill {
     display: none;
   }
-  .step-btn {
+  .syn-back-brain {
     padding: 3px 8px;
     font-size: 11px;
+  }
+  .gap-meter, .post-meter {
+    font-size: 10.5px;
+    padding: 2px 7px;
+  }
+  .stepper-drug-banner {
+    padding: 6px 8px;
+    gap: 4px;
+    font-size: 11.5px;
+  }
+  .drug-note {
+    font-size: 11px;
+    line-height: 1.35;
+  }
+  .stepper-controls {
+    gap: 6px;
+  }
+  .step-btn {
+    padding: 3px 7px;
+    font-size: 10.5px;
+  }
+  .stepper-play-btn {
+    padding: 3px 8px;
+    font-size: 10.5px;
   }
   .stepper-caption {
     font-size: 11.5px;
