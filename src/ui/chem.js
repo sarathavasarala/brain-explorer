@@ -218,19 +218,25 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
       <div class="level">
         <div class="syn-life-section">
           <h3 class="fig-title">Synapse Lifecycle</h3>
-          <ol class="syn-life-list">
+          <ol class="steps syn-steps">
             ${STAGES.map((st) => {
               const isCurrent = st.id === currentStage;
               const text = chem.life?.[st.key] || '';
               const drugNote = (isDrugActive && st.id === drugTargetStage) ? getDrugStageNote(drug) : '';
-              return `<li class="fig syn-life-card ${isCurrent ? 'is-on' : ''}" data-stage="${st.id}">
-                <div class="syn-life-head">
-                  <span class="syn-life-num">${esc(st.short)}</span>
-                  <span class="syn-life-status">${isCurrent ? 'Showing on stage' : 'View stage'}</span>
-                </div>
-                <p class="syn-life-text">${esc(text)}</p>
-                ${drugNote ? `<div class="syn-life-drug-note"><i class="drug-stage-dot"></i> <strong>${esc(drug.name)}:</strong> ${esc(drugNote)}</div>` : ''}
-              </li>`;
+              const cleanLabel = st.label.replace(/^\d+\.\s*/, '');
+              const cleanShort = st.short.replace(/^\d+\.\s*/, '');
+              return `
+                <li class="step ${isCurrent ? 'is-on' : ''}" data-stage="${st.id}">
+                  <button class="step-head" type="button" data-stage="${st.id}">
+                    <span class="step-n">${st.id + 1}</span>
+                    <span class="step-title">${esc(cleanLabel)} (${esc(cleanShort)})</span>
+                  </button>
+                  <div class="step-body" ${isCurrent ? '' : 'hidden'}>
+                    <p class="step-text">${esc(text)}</p>
+                    ${drugNote ? `<div class="syn-life-drug-note"><i class="drug-stage-dot"></i> <strong>${esc(drug.name)}:</strong> ${esc(drugNote)}</div>` : ''}
+                  </div>
+                </li>
+              `;
             }).join('')}
           </ol>
         </div>
@@ -266,11 +272,19 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
         <div class="drugs-list">
           ${drugs.map((d) => {
             const isOn = d.id === activeDrugId;
+            const stageNum = stageForDrug(d);
+            const stageObj = STAGES[stageNum];
+            const cleanShort = stageObj.short.replace(/^\d+\.\s*/, '');
             return `
               <div class="fig drug-card ${isOn ? 'is-on' : ''}" data-drug-card="${esc(d.id)}">
                 <div class="drug-head">
                   <span class="drug-name">${esc(d.name)}</span>
-                  <span class="drug-target">Target: ${esc(d.target)}</span>
+                  <div class="drug-meta">
+                    <span class="drug-stage-pill" title="Acts on Stage ${stageNum + 1}: ${esc(stageObj.label)}">
+                      <span class="step-n-mini">${stageNum + 1}</span> ${esc(cleanShort)}
+                    </span>
+                    <span class="drug-target">Target: ${esc(d.target)}</span>
+                  </div>
                 </div>
                 <p class="drug-desc">${esc(d.text)}</p>
                 <div class="drug-card-actions">

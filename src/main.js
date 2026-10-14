@@ -283,12 +283,13 @@ function syncSynapseStage() {
     tab: r.tab,
   });
 
-  // Sync active stage highlight in sidebar if on synapse tab
-  explainerEl.querySelectorAll('.syn-life-card[data-stage]').forEach((card) => {
-    const on = Number(card.dataset.stage) === getStepperStage();
-    card.classList.toggle('is-on', on);
-    const status = card.querySelector('.syn-life-status');
-    if (status) status.textContent = on ? 'Showing on stage' : 'View stage';
+  // Sync active stage highlight and accordion expansion in sidebar if on synapse tab
+  const curStage = getStepperStage();
+  explainerEl.querySelectorAll('.syn-steps .step[data-stage]').forEach((stepEl) => {
+    const on = Number(stepEl.dataset.stage) === curStage;
+    stepEl.classList.toggle('is-on', on);
+    const bodyEl = stepEl.querySelector('.step-body');
+    if (bodyEl) bodyEl.hidden = !on;
   });
 
   // Sync active receptor highlight in sidebar if on synapse tab
@@ -967,8 +968,8 @@ explainerEl.addEventListener('click', (e) => {
   if (act === 'play') togglePlay();
   const trackStep = e.target.closest('.pl-track [data-step]');
   if (trackStep) { stopPlay(); stepTo(Number(trackStep.dataset.step)); }
-  const head = e.target.closest('.step-head');
-  if (head) { stopPlay(); stepTo(Number(head.dataset.step)); }
+  const head = e.target.closest('.step-head[data-step]');
+  if (head && state.route.type === 'p') { stopPlay(); stepTo(Number(head.dataset.step)); }
   if (handleSynapseInteraction(e)) return;
 
   const recCard = e.target.closest('.receptor-card[data-receptor-card]');
