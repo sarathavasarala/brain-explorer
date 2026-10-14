@@ -1,13 +1,13 @@
 import { esc, fmt } from './format.js';
 
-const CELL = 'rgba(205, 213, 255, 0.3)';
+const CELL = 'rgba(190, 200, 255, 0.3)';
 
 export const STAGES = [
-  { id: 0, key: 'made', short: '1. Made', label: '1. Synthesis' },
-  { id: 1, key: 'packed', short: '2. Packed', label: '2. Vesicle Loading' },
-  { id: 2, key: 'released', short: '3. Released', label: '3. Vesicle Fusion' },
-  { id: 3, key: 'binds', short: '4. Binds', label: '4. Receptor Binding' },
-  { id: 4, key: 'cleared', short: '5. Cleared', label: '5. Signal Clearance' },
+  { id: 0, key: 'made', short: '1. Made', label: 'Synthesis' },
+  { id: 1, key: 'packed', short: '2. Packed', label: 'Vesicle Loading' },
+  { id: 2, key: 'released', short: '3. Released', label: 'Vesicle Fusion' },
+  { id: 3, key: 'binds', short: '4. Binds', label: 'Receptor Binding' },
+  { id: 4, key: 'cleared', short: '5. Cleared', label: 'Signal Clearance' },
 ];
 
 export function stageForDrug(drug) {
@@ -185,8 +185,8 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
       </div>
       <div class="drug-mode-row">
         <div class="drug-mode-toggle" role="group" aria-label="Drug condition">
-          <button class="drug-toggle-btn ${!isDrugActive ? 'is-on' : ''}" data-drug-mode="normal">Normal</button>
-          <button class="drug-toggle-btn ${isDrugActive ? 'is-on' : ''}" data-drug-mode="active">With ${esc(drug.name)}</button>
+          <button class="drug-toggle-btn ${!isDrugActive ? 'is-on' : ''}" data-drug-mode="normal" aria-pressed="${!isDrugActive ? 'true' : 'false'}">Normal</button>
+          <button class="drug-toggle-btn ${isDrugActive ? 'is-on' : ''}" data-drug-mode="active" aria-pressed="${isDrugActive ? 'true' : 'false'}">With ${esc(drug.name)}</button>
         </div>
         <a class="drug-clear" href="#/chem/${esc(chem.id)}/${tab || 'synapse'}" title="Remove drug simulation">Clear drug</a>
       </div>
@@ -468,7 +468,7 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
         </path>
       </g>` : '';
 
-    return `<g class="syn-receptor ${isHi ? 'is-hi' : ''} ${glowClass}" data-receptor="${esc(r.id)}" style="cursor: pointer;">
+    return `<g class="syn-receptor ${isHi ? 'is-hi' : ''} ${glowClass}" data-receptor="${esc(r.id)}" role="button" tabindex="0" aria-label="Receptor ${esc(r.id)}" style="cursor: pointer;">
       <!-- Channel silhouette -->
       <path d="M${rx - 15} 285 v-12 h7 v7 h16 v-7 h7 v12" stroke="${color}" stroke-width="1.8" fill="rgba(190,200,255,0.08)"/>
       ${cap}
@@ -551,12 +551,12 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
           </feMerge>
         </filter>
         <linearGradient id="bouton-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="rgba(205, 213, 255, 0.08)" />
-          <stop offset="100%" stop-color="rgba(205, 213, 255, 0.02)" />
+          <stop offset="0%" stop-color="rgba(190, 200, 255, 0.08)" />
+          <stop offset="100%" stop-color="rgba(190, 200, 255, 0.02)" />
         </linearGradient>
         <linearGradient id="spine-fill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stop-color="rgba(205, 213, 255, 0.03)" />
-          <stop offset="100%" stop-color="rgba(205, 213, 255, 0.07)" />
+          <stop offset="0%" stop-color="rgba(190, 200, 255, 0.03)" />
+          <stop offset="100%" stop-color="rgba(190, 200, 255, 0.07)" />
         </linearGradient>
       </defs>
 
@@ -613,7 +613,7 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
           ${STAGES.map((st) => {
             const hasDrugDot = isDrugActive && stageForDrug(drug) === st.id;
             return `
-              <button class="step-btn ${st.id === currentStage ? 'is-on' : ''}" data-stage="${st.id}" aria-current="${st.id === currentStage ? 'step' : 'false'}">
+              <button class="step-btn ${st.id === currentStage ? 'is-on' : ''}" data-stage="${st.id}" ${st.id === currentStage ? 'aria-current="step"' : ''}>
                 ${st.short}
                 ${hasDrugDot ? '<i class="drug-stage-dot" title="Drug target stage"></i>' : ''}
               </button>

@@ -283,19 +283,19 @@ function syncSynapseStage() {
     tab: r.tab,
   });
 
-  // Sync active stage highlight and accordion expansion in sidebar if on synapse tab
-  const curStage = getStepperStage();
-  explainerEl.querySelectorAll('.syn-steps .step[data-stage]').forEach((stepEl) => {
-    const on = Number(stepEl.dataset.stage) === curStage;
-    stepEl.classList.toggle('is-on', on);
-    const bodyEl = stepEl.querySelector('.step-body');
-    if (bodyEl) bodyEl.hidden = !on;
-  });
+  // Sync active stage narrative card in explainer sheet if on synapse tab
+  if (r.tab === 'synapse') {
+    const scrollPos = explainerEl.scrollTop;
+    explainerEl.innerHTML = renderChem(chem, r.tab, r.sub);
+    explainerEl.scrollTop = scrollPos;
+  }
 
   // Sync active receptor highlight in sidebar if on synapse tab
   const hiRec = getHighlightedReceptor();
   explainerEl.querySelectorAll('.receptor-card[data-receptor-card]').forEach((card) => {
-    card.classList.toggle('is-on', card.dataset.receptorCard === hiRec);
+    const on = card.dataset.receptorCard === hiRec;
+    card.classList.toggle('is-on', on);
+    card.setAttribute('aria-pressed', on ? 'true' : 'false');
   });
 }
 
@@ -808,6 +808,18 @@ explainerEl.addEventListener('submit', (e) => {
 
 function handleSynapseInteraction(e) {
   if (state.route.type !== 'chem') return false;
+
+  const stageNavBtn = e.target.closest('[data-act="prev-stage"], [data-act="next-stage"]');
+  if (stageNavBtn) {
+    stopStepperPlay();
+    setHighlightedReceptor(null);
+    const cur = getStepperStage();
+    const d = stageNavBtn.dataset.act === 'next-stage' ? 1 : -1;
+    const nextStage = Math.min(Math.max(cur + d, 0), 4);
+    setStepperStage(nextStage);
+    syncSynapseStage();
+    return true;
+  }
 
   const stageBtn = e.target.closest('[data-stage]');
   if (stageBtn) {
@@ -1434,8 +1446,23 @@ syncToolbar();
 
 // Register PWA service worker for mobile installability and offline shell
 if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('./sw.js').catch(() => {});
-  });
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    navigator.serviceWorker.getRegistrations().then((registrations) => {
+      for (const reg of registrations) {
+        reg.unregister();
+      }
+    });
+    if ('caches' in window) {
+      caches.keys().then((keys) => {
+        for (const k of keys) {
+          caches.delete(k);
+        }
+      });
+    }
+  } else {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    });
+  }
 }
 

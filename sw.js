@@ -1,11 +1,11 @@
 // Service Worker for Brain Explorer PWA
 // Provides offline shell caching and enables Add to Home Screen on mobile.
 
-const CACHE_NAME = 'brain-explorer-v5';
+const CACHE_NAME = 'brain-explorer-v6';
 const PRECACHE_URLS = [
   './',
   './index.html',
-  './styles.css?v=8',
+  './styles.css?v=10',
   './manifest.webmanifest',
   './favicon.svg',
   './icons/apple-touch-icon.png',
@@ -40,6 +40,11 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
+
+  // On localhost and development IPs, bypass cache so edits immediately reflect
+  if (url.hostname === 'localhost' || url.hostname === '127.0.0.1' || url.hostname === '0.0.0.0') {
+    return;
+  }
 
   // Never intercept or cache cross-origin requests, API calls, AI queries, or non-GET requests
   if (event.request.method !== 'GET' || url.origin !== self.location.origin || url.pathname.startsWith('/api/')) {

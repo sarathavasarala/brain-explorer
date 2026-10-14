@@ -75,7 +75,7 @@ export function renderEvidence(p, stepIndex) {
 
   if (allClaims.length) {
     html += `<div class="evidence-section">
-      <h4 class="evidence-subhead">Key claims and evidence</h4>
+      <h3 class="evidence-subhead">Key claims and evidence</h3>
       <ul class="evidence-claims-list">`;
     for (const c of allClaims) {
       const basisLabel = BASIS_LABELS[c.basis] || c.basis;
@@ -92,7 +92,7 @@ export function renderEvidence(p, stepIndex) {
 
   if (stepRoutes.length) {
     html += `<div class="evidence-section">
-      <h4 class="evidence-subhead">Route notes and connections</h4>
+      <h3 class="evidence-subhead">Route notes and connections</h3>
       <ul class="evidence-routes-list">`;
     for (const r of stepRoutes) {
       const semLabel = SEMANTICS_LABELS[r.semantics] || r.semantics;
@@ -111,7 +111,7 @@ export function renderEvidence(p, stepIndex) {
 
   if (stepSources.length) {
     html += `<div class="evidence-section">
-      <h4 class="evidence-subhead">Sources</h4>
+      <h3 class="evidence-subhead">Sources</h3>
       <ul class="evidence-sources-list">`;
     for (const s of stepSources) {
       const kindLabel = KIND_LABELS[s.kind] || s.kind;

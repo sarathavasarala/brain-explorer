@@ -244,7 +244,7 @@ function renderAnswerCard(script, step, turnIndex, followups = []) {
           <button class="pl-btn" type="button" data-chat-act="prev" data-turn="${turnIndex}" ${step === 0 ? 'disabled' : ''} aria-label="Previous step">${icon('prev', 18)}</button>
           <button class="pl-btn" type="button" data-chat-act="next" data-turn="${turnIndex}" ${step === script.steps.length - 1 ? 'disabled' : ''} aria-label="Next step">${icon('next', 18)}</button>
           <span class="chat-step-indicator">Step ${step + 1} of ${script.steps.length}</span>
-          <div class="pl-track">${script.steps.map((_, i) => `<span class="${i < step ? 'done' : i === step ? 'on' : ''}"></span>`).join('')}</div>
+          <div class="pl-track">${script.steps.map((s, i) => `<button type="button" class="pl-track-dot ${i < step ? 'done' : i === step ? 'on' : ''}" data-chat-step="${i}" data-turn="${turnIndex}" aria-label="Step ${i + 1}: ${esc(s.title || '')}"></button>`).join('')}</div>
         </div>
         <ol class="steps">
           ${script.steps.map((s, i) => `
@@ -271,7 +271,7 @@ export function renderChat({ turns = [], loading = false, currentQuery = '' } = 
   const providerLabel = config?.provider === 'openai' ? 'OpenAI' : 'Azure OpenAI';
 
   const keyBtnHtml = `
-    <button class="chat-key-btn ${hasKey ? 'is-connected' : ''}" type="button" data-chat-act="open-key-modal" title="Manage AI API key">
+    <button class="chat-key-btn ${hasKey ? 'is-connected' : ''}" type="button" data-chat-act="open-key-modal" aria-haspopup="dialog" aria-expanded="false" title="Manage AI API key">
       ${icon('key', 14)}<span>${hasKey ? providerLabel : 'API key'}</span>
     </button>
   `;
@@ -290,7 +290,7 @@ export function renderChat({ turns = [], loading = false, currentQuery = '' } = 
         <p class="ask-key-subtext">Note: This feature connects directly to an AI model and requires an API key.</p>
         ${chatForm('', { busy: false })}
         <div class="chat-starters">
-          <h3 class="home-h">Try asking</h3>
+          <h2 class="home-h">Try asking</h2>
           <div class="chips">
             ${STARTER_QUESTIONS.map((q) => `
               <button class="chip chip-starter" type="button" data-chat-starter="${esc(q)}">${esc(q)}</button>
@@ -315,7 +315,7 @@ export function renderChat({ turns = [], loading = false, currentQuery = '' } = 
           <button class="chat-new-btn" type="button" data-chat-act="new-chat">${icon('reset', 14)}<span>New question</span></button>
         </div>
       </header>
-      <div class="chat-thread">
+      <div class="chat-thread" aria-live="polite" aria-atomic="false">
         ${turns.map((turn, tIdx) => {
           if (turn.role === 'user') {
             return `<div class="chat-user-msg"><span class="chat-user-text">${esc(turn.text)}</span></div>`;

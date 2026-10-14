@@ -6,6 +6,7 @@ import { renderCircuit, renderSynapse, LINK_COLORS } from './diagrams.js';
 import { icon } from './icons.js';
 import { renderEvidence } from './evidence.js';
 import { renderCheck } from './check.js';
+import { renderBullets, renderPager, renderUpNextCard } from './components.js';
 
 const groupOf = (s) => groups.find((g) => g.id === s.group);
 const childrenOf = (id) => structures.filter((s) => s.parent === id);
@@ -14,11 +15,6 @@ const colorOf = (id) => byId.get(id)?.color || anchorById.get(id)?.color || '#ff
 
 function todo(path) {
   return `<p class="todo">Not written yet. Fill in <code>${esc(path)}</code>.</p>`;
-}
-
-function bullets(list) {
-  if (!list?.length) return '';
-  return `<ul class="bullets">${list.map((b) => `<li>${fmt(b)}</li>`).join('')}</ul>`;
 }
 
 import { renderLadder } from './ladder.js';
@@ -70,7 +66,7 @@ export function renderStateSwitcher(s, levelId, activeStateKind, file) {
   const states = s.breaks?.states || [];
   if (!states.length) {
     return s.breaks?.text
-      ? paragraphs(s.breaks.text) + bullets(s.breaks.bullets)
+      ? paragraphs(s.breaks.text) + renderBullets(s.breaks.bullets)
       : todo(`${file} → ${s.id}.breaks`);
   }
 
@@ -87,7 +83,7 @@ export function renderStateSwitcher(s, levelId, activeStateKind, file) {
 
         return `
           <div class="scenario-row ${isActive ? 'is-open' : ''}">
-            <a class="scenario-header" href="${targetHref}" ${isActive ? 'aria-current="true"' : ''}>
+            <a class="scenario-header" href="${targetHref}" role="button" aria-expanded="${isActive ? 'true' : 'false'}" ${isActive ? 'aria-current="true"' : ''}>
               <div class="scenario-titles">
                 <span class="scenario-label">${esc(st.title || meta.label)}</span>
                 <span class="scenario-teaser">${esc(st.teaser || meta.question)}</span>
@@ -102,7 +98,7 @@ export function renderStateSwitcher(s, levelId, activeStateKind, file) {
                 ${st.signs?.length ? `
                   <div class="state-signs">
                     <h4 class="scenario-subhead">What you'd notice</h4>
-                    <ul class="bullets">${st.signs.map((b) => `<li>${fmt(b)}</li>`).join('')}</ul>
+                    ${renderBullets(st.signs)}
                   </div>
                 ` : ''}
                 ${st.case ? `
@@ -155,7 +151,7 @@ export function renderStructure(s, levelId, source, activeStateKind = null) {
   const displayName = formatPartQuestionName(s.name);
 
   let body = L.text ? paragraphs(L.text) : todo(`${file} → ${s.id}.levels.${level.id}.text`);
-  body += bullets(L.bullets);
+  body += renderBullets(L.bullets);
   if (level.id === 'connects') body += connectionRows(s);
   if (level.id === 'cells') {
     const actingChems = chemicals.filter((c) => c.density && c.density[s.id]);
@@ -183,20 +179,22 @@ export function renderStructure(s, levelId, source, activeStateKind = null) {
   }
 
   return `<article class="ex" style="--accent:${s.color}">
-    <nav class="crumbs">
-      ${activeState ? `
-        <span>Showing: what if the ${esc(displayName)} ${esc(activeState.title || (STATE_METADATA[activeState.kind]?.label || activeState.kind))}</span>
-        <span class="sep">·</span>
-        <a href="#/s/${s.id}/${level.id}">Back to normal view</a>
-      ` : `
-        <span>${esc(g?.label || '')}</span>
-        ${parent ? `<span class="sep">/</span><a href="#/s/${parent.id}/${level.id}">${esc(parent.name)}</a>` : ''}
-      `}
-    </nav>
-    <h1 class="ex-title">${esc(s.name)}</h1>
-    <p class="tagline">${fmt(s.tagline || '')}</p>
-    ${makes.length ? `<div class="part-makes-row"><span class="part-makes-lead">Makes:</span> <span class="chips">${makes.map((c) => `<a class="chip chip-sm" href="#/chem/${c.id}" style="--c:${c.color}"><i class="dot"></i>${esc(c.name)}</a>`).join('')}</span></div>` : ''}
-    ${s.analogy ? `<p class="analogy"><span class="analogy-lead">Think of it as</span> ${fmt(s.analogy)}</p>` : ''}
+    <header class="ex-head">
+      <nav class="crumbs">
+        ${activeState ? `
+          <span>Showing: what if the ${esc(displayName)} ${esc(activeState.title || (STATE_METADATA[activeState.kind]?.label || activeState.kind))}</span>
+          <span class="sep">·</span>
+          <a href="#/s/${s.id}/${level.id}">Back to normal view</a>
+        ` : `
+          <span>${esc(g?.label || '')}</span>
+          ${parent ? `<span class="sep">/</span><a href="#/s/${parent.id}/${level.id}">${esc(parent.name)}</a>` : ''}
+        `}
+      </nav>
+      <h1 class="ex-title">${esc(s.name)}</h1>
+      <p class="tagline">${fmt(s.tagline || '')}</p>
+      ${makes.length ? `<div class="part-makes-row"><span class="part-makes-lead">Makes:</span> <span class="chips">${makes.map((c) => `<a class="chip chip-sm" href="#/chem/${c.id}" style="--c:${c.color}"><i class="dot"></i>${esc(c.name)}</a>`).join('')}</span></div>` : ''}
+      ${s.analogy ? `<p class="analogy"><span class="analogy-lead">Think of it as</span> ${fmt(s.analogy)}</p>` : ''}
+    </header>
     ${ladder(activeState ? null : level.id)}
     <section class="level" data-level="${level.id}">
       <h2 class="level-title">${esc(level.label)} <span>${esc(level.id === 'overview' && s.size ? s.size : level.size)}</span></h2>
@@ -212,10 +210,7 @@ export function renderStructure(s, levelId, source, activeStateKind = null) {
         ${renderStateSwitcher(s, level.id, activeStateKind, file)}
       </section>
     ` : ''}
-    <footer class="pager">
-      ${prev ? `<a href="#/s/${prev.id}/${level.id}" class="pg">${icon('prev', 16)}<span>${esc(prev.name)}</span></a>` : '<span></span>'}
-      ${next ? `<a href="#/s/${next.id}/${level.id}" class="pg pg-next"><span>${esc(next.name)}</span>${icon('next', 16)}</a>` : '<span></span>'}
-    </footer>
+    ${renderPager(prev, next, level.id, '#/s')}
   </article>`;
 }
 
@@ -266,12 +261,7 @@ export function renderPathwayMobile(p, step, playing) {
         ).join('')}
       </div>
       ${renderEvidence(p, step)}
-      ${up ? `<a class="upnext" href="#/p/${up.id}" style="--c:${colorOf(up.steps[0]?.focus?.[0])}; margin-top: 14px;">
-        <span class="upnext-lead"><span>Up next</span>${icon('next', 15)}</span>
-        <span class="upnext-name">${esc(up.name)}</span>
-        <span class="upnext-tag">${fmt(up.tagline || '')}</span>
-        ${routeStrip(up)}
-      </a>` : ''}
+      ${renderUpNextCard(up, routeStrip)}
     </div>
     <footer class="mobile-tour-controls">
       <button class="mobile-tour-btn" data-act="prev" ${step === 0 ? 'disabled' : ''} aria-label="Previous step">
@@ -338,12 +328,7 @@ export function renderLabCard(p, step) {
         ).join('')}
       </div>
       ${renderEvidence(p, step)}
-      ${up ? `<a class="upnext" href="#/p/${up.id}" style="--c:${colorOf(up.steps[0]?.focus?.[0])}; margin-top: 18px;">
-        <span class="upnext-lead"><span>Up next</span>${icon('next', 16)}</span>
-        <span class="upnext-name">${esc(up.name)}</span>
-        <span class="upnext-tag">${fmt(up.tagline || '')}</span>
-        ${routeStrip(up)}
-      </a>` : ''}
+      ${renderUpNextCard(up, routeStrip)}
     </footer>
   </article>`;
 }
@@ -369,7 +354,7 @@ export function renderPathway(p, step, playing, { isMobile = false } = {}) {
       <button class="pl-btn" data-act="prev" ${step === 0 ? 'disabled' : ''} aria-label="Previous step">${icon('prev', 18)}</button>
       <button class="pl-btn pl-play" data-act="play" aria-label="${playing ? 'Pause' : 'Play'}">${icon(playing ? 'pause' : 'play', 18)}<span>${playing ? 'Pause' : 'Play'}</span></button>
       <button class="pl-btn" data-act="next" ${step === p.steps.length - 1 ? 'disabled' : ''} aria-label="Next step">${icon('next', 18)}</button>
-      <div class="pl-track">${p.steps.map((s, i) => `<span class="${i < step ? 'done' : i === step ? 'on' : ''}" data-step="${i}" title="Step ${i + 1}: ${esc(s.title)}" aria-label="Step ${i + 1}: ${esc(s.title)}"></span>`).join('')}</div>
+      <div class="pl-track">${p.steps.map((s, i) => `<button type="button" class="pl-track-dot ${i < step ? 'done' : i === step ? 'on' : ''}" data-step="${i}" title="Step ${i + 1}: ${esc(s.title)}" aria-label="Step ${i + 1}: ${esc(s.title)}"></button>`).join('')}</div>
     </div>
     <ol class="steps">
       ${p.steps.map((s, i) => `
@@ -386,12 +371,7 @@ export function renderPathway(p, step, playing, { isMobile = false } = {}) {
           </div>` : ''}
         </li>`).join('')}
     </ol>
-    ${up ? `<a class="upnext" href="#/p/${up.id}" style="--c:${colorOf(up.steps[0]?.focus?.[0])}">
-      <span class="upnext-lead"><span>Up next</span>${icon('next', 16)}</span>
-      <span class="upnext-name">${esc(up.name)}</span>
-      <span class="upnext-tag">${fmt(up.tagline || '')}</span>
-      ${routeStrip(up)}
-    </a>` : ''}
+    ${renderUpNextCard(up, routeStrip)}
   </article>`;
 }
 
@@ -410,11 +390,11 @@ export function renderHome({ canAsk = true } = {}) {
     <dl class="ladder-key">
       ${levels.map((l) => `<div><dt>${esc(l.label)}</dt><dd>${esc({ overview: 'Its location, shape, landmarks, and what it does in daily life.', connects: 'Who it talks to. The model animates the traffic.', cells: 'The cell types, wiring and chemical messengers inside.' }[l.id] || l.size)}</dd></div>`).join('')}
     </dl>
-    <h3 class="home-h">Explore key brain regions</h3>
+    <h2 class="home-h">Explore key brain regions</h2>
     <div class="chips">${starts.map((id) => { const s = byId.get(id); return `<a class="chip" href="#/s/${id}" style="--c:${s.color}"><i></i>${esc(s.name)}</a>`; }).join('')}</div>
-    <h3 class="home-h">Follow a guided pathway</h3>
+    <h2 class="home-h">Follow a guided pathway</h2>
     <div class="chips">${featuredPathways.map((p) => `<a class="chip chip-path" href="#/p/${p.id}">${icon('pathway', 14)}${esc(p.name)}</a>`).join('')}<a class="chip chip-path" href="#/pathways">See all ${pathways.length} pathways</a></div>
-    ${canAsk ? `<h3 class="home-h">Or ask a question</h3>
+    ${canAsk ? `<h2 class="home-h">Or ask a question</h2>
     <div class="chips"><a class="chip chip-path" href="#/ask">What happens in the brain when…</a></div>` : ''}
     <p class="controls-hint">Drag to rotate · scroll to zoom · right-drag to pan · <kbd>↑</kbd><kbd>↓</kbd> move through parts · <kbd>←</kbd><kbd>→</kbd> change level</p>
   </article>`;
