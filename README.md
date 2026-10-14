@@ -45,7 +45,7 @@ Spans fast neurotransmitters, neuromodulators, and circulating endocrine hormone
 - **Endocrine Hormones** (Cortisol, Adrenaline, Oxytocin, Vasopressin, Melatonin, Thyroid hormone, Leptin, Ghrelin, Growth hormone, Sex hormones, Prolactin): Multi-organ axes connecting the hypothalamus and pituitary down to visceral organs.
 - **Interactive Synapse View**: Step through vesicle loading, exocytosis, receptor binding, and clearance, with toggles for common medications.
 
-### 3. Cells & Morphology (13 Types)
+### 3. Cells & Morphology (14 Types)
 Procedurally generated 3D cells spanning excitatory neurons, inhibitory interneurons, projection cells, and glia:
 - **Excitatory**: Pyramidal neurons, cerebellar/hippocampal granule cells, thalamic relay neurons.
 - **Inhibitory**: Purkinje cells, stellate cells, fast-spiking basket cells, axo-axonic chandelier cells, striatal medium spiny neurons.
@@ -53,11 +53,12 @@ Procedurally generated 3D cells spanning excitatory neurons, inhibitory interneu
 - **Glia**: Astrocytes (blood-brain barrier, glutamate clearance), oligodendrocytes (saltatory myelin), and microglia (synaptic pruning, immune surveillance).
 - **Firing Sequencer**: An interactive step-through showing ion channel openings, voltage thresholds, and transmitter release.
 
-### 4. Guided Pathways (12 Tours)
+### 4. Guided Pathways & Interactive Labs (14 Tours)
 Narrative multi-step tours through brain systems:
 - **Actions**: How you see an object, pick up a scent, reach for a cup, process pain and quiet the hurt, react to fear, or form a lasting memory.
 - **Chemicals**: The dopamine reward loop, serotonin mood regulation, and noradrenaline alert broadcasting.
 - **Networks**: Default mode wandering, executive attention control, and salience switching.
+- **Labs**: Interactive multi-scale experiments (such as *Learning from surprise*) pairing the 3D brain with live spike rasters, Rescorla-Wagner learning curves, microcircuit wiring, and NMDA receptor kinetics.
 
 ### 5. Ask Mode ("Ask the Brain" Chat)
 Ask natural questions about how your brain works, such as *"what happens when I fall asleep?"*, *"why does coffee wake me up?"*, or *"what happens in a panic attack?"*.
@@ -126,6 +127,8 @@ npm run validate
 - `ArrowUp` / `ArrowDown`: Step to previous or next item in the active category.
 - `Escape`: Step back one level or return to whole-brain home.
 - `Space`: Advance to next step in active guided tour.
+- `K`: Play/pause active lab surface.
+- `T`: Advance trial in active lab surface.
 
 ---
 
@@ -157,7 +160,7 @@ brain-explorer/
     │   ├── anchors.js          # Sensory endpoints and body organ anchors
     │   └── glossary/           # Definitions for [[term]] hover markup
     └── ui/
-        ├── explainer.js        # Right card: 4-level zoom ladder, try-it, breaks
+        ├── explainer.js        # Right card: 3-level zoom ladder, try-it, breaks
         ├── sidebar.js          # Unified search and Parts/Chemicals/Cells lists
         ├── chem.js             # Chemical explainer, fibre tracts, hormone axes
         ├── cell.js             # Cell explainer, morphology specs, firing sequencer

@@ -296,8 +296,8 @@ export default [
       {
         id: 'which-cue',
         title: 'Why the buzz, not the background noise?',
-        focus: ['amygdala', 'nucleus-accumbens'],
-        route: [['somatosensory-cortex', 'nucleus-accumbens']],
+        focus: ['somatosensory-cortex', 'auditory-cortex', 'nucleus-accumbens'],
+        route: [['somatosensory-cortex', 'nucleus-accumbens'], ['auditory-cortex', 'nucleus-accumbens']],
         view: 'left',
         layout: 'dock',
         world: 'rpe',

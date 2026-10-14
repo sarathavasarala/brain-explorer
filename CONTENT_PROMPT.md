@@ -23,12 +23,8 @@ Each structure object already has `id`, `name`, `group`, `color`, `shape`, `view
 ```js
 analogy: 'One sentence comparing it to something familiar.',
 levels: {
-  where: {
-    text: '2 to 4 sentences: where it sits, how big it is, what it looks like. Mention neighbours with {{id}} links.',
-    bullets: ['2 to 3 short facts about its shape or parts'],
-  },
-  does: {
-    text: '3 to 5 sentences: what it does, in everyday terms, with one concrete example.',
+  overview: {
+    text: 'Two paragraphs: (1) where it sits, how big it is, what it looks like, mentioning neighbours with {{id}} links; (2) what it does in everyday terms, with one concrete example.',
     bullets: ['3 to 4 jobs, each starting with a short name then a colon'],
   },
   connects: {

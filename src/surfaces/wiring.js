@@ -204,10 +204,11 @@ export default {
         }, edgesGroup);
 
         // Edge label
+        let labelEl = null;
         if (edge.label) {
           const lblX = ctrlX + nx * 10;
           const lblY = ctrlY + ny * 10;
-          const txt = el('text', {
+          labelEl = el('text', {
             x: lblX,
             y: lblY + 3,
             'text-anchor': 'middle',
@@ -215,7 +216,7 @@ export default {
             'font-family': 'var(--display)',
             'font-size': '10',
           }, edgesGroup);
-          txt.textContent = edge.label;
+          labelEl.textContent = edge.label;
         }
 
         // Pulse dot
@@ -231,6 +232,8 @@ export default {
           src,
           dst,
           color,
+          pathEl,
+          labelEl,
           curve: { p0: { x: src.px, y: src.py }, p1: { x: ctrlX, y: ctrlY }, p2: { x: endX, y: endY } },
           dot: pulseDot,
         });
@@ -325,8 +328,8 @@ export default {
       const target = nodeMap.get(traceDef.node);
       const spW = 120;
       const spH = 40;
-      const spX = Math.min(width - spW - 12, target.px - spW / 2);
-      const spY = target.py - 54;
+      const spX = Math.min(width - spW - 16, target.px - spW / 2 + 28);
+      const spY = Math.max(14, target.py - 72);
 
       const box = el('g', { transform: `translate(${spX}, ${spY})` }, traceGroup);
 
@@ -387,6 +390,13 @@ export default {
       render(t) {
         // Update pulses along edges
         for (const item of edgeData) {
+          const condFires = (item.edge.fire || []).filter((f) => f.when);
+          const isCondActive = condFires.length === 0 || condFires.some((f) => toggles[f.when]);
+          item.pathEl.setAttribute('opacity', isCondActive ? '0.65' : '0.16');
+          if (item.labelEl) {
+            item.labelEl.setAttribute('opacity', isCondActive ? '1' : '0.35');
+          }
+
           let pulseActive = false;
           let pulseU = 0;
 

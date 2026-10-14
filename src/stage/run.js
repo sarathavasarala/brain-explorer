@@ -10,6 +10,21 @@ export function createRunner({ scene, stageEl, dockEl }) {
   let currentSurface = null;
   let unsubs = [];
   let isDockVisible = false;
+  let currentLayout = 'brain';
+
+  function syncFrameOffset() {
+    if (!scene) return;
+    if (isDockVisible && currentLayout === 'dock') {
+      const h = dock.getHeight();
+      scene.setFrameOffset(Math.round(h / 2 + 12));
+    } else {
+      scene.setFrameOffset(0);
+    }
+  }
+
+  if (typeof ResizeObserver !== 'undefined' && dockEl) {
+    new ResizeObserver(syncFrameOffset).observe(dockEl);
+  }
 
   function stop() {
     if (currentSurface) {
@@ -24,6 +39,7 @@ export function createRunner({ scene, stageEl, dockEl }) {
     dock.clearControls();
     dock.clearBody();
     isDockVisible = false;
+    currentLayout = 'brain';
 
     if (stageEl) {
       stageEl.classList.remove('is-dock', 'is-focus');
@@ -51,6 +67,7 @@ export function createRunner({ scene, stageEl, dockEl }) {
     dock.clearBody();
 
     const layout = step.layout || (step.surface ? 'dock' : 'brain');
+    currentLayout = layout;
 
     if (stageEl) {
       stageEl.classList.remove('is-dock', 'is-focus');
@@ -61,6 +78,7 @@ export function createRunner({ scene, stageEl, dockEl }) {
     if (layout === 'brain' || !step.surface || (typeof window !== 'undefined' && window.innerWidth <= 900)) {
       dock.hide();
       isDockVisible = false;
+      currentLayout = 'brain';
       if (scene) {
         scene.clearDrive();
         scene.setFrameOffset(0);
@@ -72,12 +90,7 @@ export function createRunner({ scene, stageEl, dockEl }) {
     dock.show();
     isDockVisible = true;
 
-    if (layout === 'dock' && scene) {
-      const h = dock.getHeight();
-      scene.setFrameOffset(Math.round(h / 2 + 12));
-    } else if (scene) {
-      scene.setFrameOffset(0);
-    }
+    syncFrameOffset();
 
     const title = step.surface.title || '';
     dock.setTitle(title);

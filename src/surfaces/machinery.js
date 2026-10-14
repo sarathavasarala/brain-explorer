@@ -76,8 +76,8 @@ export default {
 
     // Layout positions
     const midX = width / 2;
-    const preY = 32;
-    const postMembraneY = 110;
+    const preY = 48;
+    const postMembraneY = 132;
 
     // 1. Presynaptic terminal
     const preTerminal = el('rect', {
@@ -100,7 +100,7 @@ export default {
       'letter-spacing': '0.08em',
       'text-transform': 'uppercase',
     }, mainGroup);
-    preTitle.textContent = 'presynaptic terminal (chime input)';
+    preTitle.textContent = 'presynaptic terminal (buzz input)';
 
     // Vesicles inside presynaptic terminal
     const vesiclePositions = [
@@ -161,8 +161,8 @@ export default {
 
     // Channel 2: NMDA (right)
     const nmdaX = midX + 60;
-    el('rect', { x: nmdaX - 10, y: postMembraneY - 6, width: 6, height: 22, rx: '3', fill: C.cell }, mainGroup);
-    el('rect', { x: nmdaX + 4, y: postMembraneY - 6, width: 6, height: 22, rx: '3', fill: C.cell }, mainGroup);
+    const nmdaLeftWall = el('rect', { x: nmdaX - 10, y: postMembraneY - 6, width: 6, height: 22, rx: '3', fill: C.cell }, mainGroup);
+    const nmdaRightWall = el('rect', { x: nmdaX + 4, y: postMembraneY - 6, width: 6, height: 22, rx: '3', fill: C.cell }, mainGroup);
 
     const nmdaLbl = el('text', {
       x: nmdaX,
@@ -366,17 +366,25 @@ export default {
           voltBar.setAttribute('width', depolarizedOn ? '48' : '12');
         }
 
-        // 3. Magnesium plug behavior
-        if (!state.mgBlocked) {
-          // Open! Slides up and out
-          mgGroup.setAttribute('transform', `translate(0, -32)`);
-          mgGroup.setAttribute('opacity', '0.4');
+        // 3. NMDA pore walls & Magnesium plug behavior across all 4 states
+        nmdaLeftWall.setAttribute('x', String(glutamateOn ? nmdaX - 12 : nmdaX - 8));
+        nmdaRightWall.setAttribute('x', String(glutamateOn ? nmdaX + 6 : nmdaX + 2));
+
+        if (state.open) {
+          // Both Glutamate + Depolarized: pore open and Mg2+ ejected!
+          mgGroup.setAttribute('transform', 'translate(0, -30)');
+          mgGroup.setAttribute('opacity', '0.35');
         } else if (depolarizedOn && !glutamateOn) {
-          // Depolarized alone: wobbles 2px shake, stays plugged
-          const wobble = Math.sin(t * 28) * 2;
-          mgGroup.setAttribute('transform', `translate(${wobble}, 0)`);
+          // Depolarized alone: voltage repels Mg2+ (wobbles), but pore is closed
+          const wobble = Math.sin(t * 24) * 2.2;
+          mgGroup.setAttribute('transform', `translate(${wobble.toFixed(1)}, -6)`);
+          mgGroup.setAttribute('opacity', '0.85');
+        } else if (glutamateOn && !depolarizedOn) {
+          // Glutamate alone: pore opens, but Mg2+ is pulled tight into the pore
+          mgGroup.setAttribute('transform', 'translate(0, 2)');
           mgGroup.setAttribute('opacity', '1');
         } else {
+          // Neither: resting closed state
           mgGroup.setAttribute('transform', 'translate(0, 0)');
           mgGroup.setAttribute('opacity', '1');
         }

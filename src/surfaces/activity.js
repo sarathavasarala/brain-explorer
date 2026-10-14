@@ -85,6 +85,8 @@ export default {
           }
           if (visibleRows >= (props.rows || 30)) {
             visibleRows = 1;
+            updateLearningVisibility();
+            updateRatePaths();
           }
           isRunningTrials = true;
           runTrialsBtn.textContent = 'Pause alerts';
@@ -92,6 +94,7 @@ export default {
             if (visibleRows < (props.rows || 30)) {
               visibleRows++;
               updateLearningVisibility();
+              updateRatePaths();
             } else {
               clearInterval(trialInterval);
               isRunningTrials = false;
@@ -349,34 +352,49 @@ export default {
           const bandRows = cond.rows;
           const rowH = (bandH - 8) / bandRows;
 
-          // Band background / hit rect for hover
+          const isActive = cIdx === highlightedConditionIndex;
+
+          // Band background / hit rect for hover & click
           const bandRect = el('rect', {
             x: 0,
             y: bY0,
             width: width,
             height: bandH,
-            fill: 'transparent',
+            fill: isActive ? 'rgba(185, 140, 255, 0.05)' : 'transparent',
             style: 'cursor: pointer;',
+          }, rasterGroup);
+
+          // Active accent indicator bar on the left of the raster area
+          const bandBar = el('rect', {
+            x: leftPad - 4,
+            y: bY0 + 3,
+            width: 2.5,
+            height: Math.max(4, bandH - 6),
+            rx: '1.25',
+            fill: C.dopamine,
+            opacity: isActive ? '1' : '0',
           }, rasterGroup);
 
           // Band label
           const bandLbl = el('text', {
             x: leftPad - 12,
-            y: bY0 + bandH * 0.45,
+            y: bY0 + bandH * 0.55,
             'text-anchor': 'end',
-            fill: cIdx === highlightedConditionIndex ? C.ink : C.muted,
+            fill: isActive ? C.ink : C.muted,
             'font-family': 'var(--display)',
             'font-size': '11',
-            'font-weight': '500',
+            'font-weight': isActive ? '600' : '500',
           }, rasterGroup);
           bandLbl.textContent = cond.label;
 
-          bandRect.addEventListener('pointerenter', () => {
+          const selectBand = () => {
             highlightedConditionIndex = cIdx;
             updateHighlightBand();
-          });
+          };
+          bandRect.addEventListener('pointerenter', selectBand);
+          bandRect.addEventListener('click', selectBand);
 
-          compareBands.push({ lbl: bandLbl, rect: bandRect, index: cIdx });
+          compareBands.push({ lbl: bandLbl, rect: bandRect, bar: bandBar, index: cIdx });
 
           // Separator
           el('line', {
@@ -413,12 +431,16 @@ export default {
 
     function updateHighlightBand() {
       for (const b of compareBands) {
-        b.lbl.setAttribute('fill', b.index === highlightedConditionIndex ? C.ink : C.muted);
+        const active = b.index === highlightedConditionIndex;
+        b.lbl.setAttribute('fill', active ? C.ink : C.muted);
+        b.lbl.setAttribute('font-weight', active ? '600' : '500');
+        b.rect.setAttribute('fill', active ? 'rgba(185, 140, 255, 0.05)' : 'transparent');
+        if (b.bar) b.bar.setAttribute('opacity', active ? '1' : '0');
       }
       for (let i = 0; i < compareRatePaths.length; i++) {
         const item = compareRatePaths[i];
-        item.path.setAttribute('opacity', i === highlightedConditionIndex ? '1' : '0.35');
-        item.area.setAttribute('opacity', i === highlightedConditionIndex ? '0.12' : '0.04');
+        item.path.setAttribute('opacity', i === highlightedConditionIndex ? '1' : '0.28');
+        item.area.setAttribute('opacity', i === highlightedConditionIndex ? '0.14' : '0.03');
       }
     }
 

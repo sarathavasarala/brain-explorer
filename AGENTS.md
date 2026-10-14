@@ -79,7 +79,7 @@ brain-explorer/
     │   │   ├── groups.js       # Cell groups (Excitatory, Inhibitory, Modulatory, Glia)
     │   │   └── index.js        # Cell definitions with morphology recipes and firing steps
     │   ├── pathways/
-    │   │   ├── groups.js       # Pathway categories (actions, chemicals, networks)
+    │   │   ├── groups.js       # Pathway categories (function, chemistry, network, labs)
     │   │   └── index.js        # Step-by-step guided tours and neural routes
     │   ├── diagrams/
     │   │   └── index.js        # Neural circuit nodes & connections for "Down to cells"
@@ -293,7 +293,7 @@ All content is beginner-accessible, rigorous, and formatted with tiny markup.
   id: 'visual-stream',
   title: 'How you see an object',
   tagline: 'From photons hitting the retina to naming what is in front of you.',
-  category: 'actions',                           // Key from src/content/pathways/groups.js
+  category: 'function',                          // Key from src/content/pathways/groups.js
   color: '#4da6ff',
   summary: '2 to 3 sentences introducing the neural journey.',
   steps: [
@@ -523,7 +523,7 @@ Scene scripts are declarative instructions for painting the 3D brain canvas. Gui
 
 ### Adding a New Pathway
 1. Open `src/content/pathways/index.js`.
-2. Choose a valid `category` from `src/content/pathways/groups.js` (`actions`, `chemicals`, `networks`).
+2. Choose a valid `category` from `src/content/pathways/groups.js` (`function`, `chemistry`, `network`, `labs`).
 3. Write steps sequentially, forming a cohesive narrative.
 4. For each step, supply `focus` (structures to highlight) and `route` (pairs of IDs or body anchors for 3D arcs).
 5. Run `npm run catalog` and `npm run validate`.
@@ -642,7 +642,7 @@ Before submitting any code or content changes, execute this verification sequenc
 4. **Browser Smoke Test**:
    Run `npm start` and test key user journeys in the browser:
    - `#/`: Home point cloud renders cleanly with glowing points and no background haze.
-   - `#/s/hippocampus/where`: Structure highlights in its accent color, camera flies smoothly.
+   - `#/s/hippocampus/overview`: Structure highlights in its accent color, camera flies smoothly.
    - `#/s/hippocampus/connects`: 3D connection arcs animate between structures.
    - `#/s/cerebellum/cells`: Circuit diagram renders SVG nodes, links, and animated pulse dots.
    - `#/pathways`: Library cards load correctly.

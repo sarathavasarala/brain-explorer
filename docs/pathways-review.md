@@ -24,10 +24,11 @@ All 13 curated guided tours and their 70 steps are listed below. Each step has a
 | `acetylcholine-pathways` | Acetylcholine: attention and memory | chemistry | 4 | Reviewed & Disclosed | E5 (Boundaries) |
 | `default-mode-network` | Default mode: the wandering mind | network | 4 | Reviewed & Disclosed | E5 (Boundaries) |
 | `stress-and-fear` | Stress and fear: how threat learning changes | function | 6 | Reviewed & Disclosed | E5 (Boundaries) |
+| `learning-from-surprise` | Learning from surprise | labs | 10 | Draft (Evidentiary claims mapped) | E4/E5 Complete |
 
 ---
 
-## 2. Complete Step Registry (70 Steps)
+## 2. Complete Step Registry (80 Steps)
 
 ### seeing (5 steps)
 1. `retina-photons`: Light hits the retina
@@ -124,6 +125,18 @@ All 13 curated guided tours and their 70 steps are listed below. Each step has a
 4. `prefrontal-disruption`: Prefrontal regulation shifts
 5. `safety-brake-circuit`: Learning that a cue is now safe
 6. `extinction-impairment`: Stress can make safety harder to recall
+
+### learning-from-surprise (10 steps)
+1. `chime-and-juice`: A buzz in your pocket
+2. `surprise-sip`: The first text is a surprise
+3. `burst-moves`: The burst moves to the buzz
+4. `three-outcomes`: A great text, an ordinary one, or spam
+5. `which-cue`: Why the buzz, not the background noise?
+6. `where-they-meet`: Where the buzz and the message meet
+7. `the-tag`: The tag: a lock with two keys
+8. `timing-window`: Dopamine has to arrive in time
+9. `why-flat`: Why the expected text stays flat
+10. `whole-loop`: The whole loop
 
 ---
 
