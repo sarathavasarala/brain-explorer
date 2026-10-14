@@ -41,8 +41,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
 
-  // Never intercept or cache API calls, AI queries, or non-GET requests
-  if (event.request.method !== 'GET' || url.pathname.startsWith('/api/')) {
+  // Never intercept or cache cross-origin requests, API calls, AI queries, or non-GET requests
+  if (event.request.method !== 'GET' || url.origin !== self.location.origin || url.pathname.startsWith('/api/')) {
     return;
   }
 
@@ -72,7 +72,7 @@ self.addEventListener('fetch', (event) => {
         return networkResponse;
       }).catch(() => cachedResponse);
 
-      return cachedResponse || fetchPromise;
+      return cachedResponse || fetchPromise.then((res) => res || new Response('', { status: 504 }));
     })
   );
 });
