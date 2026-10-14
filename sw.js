@@ -5,7 +5,7 @@ const CACHE_NAME = 'brain-explorer-v6';
 const PRECACHE_URLS = [
   './',
   './index.html',
-  './styles.css?v=10',
+  './styles.css?v=11',
   './manifest.webmanifest',
   './favicon.svg',
   './icons/apple-touch-icon.png',
