@@ -522,8 +522,23 @@ function apply() {
     }
     playStep(scene, playerDeps, p, r.step);
     runner.run(p.steps[r.step], { key: `${p.id}:${r.step}` });
-    explainerEl.innerHTML = renderPathway(p, r.step, state.playing, { isMobile: window.innerWidth <= 860 });
-    if (prev.type !== 'p' || prev.id !== r.id) explainerEl.scrollTop = 0;
+    const isMobile = window.innerWidth <= 860;
+    explainerEl.innerHTML = renderPathway(p, r.step, state.playing, { isMobile });
+    if (prev.type !== 'p' || prev.id !== r.id) {
+      if (r.step > 0 && !isMobile) {
+        requestAnimationFrame(() => {
+          const activeStepEl = explainerEl.querySelector(`.step[data-step="${r.step}"]`);
+          if (activeStepEl) activeStepEl.scrollIntoView({ behavior: 'auto', block: 'start' });
+        });
+      } else {
+        explainerEl.scrollTop = 0;
+      }
+    } else if (!isMobile) {
+      requestAnimationFrame(() => {
+        const activeStepEl = explainerEl.querySelector(`.step[data-step="${r.step}"]`);
+        if (activeStepEl) activeStepEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
+    }
   } else if (r.type === 'ask') {
     applyAsk(r);
   }

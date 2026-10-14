@@ -618,6 +618,17 @@ kbd {
 }
 
 /* pathway */
+.ex-path .player {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  margin: 12px 0 16px;
+  background: color-mix(in oklab, var(--panel, #0e111a) 86%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(190, 200, 255, 0.08);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+}
 .player {
   display: flex; align-items: center; gap: 6px; margin: 16px 0 16px;
   padding: 6px; border-radius: 14px; background: rgba(190, 200, 255, 0.04);
@@ -636,6 +647,7 @@ kbd {
 
 .steps { list-style: none; margin: 0; padding: 0; }
 .step { border-bottom: 1px solid var(--line); }
+.ex-path .step { scroll-margin-top: 68px; }
 .step-head { display: flex; align-items: center; gap: 12px; width: 100%; padding: 12px 0; text-align: left; }
 .step-n {
   display: grid; place-items: center; flex: none; width: 24px; height: 24px; border-radius: 50%;
@@ -652,6 +664,37 @@ kbd {
 .step.is-on .step-title { color: var(--ink); font-weight: 600; }
 .step-head:hover .step-title { color: var(--ink); }
 .step-body { padding: 0 0 16px 36px; animation: ex-in 0.45s var(--ease); }
+
+.step-nav {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line-2);
+}
+.step-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 14px 0 16px;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--accent) 18%, transparent);
+  border: 1px solid color-mix(in oklab, var(--accent) 36%, transparent);
+  color: var(--ink);
+  font: 500 12.5px/1 var(--display);
+  cursor: pointer;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s, transform 0.15s;
+}
+.step-nav-btn:hover {
+  background: color-mix(in oklab, var(--accent) 30%, transparent);
+  border-color: color-mix(in oklab, var(--accent) 55%, transparent);
+  transform: translateY(-1px);
+}
+.step-nav-btn:active {
+  transform: translateY(0);
+}
 
 /* tooltip */
 .tip {

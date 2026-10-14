@@ -319,6 +319,14 @@ export function renderPathway(p, step, playing, { isMobile = false } = {}) {
             ${renderCheck(s.check, i, p.id, i === p.steps.length - 1)}
             <div class="chips">${(s.focus || []).map((id) => byId.has(id) ? `<a class="chip" href="#/s/${id}" style="--c:${colorOf(id)}"><i></i>${esc(nameOf(id))}</a>` : `<span class="chip" style="--c:${colorOf(id)}"><i></i>${esc(nameOf(id))}</span>`).join('')}</div>
             ${renderEvidence(p, i)}
+            ${!s.check && i < p.steps.length - 1 ? `
+              <div class="step-nav">
+                <button type="button" class="step-nav-btn" data-act="next">
+                  <span>Next: ${esc(p.steps[i + 1].title)}</span>
+                  ${icon('next', 16)}
+                </button>
+              </div>
+            ` : ''}
           </div>` : ''}
         </li>`).join('')}
     </ol>
