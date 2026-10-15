@@ -238,8 +238,7 @@ const easeOutExpo = (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
 export function createBrainScene(canvas, { structures, anchors = [], chemicals = [], labelsEl, onHover, onPick }) {
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 900;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
-  const MAX_PIXEL = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
-  let pixel = MAX_PIXEL;
+  const pixel = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
   renderer.setPixelRatio(pixel);
   renderer.setClearColor(0x04050a, 1);
 
@@ -617,21 +616,22 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     requestRender();
   }
 
+  const tmpArcPt = new THREE.Vector3();
+  const tmpArcCol = new THREE.Color();
   function updateArcDots(time) {
     if (!arcDots) return;
     const pos = arcDots.geometry.getAttribute('position');
     const col = arcDots.geometry.getAttribute('aColor');
-    const tmp = new THREE.Color();
     for (const arc of arcs) {
       for (let i = 0; i < arc.dots; i++) {
         let t = (time * arc.speed + i / arc.dots) % 1;
         const back = arc.flow === 'back' || (arc.flow === 'both' && i % 2 === 1);
         if (back) t = 1 - t;
-        const p = arc.curve.getPoint(t);
+        const p = arc.curve.getPoint(t, tmpArcPt);
         pos.setXYZ(arc.start + i, p.x, p.y, p.z);
-        tmp.copy(arc.ca).lerp(arc.cb, t);
+        tmpArcCol.copy(arc.ca).lerp(arc.cb, t);
         const dim = arc.isAmbient ? 0.65 : 1.0;
-        col.setXYZ(arc.start + i, tmp.r * dim, tmp.g * dim, tmp.b * dim);
+        col.setXYZ(arc.start + i, tmpArcCol.r * dim, tmpArcCol.g * dim, tmpArcCol.b * dim);
       }
     }
     pos.needsUpdate = true;
@@ -656,17 +656,25 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     const r = id ? recs.get(id) : null;
     const nextId = (r && r.kind === 'region' && !focusIds.includes(id)) ? id : null;
     if (nextId === currentCortexHoverId) return;
+    if (currentCortexHoverId) {
+      const prevRec = recs.get(currentCortexHoverId);
+      if (prevRec?.ptIndices) {
+        const idxs = prevRec.ptIndices;
+        for (let k = 0; k < idxs.length; k++) aHoverAttr.array[idxs[k]] = 0;
+      } else {
+        aHoverAttr.array.fill(0);
+      }
+    }
     currentCortexHoverId = nextId;
-    aHoverAttr.array.fill(0);
     if (nextId) {
       const rec = recs.get(nextId);
-      for (let i = 0; i < nC; i++) {
-        if (rec.mask[i]) {
-          aHoverAttr.array[i] = 0.38;
-          aHoverColorAttr.array[i * 3] = rec.color.r;
-          aHoverColorAttr.array[i * 3 + 1] = rec.color.g;
-          aHoverColorAttr.array[i * 3 + 2] = rec.color.b;
-        }
+      const idxs = rec.ptIndices;
+      for (let k = 0; k < idxs.length; k++) {
+        const i = idxs[k];
+        aHoverAttr.array[i] = 0.38;
+        aHoverColorAttr.array[i * 3] = rec.color.r;
+        aHoverColorAttr.array[i * 3 + 1] = rec.color.g;
+        aHoverColorAttr.array[i * 3 + 2] = rec.color.b;
       }
       aHoverColorAttr.needsUpdate = true;
     }
@@ -721,8 +729,10 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     const paint = (id, value) => {
       const r = recs.get(id);
       if (r?.kind !== 'region') return;
-      for (let i = 0; i < nC; i++) {
-        if (!r.mask[i] || aHi.array[i] >= value) continue;
+      const idxs = r.ptIndices;
+      for (let k = 0; k < idxs.length; k++) {
+        const i = idxs[k];
+        if (aHi.array[i] >= value) continue;
         aHi.array[i] = value;
         aHiColor.array[i * 3] = r.color.r; aHiColor.array[i * 3 + 1] = r.color.g; aHiColor.array[i * 3 + 2] = r.color.b;
       }
@@ -786,8 +796,10 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     const paint = (id, value) => {
       const r = recs.get(id);
       if (r?.kind !== 'region') return;
-      for (let i = 0; i < nC; i++) {
-        if (!r.mask[i] || aHi.array[i] >= value) continue;
+      const idxs = r.ptIndices;
+      for (let k = 0; k < idxs.length; k++) {
+        const i = idxs[k];
+        if (aHi.array[i] >= value) continue;
         aHi.array[i] = value;
         aHiColor.array[i * 3] = r.color.r; aHiColor.array[i * 3 + 1] = r.color.g; aHiColor.array[i * 3 + 2] = r.color.b;
       }
@@ -851,13 +863,13 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     const r = recs.get(id);
     if (!r) return [];
     const sliced = s < 0;
-    let arr, idxs = [];
+    let arr, idxs;
     if (r.kind === 'region') {
       arr = cx.positions;
-      for (let i = 0; i < nC; i++) if (r.mask[i]) idxs.push(i * 3);
+      idxs = r.posIdxs;
     } else if (r.kind === 'deep') {
       arr = r.obj.geometry.getAttribute('position').array;
-      for (let i = 0; i < arr.length; i += 3) idxs.push(i);
+      idxs = r.posIdxs;
     } else {
       const out = [];
       for (let k = 0; k < n; k++) out.push(r.center.clone().add(randomOffset(rnd, 0.015)));
@@ -869,7 +881,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       () => true,
     ];
     let list = [];
-    for (const t of tiers) { list = idxs.filter(t); if (list.length >= 8) break; }
+    for (const t of tiers) { list = Array.from(idxs).filter(t); if (list.length >= 8) break; }
     if (!list.length) return [r.center.clone()];
     const out = [];
     for (let k = 0; k < n; k++) {
@@ -962,6 +974,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   }
 
   const PULSE_SPEED = 0.11;
+  const tmpTreePt = new THREE.Vector3();
   function updateTreePulses(time) {
     if (!treePulses || !activePulses.length) return;
     const posAttr = treePulses.geometry.getAttribute('position');
@@ -970,7 +983,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     for (let i = 0; i < activePulses.length; i++) {
       const p = activePulses[i];
       const t = (time * PULSE_SPEED + p.offset) % 1;
-      const pt = p.path.getPoint(t);
+      const pt = p.path.getPoint(t, tmpTreePt);
       posAttr.setXYZ(i, pt.x, pt.y, pt.z);
       // Fade in as it leaves the source, fade out as it releases at the tip.
       const env = Math.min(1, t / 0.08) * Math.min(1, (1 - t) / 0.06);
@@ -998,8 +1011,10 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     // Receptor glow stays soft so the fibres remain the brightest thing on screen.
     const glow = (d) => (isLocalOrFast ? 0.25 + 0.6 * d : 0.1 + 0.35 * d);
     const paintRegion = (r, val) => {
-      for (let i = 0; i < nC; i++) {
-        if (!r.mask[i] || aHi.array[i] >= val) continue;
+      const idxs = r.ptIndices;
+      for (let k = 0; k < idxs.length; k++) {
+        const i = idxs[k];
+        if (aHi.array[i] >= val) continue;
         aHi.array[i] = val;
         aHiColor.array[i * 3] = lensColor.r; aHiColor.array[i * 3 + 1] = lensColor.g; aHiColor.array[i * 3 + 2] = lensColor.b;
       }
@@ -1415,19 +1430,31 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   }
 
   // ------------------------------------------------------------ picking
+  const allSubRecs = [...deepRecs, ...anchorRecs];
+  const objToRec = new Map(allSubRecs.map((r) => [r.obj, r]));
+  const basePickTargets = [cortexPoints, ...deepRecs.map((r) => r.obj)];
   const raycaster = new THREE.Raycaster();
   raycaster.params.Points.threshold = (typeof window !== 'undefined' && window.innerWidth <= 900) ? 0.026 : 0.014;
   const mouse = new THREE.Vector2();
   let pendingPick = null;
   let lastHover = null;
+  let lastPickX = -1, lastPickY = -1;
 
   function pick(clientX, clientY) {
-    if (activeCellObj) return null;
+    if (activeCellObj || !cortexPoints.visible) return null;
     const rect = canvas.getBoundingClientRect();
     mouse.set(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
     raycaster.setFromCamera(mouse, camera);
+    if (!bodyObj.visible && raycaster.ray.distanceSqToPoint(BRAIN_CENTER) > 1.35) return null;
     const clip = sliced;
-    const targets = [cortexPoints, ...deepRecs.map((r) => r.obj), ...anchorRecs.filter((r) => r.obj.visible && r.hi > 0).map((r) => r.obj)];
+    let targets = basePickTargets;
+    for (let i = 0; i < anchorRecs.length; i++) {
+      const r = anchorRecs[i];
+      if (r.obj.visible && r.hi > 0) {
+        if (targets === basePickTargets) targets = basePickTargets.slice();
+        targets.push(r.obj);
+      }
+    }
     const hits = raycaster.intersectObjects(targets, false);
     let best = null, ghost = null;
     for (const h of hits) {
@@ -1439,7 +1466,8 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
         id = regionList[idx].id;
         weight = cortexRec.base + aHi.array[h.index] * cortexRec.hi;
       } else {
-        const r = [...deepRecs, ...anchorRecs].find((q) => q.obj === h.object);
+        const r = objToRec.get(h.object);
+        if (!r) continue;
         id = r.id;
         weight = r.base + r.hi;
       }
@@ -1452,6 +1480,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   let down = null;
   canvas.addEventListener('pointerdown', (e) => {
     down = { x: e.clientX, y: e.clientY };
+    pendingPick = null;
     controls.autoRotate = false;
     requestRender(700);
   });
@@ -1463,8 +1492,20 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     down = null;
     requestRender(700);
   });
-  canvas.addEventListener('pointermove', (e) => { pendingPick = { x: e.clientX, y: e.clientY }; requestRender(400); });
-  canvas.addEventListener('pointerleave', () => { pendingPick = null; setHover(null, 0, 0); requestRender(400); });
+  canvas.addEventListener('pointermove', (e) => {
+    if (down) return;
+    if (e.clientX === lastPickX && e.clientY === lastPickY) return;
+    lastPickX = e.clientX;
+    lastPickY = e.clientY;
+    pendingPick = { x: e.clientX, y: e.clientY };
+    wakeNextFrame();
+  });
+  canvas.addEventListener('pointerleave', () => {
+    pendingPick = null;
+    lastPickX = lastPickY = -1;
+    setHover(null, 0, 0);
+  });
+  canvas.addEventListener('wheel', () => { requestRender(500); }, { passive: true });
   controls.addEventListener('start', () => { flight = null; requestRender(700); });
   controls.addEventListener('change', () => { labelsDirty = true; if (!controls.autoRotate) requestRender(400); });
 
@@ -1474,6 +1515,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       hoverId = id;
       paintCortexHover(id);
       canvas.style.cursor = id ? 'pointer' : '';
+      requestRender(350);
     }
     onHover?.(id, x, y);
   }
@@ -1575,12 +1617,15 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   const IDLE_MS = 1000 / 30;
 
   let ticking = false;
+  function wakeNextFrame() {
+    if (hidden || ticking || rafId) return;
+    if (idleTimer) { clearTimeout(idleTimer); idleTimer = 0; }
+    rafId = requestAnimationFrame(tick);
+  }
   function requestRender(ms = 900) {
     labelsDirty = true;
     activeUntil = Math.max(activeUntil, performance.now() + ms);
-    if (hidden || ticking) return;
-    if (idleTimer) { clearTimeout(idleTimer); idleTimer = 0; }
-    if (!rafId) rafId = requestAnimationFrame(tick);
+    wakeNextFrame();
   }
   function cancelScheduled() {
     if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
@@ -1600,17 +1645,6 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
 
   function applyBloomSize() {
     bloom.setSize(Math.max(2, Math.round(width * pixel * 0.5)), Math.max(2, Math.round(height * pixel * 0.5)));
-  }
-
-  function setPixel(p) {
-    p = Math.max(1, Math.min(MAX_PIXEL, p));
-    if (p === pixel) return;
-    pixel = p;
-    renderer.setPixelRatio(pixel);
-    composer.setPixelRatio(pixel);
-    applyBloomSize();
-    for (const m of materials) if (m.uniforms?.uPixel) m.uniforms.uPixel.value = pixel;
-    for (const c of cellCache.values()) c.mat.uniforms.uPixel.value = pixel;
   }
 
   function resize() {
@@ -1642,11 +1676,18 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
 
   const drive = new Map();
   function setDrive(id, v) {
-    if (!v) drive.delete(id);
-    else drive.set(id, Math.max(-1, Math.min(1, v)));
+    const next = v ? Math.max(-1, Math.min(1, v)) : 0;
+    const prev = drive.get(id) || 0;
+    if (Math.abs(next - prev) < 0.002) return;
+    if (!next) drive.delete(id);
+    else drive.set(id, next);
     requestRender(600);
   }
-  function clearDrive() { drive.clear(); requestRender(600); }
+  function clearDrive() {
+    if (!drive.size) return;
+    drive.clear();
+    requestRender(600);
+  }
 
   const MAX_PULSES = 32;
   const pulseMat = makeMaterial(14);
@@ -1660,8 +1701,11 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   pulseGeo.getAttribute('position').setUsage(THREE.DynamicDrawUsage);
   const pulseObj = new THREE.Points(pulseGeo, pulseMat);
   pulseObj.frustumCulled = false;
+  pulseObj.visible = false;
   scene.add(pulseObj);
   let pulses = [];
+  let pulsesDirty = false;
+  const tmpPulsePt = new THREE.Vector3();
 
   function firePulse(from, to, { color, dur = 0.7, size = 2.6 } = {}) {
     const s = visibleSide();
@@ -1670,10 +1714,13 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     const c = new THREE.Color(color || recs.get(from)?.color || '#ffffff');
     pulses.push({ curve: buildArc(a, b, 1, s), t0: clock.elapsedTime, dur, c, size });
     if (pulses.length > MAX_PULSES) pulses.shift();
+    pulseObj.visible = true;
+    pulsesDirty = true;
     requestRender(Math.max(900, dur * 1000 + 200));
   }
 
   function updatePulses(time) {
+    if (!pulses.length && !pulsesDirty) return;
     const pos = pulseGeo.getAttribute('position');
     const col = pulseGeo.getAttribute('aColor');
     const siz = pulseGeo.getAttribute('aSize');
@@ -1682,55 +1729,36 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       const p = pulses[i];
       if (!p) { siz.setX(i, 0); continue; }
       const u = (time - p.t0) / p.dur;
-      const pt = p.curve.getPoint(u);
+      const pt = p.curve.getPoint(u, tmpPulsePt);
       pos.setXYZ(i, pt.x, pt.y, pt.z);
       const fade = Math.sin(Math.PI * u);
       col.setXYZ(i, p.c.r * fade, p.c.g * fade, p.c.b * fade);
       siz.setX(i, p.size);
     }
     pos.needsUpdate = col.needsUpdate = siz.needsUpdate = true;
+    pulsesDirty = pulses.length > 0;
+    pulseObj.visible = pulsesDirty;
   }
 
   function approach(u, target, k) { u.value += (target - u.value) * k; }
 
   function isBusy() {
     if (flight || zoom) return true;
-    if (pulses.length || activePulses.length || arcs.length) return true;
-    if (activeCellObj) return true;
+    if (pulses.length) return true;
     if (performance.now() < activeUntil) return true;
     if (Math.abs(brainGlobalCurrent - brainGlobalTarget) > 0.004) return true;
     if (Math.abs(bodyCurrent - bodyTarget) > 0.004) return true;
-    if (cortexRec.activity > 0.001) return true;
-    for (const r of deepRecs) if (r.activity > 0.001) return true;
-    for (const r of anchorRecs) if (r.activity > 0.001) return true;
+    if (cortexMat.uniforms.uMix.value < 0.99) return true;
     return false;
-  }
-
-  let lastTickMs = 0;
-  let qAccum = 0, qFrames = 0, qCooldown = 0;
-
-  function trackQuality(ms) {
-    if (qCooldown > 0) { qCooldown -= ms; return; }
-    qAccum += ms; qFrames++;
-    if (qFrames < 45) return;
-    const avg = qAccum / qFrames;
-    qAccum = 0; qFrames = 0;
-    if (avg > 21 && pixel > 1) { setPixel(pixel - 0.5); qCooldown = 1500; }
-    else if (avg < 11 && pixel < MAX_PIXEL) { setPixel(pixel + 0.5); qCooldown = 1500; }
   }
 
   function tick() {
     rafId = 0;
     if (hidden) return;
-    const now = performance.now();
-    const interval = lastTickMs ? now - lastTickMs : 16;
-    lastTickMs = now;
     ticking = true;
     renderFrame();
     const busy = isBusy();
     ticking = false;
-    if (busy) trackQuality(interval > 100 ? 16 : interval);
-    else { qAccum = 0; qFrames = 0; }
     if (busy) rafId = requestAnimationFrame(tick);
     else if (!reducedMotion) idleTimer = setTimeout(() => { idleTimer = 0; tick(); }, IDLE_MS);
   }
@@ -1758,8 +1786,13 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
 
     stepZoom(dt);
     brainGlobalCurrent += (brainGlobalTarget - brainGlobalCurrent) * (1 - Math.exp(-dt * 4));
-    for (const m of brainMaterials) {
-      m.uniforms.uGlobal.value = brainGlobalCurrent;
+    const showBrain = brainGlobalCurrent >= 0.004;
+    cortexPoints.visible = showBrain;
+    for (let i = 0; i < deepRecs.length; i++) deepRecs[i].obj.visible = showBrain;
+    if (showBrain) {
+      for (const m of brainMaterials) {
+        m.uniforms.uGlobal.value = brainGlobalCurrent;
+      }
     }
     for (const [id, c] of cellCache) {
       if (c === activeCellObj) {
@@ -1773,21 +1806,24 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     }
 
     materials.forEach((m) => { if (m.uniforms?.uTime) m.uniforms.uTime.value = time; });
-    approach(cortexMat.uniforms.uBase, cortexRec.base, k);
-    approach(cortexMat.uniforms.uHi, cortexRec.hi, k);
-    approach(cortexMat.uniforms.uMix, 1, 1 - Math.exp(-dt * 4));
-    approach(cortexMat.uniforms.uActivity, cortexRec.activity, k);
-    for (const r of [...deepRecs, ...anchorRecs]) {
-      const beat = isLensActive && lensSources.includes(r.id) ? 0.3 * Math.sin(time * 2.4) : 0;
-      const d = drive.get(r.id) || 0;
-      const fast = d !== 0 ? 1 - Math.exp(-dt * 18) : k;
-      const dim = d < 0 ? 1 + d * 0.85 : 1;
-      approach(r.mat.uniforms.uBase, r.base * dim, fast);
-      approach(r.mat.uniforms.uHi, (r.hi + beat) * dim + Math.max(d, 0) * 0.9, fast);
-      approach(r.mat.uniforms.uActivity, r.activity + Math.max(d, 0), k);
-      approach(r.mat.uniforms.uMix, 1, 1 - Math.exp(-dt * 4));
-      approach(r.mat.uniforms.uHover, hoverId === r.id && !focusIds.includes(r.id) ? 0.35 : 0, 1 - Math.exp(-dt * 10));
-      if (r.kind === 'anchor' && r.hi === 0 && r.mat.uniforms.uHi.value < 0.01) r.obj.visible = false;
+    if (showBrain) {
+      approach(cortexMat.uniforms.uBase, cortexRec.base, k);
+      approach(cortexMat.uniforms.uHi, cortexRec.hi, k);
+      approach(cortexMat.uniforms.uMix, 1, 1 - Math.exp(-dt * 4));
+      approach(cortexMat.uniforms.uActivity, cortexRec.activity, k);
+      for (let i = 0; i < allSubRecs.length; i++) {
+        const r = allSubRecs[i];
+        const beat = isLensActive && lensSources.includes(r.id) ? 0.3 * Math.sin(time * 2.4) : 0;
+        const d = drive.get(r.id) || 0;
+        const fast = d !== 0 ? 1 - Math.exp(-dt * 18) : k;
+        const dim = d < 0 ? 1 + d * 0.85 : 1;
+        approach(r.mat.uniforms.uBase, r.base * dim, fast);
+        approach(r.mat.uniforms.uHi, (r.hi + beat) * dim + Math.max(d, 0) * 0.9, fast);
+        approach(r.mat.uniforms.uActivity, r.activity + Math.max(d, 0), k);
+        approach(r.mat.uniforms.uMix, 1, 1 - Math.exp(-dt * 4));
+        approach(r.mat.uniforms.uHover, hoverId === r.id && !focusIds.includes(r.id) ? 0.35 : 0, 1 - Math.exp(-dt * 10));
+        if (r.kind === 'anchor' && r.hi === 0 && r.mat.uniforms.uHi.value < 0.01) r.obj.visible = false;
+      }
     }
     bodyCurrent += (bodyTarget - bodyCurrent) * (1 - Math.exp(-dt * 4));
     bodyMat.uniforms.uBase.value = bodyCurrent * 0.22;
@@ -1805,7 +1841,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     document.addEventListener('visibilitychange', () => {
       hidden = document.hidden;
       if (hidden) cancelScheduled();
-      else { lastTickMs = 0; requestRender(200); }
+      else requestRender(200);
     });
   }
 
