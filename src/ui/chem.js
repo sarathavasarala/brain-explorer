@@ -5,16 +5,8 @@ import { fmt, paragraphs, esc } from './format.js';
 import { renderSegmentedTabs } from './tabs.js';
 import { renderBullets, renderPartChips, renderPager } from './components.js';
 import { renderSpeedWidget } from './speed.js';
-import { STAGES, getStepperStage, getHighlightedReceptor, getDrugMode, stageForDrug, getDrugStageNote } from './synapse-stepper.js';
+import { STAGES, getHighlightedReceptor, stageForDrug } from './synapse-stepper.js';
 import { icon } from './icons.js';
-
-const STAGE_TITLES = {
-  0: 'Transmitter Synthesis from Chemical Precursors',
-  1: 'Packaging Transmitters into Synaptic Vesicles',
-  2: 'Action Potential Influx and Vesicle Fusion',
-  3: 'Diffusion Across the Cleft and Receptor Binding',
-  4: 'Signal Termination and Transmitter Clearance',
-};
 
 export function renderChemHome() {
   return `<article class="ex" style="--accent:#b98cff">
@@ -204,43 +196,10 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
     levelTitle = 'At the Synapse';
     levelScale = '20 nm Cleft';
     const receptors = chem.receptors || [];
-    const currentStage = getStepperStage();
-    const drug = sub ? (chem.drugs || []).find((d) => d.id === sub) : null;
-    const isDrugActive = !!(drug && getDrugMode());
-    const drugTargetStage = isDrugActive ? stageForDrug(drug) : -1;
     const hiRec = getHighlightedReceptor();
-    const st = STAGES[currentStage] || STAGES[0];
-    const stageText = chem.life?.[st.key] || '';
-    const drugNote = (isDrugActive && currentStage === drugTargetStage) ? getDrugStageNote(drug) : '';
 
     body = `
-      <div class="syn-stage-card" data-active-stage="${st.id}">
-        <div class="syn-stage-meta">
-          <span class="syn-stage-pill">
-            <i class="syn-stage-dot"></i>
-            Stage ${st.id + 1} of 5 &middot; ${esc(st.label)}
-          </span>
-          <span class="syn-stage-short">${esc(st.short)}</span>
-        </div>
-        <h3 class="syn-stage-title">${esc(STAGE_TITLES[st.id] || st.label)}</h3>
-        <p class="syn-stage-prose">${fmt(stageText)}</p>
-        ${drugNote ? `
-          <div class="syn-life-drug-note">
-            <i class="drug-stage-dot"></i> <strong>${esc(drug.name)} effect:</strong> ${esc(drugNote)}
-          </div>
-        ` : ''}
-        <div class="syn-stage-nav">
-          <span class="syn-stage-nav-hint">Scrub stages in theater above or step here:</span>
-          <div class="syn-stage-nav-btns">
-            <button class="syn-stage-nav-btn" data-act="prev-stage" ${currentStage === 0 ? 'disabled' : ''} aria-label="Previous synapse stage">
-              ${icon('prev', 12)} Prev
-            </button>
-            <button class="syn-stage-nav-btn" data-act="next-stage" ${currentStage === 4 ? 'disabled' : ''} aria-label="Next synapse stage">
-              Next ${icon('next', 12)}
-            </button>
-          </div>
-        </div>
-      </div>
+      <p class="syn-intro">Step through one signal in the theater: made, packed, released, bound, then cleared. Click a receptor there or below to see what it does.</p>
 
       <div class="receptors-section">
         <h3 class="fig-title">Receptors</h3>

@@ -283,13 +283,6 @@ function syncSynapseStage() {
     tab: r.tab,
   });
 
-  // Sync active stage narrative card in explainer sheet if on synapse tab
-  if (r.tab === 'synapse') {
-    const scrollPos = explainerEl.scrollTop;
-    explainerEl.innerHTML = renderChem(chem, r.tab, r.sub);
-    explainerEl.scrollTop = scrollPos;
-  }
-
   // Sync active receptor highlight in sidebar if on synapse tab
   const hiRec = getHighlightedReceptor();
   explainerEl.querySelectorAll('.receptor-card[data-receptor-card]').forEach((card) => {

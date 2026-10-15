@@ -1,13 +1,14 @@
 import { esc, fmt } from './format.js';
+import { icon } from './icons.js';
 
 const CELL = 'rgba(190, 200, 255, 0.3)';
 
 export const STAGES = [
-  { id: 0, key: 'made', short: '1. Made', label: 'Synthesis' },
-  { id: 1, key: 'packed', short: '2. Packed', label: 'Vesicle Loading' },
-  { id: 2, key: 'released', short: '3. Released', label: 'Vesicle Fusion' },
-  { id: 3, key: 'binds', short: '4. Binds', label: 'Receptor Binding' },
-  { id: 4, key: 'cleared', short: '5. Cleared', label: 'Signal Clearance' },
+  { id: 0, key: 'made', short: '1. Made', label: 'Synthesis', title: 'Transmitter Synthesis from Chemical Precursors' },
+  { id: 1, key: 'packed', short: '2. Packed', label: 'Vesicle Loading', title: 'Packaging Transmitters into Synaptic Vesicles' },
+  { id: 2, key: 'released', short: '3. Released', label: 'Vesicle Fusion', title: 'Action Potential Influx and Vesicle Fusion' },
+  { id: 3, key: 'binds', short: '4. Binds', label: 'Receptor Binding', title: 'Diffusion Across the Cleft and Receptor Binding' },
+  { id: 4, key: 'cleared', short: '5. Cleared', label: 'Signal Clearance', title: 'Signal Termination and Transmitter Clearance' },
 ];
 
 export function stageForDrug(drug) {
@@ -171,9 +172,8 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
   } else if (currentStage === 4) {
     stageCaption = life.cleared || 'Molecules are cleared from the cleft by reuptake transporters, enzymes, astrocytes, or capillary blood to reset the synapse.';
   }
-  if (isDrugActive && stageForDrug(drug) === currentStage) {
-    stageCaption += ` ${getDrugStageNote(drug)}`;
-  }
+  const drugNote = (isDrugActive && stageForDrug(drug) === currentStage) ? getDrugStageNote(drug) : '';
+  const st = STAGES[currentStage];
 
   // Drug overlay message with toggle
   let drugBanner = '';
@@ -606,9 +606,15 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
 
     <!-- Bottom HUD zone -->
     <footer class="syn-hud-bottom">
-      ${tab === 'medicine' ? `<p class="fig-caption stepper-caption">${fmt(stageCaption)}</p>` : ''}
+      <div class="syn-caption" data-active-stage="${st.id}" aria-live="polite">
+        <p class="syn-caption-kicker"><i class="syn-stage-dot"></i>Stage ${st.id + 1} of 5 &middot; ${esc(st.label)}</p>
+        <h3 class="syn-caption-title">${esc(st.title)}</h3>
+        <p class="syn-caption-text">${fmt(stageCaption)}</p>
+        ${drugNote ? `<p class="syn-life-drug-note"><i class="drug-stage-dot"></i><strong>${esc(drug.name)}:</strong> ${esc(drugNote)}</p>` : ''}
+      </div>
 
       <div class="stepper-controls" role="group" aria-label="Synapse stages">
+        <button class="stepper-nav-btn" data-act="prev-stage" ${currentStage === 0 ? 'disabled' : ''} aria-label="Previous stage">${icon('prev', 14)}</button>
         <div class="stepper-buttons">
           ${STAGES.map((st) => {
             const hasDrugDot = isDrugActive && stageForDrug(drug) === st.id;
@@ -620,8 +626,9 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
             `;
           }).join('')}
         </div>
-        <button class="stepper-play-btn ${playTimer ? 'is-playing' : ''}" data-play-stepper>
-          ${playTimer ? 'Pause' : 'Play cycle'}
+        <button class="stepper-nav-btn" data-act="next-stage" ${currentStage === 4 ? 'disabled' : ''} aria-label="Next stage">${icon('next', 14)}</button>
+        <button class="stepper-play-btn ${playTimer ? 'is-playing' : ''}" data-play-stepper aria-pressed="${playTimer ? 'true' : 'false'}">
+          ${icon(playTimer ? 'pause' : 'play', 12)} ${playTimer ? 'Pause' : 'Play cycle'}
         </button>
       </div>
     </footer>

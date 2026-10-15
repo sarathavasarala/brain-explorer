@@ -1450,8 +1450,16 @@ kbd {
 }
 
 .stepper-controls {
-  display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap;
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
 }
+.stepper-nav-btn {
+  display: inline-grid; place-items: center;
+  width: 28px; height: 28px; border-radius: 6px;
+  color: var(--ink-2); background: transparent;
+  border: 1px solid var(--line); transition: background 0.2s, color 0.2s, opacity 0.2s;
+}
+.stepper-nav-btn:hover:not(:disabled) { background: rgba(190, 200, 255, 0.12); color: var(--ink); }
+.stepper-nav-btn:disabled { opacity: 0.3; cursor: default; }
 .stepper-buttons { display: flex; gap: 4px; flex-wrap: wrap; }
 .step-btn {
   padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 500;
@@ -1478,6 +1486,7 @@ kbd {
 }
 
 .stepper-play-btn {
+  display: inline-flex; align-items: center; gap: 6px; margin-left: auto;
   padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 500;
   background: rgba(190, 200, 255, 0.08); color: var(--ink-2);
   border: 1px solid var(--line); transition: background 0.2s, color 0.2s;
@@ -1496,11 +1505,36 @@ kbd {
   box-shadow: 0 0 6px var(--accent, #b98cff);
 }
 
-.stepper-caption {
-  font-size: 12.5px;
-  line-height: 1.5;
-  color: var(--ink-2);
+.syn-caption {
+  min-height: 92px;
+  padding: 2px 4px 0;
+}
+.syn-caption-kicker {
+  display: flex; align-items: center; gap: 7px;
+  margin: 0 0 4px;
+  font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  color: var(--accent);
+}
+.syn-stage-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--accent); box-shadow: 0 0 6px var(--accent);
+}
+.syn-caption-title {
+  margin: 0 0 4px;
+  font-family: var(--display); font-size: 16px; font-weight: 600; letter-spacing: -0.01em;
+  color: #fff;
+}
+.syn-caption-text {
   margin: 0;
+  max-width: 68ch;
+  font-family: var(--read); font-size: 15px; line-height: 1.5;
+  color: var(--ink);
+}
+.syn-caption .syn-life-drug-note { display: inline-block; margin: 8px 0 0; }
+.syn-intro {
+  margin: 4px 0 18px;
+  font-size: 13.5px; line-height: 1.55;
+  color: var(--ink-2);
 }
 
 /* Sidebar Synapse Lifecycle List */
@@ -1556,96 +1590,6 @@ kbd {
 }
 
 /* ------------------------------------------------------------ Synapse Stage Narrative Card */
-.syn-stage-card {
-  margin: 16px 0 20px;
-  padding: 16px 18px;
-  border-radius: 12px;
-  background: color-mix(in oklab, var(--accent) 6%, rgba(190, 200, 255, 0.03));
-  border: 1px solid color-mix(in oklab, var(--accent) 35%, var(--line));
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-  animation: ex-in 0.3s var(--ease);
-}
-.syn-stage-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 8px;
-}
-.syn-stage-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--accent);
-  background: color-mix(in oklab, var(--accent) 14%, transparent);
-  border: 1px solid color-mix(in oklab, var(--accent) 30%, transparent);
-  padding: 2.5px 8px;
-  border-radius: 6px;
-}
-.syn-stage-pill .syn-stage-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 6px var(--accent);
-}
-.syn-stage-title {
-  margin: 0 0 8px;
-  font-family: var(--display);
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: #fff;
-}
-.syn-stage-prose {
-  font-family: var(--read);
-  font-size: 15.5px;
-  line-height: 1.6;
-  color: var(--ink);
-  margin: 0;
-}
-.syn-stage-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 14px;
-  padding-top: 10px;
-  border-top: 1px solid var(--line);
-}
-.syn-stage-nav-hint {
-  font-size: 11.5px;
-  color: var(--ink-3);
-}
-.syn-stage-nav-btns {
-  display: flex;
-  gap: 6px;
-}
-.syn-stage-nav-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--ink-2);
-  background: rgba(190, 200, 255, 0.06);
-  border: 1px solid var(--line);
-  transition: all 0.2s;
-  cursor: pointer;
-}
-.syn-stage-nav-btn:hover:not(:disabled) {
-  color: #fff;
-  background: rgba(190, 200, 255, 0.12);
-}
-.syn-stage-nav-btn:disabled {
-  opacity: 0.35;
-  cursor: default;
-}
 .tract-card-head {
   display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin-bottom: 6px;
 }
@@ -2881,14 +2825,16 @@ kbd {
     padding: 3px 7px;
     font-size: 10.5px;
   }
+  .stepper-nav-btn {
+    width: 24px; height: 24px;
+  }
   .stepper-play-btn {
     padding: 3px 8px;
     font-size: 10.5px;
   }
-  .stepper-caption {
-    font-size: 11.5px;
-    line-height: 1.4;
-  }
+  .syn-caption { min-height: 0; }
+  .syn-caption-title { font-size: 14px; }
+  .syn-caption-text { font-size: 13.5px; line-height: 1.45; }
 
   .dock { display: none !important; }
   .lib-section.is-labs { display: none !important; }
