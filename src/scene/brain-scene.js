@@ -1345,6 +1345,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
 
   function showCell(cellEntry, { fire = false, from = null, to = null } = {}) {
     if (!cellEntry) {
+      if (!activeCellObj && !zoom && brainGlobalTarget === 1.0 && !cellLandmarkLabels.length) return;
       const leaving = activeCellObj;
       const at = to && zoomPointOf(to);
       if (leaving && at) zoom = { dir: 'out', t: 0, cell: leaving, at };
@@ -1482,7 +1483,6 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     const rect = canvas.getBoundingClientRect();
     mouse.set(((clientX - rect.left) / rect.width) * 2 - 1, -((clientY - rect.top) / rect.height) * 2 + 1);
     raycaster.setFromCamera(mouse, camera);
-    if (!bodyObj.visible && raycaster.ray.distanceSqToPoint(BRAIN_CENTER) > 1.35) return null;
     const clip = sliced;
     let targets = basePickTargets;
     for (let i = 0; i < anchorRecs.length; i++) {
@@ -1492,6 +1492,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
         targets.push(r.obj);
       }
     }
+    if (targets === basePickTargets && raycaster.ray.distanceSqToPoint(BRAIN_CENTER) > 1.6) return null;
     const hits = raycaster.intersectObjects(targets, false);
     let best = null, ghost = null;
     for (const h of hits) {
