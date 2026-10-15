@@ -238,7 +238,8 @@ const easeOutExpo = (t) => (t >= 1 ? 1 : 1 - Math.pow(2, -10 * t));
 export function createBrainScene(canvas, { structures, anchors = [], chemicals = [], labelsEl, onHover, onPick }) {
   const isMobile = typeof window !== 'undefined' && window.innerWidth <= 900;
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
-  const pixel = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+  const MAX_PIXEL = Math.min(window.devicePixelRatio || 1, isMobile ? 1.5 : 2);
+  let pixel = MAX_PIXEL;
   renderer.setPixelRatio(pixel);
   renderer.setClearColor(0x04050a, 1);
 
@@ -469,6 +470,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
         }
       }
     }
+    requestRender();
   }
 
   // ------------------------------------------------------------ slicing state & visible half
@@ -612,6 +614,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       scene.add(arcDots);
       arcDotMat.uniforms.uHi.value = 0;
     }
+    requestRender();
   }
 
   function updateArcDots(time) {
@@ -755,6 +758,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       r.obj.visible = r.hi > 0;
     }
     syncStructureLabels([...focusIds, ...ctx]);
+    requestRender();
   }
 
   // Ask sketches: light each part by how it is involved.
@@ -824,6 +828,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       r.obj.visible = r.hi > 0;
     }
     syncStructureLabels([...focusIds, ...ctx]);
+    requestRender();
   }
 
   // ------------------------------------------------------------ chemical lens in 3D
@@ -1202,6 +1207,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       fromPos: camera.position.clone(), fromTarget: controls.target.clone(),
       toPos: center.clone().add(dir.multiplyScalar(dist)), toTarget: center,
     };
+    requestRender(1600);
   }
 
   function flyToTarget(center, dist, view = 'front', dur = 1.25) {
@@ -1212,6 +1218,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       fromPos: camera.position.clone(), fromTarget: controls.target.clone(),
       toPos: center.clone().add(dir.multiplyScalar(dist)), toTarget: center.clone(),
     };
+    requestRender(Math.max(1600, dur * 1000 + 400));
   }
 
   // ------------------------------------------------------------ 3D cells
@@ -1294,6 +1301,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       activeCellObj = null;
       brainGlobalTarget = 1.0;
       clearCellLabels();
+      requestRender(1600);
       return;
     }
 
@@ -1361,6 +1369,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     activeCellObj = cached;
     controls.autoRotate = false;
     setupCellLabels(cellEntry, cached.landmarks);
+    requestRender(1600);
     if (same) return;
 
     if (at) {
@@ -1383,6 +1392,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   function setCellFire(on) {
     if (activeCellObj) {
       activeCellObj.mat.uniforms.uFire.value = on ? 1.0 : 0.0;
+      requestRender(1600);
     }
   }
 
@@ -1401,6 +1411,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     if (isLensActive && lastChemConfig && lastChemSide !== visibleSide()) showChemical(lastChemConfig);
     // Rebuild arcs on the visible half if the slice flips sides.
     if (lastArcList.length && lastArcSide !== visibleSide()) setArcs(lastArcList);
+    requestRender();
   }
 
   // ------------------------------------------------------------ picking
@@ -1442,6 +1453,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   canvas.addEventListener('pointerdown', (e) => {
     down = { x: e.clientX, y: e.clientY };
     controls.autoRotate = false;
+    requestRender(700);
   });
   canvas.addEventListener('pointerup', (e) => {
     if (down && Math.hypot(e.clientX - down.x, e.clientY - down.y) < 5) {
@@ -1449,10 +1461,12 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       onPick?.(id);
     }
     down = null;
+    requestRender(700);
   });
-  canvas.addEventListener('pointermove', (e) => { pendingPick = { x: e.clientX, y: e.clientY }; });
-  canvas.addEventListener('pointerleave', () => { pendingPick = null; setHover(null, 0, 0); });
-  controls.addEventListener('start', () => { flight = null; });
+  canvas.addEventListener('pointermove', (e) => { pendingPick = { x: e.clientX, y: e.clientY }; requestRender(400); });
+  canvas.addEventListener('pointerleave', () => { pendingPick = null; setHover(null, 0, 0); requestRender(400); });
+  controls.addEventListener('start', () => { flight = null; requestRender(700); });
+  controls.addEventListener('change', () => { labelsDirty = true; if (!controls.autoRotate) requestRender(400); });
 
   function setHover(id, x, y) {
     if (id !== lastHover) {
@@ -1530,7 +1544,8 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   function spreadLabels(list, w, h, lift, show) {
     const placed = list.map((t) => {
       tmpV.copy(t.pos).project(camera);
-      return { el: t.el, vis: tmpV.z < 1, x: ((tmpV.x + 1) / 2) * w, y: ((1 - tmpV.y) / 2) * h + lift, hw: (t.el.offsetWidth || 120) / 2 };
+      if (t.el._hw == null) t.el._hw = (t.el.offsetWidth || 120) / 2;
+      return { el: t.el, vis: tmpV.z < 1, x: ((tmpV.x + 1) / 2) * w, y: ((1 - tmpV.y) / 2) * h + lift, hw: t.el._hw };
     }).sort((a, b) => a.y - b.y);
     for (let i = 1; i < placed.length; i++) {
       for (let j = 0; j < i; j++) {
@@ -1545,21 +1560,67 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   }
 
   // ------------------------------------------------------------ loop
+  // On-demand renderer. Full-rate only while something is moving or animating,
+  // a gentle 30fps idle cadence keeps the point shimmer and slow spin alive,
+  // and rendering stops completely while the tab is hidden.
   let width = 1, height = 1;
   let frameOffset = 0;
+
+  let rafId = 0;
+  let idleTimer = 0;
+  let activeUntil = 0;
+  let labelsDirty = true;
+  let hidden = typeof document !== 'undefined' && document.hidden;
+  const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const IDLE_MS = 1000 / 30;
+
+  let ticking = false;
+  function requestRender(ms = 900) {
+    labelsDirty = true;
+    activeUntil = Math.max(activeUntil, performance.now() + ms);
+    if (hidden || ticking) return;
+    if (idleTimer) { clearTimeout(idleTimer); idleTimer = 0; }
+    if (!rafId) rafId = requestAnimationFrame(tick);
+  }
+  function cancelScheduled() {
+    if (rafId) { cancelAnimationFrame(rafId); rafId = 0; }
+    if (idleTimer) { clearTimeout(idleTimer); idleTimer = 0; }
+  }
+  function start() {
+    if (hidden || rafId || idleTimer) return;
+    rafId = requestAnimationFrame(tick);
+  }
+
   function applyFrameOffset() {
     if (frameOffset) camera.setViewOffset(width, height, 0, frameOffset, width, height);
     else camera.clearViewOffset();
     camera.updateProjectionMatrix();
   }
-  function setFrameOffset(px) { frameOffset = Math.round(px || 0); applyFrameOffset(); }
+  function setFrameOffset(px) { frameOffset = Math.round(px || 0); applyFrameOffset(); requestRender(); }
+
+  function applyBloomSize() {
+    bloom.setSize(Math.max(2, Math.round(width * pixel * 0.5)), Math.max(2, Math.round(height * pixel * 0.5)));
+  }
+
+  function setPixel(p) {
+    p = Math.max(1, Math.min(MAX_PIXEL, p));
+    if (p === pixel) return;
+    pixel = p;
+    renderer.setPixelRatio(pixel);
+    composer.setPixelRatio(pixel);
+    applyBloomSize();
+    for (const m of materials) if (m.uniforms?.uPixel) m.uniforms.uPixel.value = pixel;
+    for (const c of cellCache.values()) c.mat.uniforms.uPixel.value = pixel;
+  }
 
   function resize() {
     const box = canvas.parentElement.getBoundingClientRect();
     width = Math.max(1, box.width); height = Math.max(1, box.height);
+    renderer.setPixelRatio(pixel);
     renderer.setSize(width, height, false);
+    composer.setPixelRatio(pixel);
     composer.setSize(width, height);
-    bloom.setSize(width * pixel, height * pixel);
+    applyBloomSize();
     const mobile = window.innerWidth <= 900;
     bloom.strength = mobile ? 0.38 : 0.72;
     bloom.radius = mobile ? 0.14 : 0.20;
@@ -1567,6 +1628,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     applyFrameOffset();
+    requestRender(0);
   }
   new ResizeObserver(resize).observe(canvas.parentElement);
   resize();
@@ -1582,8 +1644,9 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   function setDrive(id, v) {
     if (!v) drive.delete(id);
     else drive.set(id, Math.max(-1, Math.min(1, v)));
+    requestRender(600);
   }
-  function clearDrive() { drive.clear(); }
+  function clearDrive() { drive.clear(); requestRender(600); }
 
   const MAX_PULSES = 32;
   const pulseMat = makeMaterial(14);
@@ -1607,6 +1670,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     const c = new THREE.Color(color || recs.get(from)?.color || '#ffffff');
     pulses.push({ curve: buildArc(a, b, 1, s), t0: clock.elapsedTime, dur, c, size });
     if (pulses.length > MAX_PULSES) pulses.shift();
+    requestRender(Math.max(900, dur * 1000 + 200));
   }
 
   function updatePulses(time) {
@@ -1628,7 +1692,50 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   }
 
   function approach(u, target, k) { u.value += (target - u.value) * k; }
-  function frame() {
+
+  function isBusy() {
+    if (flight || zoom) return true;
+    if (pulses.length || activePulses.length || arcs.length) return true;
+    if (activeCellObj) return true;
+    if (performance.now() < activeUntil) return true;
+    if (Math.abs(brainGlobalCurrent - brainGlobalTarget) > 0.004) return true;
+    if (Math.abs(bodyCurrent - bodyTarget) > 0.004) return true;
+    if (cortexRec.activity > 0.001) return true;
+    for (const r of deepRecs) if (r.activity > 0.001) return true;
+    for (const r of anchorRecs) if (r.activity > 0.001) return true;
+    return false;
+  }
+
+  let lastTickMs = 0;
+  let qAccum = 0, qFrames = 0, qCooldown = 0;
+
+  function trackQuality(ms) {
+    if (qCooldown > 0) { qCooldown -= ms; return; }
+    qAccum += ms; qFrames++;
+    if (qFrames < 45) return;
+    const avg = qAccum / qFrames;
+    qAccum = 0; qFrames = 0;
+    if (avg > 21 && pixel > 1) { setPixel(pixel - 0.5); qCooldown = 1500; }
+    else if (avg < 11 && pixel < MAX_PIXEL) { setPixel(pixel + 0.5); qCooldown = 1500; }
+  }
+
+  function tick() {
+    rafId = 0;
+    if (hidden) return;
+    const now = performance.now();
+    const interval = lastTickMs ? now - lastTickMs : 16;
+    lastTickMs = now;
+    ticking = true;
+    renderFrame();
+    const busy = isBusy();
+    ticking = false;
+    if (busy) trackQuality(interval > 100 ? 16 : interval);
+    else { qAccum = 0; qFrames = 0; }
+    if (busy) rafId = requestAnimationFrame(tick);
+    else if (!reducedMotion) idleTimer = setTimeout(() => { idleTimer = 0; tick(); }, IDLE_MS);
+  }
+
+  function renderFrame() {
     const dt = Math.min(clock.getDelta(), 0.05);
     const time = clock.elapsedTime;
     const k = 1 - Math.exp(-dt * 5);
@@ -1640,7 +1747,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       controls.target.lerpVectors(flight.fromTarget, flight.toTarget, e);
       if (flight.t >= 1) flight = null;
     }
-    controls.update();
+    controls.update(dt);
 
     if (pendingPick) {
       const id = pick(pendingPick.x, pendingPick.y);
@@ -1689,11 +1796,20 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     updateArcDots(time);
     updatePulses(time);
     updateTreePulses(time);
-    updateLabels(width, height);
+    if (Math.abs(bodyCurrent - bodyTarget) > 0.004) labelsDirty = true;
+    if (labelsDirty) { updateLabels(width, height); labelsDirty = false; }
     composer.render();
-    requestAnimationFrame(frame);
   }
-  requestAnimationFrame(frame);
+
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+      hidden = document.hidden;
+      if (hidden) cancelScheduled();
+      else { lastTickMs = 0; requestRender(200); }
+    });
+  }
+
+  start();
 
   return {
     focus,
@@ -1720,11 +1836,12 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     setSlice(on) { sliced = Boolean(on); applySlice(); },
     forceSlice(on) { sliced = Boolean(on); applySlice(); },
     get slice() { return sliced; },
-    setSpin(on) { controls.autoRotate = on; },
+    setSpin(on) { controls.autoRotate = on; requestRender(300); },
     get spin() { return controls.autoRotate; },
     previewHover(id) {
       hoverId = id && recs.has(id) ? id : null;
       paintCortexHover(hoverId);
+      requestRender(300);
     },
   };
 }
