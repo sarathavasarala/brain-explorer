@@ -52,7 +52,17 @@ const vertexShader = /* glsl */ `
   varying vec3 vColor;
   varying float vAlpha;
   void main() {
+    if (uGlobal < 0.004) {
+      gl_PointSize = 0.0;
+      gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      return;
+    }
     vec4 world = modelMatrix * vec4(position, 1.0);
+    if (uClip > 0.5 && world.x > 0.004) {
+      gl_PointSize = 0.0;
+      gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      return;
+    }
     vec4 mv = viewMatrix * world;
     float hNew = aHi * uMix;
     float hOld = aHiPrev * (1.0 - uMix);
@@ -68,10 +78,13 @@ const vertexShader = /* glsl */ `
       wave = pow(max(w, 0.0), 10.0) * uActivity * clamp(hi, 0.0, 1.0);
     }
     float b = (uBase + hi + hov) * twinkle + wave * 1.6;
+    vAlpha = b * mix(0.5, 1.0, aSize) * uGlobal * smoothstep(0.35, 1.1, -mv.z);
+    if (vAlpha < 0.004) {
+      gl_PointSize = 0.0;
+      gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      return;
+    }
     vColor = col;
-    vAlpha = b * mix(0.5, 1.0, aSize) * uGlobal;
-    if (uClip > 0.5 && world.x > 0.004) vAlpha = 0.0;
-    vAlpha *= smoothstep(0.35, 1.1, -mv.z);
     gl_PointSize = min(uScale * aSize * (1.0 + clamp(hi, 0.0, 1.0) * uHiSize + wave * 0.8 + hov * 0.35) * uPixel / -mv.z, 26.0 * uPixel);
     gl_Position = projectionMatrix * mv;
   }
@@ -89,6 +102,11 @@ const cellVertexShader = /* glsl */ `
   varying float vAlpha;
 
   void main() {
+    if (uGlobal < 0.004) {
+      gl_PointSize = 0.0;
+      gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      return;
+    }
     vec3 pos = position;
     if (uIsMicroglia > 0.5 && aPart > 0.5 && aPart < 1.5) {
       pos.x += sin(uTime * 2.0 + aRand * 6.0) * 0.004;
@@ -175,9 +193,13 @@ const cellVertexShader = /* glsl */ `
       brightness = 0.18;
     }
 
+    vAlpha = 1.35 * brightness * mix(0.6, 1.0, aSize) * uGlobal * smoothstep(0.2, 0.8, -mv.z);
+    if (vAlpha < 0.004) {
+      gl_PointSize = 0.0;
+      gl_Position = vec4(2.0, 2.0, 2.0, 1.0);
+      return;
+    }
     vColor = col;
-    vAlpha = 1.35 * brightness * mix(0.6, 1.0, aSize) * uGlobal;
-    vAlpha *= smoothstep(0.2, 0.8, -mv.z);
 
     float pointSize = uScale * aSize * (1.0 + glow * 0.8) * uPixel / -mv.z;
     gl_PointSize = clamp(pointSize, 1.0, 32.0 * uPixel);
@@ -360,12 +382,23 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   for (let i = 0; i < nC; i++) pts[i] = cortexPoint(cx.positions, cx.lobe, cx.medial, i);
   for (const s of [...regions].sort((a, b) => depthOf(b) - depthOf(a))) {
     const mask = new Uint8Array(nC);
-    let count = 0;
-    for (let i = 0; i < nC; i++) if (s.shape.test(pts[i])) { mask[i] = 1; count++; }
+    const ptIdxs = [], posIdxs = [];
+    for (let i = 0; i < nC; i++) {
+      if (s.shape.test(pts[i])) {
+        mask[i] = 1;
+        ptIdxs.push(i);
+        posIdxs.push(i * 3);
+      }
+    }
+    const ptIndices = new Uint32Array(ptIdxs);
+    const count = ptIndices.length;
     const { center, radius } = anchorOf(cx.positions, (i) => mask[i]);
-    const rec = { id: s.id, kind: 'region', mask, color: new THREE.Color(s.color), center, radius, structure: s, count };
+    const rec = { id: s.id, kind: 'region', mask, ptIndices, posIdxs: new Uint32Array(posIdxs), color: new THREE.Color(s.color), center, radius, structure: s, count };
     const idx = regionList.push(rec) - 1;
-    for (let i = 0; i < nC; i++) if (mask[i] && regionIndex[i] < 0) regionIndex[i] = idx;
+    for (let k = 0; k < count; k++) {
+      const i = ptIndices[k];
+      if (regionIndex[i] < 0) regionIndex[i] = idx;
+    }
     recs.set(s.id, rec);
     if (!count) console.warn(`[brain] cortical region "${s.id}" matched no points`);
   }
@@ -381,7 +414,9 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     obj.frustumCulled = false;
     scene.add(obj);
     const { center, radius } = anchorOf(shape.positions);
-    const rec = { id: s.id, kind: 'deep', obj, mat, color: new THREE.Color(s.color), center, radius, structure: s, base: 0.4, hi: 0, activity: 0, hover: 0 };
+    const posIdxs = new Uint32Array(n);
+    for (let i = 0; i < n; i++) posIdxs[i] = i * 3;
+    const rec = { id: s.id, kind: 'deep', obj, mat, posIdxs, color: new THREE.Color(s.color), center, radius, structure: s, base: 0.4, hi: 0, activity: 0, hover: 0 };
     rec.hiOrig = geo.getAttribute('aHiColor').array.slice();
     recs.set(s.id, rec);
     deepRecs.push(rec);
@@ -499,26 +534,28 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     if (!r) return null;
     if (r.kind === 'anchor') {
       if (r.anchor?.body && bodyTarget < 0.5) return null;
-      const p = r.center.clone();
-      if (s < 0 && p.x > 0.004) {
+      if (s < 0 && r.center.x > 0.004) {
         if (r.anchor?.mirror || r.anchor?.flipWhenSliced) {
-          p.x = -p.x;
-        } else {
-          // Anchors on the clipped (+x) half when sliced that cannot be mirrored
-          // (such as unmirrored body organs) cannot be seen, so return null to avoid drawing arcs to them.
-          return null;
+          return r.centerNeg || (r.centerNeg = new THREE.Vector3(-r.center.x, r.center.y, r.center.z));
         }
+        // Anchors on the clipped (+x) half when sliced that cannot be mirrored
+        // (such as unmirrored body organs) cannot be seen, so return null to avoid drawing arcs to them.
+        return null;
       }
-      return p;
+      return r.center;
     }
-    const pts = [];
-    if (r.kind === 'region') {
-      for (let i = 0; i < nC; i++) if (r.mask[i]) pts.push(i * 3);
-      return centroidOf(cx.positions, pts, s, r.center);
+    if (s < 0) {
+      if (!r.sideCenterNeg) {
+        const arr = r.kind === 'region' ? cx.positions : r.obj.geometry.getAttribute('position').array;
+        r.sideCenterNeg = centroidOf(arr, r.posIdxs, -1, r.center);
+      }
+      return r.sideCenterNeg;
     }
-    const pos = r.obj.geometry.getAttribute('position').array;
-    for (let i = 0; i < pos.length; i += 3) pts.push(i);
-    return centroidOf(pos, pts, s, r.center);
+    if (!r.sideCenterPos) {
+      const arr = r.kind === 'region' ? cx.positions : r.obj.geometry.getAttribute('position').array;
+      r.sideCenterPos = centroidOf(arr, r.posIdxs, 1, r.center);
+    }
+    return r.sideCenterPos;
   }
 
   // ------------------------------------------------------------ arcs (connections / pathway routes)
