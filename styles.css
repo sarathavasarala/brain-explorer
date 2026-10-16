@@ -2905,6 +2905,91 @@ kbd {
   .syn-caption-title { font-size: 14px; }
   .syn-caption-text { font-size: 13.5px; line-height: 1.45; }
 
+  /* Smooth transition when bottom sheet snaps between half and peek */
+  .synapse-theater {
+    transition: padding 0.28s var(--ease), gap 0.28s var(--ease);
+  }
+  .synapse-svg {
+    transition: max-height 0.28s var(--ease);
+  }
+  .app.is-sheet-dragging .synapse-theater,
+  .app.is-sheet-dragging .synapse-svg {
+    transition: none;
+  }
+
+  /* When bottom sheet is collapsed (swiped down to peek), synapse theater expands to full stage height */
+  .app[data-sheet-state="peek"] .synapse-stage,
+  .app:has(#explainer-sheet[data-sheet-state="peek"]) .synapse-stage {
+    padding: 6px 8px 8px;
+    align-items: stretch;
+    height: 100%;
+  }
+
+  .app[data-sheet-state="peek"] .synapse-theater,
+  .app:has(#explainer-sheet[data-sheet-state="peek"]) .synapse-theater {
+    height: 100%;
+    max-height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 12px 12px 10px;
+    gap: 10px;
+    border-radius: 14px;
+    box-sizing: border-box;
+  }
+
+  .app[data-sheet-state="peek"] .synapse-svg,
+  .app:has(#explainer-sheet[data-sheet-state="peek"]) .synapse-svg {
+    max-height: min(44vh, 320px);
+    margin: 0 auto;
+    width: 100%;
+    flex: 0 0 auto;
+  }
+
+  .app[data-sheet-state="peek"] .syn-hud-bottom,
+  .app:has(#explainer-sheet[data-sheet-state="peek"]) .syn-hud-bottom {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    flex: 1 1 auto;
+    margin-top: 4px;
+    gap: 10px;
+    min-height: 0;
+  }
+
+  .app[data-sheet-state="peek"] .syn-caption-title {
+    font-size: 16.5px;
+    line-height: 1.25;
+  }
+
+  .app[data-sheet-state="peek"] .syn-caption-text {
+    font-size: 13.5px;
+    line-height: 1.48;
+  }
+
+  .app[data-sheet-state="peek"] .stepper-controls {
+    margin-top: auto;
+    padding-top: 4px;
+    gap: 6px;
+  }
+
+  .app[data-sheet-state="peek"] .step-btn {
+    min-height: 36px;
+    padding: 6px 9px;
+    font-size: 11.5px;
+  }
+
+  .app[data-sheet-state="peek"] .stepper-nav-btn {
+    width: 30px;
+    height: 36px;
+  }
+
+  .app[data-sheet-state="peek"] .stepper-play-btn {
+    min-height: 36px;
+    padding: 6px 12px;
+    font-size: 11.5px;
+  }
+
   .dock { display: none !important; }
   .lib-section.is-labs { display: none !important; }
 }

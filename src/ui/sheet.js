@@ -33,15 +33,21 @@ export function initBottomSheet({
   }
 
   function applyHeight(heightPx, animate = true) {
+    const appEl = sheetEl.closest('.app') || document.querySelector('.app');
     if (window.innerWidth > 860) {
       sheetEl.style.removeProperty('--sheet-height');
       sheetEl.classList.remove('is-dragging');
+      if (appEl) {
+        appEl.classList.remove('is-sheet-dragging');
+      }
       return;
     }
     if (!animate) {
       sheetEl.classList.add('is-dragging');
+      if (appEl) appEl.classList.add('is-sheet-dragging');
     } else {
       sheetEl.classList.remove('is-dragging');
+      if (appEl) appEl.classList.remove('is-sheet-dragging');
     }
     sheetEl.style.setProperty('--sheet-height', `${Math.round(heightPx)}px`);
   }
@@ -49,6 +55,8 @@ export function initBottomSheet({
   function snapTo(targetState, animate = true) {
     currentState = targetState;
     sheetEl.dataset.sheetState = targetState;
+    const appEl = sheetEl.closest('.app') || document.querySelector('.app');
+    if (appEl) appEl.dataset.sheetState = targetState;
     const heights = getSnapHeights();
     const targetHeight = heights[targetState] || heights.half;
 
@@ -112,6 +120,8 @@ export function initBottomSheet({
     if (!isDragging) return;
     isDragging = false;
     sheetEl.classList.remove('is-dragging');
+    const appEl = sheetEl.closest('.app') || document.querySelector('.app');
+    if (appEl) appEl.classList.remove('is-sheet-dragging');
 
     try {
       handleEl.releasePointerCapture(e.pointerId);
@@ -182,9 +192,14 @@ export function initBottomSheet({
 
   // Handle window resizing
   window.addEventListener('resize', () => {
+    const appEl = sheetEl.closest('.app') || document.querySelector('.app');
     if (window.innerWidth > 860) {
       sheetEl.style.removeProperty('--sheet-height');
       sheetEl.classList.remove('is-dragging');
+      if (appEl) {
+        appEl.classList.remove('is-sheet-dragging');
+        appEl.dataset.sheetState = 'half';
+      }
     } else {
       snapTo(currentState, false);
     }
@@ -193,6 +208,9 @@ export function initBottomSheet({
   // Initial snap
   if (window.innerWidth <= 860) {
     snapTo(currentState, false);
+  } else {
+    const appEl = sheetEl.closest('.app') || document.querySelector('.app');
+    if (appEl) appEl.dataset.sheetState = 'half';
   }
 
   return {

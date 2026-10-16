@@ -26,6 +26,9 @@ const bottomSheet = initBottomSheet({
   sheetEl: explainerSheetEl,
   handleEl: sheetHandleEl,
   contentEl: explainerEl,
+  onStateChange: (s) => {
+    if (appEl) appEl.dataset.sheetState = s;
+  },
 });
 const libraryEl = $('#library');
 const hoverEl = $('#hover-label');
@@ -271,6 +274,7 @@ function syncSynapseStage() {
   const r = state.route;
   const isSynapseView = r.type === 'chem' && (r.tab === 'synapse' || r.tab === 'medicine');
   stageEl.classList.toggle('is-synapse', isSynapseView);
+  if (appEl) appEl.classList.toggle('is-synapse', isSynapseView);
   synapseStageEl.hidden = !isSynapseView;
   if (!isSynapseView) return;
 
@@ -862,6 +866,31 @@ if (synapseStageEl) {
   synapseStageEl.addEventListener('click', (e) => {
     handleSynapseInteraction(e);
   });
+
+  // Mobile swipe down gesture to collapse reading sheet and expand synapse theater to full height
+  let synTouchStartY = 0;
+  let synTouchStartX = 0;
+  synapseStageEl.addEventListener('touchstart', (e) => {
+    if (window.innerWidth > 860) return;
+    const touch = e.touches[0];
+    synTouchStartY = touch.clientY;
+    synTouchStartX = touch.clientX;
+  }, { passive: true });
+
+  synapseStageEl.addEventListener('touchend', (e) => {
+    if (window.innerWidth > 860) return;
+    const touch = e.changedTouches[0];
+    const diffY = touch.clientY - synTouchStartY;
+    const diffX = touch.clientX - synTouchStartX;
+    if (diffY > 44 && Math.abs(diffX) < 45) {
+      const theater = synapseStageEl.querySelector('.synapse-theater');
+      if (!theater || theater.scrollTop <= 4) {
+        if (bottomSheet && bottomSheet.getState() === 'half') {
+          bottomSheet.snapTo('peek');
+        }
+      }
+    }
+  }, { passive: true });
 }
 
 explainerEl.addEventListener('click', (e) => {
