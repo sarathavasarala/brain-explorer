@@ -9,7 +9,7 @@
 //   p.medial        true on the flat inner wall facing the other hemisphere
 //   p.central       z position of the central sulcus at this height (frontal/parietal border)
 //
-// All text fields are written for a beginner. See CONTENT_PROMPT.md for the full schema.
+// All text fields are written for a beginner. See AGENTS.md for the full schema.
 
 import { callosumY } from '../../scene/shapes.js';
 
