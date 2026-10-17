@@ -154,6 +154,59 @@ export default [
     },
   },
   {
+    id: 'premotor-cortex',
+    name: 'Premotor cortex',
+    parent: 'frontal-lobe',
+    group: 'cortex',
+    color: '#ff70a6',
+    shape: {
+      type: 'cortex',
+      test: (p) => p.lobe === 'frontal' && p.z >= p.central + 0.085 && p.z <= 0.3 && p.y > 0.04,
+    },
+    view: 'left-front',
+    size: 'about 6 cm long band',
+    tagline: 'Prepares and sequences movements before muscles fire.',
+    analogy: 'A choreographer who lines up the steps in order before the dancers take the stage.',
+    levels: {
+      overview: {
+        text: 'The premotor [[cortex]] forms a vertical band across the {{frontal-lobe}}, sitting directly in front of the {{motor-cortex}} and behind the {{prefrontal-cortex}}. It includes the lateral premotor strip on the outer surface and the supplementary motor area tucked on the inner midline wall.\n\nIt turns an abstract intention into a staged movement plan. Before your fingers press a chord on a piano or reach around an obstacle for a mug, premotor circuits select which muscles will work together and in what sequence. It also fires when you watch someone else perform an action, helping you learn physical skills by observation.',
+        bullets: [
+          'Movement preparation: lines up multi-step muscle sequences before execution begins.',
+          'Sensory guidance: uses visual and touch maps from parietal areas to shape the reach.',
+          'Two-handed coordination: links both hemispheres when hands perform different parts of one task.',
+          'Physical landmarks: broad vertical strip immediately anterior to the primary motor strip.',
+        ],
+      },
+      connects: {
+        text: 'Goals arrive from the {{prefrontal-cortex}} while spatial target coordinates stream in from the {{posterior-parietal}}. After assembling the sequence and timing with help from the {{thalamus}}, the premotor cortex hands the ready-to-run motor program directly to the {{motor-cortex}}.',
+        connections: [
+          { id: 'prefrontal-cortex', dir: 'in', label: 'Goals arriving to be turned into action sequences' },
+          { id: 'posterior-parietal', dir: 'in', label: 'Target locations and object shapes for reaching' },
+          { id: 'thalamus', dir: 'in', label: 'Timing and habit gating from basal ganglia and cerebellum' },
+          { id: 'motor-cortex', dir: 'out', label: 'Prepared movement sequences sent for execution' },
+        ],
+      },
+      cells: {
+        text: 'Like neighboring frontal areas, its six layers follow the column diagram, with deep [[pyramidal cell|pyramidal cells]] sending [[glutamate]] projections to both the {{motor-cortex}} and the {{spinal-cord}}. Many neurons here fire hundreds of milliseconds before a movement starts, holding the upcoming sequence ready until the cue to move arrives.',
+        diagram: 'cortical-column',
+        synapse: 'glutamate',
+        bullets: [
+          'Readiness activity builds here well before a voluntary movement actually begins.',
+          'Some premotor neurons fire both when performing a grasp and when watching another person do the same grasp.',
+        ],
+      },
+    },
+    tryIt: 'Tap a table in a repeating rhythm: two taps with your left hand, one with your right. Keeping that sequence organized before each tap leaves your fingers is your premotor cortex at work.',
+    breaks: {
+      text: 'Damage leaves muscle strength intact, but multi-step or coordinated routines fall apart.',
+      bullets: [
+        'Apraxia: knowing what a tool is for, such as a toothbrush or key, but struggling to organize the hand sequence to use it.',
+        'Bimanual clumsiness: difficulty using both hands together smoothly, such as buttoning a coat or tying shoelaces.',
+        'Motor perseveration: getting stuck repeating the same gesture after the task has changed.',
+      ],
+    },
+  },
+  {
     id: 'motor-cortex',
     name: 'Primary motor cortex',
     parent: 'frontal-lobe',
@@ -610,6 +663,112 @@ export default [
       ],
     },
   },
+  {
+    id: 'fusiform-gyrus',
+    name: 'Fusiform gyrus',
+    parent: 'temporal-lobe',
+    group: 'cortex',
+    color: '#c084fc',
+    shape: {
+      type: 'cortex',
+      test: (p) => p.lobe === 'temporal' && p.y < -0.22 && p.z <= -0.05 && p.z > -0.38,
+    },
+    view: 'left-below',
+    size: 'about 5 cm long ridge',
+    tagline: 'Recognises faces, familiar objects and written words at a glance.',
+    analogy: 'A visual ID badge scanner that matches shapes to identities in a fraction of a second.',
+    levels: {
+      overview: {
+        text: 'The [[fusiform gyrus]] is a spindle-shaped ridge running along the underside of each {{temporal-lobe}}, bridging the {{occipital-lobe}} behind and the temporal pole ahead. Tucked along the basal surface of the brain, it sits near the end of the ventral visual stream.\n\nIt turns collections of lines and curves into instant recognition. Dedicated patches within this ridge specialize in human faces, whole bodies, and familiar object categories, while a region on the left side learns to recognize written letter strings as whole words. Spotting a close friend in a crowded hallway before you consciously check their clothes is the fusiform gyrus at work.',
+        bullets: [
+          'Face recognition: computes the spacing and geometry of eyes, nose, and mouth to identify individuals.',
+          'Visual word form: groups letters into whole words on the left side so reading feels effortless.',
+          'Category expertise: builds fine-tuned maps for whatever you study closely, from birds to chessboards.',
+          'Physical landmarks: long basal ridge on the ventral surface of the temporal and occipital lobes.',
+        ],
+      },
+      connects: {
+        text: 'Early visual lines and colors arrive from the {{visual-cortex}} and are assembled into whole objects here. Once an identity is matched, signals pass forward to the {{hippocampus}} to recall who the person is and to the {{amygdala}} to register how you feel about them.',
+        connections: [
+          { id: 'visual-cortex', dir: 'in', label: 'Lines and shapes arriving from early vision' },
+          { id: 'amygdala', dir: 'both', label: 'Facial expressions and emotional weight shared' },
+          { id: 'hippocampus', dir: 'out', label: 'Recognised faces and places linked to memories' },
+          { id: 'wernickes-area', dir: 'out', label: 'Seen letter strings passed on for word meaning' },
+        ],
+      },
+      cells: {
+        text: 'Columns here follow the standard six-layer cortical diagram, with [[pyramidal cell|pyramidal cells]] in upper layers pooling inputs from wide patches of visual space using [[glutamate]]. Because cells here respond to whole configurations rather than tiny local edges, a face still triggers the same neurons whether it is near or far.',
+        diagram: 'cortical-column',
+        synapse: 'glutamate',
+        bullets: [
+          'Face-selective patches respond within about 170 milliseconds of seeing a face.',
+          'Turning a face upside down disrupts this holistic tuning, making expression changes much harder to spot.',
+        ],
+      },
+    },
+    tryIt: 'Look at an upside-down photo of a familiar person, then flip it right-side up. The sudden jump from puzzling features to instant recognition is your fusiform face network engaging.',
+    breaks: {
+      text: 'Damage along this underside strip leaves eyesight sharp, but strips away rapid visual recognition.',
+      bullets: [
+        'Prosopagnosia (face blindness): inability to recognize familiar faces, sometimes even one\'s own reflection, while recognizing people immediately by voice.',
+        'Pure alexia: after left-side damage, patients can still write sentences but must spell out written words letter by letter to read them.',
+        'Achromatopsia or object agnosia: difficulty identifying everyday objects or colors by sight alone.',
+      ],
+    },
+  },
+  {
+    id: 'entorhinal-cortex',
+    name: 'Entorhinal cortex',
+    parent: 'temporal-lobe',
+    group: 'cortex',
+    color: '#38bdf8',
+    shape: {
+      type: 'cortex',
+      test: (p) => p.lobe === 'temporal' && p.ax < 0.42 && p.y < -0.14 && p.z > -0.12 && p.z < 0.24,
+    },
+    view: 'left-below',
+    size: 'about 3 cm long patch',
+    tagline: 'The main doorway into the hippocampus and home of your internal coordinate grid.',
+    analogy: 'A reception desk and map room where sensory experiences are stamped with coordinates before entering the memory archive.',
+    levels: {
+      overview: {
+        text: 'The [[entorhinal cortex]] sits on the inner underside of each {{temporal-lobe}}, wrapping around the front of the {{hippocampus}}. It acts as the primary interface between the outer neocortex and the deep memory circuits of the medial temporal lobe.\n\nAlmost everything the cortex sees, hears, or plans passes through this hub on its way into long-term memory, and consolidated memories travel back through it on their way out. Its medial half also houses [[grid cell|grid cells]], neurons that lay a repeating hexagonal coordinate system across every room you walk through so you can track distance and direction even in the dark.',
+        bullets: [
+          'Memory gateway: funnels sensory and executive summaries into and out of the {{hippocampus}}.',
+          'Hexagonal space map: uses [[grid cell|grid cells]] to measure how far and which way you have moved.',
+          'What and where integration: merges object identity from its lateral side with spatial layout from its medial side.',
+          'Physical landmarks: anterior parahippocampal cortex tucked on the ventromedial temporal surface.',
+        ],
+      },
+      connects: {
+        text: 'Sensory and association areas across the {{temporal-lobe}} and {{prefrontal-cortex}} converge here. The entorhinal cortex bundles those streams and sends them into the {{hippocampus}} along the perforant pathway, then receives the bound memory trace back to distribute to the cortex.',
+        connections: [
+          { id: 'hippocampus', dir: 'both', label: 'Two-way gateway for encoding and recalling memories' },
+          { id: 'temporal-lobe', dir: 'both', label: 'Object and word concepts gathered for memory' },
+          { id: 'prefrontal-cortex', dir: 'both', label: 'Goals and context exchanged with memory loops' },
+          { id: 'olfactory-bulb', dir: 'in', label: 'Direct scent inputs arriving without thalamic relay' },
+        ],
+      },
+      cells: {
+        text: 'As the hippocampal loop diagram shows, layer II and III [[pyramidal cell|pyramidal cells]] and [[stellate cell|stellate cells]] send excitatory [[glutamate]] axons directly into the dentate gyrus and CA1. Medial entorhinal cells fire in periodic triangular grids that tile any environment you explore.',
+        diagram: 'hippocampal-loop',
+        synapse: 'glutamate',
+        bullets: [
+          'Grid cells fire at the corners of a regular hexagonal lattice across the floor as you walk.',
+          'Layer II neurons here are among the very first cells in the brain to accumulate tau tangles in Alzheimer\'s disease.',
+        ],
+      },
+    },
+    tryIt: 'Stand in a familiar room, close your eyes, and take three steps forward and a quarter-turn left. Knowing exactly where the door now sits relative to your body relies on entorhinal grid cells tracking your path.',
+    breaks: {
+      text: 'Because this narrow bottleneck connects the cortex to the hippocampus, early cell loss here disconnects memory formation.',
+      bullets: [
+        'Early Alzheimer\'s disease: degeneration often begins here before spreading into the hippocampus, causing early spatial disorientation and forgetfulness.',
+        'Path integration failure: losing track of where you are relative to your starting point when visual landmarks are dim.',
+        'Tip-of-the-tongue and recent recall gaps when the return highway from hippocampus to cortex weakens.',
+      ],
+    },
+  },
 
   // ---------------------------------------------------------------- occipital
   {
@@ -761,6 +920,60 @@ export default [
         'Overactivity is linked to OCD, anxiety and chronic pain loops.',
         'Damage can flatten motivation, so errors no longer prompt fixes.',
         'Back part failure shows early in Alzheimer\'s as lost direction.',
+      ],
+    },
+  },
+  {
+    id: 'anterior-cingulate',
+    name: 'Anterior cingulate cortex',
+    parent: 'cingulate-cortex',
+    group: 'cortex',
+    color: '#ff7b54',
+    shape: {
+      type: 'cortex',
+      test: (p) => p.medial && p.z > 0.02 && p.z < 0.4 && p.y > callosumY(p.z) + 0.03 && p.y < callosumY(p.z) + 0.15,
+    },
+    view: 'medial',
+    size: 'about 5 cm curved collar',
+    slice: true,
+    tagline: 'Detects conflict and errors, weighs effort, and registers the distress of pain.',
+    analogy: 'A dashboard warning light that flashes when two plans clash, effort rises, or something hurts.',
+    levels: {
+      overview: {
+        text: 'The [[anterior cingulate cortex]] forms the front half of the {{cingulate-cortex}}, curving around the front knee of the {{corpus-callosum}} on the inner wall of each [[hemisphere]]. It sits at the crossroads between the thinking {{prefrontal-cortex}} and the emotional limbic system.\n\nIt monitors ongoing actions for conflict, tracks how much effort a task requires, and registers the emotional unpleasantness of pain. While the {{somatosensory-cortex}} tells you where a burn is located on your finger, the anterior cingulate makes the burn feel distressing and urgent so you care enough to protect it.',
+        bullets: [
+          'Conflict and error alarm: fires within milliseconds when a slip occurs or two habits compete.',
+          'Pain distress: encodes the emotional suffering of physical pain and social exclusion.',
+          'Effort calculator: weighs whether an expected reward justifies ramping up mental or physical effort.',
+          'Autonomic drive: nudges heart rate and blood pressure upward when a mental task grows demanding.',
+        ],
+      },
+      connects: {
+        text: 'Visceral and pain signals arrive from the {{thalamus}} and {{insula}}, while threat and reward updates arrive from the {{amygdala}} and {{vta}}. When conflict or pain is detected, the anterior cingulate alerts the {{prefrontal-cortex}} to tighten focus and adjust strategy.',
+        connections: [
+          { id: 'prefrontal-cortex', dir: 'both', label: 'Conflict alerts traded for stronger top-down control' },
+          { id: 'insula', dir: 'both', label: 'Internal body state and pain feelings shared' },
+          { id: 'amygdala', dir: 'both', label: 'Emotional urgency and threat signals linked' },
+          { id: 'thalamus', dir: 'in', label: 'Ascending pain and arousal signals arriving' },
+        ],
+      },
+      cells: {
+        text: 'Its deep layer V holds large spindle-shaped [[neuron|neurons]] (von Economo neurons) alongside standard [[pyramidal cell|pyramidal cells]], sending fast [[glutamate]] signals to frontal and autonomic hubs. [[Dopamine]] arriving from the midbrain tunes how strongly these columns respond to errors and effort costs.',
+        diagram: 'cortical-column',
+        synapse: 'glutamate',
+        bullets: [
+          'Houses spindle neurons, elongated cells found mainly in large-brained social mammals.',
+          'Generates the error-related negativity, a sharp electrical dip recorded at the scalp about 80 milliseconds after a mistake.',
+        ],
+      },
+    },
+    tryIt: 'Hold an ice cube tightly in your hand for ten seconds. Notice the split between the cold location on your skin and the rising urge to drop it. That emotional urgency comes from your anterior cingulate.',
+    breaks: {
+      text: 'Underactivity drains the drive to act or care about pain, while overactivity locks the brain into worry and distress.',
+      bullets: [
+        'Akinetic mutism: severe bilateral damage can leave a person awake and able to move, yet lacking the internal drive to speak or initiate action.',
+        'Pain indifference: damage here can leave people able to feel where pain is without feeling bothered by it.',
+        'OCD and chronic depression: hyperactive subgenual and dorsal loops fuel persistent error signals and heavy emotional distress.',
       ],
     },
   },

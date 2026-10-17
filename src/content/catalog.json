@@ -11,6 +11,11 @@
       "tagline": "Keeps goals in mind and puts the brakes on impulses."
     },
     {
+      "id": "premotor-cortex",
+      "name": "Premotor cortex",
+      "tagline": "Prepares and sequences movements before muscles fire."
+    },
+    {
       "id": "motor-cortex",
       "name": "Primary motor cortex",
       "tagline": "Shapes voluntary movement commands sent toward the spinal cord."
@@ -51,6 +56,16 @@
       "tagline": "Helps you understand the words you hear and read."
     },
     {
+      "id": "fusiform-gyrus",
+      "name": "Fusiform gyrus",
+      "tagline": "Recognises faces, familiar objects and written words at a glance."
+    },
+    {
+      "id": "entorhinal-cortex",
+      "name": "Entorhinal cortex",
+      "tagline": "The main doorway into the hippocampus and home of your internal coordinate grid."
+    },
+    {
       "id": "occipital-lobe",
       "name": "Occipital lobe",
       "tagline": "The vision department at the back of your head."
@@ -66,6 +81,11 @@
       "tagline": "Notices mistakes and conflict, and links feelings to action."
     },
     {
+      "id": "anterior-cingulate",
+      "name": "Anterior cingulate cortex",
+      "tagline": "Detects conflict and errors, weighs effort, and registers the distress of pain."
+    },
+    {
       "id": "insula",
       "name": "Insula",
       "tagline": "Your sense of the inside of your body: heartbeat, hunger, disgust."
@@ -76,24 +96,34 @@
       "tagline": "The relay station that passes almost every sense on to the cortex."
     },
     {
+      "id": "habenula",
+      "name": "Habenula",
+      "tagline": "Signals disappointment and brakes dopamine when an expected reward fails."
+    },
+    {
+      "id": "pineal-gland",
+      "name": "Pineal gland",
+      "tagline": "Produces melatonin in the dark to set your daily sleep and wake rhythm."
+    },
+    {
       "id": "hypothalamus",
       "name": "Hypothalamus",
       "tagline": "Runs the body: hunger, thirst, temperature, sleep and hormones."
     },
     {
-      "id": "striatum",
-      "name": "Striatum",
-      "tagline": "Learns habits and helps pick which action to do next."
+      "id": "suprachiasmatic-nucleus",
+      "name": "Suprachiasmatic nucleus",
+      "tagline": "The master 24-hour body clock calibrated by morning light."
     },
     {
-      "id": "globus-pallidus",
-      "name": "Globus pallidus",
-      "tagline": "The brake pedal on movement, released only for the right action."
+      "id": "pituitary",
+      "name": "Pituitary gland",
+      "tagline": "The master endocrine gland that releases hormones into the bloodstream."
     },
     {
-      "id": "substantia-nigra",
-      "name": "Substantia nigra",
-      "tagline": "Uses dopamine and inhibitory output to tune movement circuits."
+      "id": "mammillary-bodies",
+      "name": "Mammillary bodies",
+      "tagline": "Relays memory signals from the hippocampus to the thalamus."
     },
     {
       "id": "hippocampus",
@@ -106,14 +136,9 @@
       "tagline": "The alarm that flags danger and gives memories emotional weight."
     },
     {
-      "id": "corpus-callosum",
-      "name": "Corpus callosum",
-      "tagline": "A thick cable of fibres that lets the two halves talk."
-    },
-    {
-      "id": "vta",
-      "name": "Ventral tegmental area",
-      "tagline": "Sends learning and motivation signals through several dopamine pathways."
+      "id": "olfactory-bulb",
+      "name": "Olfactory bulb",
+      "tagline": "The sensory station for smell, wired directly to memory and emotion."
     },
     {
       "id": "basal-forebrain",
@@ -121,39 +146,24 @@
       "tagline": "Sends acetylcholine widely to tune attention, learning and wakefulness."
     },
     {
+      "id": "striatum",
+      "name": "Striatum",
+      "tagline": "Learns habits and helps pick which action to do next."
+    },
+    {
       "id": "nucleus-accumbens",
       "name": "Nucleus accumbens",
       "tagline": "Ventral striatum that translates reward signals and motivation into action."
     },
     {
-      "id": "pituitary",
-      "name": "Pituitary gland",
-      "tagline": "The master endocrine gland that releases hormones into the bloodstream."
+      "id": "globus-pallidus",
+      "name": "Globus pallidus",
+      "tagline": "The brake pedal on movement, released only for the right action."
     },
     {
-      "id": "pineal-gland",
-      "name": "Pineal gland",
-      "tagline": "Produces melatonin in the dark to set your daily sleep and wake rhythm."
-    },
-    {
-      "id": "mammillary-bodies",
-      "name": "Mammillary bodies",
-      "tagline": "Relays memory signals from the hippocampus to the thalamus."
-    },
-    {
-      "id": "habenula",
-      "name": "Habenula",
-      "tagline": "Signals disappointment and brakes dopamine when an expected reward fails."
-    },
-    {
-      "id": "olfactory-bulb",
-      "name": "Olfactory bulb",
-      "tagline": "The sensory station for smell, wired directly to memory and emotion."
-    },
-    {
-      "id": "cerebellum",
-      "name": "Cerebellum",
-      "tagline": "Fine-tunes movement so it comes out smooth, timed and accurate."
+      "id": "corpus-callosum",
+      "name": "Corpus callosum",
+      "tagline": "A thick cable of fibres that lets the two halves talk."
     },
     {
       "id": "midbrain",
@@ -161,9 +171,29 @@
       "tagline": "Reflex hub for eyes and ears, and home of the dopamine cells."
     },
     {
+      "id": "substantia-nigra",
+      "name": "Substantia nigra",
+      "tagline": "Uses dopamine and inhibitory output to tune movement circuits."
+    },
+    {
+      "id": "vta",
+      "name": "Ventral tegmental area",
+      "tagline": "Sends learning and motivation signals through several dopamine pathways."
+    },
+    {
+      "id": "periaqueductal-gray",
+      "name": "Periaqueductal gray",
+      "tagline": "Suppresses incoming pain during emergencies and triggers survival freeze reflexes."
+    },
+    {
       "id": "pons",
       "name": "Pons",
       "tagline": "A bridge carrying signals between the cortex and the cerebellum."
+    },
+    {
+      "id": "locus-coeruleus",
+      "name": "Locus coeruleus",
+      "tagline": "A small noradrenaline system that retunes alertness and attention."
     },
     {
       "id": "medulla",
@@ -171,19 +201,19 @@
       "tagline": "Keeps you alive on autopilot: breathing, heart rate, swallowing."
     },
     {
-      "id": "spinal-cord",
-      "name": "Spinal cord",
-      "tagline": "The main cable between brain and body."
-    },
-    {
       "id": "raphe-nuclei",
       "name": "Raphe nuclei",
       "tagline": "Brainstem nuclei that send serotonin through widespread circuits."
     },
     {
-      "id": "locus-coeruleus",
-      "name": "Locus coeruleus",
-      "tagline": "A small noradrenaline system that retunes alertness and attention."
+      "id": "spinal-cord",
+      "name": "Spinal cord",
+      "tagline": "The main cable between brain and body."
+    },
+    {
+      "id": "cerebellum",
+      "name": "Cerebellum",
+      "tagline": "Fine-tunes movement so it comes out smooth, timed and accurate."
     }
   ],
   "anchors": [
@@ -480,7 +510,14 @@
     "homeostasis",
     "downregulation",
     "anhedonia",
-    "variable-ratio schedule"
+    "variable-ratio schedule",
+    "premotor cortex",
+    "anterior cingulate cortex",
+    "entorhinal cortex",
+    "fusiform gyrus",
+    "suprachiasmatic nucleus",
+    "periaqueductal gray",
+    "grid cell"
   ],
   "roles": [
     "more_active",

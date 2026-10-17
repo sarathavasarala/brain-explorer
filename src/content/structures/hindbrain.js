@@ -1,7 +1,480 @@
 // Brainstem, cerebellum and spinal cord.
-// The cerebellum entry is a fully written example of every text field.
+// Ordered anatomically top-to-bottom down the brainstem, followed by the cerebellum.
 
 export default [
+  {
+    id: 'midbrain',
+    name: 'Midbrain',
+    group: 'hindbrain',
+    color: '#ffa94d',
+    shape: { type: 'tube', path: [[0, -0.01, -0.1], [0, -0.1, -0.13], [0, -0.2, -0.17]], radius: 0.085, count: 1800, pattern: 'rings', fill: 0.18 },
+    view: 'left',
+    size: 'about 2 cm long',
+    slice: true,
+    tagline: 'Reflex hub for eyes and ears, and home of the dopamine cells.',
+    analogy: 'A night watchman who turns your head toward sudden sounds and sights before you decide to look.',
+    levels: {
+      overview: {
+        text: 'The midbrain is the top inch of the brainstem, sitting just below the {{thalamus}} and above the {{pons}}. About as long as the top joint of your thumb, all neural signals traveling between the forebrain and the rest of the body pass through or beside it.\n\nIt runs fast survival reflexes you do not choose. When something flashes at the edge of vision or a twig snaps behind you, it whips your eyes and head toward the surprise. At the same time, its {{substantia-nigra}} cells send steady [[dopamine]] that keeps voluntary movement smooth and ready to start.',
+        bullets: [
+          'Visual and sound reflexes: points the eyes and head toward sudden cues.',
+          'Movement support: dopamine from the substantia nigra helps start physical actions.',
+          'Alertness control: adjusts background wakefulness and dampens pain.',
+          'Physical landmarks: roof features four bumps (the colliculi) for sight and sound reflexes.',
+        ],
+      },
+      connects: {
+        text: 'Alarm signals arrive from the {{amygdala}} when something unexpected occurs. The midbrain triggers an instant reflex to snap your eyes and head toward the surprise, while passing the alert upward to the {{thalamus}} to wake up the thinking cortex.',
+        connections: [
+          { id: 'thalamus', dir: 'out', label: 'Alert signals passed up toward the cortex' },
+          { id: 'pons', dir: 'both', label: 'Eye and body signals shared down the brainstem' },
+          { id: 'amygdala', dir: 'in', label: 'Alarm input when something feels threatening' },
+        ],
+      },
+      cells: {
+        text: 'Most midbrain cells are ordinary relay [[neuron|neurons]] that use [[glutamate]] and pass messages quickly. The famous exception is the dopamine cluster in the {{substantia-nigra}}. Like the broadcast diagram shows, a few thousand of these cells grow hugely branched [[axon|axons]] that reach the whole {{striatum}} and change how it responds.',
+        diagram: 'neuromodulator',
+        synapse: 'dopamine',
+        bullets: [
+          'The dark colour of the substantia nigra comes from pigment inside its dopamine cells.',
+          'Parkinson\'s motor signs usually appear only after substantial loss of these cells and their striatal dopamine supply.',
+        ],
+      },
+    },
+    tryIt: 'Look at one corner of the room, then flick your eyes to the opposite corner without moving your head. That quick jump (a saccade) is steered through the midbrain.',
+    breaks: {
+      text: 'Damage here is rare but serious, because so many cables pass through such a small space.',
+      bullets: [
+        'Loss of dopamine cells causes Parkinson\'s: slow movement, stiffness and a resting tremor.',
+        'Damage to the eye reflex bumps causes double vision or trouble looking up and down.',
+        'A stroke here can affect the eyes, the body and wakefulness all at once.',
+      ],
+    },
+  },
+  {
+    id: 'substantia-nigra',
+    name: 'Substantia nigra',
+    group: 'hindbrain',
+    parent: 'midbrain',
+    color: '#ffcf5c',
+    shape: { type: 'ellipsoid', center: [0.07, -0.14, -0.1], radii: [0.04, 0.014, 0.05], count: 700, mirror: true, fill: 1 },
+    view: 'left',
+    size: 'about 1 cm long',
+    tagline: 'Uses dopamine and inhibitory output to tune movement circuits.',
+    analogy: 'A watering can that sprinkles dopamine over the movement circuits to keep them willing to move.',
+    levels: {
+      overview: {
+        text: 'The substantia nigra is a dark, flattened band of cells nestled inside the {{midbrain}}, sitting just above the {{pons}} and alongside descending motor pathways. Its Latin name means "black substance," reflecting the dark neuromelanin pigment produced when making [[dopamine]]. Despite its tiny size, its sprawling nerve branches reach upward across the entire {{striatum}}.\n\nIts dopamine neurons provide the chemical green light that allows movement circuits to start and run smoothly. When you decide to stand up from a chair, these cells release a burst of dopamine into the striatum to facilitate the transition into motion. When these cells die away, movements become slow, rigid, and hesitant, as seen in Parkinson\'s disease.',
+        bullets: [
+          "Movement facilitation: delivers dopamine to the {{striatum}} to help initiate voluntary actions.",
+          "Action reinforcement: signals unexpected rewards to help motor circuits repeat successful efforts.",
+          "Motor tuning: balances the direct and indirect pathways of the basal ganglia to control physical vigour.",
+          "Inhibitory output: uses its pars reticulata segment to help guide rapid saccadic eye movements.",
+        ],
+      },
+      connects: {
+        text: 'Rather than driving movements directly, this region releases neuromodulatory signals that adjust responsiveness in motor circuits. A burst of dopamine lowers the threshold for starting an action, while inhibitory outputs help stabilize eye movements and posture.',
+        connections: [
+          { id: 'striatum', dir: 'out', label: 'Dopamine teaching signal sent upward' },
+          { id: 'globus-pallidus', dir: 'both', label: 'Braking level tuned together' },
+          { id: 'thalamus', dir: 'out', label: 'A smaller supply to the relay' },
+        ],
+      },
+      cells: {
+        text: 'Each dopamine cell grows an enormously branched [[axon]], one cell reaching tens of thousands of striatum targets. Like the [[neuromodulator]] broadcast diagram, it does not send precise orders. It changes how strongly other inputs work, and the effect lasts seconds to minutes rather than milliseconds.',
+        diagram: 'basal-ganglia',
+        synapse: 'dopamine',
+        bullets: [
+          'Humans have only several hundred thousand dopamine neurons in the substantia nigra on both sides combined.',
+          'Their activity reflects movement as well as learning about outcomes and cues.',
+        ],
+      },
+    },
+    tryIt: 'Think of how an unexpectedly good result changes what you try next time. Dopamine signals from the substantia nigra are one part of how movement circuits update action values, but the feeling itself comes from a wider network.',
+    breaks: {
+      text: 'These cells die slowly with age, and faster in disease. Movement and mood both suffer.',
+      bullets: [
+        'Parkinson\'s motor signs emerge after substantial cell and striatal dopamine loss, producing slow movement, stiffness and sometimes tremor.',
+        'Too much dopamine signalling is linked to the false alarms of psychosis.',
+        'Some Parkinson\'s drugs mimic dopamine but can cause impulsive habits like gambling.',
+      ],
+      states: [
+        {
+          kind: 'lesion',
+          teaser: 'Movement loses its chemical starter signal.',
+          text: 'The gradual loss of dopamine-producing cells in the substantia nigra deprives movement circuits of their chemical starter signal. Without steady dopamine delivery to the striatum, the brain struggles to initiate and smooth voluntary physical actions. Muscles become stiff and slow, and hands tremble rhythmically when resting.',
+          signs: [
+            'Slowness and freezing when attempting to start walking or reaching.',
+            'Rhythmic resting tremor in the fingers that calms down during active movement.',
+            'Muscle stiffness that feels like moving against continuous resistance.',
+          ],
+          case: {
+            name: 'Parkinson\'s Disease (Parkinson, 1817)',
+            text: 'In 1817, British physician James Parkinson published the first detailed clinical account of the shaking palsy. Later researchers identified the underlying cause as the loss of dopamine-producing cells in the substantia nigra pars compacta. This chemical deficit cuts off signals to the striatum, producing resting tremors, muscle rigidity, and difficulty starting movements.',
+          },
+          ripple: [
+            { id: 'striatum', role: 'cut_off' },
+          ],
+        },
+        {
+          kind: 'over',
+          teaser: 'Dopamine medication excess causes involuntary movements.',
+          text: 'Too much dopamine signalling, most often from Parkinson\'s medication, causes motor circuits to fire without restraint. Instead of producing smooth coordination, the excess dopamine sparks involuntary twisting and dance-like gestures known as dyskinesias. At the same time, reward circuits become overstimulated, sparking sudden compulsive urges like gambling or shopping.',
+          signs: [
+            'Involuntary writhing or dance-like movements of the limbs and face.',
+            'Sudden compulsive urges to gamble, spend money, or repeat repetitive tasks.',
+          ],
+        },
+      ],
+    },
+  },
+  {
+    id: 'vta',
+    name: 'Ventral tegmental area',
+    group: 'hindbrain',
+    parent: 'midbrain',
+    color: '#ffb703',
+    shape: { type: 'ellipsoid', center: [0.03, -0.13, -0.09], radii: [0.024, 0.016, 0.032], count: 500, mirror: true, fill: 1 },
+    view: 'left',
+    size: 'about 1 cm across',
+    tagline: 'Sends learning and motivation signals through several dopamine pathways.',
+    analogy: 'A prediction updater that helps the brain revise what is worth pursuing.',
+    levels: {
+      overview: {
+        text: 'The ventral tegmental area (VTA) is a compact cluster of neurons nestled in the floor of the {{midbrain}}, situated immediately medial to the {{substantia-nigra}}. Although small enough to fit on the tip of a pencil, its ascending dopamine, GABA, and glutamate branches reach outward to illuminate the entire front of the brain.\n\nThe VTA computes reward prediction errors, signaling when an outcome turns out better or worse than anticipated. When a notification chimes or you catch an unexpected whiff of fresh coffee, VTA dopamine bursts highlight the cue and generate the motivational drive to pursue it. It does not generate raw pleasure on its own, but rather imbues goals with wanting and anticipation.',
+        bullets: [
+          "Prediction error: fires when an outcome beats expectations, updating how much an action was worth.",
+          "Motivational drive: energizes the willingness to invest physical or mental effort toward a goal.",
+          "Mesolimbic pathway: sends dopamine to the {{nucleus-accumbens}} and {{amygdala}} for reward learning.",
+          "Mesocortical pathway: projects dopamine to the {{prefrontal-cortex}} to support goal focus and working memory.",
+        ],
+      },
+      connects: {
+        text: 'Broad ascending projections carry dopamine pulses to frontal and limbic networks. Rather than carrying detailed sensory content, these signals tell downstream circuits whether an event exceeded expectations, updating the value of memories and strengthening the urge to pursue useful goals.',
+        connections: [
+          { id: 'nucleus-accumbens', dir: 'out', label: 'Dopamine reward signal to ventral striatum' },
+          { id: 'prefrontal-cortex', dir: 'out', label: 'Dopamine tunes working memory and planning' },
+          { id: 'amygdala', dir: 'out', label: 'Dopamine influences emotional learning' },
+          { id: 'hippocampus', dir: 'out', label: 'Dopamine influences memory formation' },
+        ],
+      },
+      cells: {
+        text: 'VTA neurons are neuromodulators with enormous branching trees, as the broadcast diagram shows. They release [[dopamine]] across wide areas, changing how sensitive other synapses are to [[glutamate]]. When an expected reward goes missing, these cells temporarily go quiet.',
+        diagram: 'neuromodulator',
+        synapse: 'dopamine',
+        bullets: [
+          'Individual dopamine neurons can influence many thousands of targets through widely branching axons.',
+          'Addictive substances alter this learning system through several mechanisms, many of which increase dopamine signalling.',
+        ],
+      },
+    },
+    tryIt: 'Notice how a reliable cue, such as the smell of a favourite food, changes what you expect and do next. VTA dopamine helps update such predictions, but the conscious feeling of anticipation uses a wider network.',
+    breaks: {
+      text: 'Disruptions in this circuit alter drive, mood, and belief in what is worth doing.',
+      bullets: [
+        'Anhedonia: losing the ability to feel pleasure or anticipation, common in severe depression.',
+        'Addiction: repeated surges re-wire the circuit until cravings overpower conscious goals.',
+        'Overactivity is linked to the false importance assigned to coincidences in psychosis.',
+      ],
+    },
+  },
+  {
+    id: 'periaqueductal-gray',
+    name: 'Periaqueductal gray',
+    group: 'hindbrain',
+    parent: 'midbrain',
+    color: '#f97316',
+    shape: { type: 'tube', path: [[0, -0.03, -0.125], [0, -0.1, -0.15], [0, -0.17, -0.18]], radius: 0.028, count: 550, pattern: 'rings', fill: 0.35, pointScale: 8.0 },
+    view: 'medial',
+    size: 'about 1.5 cm sleeve',
+    slice: true,
+    tagline: 'Suppresses incoming pain during emergencies and triggers survival freeze reflexes.',
+    analogy: 'An emergency override switch that mutes pain alarms and locks the brakes until danger passes.',
+    levels: {
+      overview: {
+        text: 'The [[periaqueductal gray]] (PAG) is a sleeve of grey matter wrapping around the narrow fluid canal (the cerebral aqueduct) running through the center of the {{midbrain}}. Positioned along the midline between the {{thalamus}} above and the {{pons}} below, it sits directly on the route linking emotional hubs to the spinal cord.\n\nIt runs two ancient survival programs: defensive freezing and natural pain suppression. When a sudden threat appears, outputs from the {{amygdala}} recruit the PAG to hold the body completely still while you assess danger. During high stress or intense focus, it also triggers descending pathways that block pain signals in the {{spinal-cord}} before they ever reach consciousness.',
+        bullets: [
+          'Descending analgesia: activates brainstem relays to mute pain signals at the spinal cord gate.',
+          'Defensive freeze: locks posture and slows heart rate when a threat is detected nearby.',
+          'Active coping: switches from freezing to flight or vocal alarm when threat closes in.',
+          'Physical landmarks: cylindrical grey-matter cuff surrounding the midbrain aqueduct.',
+        ],
+      },
+      connects: {
+        text: 'Threat and context assessments arrive from the {{amygdala}}, {{hypothalamus}}, and {{anterior-cingulate}}. In response, the periaqueductal gray signals downward through the {{raphe-nuclei}} and {{medulla}} into the {{spinal-cord}} to dampen incoming pain and coordinate defensive posture.',
+        connections: [
+          { id: 'amygdala', dir: 'in', label: 'Urgent threat signals triggering freeze reflexes' },
+          { id: 'anterior-cingulate', dir: 'in', label: 'Top-down pain modulation and placebo signals' },
+          { id: 'hypothalamus', dir: 'both', label: 'Autonomic stress and survival state shared' },
+          { id: 'raphe-nuclei', dir: 'out', label: 'Triggers descending serotonin pain braking' },
+          { id: 'spinal-cord', dir: 'out', label: 'Blocks incoming pain and locks defensive posture' },
+        ],
+      },
+      cells: {
+        text: 'As the fear circuit diagram shows, excitatory projections from the central {{amygdala}} and cortex land here. Internally, local [[GABA]] [[interneuron|interneurons]] normally hold pain-suppressing output cells quiet; when natural opioids (endorphins) or painkillers bind to mu-opioid [[receptor|receptors]], they silence those GABA brakes and let pain-blocking signals flow down the brainstem.',
+        diagram: 'fear-circuit',
+        synapse: 'gaba',
+        bullets: [
+          'Disinhibition is its core trick: opioids quiet the local GABA brakes so descending pain-relief cells can fire.',
+          'This circuit explains why athletes or soldiers in acute danger often do not feel a serious injury until the crisis ends.',
+        ],
+      },
+    },
+    tryIt: 'Think of a time you stubbed a toe or scraped a knee while rushing and barely noticed it until you sat down later. That temporary muting of pain signals is your periaqueductal gray closing the spinal gate.',
+    breaks: {
+      text: 'When this pain-gating and defense hub malfunctions, pain filtering and panic responses go awry.',
+      bullets: [
+        'Chronic pain states: weakened descending inhibition leaves the spinal gate wide open, amplifying ordinary aches.',
+        'Panic and freezing: inappropriate activation can trigger sudden breathlessness, dread, and an inability to move.',
+        'Opioid tolerance: repeated opioid use downregulates receptors here, requiring higher doses to open the pain brake.',
+      ],
+    },
+  },
+  {
+    id: 'pons',
+    name: 'Pons',
+    group: 'hindbrain',
+    color: '#ff9b3d',
+    shape: { type: 'tube', path: [[0, -0.2, -0.155], [0, -0.3, -0.175], [0, -0.4, -0.215]], radius: [[0, 0.095], [0.5, 0.13], [1, 0.095]], count: 2200, pattern: 'rings', fill: 0.14 },
+    view: 'left',
+    size: 'about 4 cm across',
+    tagline: 'A bridge carrying signals between the cortex and the cerebellum.',
+    analogy: 'A busy interchange where every lane from the cortex gets copied and sent south to the cerebellum.',
+    levels: {
+      overview: {
+        text: 'The pons is the rounded bulge on the front of the brainstem, between the {{midbrain}} above, the {{medulla}} below, and the {{cerebellum}} behind. Its Latin name means bridge, describing the thick bundle of crossing [[white matter]] fibres on its front.\n\nIt helps movements come out smoothly and also supports sideways eye movements, chewing, face sensation, and the switches that govern dream sleep.',
+        bullets: [
+          'Cerebellar relay: sends a copy of cortical motor plans to the cerebellum.',
+          'Eye coordination: coordinates both eyes to move sideways together.',
+          'Sleep rhythms: hosts circuits that trigger and regulate dream sleep.',
+          'Physical landmarks: prominent rounded bulge about 2 to 3 cm tall on the front of the brainstem.',
+        ],
+      },
+      connects: {
+        text: 'The pons passes a copy of a movement plan toward the system that checks its timing. Its other exchanges help coordinate automatic functions such as breathing and sleep.',
+        connections: [
+          { id: 'motor-cortex', dir: 'in', label: 'A copy of each movement plan from the cortex' },
+          { id: 'cerebellum', dir: 'out', label: 'Plans forwarded for smoothing and timing' },
+          { id: 'medulla', dir: 'both', label: 'Breathing, sleep and heart signals shared' },
+        ],
+      },
+      cells: {
+        text: 'The pons is mostly crossing [[axon|axons]] wrapped in [[myelin]], which is why it looks pale and bulging. Scattered among them are relay cells that use [[glutamate]] to pass the cortical copy onward. A small blue-tinged cluster (the locus coeruleus) works like the broadcast diagram, spraying noradrenaline across the brain to raise alertness.',
+        diagram: 'neuromodulator',
+        synapse: 'noradrenaline',
+        bullets: [
+          'The two locus coeruleus nuclei together contain only tens of thousands of neurons, yet their axons reach most of the brain.',
+          'It goes quiet during dream sleep and fires in bursts when something surprising happens.',
+        ],
+      },
+    },
+    tryIt: 'Hold a finger up and look at it, then look at the far wall, then back. The clean sideways jump your eyes make travels through circuits in the pons.',
+    breaks: {
+      text: 'Because the pons packs movement, feeling and alertness fibres into a small space, damage here has wide effects.',
+      bullets: [
+        'A stroke can cause "locked-in" syndrome: fully awake but unable to move except the eyes.',
+        'Damage to eye circuits causes double vision or eyes that do not move together.',
+        'Interrupted sleep circuits lead to very broken sleep or loss of dream sleep.',
+      ],
+    },
+  },
+  {
+    id: 'locus-coeruleus',
+    name: 'Locus coeruleus',
+    group: 'hindbrain',
+    parent: 'pons',
+    color: '#ff5722',
+    shape: { type: 'ellipsoid', center: [0.035, -0.2, -0.21], radii: [0.016, 0.02, 0.022], count: 450, mirror: true, fill: 1 },
+    view: 'left-back',
+    size: 'about 15 mm long',
+    tagline: 'A small noradrenaline system that retunes alertness and attention.',
+    analogy: 'A watchtower sentry who fires a flare when something unexpected happens, putting the whole city on alert.',
+    levels: {
+      overview: {
+        text: 'The locus coeruleus ("blue spot") is a tiny pair of nuclei in the upper {{pons}}, on the floor of the fourth ventricle. Its bluish hue under a microscope comes from melanin granules produced as a byproduct of synthesizing [[noradrenaline]].\n\nAlthough it contains only about 30,000 to 50,000 neurons, its branched axons reach almost every corner of the cortex, cerebellum, and spinal cord. It acts like a neural broadcast tower, firing in bursts during surprises or sudden danger to sharpen sensory focus and wake the brain up.',
+        bullets: [
+          'Arousal broadcasting: releases noradrenaline to tune alertness across the brain.',
+          'Surprise response: fires bursts when unexpected events demand immediate attention.',
+          'Signal tuning: helps circuits focus on relevant cues and filter out noise.',
+          'Physical landmarks: tiny blue-pigmented nuclei on the upper rear wall of the pons.',
+        ],
+      },
+      connects: {
+        text: 'When a sudden noise or surprise demands attention, the locus coeruleus broadcasts a wave of noradrenaline across the brain. These signals quiet down background mental chatter in the {{thalamus}} and focus the {{prefrontal-cortex}} so you can react quickly.',
+        connections: [
+          { id: 'thalamus', dir: 'out', label: 'Sensory relay responses retuned' },
+          { id: 'amygdala', dir: 'out', label: 'Emotional learning and arousal modulated' },
+          { id: 'prefrontal-cortex', dir: 'out', label: 'Attention and working memory retuned' },
+          { id: 'cerebellum', dir: 'out', label: 'Movement and learning circuits modulated' },
+        ],
+      },
+      cells: {
+        text: 'Locus coeruleus neurons have extremely branched axons, as shown in the neuromodulator broadcast diagram. Different cells project to overlapping sets of cortical, cerebellar, brainstem and spinal targets, allowing [[noradrenaline]] to coordinate broad but not uniform changes.',
+        diagram: 'neuromodulator',
+        synapse: 'noradrenaline',
+        bullets: [
+          'Their firing varies with arousal and events, and becomes very low during REM sleep.',
+          'Locus coeruleus degeneration occurs early in Alzheimer\'s disease and is also found in Parkinson\'s disease.',
+        ],
+      },
+    },
+    tryIt: 'Notice how a sudden sound interrupts a wandering thought. Locus-coeruleus noradrenaline helps retune attention during surprise, alongside sensory, autonomic and cortical networks.',
+    breaks: {
+      text: 'Changes in this system are associated with several disorders, but they are not a single cause of panic, ADHD or fatigue.',
+      bullets: [
+        'PTSD and panic disorder can involve altered noradrenergic arousal alongside wider fear and stress networks.',
+        'ADHD medicines can act on noradrenaline and dopamine, but the condition is not a simple shortage of either.',
+        'Stress and fatigue change locus coeruleus activity, without evidence for a finite noradrenaline reserve being exhausted.',
+      ],
+    },
+  },
+  {
+    id: 'medulla',
+    name: 'Medulla oblongata',
+    group: 'hindbrain',
+    color: '#ffc46b',
+    shape: { type: 'tube', path: [[0, -0.4, -0.23], [0, -0.52, -0.27], [0, -0.64, -0.3]], radius: [[0, 0.085], [1, 0.058]], count: 1700, pattern: 'fibers', fill: 0.14 },
+    view: 'left',
+    size: 'about 3 cm long',
+    tagline: 'Keeps you alive on autopilot: breathing, heart rate, swallowing.',
+    analogy: 'The building manager in the basement who keeps the power, water and air running while everyone upstairs works.',
+    levels: {
+      overview: {
+        text: 'The medulla oblongata is the lowest part of the brainstem, where the brain narrows into the {{spinal-cord}}. It sits beneath the {{pons}} and in front of the {{cerebellum}}, looking like a slightly swollen stalk about 3 cm long.\n\nIt runs the vital survival jobs you cannot pause. Sensors in your blood and body feed into the medulla, which fine-tunes your breathing rate, steadies blood pressure, and directs swallowing and coughing. When you try holding your breath, rising carbon dioxide triggers the medulla until it forces a breath in.',
+        bullets: [
+          'Breathing control: speeds or slows respiration based on blood chemistry.',
+          'Heart and blood pressure: balances heart rate and vascular tone second by second.',
+          'Throat reflexes: coordinates swallowing, gagging, and coughing sequences.',
+          'Physical landmarks: front ridges called pyramids where motor cables cross sides.',
+        ],
+      },
+      connects: {
+        text: 'Body signals travel up through the spinal cord reporting blood pressure and oxygen levels, while orders arrive from the {{hypothalamus}}. The medulla coordinates these signals to keep your lungs breathing and heart beating in rhythm, working with the {{cerebellum}} to keep your balance steady.',
+        connections: [
+          { id: 'spinal-cord', dir: 'both', label: 'Body signals up, orders down' },
+          { id: 'hypothalamus', dir: 'in', label: 'Body-state orders such as hunger or heat' },
+          { id: 'cerebellum', dir: 'both', label: 'Balance and posture feedback exchanged' },
+          { id: 'pons', dir: 'both', label: 'Breathing and heart rhythms coordinated' },
+        ],
+      },
+      cells: {
+        text: 'The medulla mixes big [[white matter]] highways with small [[grey matter]] control clusters. Many clusters spray serotonin widely, as the broadcast diagram shows, to set sleep, mood and pain levels. Its rhythm-generating cells fire on their own, like a slow pacemaker, and excite motor [[neuron|neurons]] with [[glutamate]].',
+        diagram: 'neuromodulator',
+        synapse: 'serotonin',
+        bullets: [
+          'Breathing pacemaker cells keep firing even in a dish, with no input at all.',
+          'Opiate painkillers act partly here, which is why overdoses slow breathing dangerously.',
+        ],
+      },
+    },
+    tryIt: 'Swallow now and notice you cannot breathe at the same moment. That brief switch, breathing paused while the throat closes, is the medulla running the sequence.',
+    breaks: {
+      text: 'Damage here can be life threatening, because breathing and blood pressure control live here.',
+      bullets: [
+        'A stroke can cause trouble swallowing, slurred speech and dizziness.',
+        'Injury high on the neck or medulla can stop breathing and need a ventilator.',
+        'Long term high blood pressure and sleep apnoea both involve these control loops going wrong.',
+      ],
+    },
+  },
+  {
+    id: 'raphe-nuclei',
+    name: 'Raphe nuclei',
+    group: 'hindbrain',
+    color: '#00f5d4',
+    shape: { type: 'ellipsoid', center: [0.0, -0.22, -0.2], radii: [0.018, 0.07, 0.024], count: 650, pattern: 'fine', fill: 0.8 },
+    view: 'medial',
+    size: 'about 2 cm long',
+    slice: true,
+    tagline: 'Brainstem nuclei that send serotonin through widespread circuits.',
+    analogy: 'A set of tuning controls whose effects depend on the receptor and circuit receiving the signal.',
+    levels: {
+      overview: {
+        text: 'The raphe nuclei form a narrow chain of neuron clusters running down the midline seam of the brainstem, from the {{midbrain}} through the {{pons}} and {{medulla}}. The name comes from the Greek word for seam, describing how they sit like stitches joining the two halves.\n\nThese nuclei serve as the central nervous system\'s primary source of [[serotonin]]. They release serotonin into widespread forebrain and spinal circuits, shaping sleep cycles, appetite, pain sensitivity, and behavioral flexibility depending on the local receptors receiving the signal.',
+        bullets: [
+          'Serotonin broadcast: sends neuromodulatory projections across the whole brain.',
+          'Sleep and wake cycles: changes firing rates across sleep, dream sleep, and waking.',
+          'Pain dampening: descending projections quiet pain signals in the spinal cord.',
+          'Physical landmarks: a thin column running along the midline core of the brainstem.',
+        ],
+      },
+      connects: {
+        text: 'Serotonin axons fan out across the {{prefrontal-cortex}}, {{amygdala}}, and {{hippocampus}} to soften stress responses and encourage calm focus. At the same time, descending fibres run down into the {{spinal-cord}} to act as a gatekeeper, dampening pain signals before they can travel up to conscious awareness.',
+        connections: [
+          { id: 'prefrontal-cortex', dir: 'out', label: 'Behaviour and learning tuned by serotonin' },
+          { id: 'amygdala', dir: 'out', label: 'Emotional responses modulated by serotonin' },
+          { id: 'hypothalamus', dir: 'out', label: 'Circadian rhythm and sleep-wake tuning' },
+          { id: 'spinal-cord', dir: 'out', label: 'Pain processing modulated from above' },
+        ],
+      },
+      cells: {
+        text: 'Raphe neurons fire with a slow, regular pacemaker beat during wakefulness. Their sprawling branches release [[serotonin]], which binds to over a dozen different [[receptor]] types across target areas, as pictured in the broadcast diagram.',
+        diagram: 'neuromodulator',
+        synapse: 'serotonin',
+        bullets: [
+          'Antidepressant medicines (SSRIs) slow down the removal of serotonin released by these cells.',
+          'Psychedelic compounds act primarily by stimulating 5-HT2A serotonin receptors in the cortex.',
+        ],
+      },
+    },
+    tryIt: 'Take three slow breaths with longer exhalations and notice any change in tension. Breathing can alter autonomic and attention networks, but the feeling cannot be assigned to serotonin or the raphe nuclei alone.',
+    breaks: {
+      text: 'Raphe damage and altered serotonin signalling can affect sleep, pain and behaviour, but common mood disorders cannot be reduced to a simple serotonin shortage.',
+      bullets: [
+        'Depression and anxiety involve many interacting systems. Serotonin treatments can help some people without proving a single chemical deficit.',
+        'Sleep disorders can involve raphe circuits alongside many other brainstem, hypothalamic and cortical systems.',
+        'Serotonin syndrome: life-threatening toxicity caused by accidental overdoses of serotonergic drugs.',
+      ],
+    },
+  },
+  {
+    id: 'spinal-cord',
+    name: 'Spinal cord',
+    group: 'hindbrain',
+    color: '#e8d7a8',
+    shape: { type: 'tube', path: [[0, -0.64, -0.3], [0, -0.82, -0.33], [0, -1.02, -0.35]], radius: [[0, 0.058], [1, 0.045]], count: 1300, pattern: 'fibers', fill: 0.12 },
+    view: 'left',
+    size: 'about 45 cm long',
+    tagline: 'The main cable between brain and body.',
+    analogy: 'A motorway with local slip roads: through traffic to the brain, plus quick local exits for reflexes.',
+    levels: {
+      overview: {
+        text: 'The spinal cord runs from the {{medulla}} down inside your backbone, measuring about 45 cm long in an adult and roughly as thick as your little finger. At each level, paired spinal nerves branch off to serve parts of the body.\n\nIt carries information between brain and body and also manages local reflexes. Pulling your hand away from a hot stove can begin here before you consciously feel the pain.',
+        bullets: [
+          'Two-way highway: carries motor orders down and sensory signals up.',
+          'Local reflex loops: snaps limbs away from danger without waiting for the brain.',
+          'Rhythm generators: coordinates automatic walking cycles and bladder control.',
+          'Physical landmarks: 31 pairs of spinal nerves leaving along the vertebral column.',
+        ],
+      },
+      connects: {
+        text: 'Traffic runs in both directions through the cord. Descending signals help start movement, while ascending signals report touch and body position. Side routes let movement be adjusted as it happens.',
+        connections: [
+          { id: 'motor-cortex', dir: 'in', label: 'Movement orders travelling down to muscles' },
+          { id: 'somatosensory-cortex', dir: 'out', label: 'Touch and body signals travelling up' },
+          { id: 'cerebellum', dir: 'out', label: 'Copies sent for balance correction' },
+        ],
+      },
+      cells: {
+        text: 'A reflex arc, like the diagram shows, needs only three cells: a sensory [[neuron]], a relay [[interneuron]], and a motor neuron that uses acetylcholine to contract muscle. Signals between vertebrae use [[glutamate]] to excite the next cell. Brain orders ride down fast, [[myelin]] wrapped highways on the outside.',
+        diagram: 'reflex-arc',
+        synapse: 'acetylcholine',
+        bullets: [
+          'A knee jerk reflex uses just two cells and takes about 30 milliseconds.',
+          'Motor neurons in the cord are among the longest cells in your body, up to a metre long.',
+        ],
+      },
+    },
+    tryIt: 'Rest a hand near the edge of a table and have a friend tap just below your kneecap with the side of their hand while your leg dangles. The small kick that follows is a spinal reflex, no brain needed.',
+    breaks: {
+      text: 'A spinal-cord injury can disrupt movement, sensation and automatic body functions below the injury. Damage at the injured segment can also affect nearby nerves and muscles.',
+      bullets: [
+        'A neck injury can paralyse arms and legs (tetraplegia). A lower injury affects the legs only (paraplegia).',
+        'Damaged touch highways cause numbness, tingling or chronic pain.',
+        'Disc disease can compress nerve roots, while motor neuron diseases can damage cells in the cord as well as other motor pathways.',
+      ],
+    },
+  },
   {
     id: 'cerebellum',
     name: 'Cerebellum',
@@ -70,299 +543,6 @@ export default [
             { id: 'motor-cortex', role: 'cut_off' },
           ],
         },
-      ],
-    },
-  },
-  {
-    id: 'midbrain',
-    name: 'Midbrain',
-    group: 'hindbrain',
-    color: '#ffa94d',
-    shape: { type: 'tube', path: [[0, -0.01, -0.1], [0, -0.1, -0.13], [0, -0.2, -0.17]], radius: 0.085, count: 1800, pattern: 'rings', fill: 0.18 },
-    view: 'left',
-    size: 'about 2 cm long',
-    slice: true,
-    tagline: 'Reflex hub for eyes and ears, and home of the dopamine cells.',
-    analogy: 'A night watchman who turns your head toward sudden sounds and sights before you decide to look.',
-    levels: {
-      overview: {
-        text: 'The midbrain is the top inch of the brainstem, sitting just below the {{thalamus}} and above the {{pons}}. About as long as the top joint of your thumb, all neural signals traveling between the forebrain and the rest of the body pass through or beside it.\n\nIt runs fast survival reflexes you do not choose. When something flashes at the edge of vision or a twig snaps behind you, it whips your eyes and head toward the surprise. At the same time, its {{substantia-nigra}} cells send steady [[dopamine]] that keeps voluntary movement smooth and ready to start.',
-        bullets: [
-          'Visual and sound reflexes: points the eyes and head toward sudden cues.',
-          'Movement support: dopamine from the substantia nigra helps start physical actions.',
-          'Alertness control: adjusts background wakefulness and dampens pain.',
-          'Physical landmarks: roof features four bumps (the colliculi) for sight and sound reflexes.',
-        ],
-      },
-      connects: {
-        text: 'Alarm signals arrive from the {{amygdala}} when something unexpected occurs. The midbrain triggers an instant reflex to snap your eyes and head toward the surprise, while passing the alert upward to the {{thalamus}} to wake up the thinking cortex.',
-        connections: [
-          { id: 'thalamus', dir: 'out', label: 'Alert signals passed up toward the cortex' },
-          { id: 'pons', dir: 'both', label: 'Eye and body signals shared down the brainstem' },
-          { id: 'amygdala', dir: 'in', label: 'Alarm input when something feels threatening' },
-        ],
-      },
-      cells: {
-        text: 'Most midbrain cells are ordinary relay [[neuron|neurons]] that use [[glutamate]] and pass messages quickly. The famous exception is the dopamine cluster in the {{substantia-nigra}}. Like the broadcast diagram shows, a few thousand of these cells grow hugely branched [[axon|axons]] that reach the whole {{striatum}} and change how it responds.',
-        diagram: 'neuromodulator',
-        synapse: 'dopamine',
-        bullets: [
-          'The dark colour of the substantia nigra comes from pigment inside its dopamine cells.',
-          'Parkinson\'s motor signs usually appear only after substantial loss of these cells and their striatal dopamine supply.',
-        ],
-      },
-    },
-    tryIt: 'Look at one corner of the room, then flick your eyes to the opposite corner without moving your head. That quick jump (a saccade) is steered through the midbrain.',
-    breaks: {
-      text: 'Damage here is rare but serious, because so many cables pass through such a small space.',
-      bullets: [
-        'Loss of dopamine cells causes Parkinson\'s: slow movement, stiffness and a resting tremor.',
-        'Damage to the eye reflex bumps causes double vision or trouble looking up and down.',
-        'A stroke here can affect the eyes, the body and wakefulness all at once.',
-      ],
-    },
-  },
-  {
-    id: 'pons',
-    name: 'Pons',
-    group: 'hindbrain',
-    color: '#ff9b3d',
-    shape: { type: 'tube', path: [[0, -0.2, -0.155], [0, -0.3, -0.175], [0, -0.4, -0.215]], radius: [[0, 0.095], [0.5, 0.13], [1, 0.095]], count: 2200, pattern: 'rings', fill: 0.14 },
-    view: 'left',
-    size: 'about 4 cm across',
-    tagline: 'A bridge carrying signals between the cortex and the cerebellum.',
-    analogy: 'A busy interchange where every lane from the cortex gets copied and sent south to the cerebellum.',
-    levels: {
-      overview: {
-        text: 'The pons is the rounded bulge on the front of the brainstem, between the {{midbrain}} above, the {{medulla}} below, and the {{cerebellum}} behind. Its Latin name means bridge, describing the thick bundle of crossing [[white matter]] fibres on its front.\n\nIt helps movements come out smoothly and also supports sideways eye movements, chewing, face sensation, and the switches that govern dream sleep.',
-        bullets: [
-          'Cerebellar relay: sends a copy of cortical motor plans to the cerebellum.',
-          'Eye coordination: coordinates both eyes to move sideways together.',
-          'Sleep rhythms: hosts circuits that trigger and regulate dream sleep.',
-          'Physical landmarks: prominent rounded bulge about 2 to 3 cm tall on the front of the brainstem.',
-        ],
-      },
-      connects: {
-        text: 'The pons passes a copy of a movement plan toward the system that checks its timing. Its other exchanges help coordinate automatic functions such as breathing and sleep.',
-        connections: [
-          { id: 'motor-cortex', dir: 'in', label: 'A copy of each movement plan from the cortex' },
-          { id: 'cerebellum', dir: 'out', label: 'Plans forwarded for smoothing and timing' },
-          { id: 'medulla', dir: 'both', label: 'Breathing, sleep and heart signals shared' },
-        ],
-      },
-      cells: {
-        text: 'The pons is mostly crossing [[axon|axons]] wrapped in [[myelin]], which is why it looks pale and bulging. Scattered among them are relay cells that use [[glutamate]] to pass the cortical copy onward. A small blue-tinged cluster (the locus coeruleus) works like the broadcast diagram, spraying noradrenaline across the brain to raise alertness.',
-        diagram: 'neuromodulator',
-        synapse: 'noradrenaline',
-        bullets: [
-          'The two locus coeruleus nuclei together contain only tens of thousands of neurons, yet their axons reach most of the brain.',
-          'It goes quiet during dream sleep and fires in bursts when something surprising happens.',
-        ],
-      },
-    },
-    tryIt: 'Hold a finger up and look at it, then look at the far wall, then back. The clean sideways jump your eyes make travels through circuits in the pons.',
-    breaks: {
-      text: 'Because the pons packs movement, feeling and alertness fibres into a small space, damage here has wide effects.',
-      bullets: [
-        'A stroke can cause "locked-in" syndrome: fully awake but unable to move except the eyes.',
-        'Damage to eye circuits causes double vision or eyes that do not move together.',
-        'Interrupted sleep circuits lead to very broken sleep or loss of dream sleep.',
-      ],
-    },
-  },
-  {
-    id: 'medulla',
-    name: 'Medulla oblongata',
-    group: 'hindbrain',
-    color: '#ffc46b',
-    shape: { type: 'tube', path: [[0, -0.4, -0.23], [0, -0.52, -0.27], [0, -0.64, -0.3]], radius: [[0, 0.085], [1, 0.058]], count: 1700, pattern: 'fibers', fill: 0.14 },
-    view: 'left',
-    size: 'about 3 cm long',
-    tagline: 'Keeps you alive on autopilot: breathing, heart rate, swallowing.',
-    analogy: 'The building manager in the basement who keeps the power, water and air running while everyone upstairs works.',
-    levels: {
-      overview: {
-        text: 'The medulla oblongata is the lowest part of the brainstem, where the brain narrows into the {{spinal-cord}}. It sits beneath the {{pons}} and in front of the {{cerebellum}}, looking like a slightly swollen stalk about 3 cm long.\n\nIt runs the vital survival jobs you cannot pause. Sensors in your blood and body feed into the medulla, which fine-tunes your breathing rate, steadies blood pressure, and directs swallowing and coughing. When you try holding your breath, rising carbon dioxide triggers the medulla until it forces a breath in.',
-        bullets: [
-          'Breathing control: speeds or slows respiration based on blood chemistry.',
-          'Heart and blood pressure: balances heart rate and vascular tone second by second.',
-          'Throat reflexes: coordinates swallowing, gagging, and coughing sequences.',
-          'Physical landmarks: front ridges called pyramids where motor cables cross sides.',
-        ],
-      },
-      connects: {
-        text: 'Body signals travel up through the spinal cord reporting blood pressure and oxygen levels, while orders arrive from the {{hypothalamus}}. The medulla coordinates these signals to keep your lungs breathing and heart beating in rhythm, working with the {{cerebellum}} to keep your balance steady.',
-        connections: [
-          { id: 'spinal-cord', dir: 'both', label: 'Body signals up, orders down' },
-          { id: 'hypothalamus', dir: 'in', label: 'Body-state orders such as hunger or heat' },
-          { id: 'cerebellum', dir: 'both', label: 'Balance and posture feedback exchanged' },
-          { id: 'pons', dir: 'both', label: 'Breathing and heart rhythms coordinated' },
-        ],
-      },
-      cells: {
-        text: 'The medulla mixes big [[white matter]] highways with small [[grey matter]] control clusters. Many clusters spray serotonin widely, as the broadcast diagram shows, to set sleep, mood and pain levels. Its rhythm-generating cells fire on their own, like a slow pacemaker, and excite motor [[neuron|neurons]] with [[glutamate]].',
-        diagram: 'neuromodulator',
-        synapse: 'serotonin',
-        bullets: [
-          'Breathing pacemaker cells keep firing even in a dish, with no input at all.',
-          'Opiate painkillers act partly here, which is why overdoses slow breathing dangerously.',
-        ],
-      },
-    },
-    tryIt: 'Swallow now and notice you cannot breathe at the same moment. That brief switch, breathing paused while the throat closes, is the medulla running the sequence.',
-    breaks: {
-      text: 'Damage here can be life threatening, because breathing and blood pressure control live here.',
-      bullets: [
-        'A stroke can cause trouble swallowing, slurred speech and dizziness.',
-        'Injury high on the neck or medulla can stop breathing and need a ventilator.',
-        'Long term high blood pressure and sleep apnoea both involve these control loops going wrong.',
-      ],
-    },
-  },
-  {
-    id: 'spinal-cord',
-    name: 'Spinal cord',
-    group: 'hindbrain',
-    color: '#e8d7a8',
-    shape: { type: 'tube', path: [[0, -0.64, -0.3], [0, -0.82, -0.33], [0, -1.02, -0.35]], radius: [[0, 0.058], [1, 0.045]], count: 1300, pattern: 'fibers', fill: 0.12 },
-    view: 'left',
-    size: 'about 45 cm long',
-    tagline: 'The main cable between brain and body.',
-    analogy: 'A motorway with local slip roads: through traffic to the brain, plus quick local exits for reflexes.',
-    levels: {
-      overview: {
-        text: 'The spinal cord runs from the {{medulla}} down inside your backbone, measuring about 45 cm long in an adult and roughly as thick as your little finger. At each level, paired spinal nerves branch off to serve parts of the body.\n\nIt carries information between brain and body and also manages local reflexes. Pulling your hand away from a hot stove can begin here before you consciously feel the pain.',
-        bullets: [
-          'Two-way highway: carries motor orders down and sensory signals up.',
-          'Local reflex loops: snaps limbs away from danger without waiting for the brain.',
-          'Rhythm generators: coordinates automatic walking cycles and bladder control.',
-          'Physical landmarks: 31 pairs of spinal nerves leaving along the vertebral column.',
-        ],
-      },
-      connects: {
-        text: 'Traffic runs in both directions through the cord. Descending signals help start movement, while ascending signals report touch and body position. Side routes let movement be adjusted as it happens.',
-        connections: [
-          { id: 'motor-cortex', dir: 'in', label: 'Movement orders travelling down to muscles' },
-          { id: 'somatosensory-cortex', dir: 'out', label: 'Touch and body signals travelling up' },
-          { id: 'cerebellum', dir: 'out', label: 'Copies sent for balance correction' },
-        ],
-      },
-      cells: {
-        text: 'A reflex arc, like the diagram shows, needs only three cells: a sensory [[neuron]], a relay [[interneuron]], and a motor neuron that uses acetylcholine to contract muscle. Signals between vertebrae use [[glutamate]] to excite the next cell. Brain orders ride down fast, [[myelin]] wrapped highways on the outside.',
-        diagram: 'reflex-arc',
-        synapse: 'acetylcholine',
-        bullets: [
-          'A knee jerk reflex uses just two cells and takes about 30 milliseconds.',
-          'Motor neurons in the cord are among the longest cells in your body, up to a metre long.',
-        ],
-      },
-    },
-    tryIt: 'Rest a hand near the edge of a table and have a friend tap just below your kneecap with the side of their hand while your leg dangles. The small kick that follows is a spinal reflex, no brain needed.',
-    breaks: {
-      text: 'A spinal-cord injury can disrupt movement, sensation and automatic body functions below the injury. Damage at the injured segment can also affect nearby nerves and muscles.',
-      bullets: [
-        'A neck injury can paralyse arms and legs (tetraplegia). A lower injury affects the legs only (paraplegia).',
-        'Damaged touch highways cause numbness, tingling or chronic pain.',
-        'Disc disease can compress nerve roots, while motor neuron diseases can damage cells in the cord as well as other motor pathways.',
-      ],
-    },
-  },
-  {
-    id: 'raphe-nuclei',
-    name: 'Raphe nuclei',
-    group: 'hindbrain',
-    color: '#00f5d4',
-    shape: { type: 'ellipsoid', center: [0.0, -0.22, -0.2], radii: [0.018, 0.07, 0.024], count: 650, pattern: 'fine', fill: 0.8 },
-    view: 'medial',
-    size: 'about 2 cm long',
-    slice: true,
-    tagline: 'Brainstem nuclei that send serotonin through widespread circuits.',
-    analogy: 'A set of tuning controls whose effects depend on the receptor and circuit receiving the signal.',
-    levels: {
-      overview: {
-        text: 'The raphe nuclei form a narrow chain of neuron clusters running down the midline seam of the brainstem, from the {{midbrain}} through the {{pons}} and {{medulla}}. The name comes from the Greek word for seam, describing how they sit like stitches joining the two halves.\n\nThese nuclei serve as the central nervous system\'s primary source of [[serotonin]]. They release serotonin into widespread forebrain and spinal circuits, shaping sleep cycles, appetite, pain sensitivity, and behavioral flexibility depending on the local receptors receiving the signal.',
-        bullets: [
-          'Serotonin broadcast: sends neuromodulatory projections across the whole brain.',
-          'Sleep and wake cycles: changes firing rates across sleep, dream sleep, and waking.',
-          'Pain dampening: descending projections quiet pain signals in the spinal cord.',
-          'Physical landmarks: a thin column running along the midline core of the brainstem.',
-        ],
-      },
-      connects: {
-        text: 'Serotonin axons fan out across the {{prefrontal-cortex}}, {{amygdala}}, and {{hippocampus}} to soften stress responses and encourage calm focus. At the same time, descending fibres run down into the {{spinal-cord}} to act as a gatekeeper, dampening pain signals before they can travel up to conscious awareness.',
-        connections: [
-          { id: 'prefrontal-cortex', dir: 'out', label: 'Behaviour and learning tuned by serotonin' },
-          { id: 'amygdala', dir: 'out', label: 'Emotional responses modulated by serotonin' },
-          { id: 'hypothalamus', dir: 'out', label: 'Circadian rhythm and sleep-wake tuning' },
-          { id: 'spinal-cord', dir: 'out', label: 'Pain processing modulated from above' },
-        ],
-      },
-      cells: {
-        text: 'Raphe neurons fire with a slow, regular pacemaker beat during wakefulness. Their sprawling branches release [[serotonin]], which binds to over a dozen different [[receptor]] types across target areas, as pictured in the broadcast diagram.',
-        diagram: 'neuromodulator',
-        synapse: 'serotonin',
-        bullets: [
-          'Antidepressant medicines (SSRIs) slow down the removal of serotonin released by these cells.',
-          'Psychedelic compounds act primarily by stimulating 5-HT2A serotonin receptors in the cortex.',
-        ],
-      },
-    },
-    tryIt: 'Take three slow breaths with longer exhalations and notice any change in tension. Breathing can alter autonomic and attention networks, but the feeling cannot be assigned to serotonin or the raphe nuclei alone.',
-    breaks: {
-      text: 'Raphe damage and altered serotonin signalling can affect sleep, pain and behaviour, but common mood disorders cannot be reduced to a simple serotonin shortage.',
-      bullets: [
-        'Depression and anxiety involve many interacting systems. Serotonin treatments can help some people without proving a single chemical deficit.',
-        'Sleep disorders can involve raphe circuits alongside many other brainstem, hypothalamic and cortical systems.',
-        'Serotonin syndrome: life-threatening toxicity caused by accidental overdoses of serotonergic drugs.',
-      ],
-    },
-  },
-  {
-    id: 'locus-coeruleus',
-    name: 'Locus coeruleus',
-    group: 'hindbrain',
-    color: '#ff5722',
-    shape: { type: 'ellipsoid', center: [0.035, -0.2, -0.21], radii: [0.016, 0.02, 0.022], count: 450, mirror: true, fill: 1 },
-    view: 'left-back',
-    size: 'about 15 mm long',
-    tagline: 'A small noradrenaline system that retunes alertness and attention.',
-    analogy: 'A watchtower sentry who fires a flare when something unexpected happens, putting the whole city on alert.',
-    levels: {
-      overview: {
-        text: 'The locus coeruleus ("blue spot") is a tiny pair of nuclei in the upper {{pons}}, on the floor of the fourth ventricle. Its bluish hue under a microscope comes from melanin granules produced as a byproduct of synthesizing [[noradrenaline]].\n\nAlthough it contains only about 30,000 to 50,000 neurons, its branched axons reach almost every corner of the cortex, cerebellum, and spinal cord. It acts like a neural broadcast tower, firing in bursts during surprises or sudden danger to sharpen sensory focus and wake the brain up.',
-        bullets: [
-          'Arousal broadcasting: releases noradrenaline to tune alertness across the brain.',
-          'Surprise response: fires bursts when unexpected events demand immediate attention.',
-          'Signal tuning: helps circuits focus on relevant cues and filter out noise.',
-          'Physical landmarks: tiny blue-pigmented nuclei on the upper rear wall of the pons.',
-        ],
-      },
-      connects: {
-        text: 'When a sudden noise or surprise demands attention, the locus coeruleus broadcasts a wave of noradrenaline across the brain. These signals quiet down background mental chatter in the {{thalamus}} and focus the {{prefrontal-cortex}} so you can react quickly.',
-        connections: [
-          { id: 'thalamus', dir: 'out', label: 'Sensory relay responses retuned' },
-          { id: 'amygdala', dir: 'out', label: 'Emotional learning and arousal modulated' },
-          { id: 'prefrontal-cortex', dir: 'out', label: 'Attention and working memory retuned' },
-          { id: 'cerebellum', dir: 'out', label: 'Movement and learning circuits modulated' },
-        ],
-      },
-      cells: {
-        text: 'Locus coeruleus neurons have extremely branched axons, as shown in the neuromodulator broadcast diagram. Different cells project to overlapping sets of cortical, cerebellar, brainstem and spinal targets, allowing [[noradrenaline]] to coordinate broad but not uniform changes.',
-        diagram: 'neuromodulator',
-        synapse: 'noradrenaline',
-        bullets: [
-          'Their firing varies with arousal and events, and becomes very low during REM sleep.',
-          'Locus coeruleus degeneration occurs early in Alzheimer\'s disease and is also found in Parkinson\'s disease.',
-        ],
-      },
-    },
-    tryIt: 'Notice how a sudden sound interrupts a wandering thought. Locus-coeruleus noradrenaline helps retune attention during surprise, alongside sensory, autonomic and cortical networks.',
-    breaks: {
-      text: 'Changes in this system are associated with several disorders, but they are not a single cause of panic, ADHD or fatigue.',
-      bullets: [
-        'PTSD and panic disorder can involve altered noradrenergic arousal alongside wider fear and stress networks.',
-        'ADHD medicines can act on noradrenaline and dopamine, but the condition is not a simple shortage of either.',
-        'Stress and fatigue change locus coeruleus activity, without evidence for a finite noradrenaline reserve being exhausted.',
       ],
     },
   },

@@ -31,7 +31,9 @@ Brain Explorer treats the brain as an interactive visual canvas where explanatio
 
 ## Exploring Across Scales
 
-### 1. Brain Parts (37 Structures)
+### 1. Brain Parts (43 Structures)
+Clinical atlases list hundreds of Latin subdivisions. To stay approachable for beginners and intermediate learners, the atlas curates 43 landmark parts across three spatial layers (**Cerebral cortex**, **Deep structures**, and **Brainstem & cerebellum**). Sub-parts are nested under their anatomical parent when they carry a distinct everyday job, clinical syndrome, or chemical pathway, while finer micro-circuits live inside the cell-level diagrams.
+
 Every structure features an explainer with a three-level zoom ladder and perturbation scenarios:
 1. **The part** (`overview`): Spatial location, physical boundaries, and everyday function with concrete analogies.
 2. **How it connects** (`connects`): Animated 3D input and output arcs showing who talks to whom.

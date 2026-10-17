@@ -495,6 +495,21 @@ Scene scripts are declarative instructions for painting the 3D brain canvas. Gui
 
 ## 8. How to Extend Brain Explorer
 
+### Hierarchy & Curation Rules (Parts vs. Sub-parts)
+Clinical atlases contain 500 to 1,000+ named structures. To keep Brain Explorer approachable for beginner and intermediate learners (~40 to 45 total parts), adhere to these four curation rules when deciding what to include and how to nest it:
+1. **Three Spatial Groups (`group`)**:
+   - `cortex`: The 4 classic lobes (`frontal-lobe`, `parietal-lobe`, `temporal-lobe`, `occipital-lobe`) plus the 2 internal/hidden cortical structures (`cingulate-cortex`, `insula`).
+   - `deep`: Forebrain subcortical structures ordered by functional family: Diencephalon (`thalamus`, `hypothalamus`), Limbic (`hippocampus`, `amygdala`, `olfactory-bulb`, `basal-forebrain`), Basal Ganglia (`striatum`, `globus-pallidus`), and White Matter (`corpus-callosum`).
+   - `hindbrain`: Brainstem structures ordered top-to-bottom (`midbrain`, `pons`, `medulla`, `raphe-nuclei`, `spinal-cord`) followed by `cerebellum`.
+2. **Anatomical Parent-Child Nesting (`parent`)**:
+   - Cap sidebar nesting at 2 levels (`Part -> Sub-part`), placing child entries immediately after their parent in the source array so Prev/Next paging matches the sidebar tree.
+   - Nest cortical functional zones under their host lobe (`prefrontal-cortex`, `premotor-cortex`, `motor-cortex`, `brocas-area` under `frontal-lobe`; `anterior-cingulate` under `cingulate-cortex`; `fusiform-gyrus` and `entorhinal-cortex` under `temporal-lobe`, etc.).
+   - Nest subcortical and brainstem sub-nuclei under their anatomical parent (`habenula` and `pineal-gland` under `thalamus`; `suprachiasmatic-nucleus`, `pituitary`, and `mammillary-bodies` under `hypothalamus`; `nucleus-accumbens` under `striatum`; `substantia-nigra`, `vta`, and `periaqueductal-gray` under `midbrain`; `locus-coeruleus` under `pons`).
+3. **The 3-Part Inclusion Bar**:
+   - A sub-part only earns a 3D sidebar slot if it has (a) a distinct everyday function or landmark clinical syndrome, (b) serves as a key endpoint for a Guided Pathway or Chemical tract, AND (c) is spatially distinguishable in the 3D point cloud.
+4. **Micro-zones Belong in Level 3 Diagrams**:
+   - Do not add cytoarchitectonic subdivisions that share the same 3D volume (such as CA1/CA3/dentate gyrus in the hippocampus, basolateral vs. central amygdala, or direct vs. indirect striatal pathways) as separate 3D structures. Represent those inside the Level 3 (`cells`) SVG circuit diagrams.
+
 ### Adding a New Brain Structure
 1. Choose the destination file:
    - Cortical areas: `src/content/structures/cortex.js`
