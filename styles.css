@@ -54,16 +54,18 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
 .brand-mark { width: 26px; height: 26px; filter: drop-shadow(0 1px 5px rgba(200, 120, 255, 0.35)); }
 .brand-name { font-size: 15.5px; font-weight: 600; letter-spacing: -0.02em; }
 .modes {
-  display: flex; gap: 2px; padding: 3px;
+  display: inline-flex; gap: 2px; padding: 3px;
   background: rgba(190, 200, 255, 0.05); border-radius: 10px;
+  flex: none;
 }
-.modes a {
+.modes a, .modes button {
   padding: 6px 16px; border-radius: 8px; font-size: 13px; font-weight: 500; color: var(--ink-2);
+  font-family: inherit; background: transparent; border: none; cursor: pointer;
   transition: background 0.25s var(--ease), color 0.25s var(--ease);
 }
-.modes a[hidden] { display: none; }
-.modes a:hover { color: var(--ink); }
-.modes a.is-on { background: rgba(190, 200, 255, 0.1); color: var(--ink); }
+.modes a[hidden], .modes button[hidden] { display: none; }
+.modes a:hover, .modes button:hover { color: var(--ink); }
+.modes a.is-on, .modes button.is-on { background: rgba(190, 200, 255, 0.1); color: var(--ink); }
 
 /* ------------------------------------------------------------ sidebar */
 .sidebar {
@@ -950,90 +952,6 @@ kbd {
 .lib-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; margin-bottom: 34px; }
 .lib-title { margin: 0; font-size: 44px; line-height: 1; font-weight: 600; letter-spacing: -0.03em; font-variation-settings: 'opsz' 96; color: color-mix(in oklab, #c77dff 18%, white); }
 .lib-sub { margin: 12px 0 0; max-width: 46ch; font-family: var(--read); font-style: italic; font-size: 18px; line-height: 1.45; color: var(--ink-2); }
-.lib-filters {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px;
-  background: rgba(7, 9, 17, 0.75);
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  flex: none;
-}
-.lib-filter-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  padding: 7px 14px;
-  font-family: inherit;
-  font-size: 13.5px;
-  font-weight: 500;
-  color: var(--ink-2);
-  background: transparent;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  cursor: pointer;
-  transition: all 0.2s var(--ease);
-  white-space: nowrap;
-}
-.lib-filter-btn:hover {
-  color: var(--ink);
-  background: rgba(190, 200, 255, 0.05);
-}
-.lib-filter-btn.is-active {
-  color: #fff;
-  background: color-mix(in oklab, #c77dff 24%, rgba(255, 255, 255, 0.06));
-  border-color: color-mix(in oklab, #c77dff 50%, transparent);
-  box-shadow: 0 0 14px rgba(199, 125, 255, 0.16);
-}
-.lib-filter-count {
-  font-size: 11px;
-  font-weight: 600;
-  padding: 1px 6px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--ink-2);
-  font-variant-numeric: tabular-nums;
-}
-.lib-filter-btn.is-active .lib-filter-count {
-  background: color-mix(in oklab, #c77dff 40%, rgba(255, 255, 255, 0.12));
-  color: #fff;
-}
-.lib-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 2px 7px;
-  border-radius: 6px;
-  font-size: 10.5px;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-}
-.lib-badge.is-tour {
-  background: rgba(190, 200, 255, 0.07);
-  color: var(--ink-2);
-}
-.lib-badge.is-lab {
-  background: rgba(185, 140, 255, 0.16);
-  color: #d6b4ff;
-  border: 1px solid rgba(185, 140, 255, 0.32);
-}
-.lib-lab-top {
-  display: flex;
-  align-items: center;
-  margin-bottom: 2px;
-}
-.lib-lab-pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #d6b4ff;
-  letter-spacing: 0.02em;
-}
 
 .lib-section {
   display: grid; grid-template-columns: 220px minmax(0, 1fr); gap: 36px;
@@ -2539,7 +2457,7 @@ kbd {
     gap: 2px;
     padding: 2px;
   }
-  .modes a {
+  .modes a, .modes button {
     padding: 5px 9px;
     font-size: 12px;
   }
@@ -2970,21 +2888,6 @@ kbd {
   .lib-sub {
     font-size: 15px;
     max-width: 100%;
-  }
-  .lib-filters {
-    width: 100%;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    border-radius: 12px;
-    padding: 3px;
-    gap: 4px;
-    box-sizing: border-box;
-  }
-  .lib-filter-btn {
-    padding: 6px 11px;
-    font-size: 12px;
-    flex: 1 0 auto;
-    justify-content: center;
   }
   .lib-section {
     grid-template-columns: 1fr;

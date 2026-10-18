@@ -571,10 +571,8 @@ function apply() {
     clearScene('library');
     if (prev.type !== 'library') {
       const f = state.libFilter || 'all';
-      libraryEl.querySelectorAll('.lib-filter-btn').forEach((b) => {
-        const on = b.dataset.filter === f;
-        b.classList.toggle('is-active', on);
-        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      libraryEl.querySelectorAll('.modes button[data-filter]').forEach((b) => {
+        b.classList.toggle('is-on', b.dataset.filter === f);
       });
       libraryEl.querySelector('#lib-body').innerHTML = renderLibraryBody(f);
       libraryEl.scrollTop = 0;
@@ -780,14 +778,12 @@ $('#search').addEventListener('keydown', (e) => {
 
 libraryEl.innerHTML = renderLibraryShell(state.libFilter || 'all');
 libraryEl.addEventListener('click', (e) => {
-  const btn = e.target.closest('.lib-filter-btn');
+  const btn = e.target.closest('.modes button[data-filter]');
   if (!btn) return;
   const filter = btn.dataset.filter || 'all';
   state.libFilter = filter;
-  libraryEl.querySelectorAll('.lib-filter-btn').forEach((b) => {
-    const on = b.dataset.filter === filter;
-    b.classList.toggle('is-active', on);
-    b.setAttribute('aria-selected', on ? 'true' : 'false');
+  libraryEl.querySelectorAll('.modes button[data-filter]').forEach((b) => {
+    b.classList.toggle('is-on', b.dataset.filter === filter);
   });
   const bodyEl = libraryEl.querySelector('#lib-body');
   if (bodyEl) bodyEl.innerHTML = renderLibraryBody(filter);
