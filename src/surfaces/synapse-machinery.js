@@ -363,7 +363,7 @@ export function mountDopamineSynapse(container, props = {}, ctx = {}) {
   const d2CenterX = midX + 115;
   const d2Group = el('g', { class: 'd2-complex' }, mainGroup);
 
-  // Intracellular Endosome (y = 188, spans 174..202 — well above labels at y = 234!)
+  // Intracellular Endosome (y = 188, spans 174..202, well above labels at y = 234!)
   const endosomeGroup = el('g', { class: 'endosome' }, d2Group);
   const endoY = postMembraneY + 32;
   const endoCircle = el('ellipse', {

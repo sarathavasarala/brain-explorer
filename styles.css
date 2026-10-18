@@ -161,19 +161,26 @@ button { font: inherit; color: inherit; background: none; border: 0; cursor: poi
   background: radial-gradient(ellipse 70% 65% at 50% 48%, transparent 55%, rgba(2, 3, 7, 0.75) 100%);
 }
 .labels { position: absolute; inset: 0; pointer-events: none; z-index: 2; }
-/* stage dimming in synapse theater mode */
+/* stage dimming in synapse theater and focus lab mode */
 .stage canvas#brain {
   transition: opacity 0.4s var(--ease), filter 0.4s var(--ease);
 }
-.stage.is-synapse canvas#brain {
-  opacity: 0.14;
-  filter: blur(2px);
+.stage.is-synapse canvas#brain,
+.stage.is-focus canvas#brain {
+  opacity: 0.08;
+  filter: blur(4px);
   pointer-events: none;
 }
 .stage.is-synapse .toolbar,
 .stage.is-synapse .stage-note,
 .stage.is-synapse .lens-legend,
-.stage.is-synapse .labels {
+.stage.is-synapse .labels,
+.stage.is-synapse .cell-inset,
+.stage.is-focus .toolbar,
+.stage.is-focus .stage-note,
+.stage.is-focus .lens-legend,
+.stage.is-focus .labels,
+.stage.is-focus .cell-inset {
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.3s var(--ease);
@@ -3037,13 +3044,29 @@ kbd {
 .stage.is-focus .dock {
   bottom: 50%;
   transform: translate(-50%, 50%);
-  height: clamp(320px, 62vh, 520px);
-  width: min(920px, calc(100% - 48px));
+  width: min(1360px, calc(100% - 40px));
+  height: min(84vh, 760px);
+  max-height: calc(100% - 32px);
+  background: rgba(8, 10, 18, 0.94);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--line-2);
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 48px rgba(185, 140, 255, 0.08);
 }
 .stage.is-focus .dock[hidden] {
   transform: translate(-50%, calc(50% + 16px));
 }
-.stage.is-focus #brain { opacity: .28; transition: opacity .4s var(--ease); }
+.stage.is-focus .dock-head {
+  padding: 12px 20px 8px;
+}
+.stage.is-focus .dock-title {
+  font-size: 12px;
+  color: rgba(233, 235, 245, 0.75);
+}
+.stage.is-focus .dock-body {
+  padding: 6px 18px 14px;
+}
 .stage.is-dock .toolbar,
 .stage.is-focus .toolbar {
   top: 16px;
