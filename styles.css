@@ -1483,7 +1483,19 @@ kbd {
   to { stroke-dashoffset: 0; }
 }
 
-.syn-player { margin: 0; }
+.syn-sidebar-pane {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+}
+.syn-player {
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
+  background: rgba(190, 200, 255, 0.05);
+  border: 1px solid var(--line);
+}
 .syn-theater-body {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(320px, 1fr);

@@ -76,11 +76,11 @@ export default [
       },
     ],
     life: {
-      made: 'Cells build glutamate from the amino acid glutamine inside the sending terminal.',
-      packed: 'Transporter proteins pump glutamate molecules into tiny membrane bubbles called vesicles.',
-      released: 'An arriving electrical spike lets calcium flood in, fusing the bubbles with the cell edge to spill glutamate into the gap.',
-      binds: 'Glutamate floats across the tiny synaptic gap and locks into AMPA and NMDA receptor gates.',
-      cleared: 'Nearby star-shaped glia (astrocytes) mop up glutamate from the gap so signals stay crisp.',
+      made: 'Excitatory neurons build glutamate from the precursor amino acid **glutamine** inside the axon terminal, recycling raw materials supplied by neighboring support cells.',
+      packed: 'Vesicular glutamate transporters (**VGLUT**) pump thousands of glutamate molecules into each tiny [[synaptic vesicle|vesicle]]. Packing the transmitter under high pressure ensures every released bubble delivers an identical, decisive punch.',
+      released: 'An incoming [[action potential]] opens calcium channels. The calcium influx prompts vesicle docking proteins to snap shut, fusing the vesicles with the cell border and flooding glutamate into the narrow cleft in less than a millisecond.',
+      binds: 'Glutamate crosses the 20-nanometre gap to open **AMPA** gates for an instant positive electrical boost, while unlocking **NMDA** receptors to let in calcium for building lasting memories.',
+      cleared: 'Nearby star-shaped glia called [[astrocyte|astrocytes]] deploy powerful pumps to rapidly vacuum glutamate out of the cleft, protecting neurons from toxic overstimulation and resetting the synapse.',
       clearedBy: 'astrocyte',
     },
     drugs: [
@@ -184,11 +184,11 @@ export default [
       },
     ],
     life: {
-      made: 'Cells make GABA by trimming an acid group off glutamate using a dedicated enzyme.',
-      packed: 'Transporter pumps pack GABA molecules tightly into synaptic vesicles.',
-      released: 'An incoming electrical pulse triggers calcium entry, causing vesicles to fuse and release GABA into the gap.',
-      binds: 'GABA crosses the gap and binds to GABA-A and GABA-B receptors, holding the cell back from firing.',
-      cleared: 'Transporter proteins on terminals and helper glia vacuum GABA out of the gap to reset the circuit.',
+      made: 'Inhibitory cells synthesize GABA directly from glutamate using a specialized enzyme called **GAD**, transforming the brain\'s main accelerator into its primary brake.',
+      packed: 'Vesicular transporters called **VGAT** pump GABA molecules into [[synaptic vesicle|vesicles]], packaging a measured dose of calming restraint into every microscopic packet.',
+      released: 'When an electrical pulse depolarizes the terminal, calcium floods inside. This commands vesicles to fuse with the cell edge, releasing GABA across the 20-nanometre cleft.',
+      binds: 'GABA binds to **GABA-A** receptors, opening channels for negative chloride ions to rush in. This pulls membrane voltage downward, preventing runaway excitation and keeping circuits stable.',
+      cleared: 'Dedicated GABA transporters (**GAT**) on axon terminals and neighboring astrocytes vacuum GABA out of the gap through [[reuptake]], ensuring inhibitory pauses remain brief and precisely timed.',
       clearedBy: 'reuptake',
     },
     drugs: [

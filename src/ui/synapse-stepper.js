@@ -242,11 +242,11 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
 
   // Caption for each stage
   const captions = [
-    life.made || 'Molecules are synthesized from chemical precursors inside the sending terminal.',
-    life.packed || 'Transporter proteins pump neurotransmitter molecules into protective vesicles.',
-    life.released || 'An incoming action potential opens voltage-gated calcium channels, prompting vesicles to fuse and release molecules into the cleft.',
-    life.binds || 'Molecules diffuse across the 20 nm synaptic cleft and bind to receptor proteins on the receiving cell membrane.',
-    life.cleared || 'Molecules are cleared from the cleft by reuptake transporters, enzymes, astrocytes, or capillary blood to reset the synapse.',
+    life.made || 'Sending neurons synthesize chemical messengers from nutrient precursors inside the axon terminal.',
+    life.packed || 'Vesicular transporter pumps pack chemical messengers into protective membrane bubbles called vesicles, shielding them from enzymes in the terminal fluid.',
+    life.released || 'An arriving action potential triggers calcium influx, causing docked vesicles to fuse with the cell membrane and spill molecules into the synaptic cleft.',
+    life.binds || 'Molecules diffuse across the 20 nm gap and dock onto receptor proteins on the receiving cell, exciting, quieting, or tuning the membrane voltage.',
+    life.cleared || 'Transporters, enzymes, or helper glia swiftly clear molecules from the synaptic gap, resetting the connection for the next signal.',
   ];
   const drugStepIdx = drug ? stageForDrug(drug) : -1;
 
@@ -837,14 +837,6 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
       </div>
     </header>
 
-    <!-- Stage player (pathway tour pattern) -->
-    <div class="player syn-player" role="group" aria-label="Synapse stage player">
-      <button class="pl-btn" data-act="prev-stage" ${currentStage === 0 ? 'disabled' : ''} aria-label="Previous stage">${icon('prev', 18)}</button>
-      <button class="pl-btn pl-play" data-play-stepper aria-pressed="${playing ? 'true' : 'false'}">${icon(playing ? 'pause' : 'play', 16)}<span>${playing ? 'Pause' : 'Play cycle'}</span></button>
-      <button class="pl-btn" data-act="next-stage" ${currentStage === 4 ? 'disabled' : ''} aria-label="Next stage">${icon('next', 18)}</button>
-      <div class="pl-track">${STAGES.map((st, i) => `<button type="button" class="pl-track-dot ${i < currentStage ? 'done' : i === currentStage ? 'on' : ''}${playing && i === currentStage ? ' is-ticking' : ''}" data-stage="${i}" title="Step ${i + 1}: ${esc(st.title)}" aria-label="Step ${i + 1}: ${esc(st.title)}"${i === currentStage ? ' aria-current="step"' : ''}>${drug && i === drugStepIdx ? '<i class="drug-stage-dot" title="Drug target step"></i>' : ''}</button>`).join('')}</div>
-    </div>
-
     <div class="syn-theater-body">
       <!-- Center Widescreen SVG (760x440) -->
     <svg class="synapse-svg" viewBox="0 0 760 440" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Synapse stage: ${STAGES[currentStage].label}">
@@ -874,8 +866,18 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
       ${svgMarkup}
     </svg>
 
-      <!-- Stage list (pathway tour pattern) -->
-      <ol class="steps syn-steps" aria-label="Stages of one signal">
+      <!-- Right Control & Narrative Panel -->
+      <div class="syn-sidebar-pane">
+        <!-- Stage player (prev/play/next + progress track) -->
+        <div class="player syn-player" role="group" aria-label="Synapse stage player">
+          <button class="pl-btn" data-act="prev-stage" ${currentStage === 0 ? 'disabled' : ''} aria-label="Previous stage">${icon('prev', 18)}</button>
+          <button class="pl-btn pl-play" data-play-stepper aria-pressed="${playing ? 'true' : 'false'}">${icon(playing ? 'pause' : 'play', 16)}<span>${playing ? 'Pause' : 'Play cycle'}</span></button>
+          <button class="pl-btn" data-act="next-stage" ${currentStage === 4 ? 'disabled' : ''} aria-label="Next stage">${icon('next', 18)}</button>
+          <div class="pl-track">${STAGES.map((st, i) => `<button type="button" class="pl-track-dot ${i < currentStage ? 'done' : i === currentStage ? 'on' : ''}${playing && i === currentStage ? ' is-ticking' : ''}" data-stage="${i}" title="Step ${i + 1}: ${esc(st.title)}" aria-label="Step ${i + 1}: ${esc(st.title)}"${i === currentStage ? ' aria-current="step"' : ''}>${drug && i === drugStepIdx ? '<i class="drug-stage-dot" title="Drug target step"></i>' : ''}</button>`).join('')}</div>
+        </div>
+
+        <!-- Stage list (pathway tour pattern) -->
+        <ol class="steps syn-steps" aria-label="Stages of one signal">
         ${STAGES.map((st, i) => {
           const isOn = i === currentStage;
           const isDrugStep = drug && i === drugStepIdx;
@@ -919,6 +921,7 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
           </li>`;
         }).join('')}
       </ol>
+      </div>
     </div>
   </div>`;
 }

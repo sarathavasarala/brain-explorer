@@ -517,7 +517,12 @@
     "fusiform gyrus",
     "suprachiasmatic nucleus",
     "periaqueductal gray",
-    "grid cell"
+    "grid cell",
+    "synaptic cleft",
+    "synaptic vesicle",
+    "vesicle",
+    "transporter",
+    "reuptake"
   ],
   "roles": [
     "more_active",
