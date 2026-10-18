@@ -149,7 +149,7 @@ export default [
   },
   {
     id: 'dopamine-pathways',
-    category: 'chemistry',
+    category: 'systems',
     name: 'Dopamine: prediction, drive and habit',
     tagline: 'How reward prediction errors teach the brain what to want and repeat.',
     summary: '[[dopamine|Dopamine]] is often called a pleasure chemical, but immediate sensory enjoyment involves separate opioid and sensory networks. Dopamine functions as a critical engine for motivation, movement vigor, and learning. Midbrain cells in the {{vta}} and {{substantia-nigra}} release dopamine to tune expectations through [[reward prediction error|reward prediction errors]], support goal-directed action, and help establish routines.',
@@ -1342,7 +1342,7 @@ export default [
   },
   {
     id: 'serotonin-pathways',
-    category: 'chemistry',
+    category: 'systems',
     name: 'Serotonin: mood, resilience and sleep',
     tagline: 'A slow, steady signal from the brainstem that shapes mood and sleep.',
     summary: '[[serotonin|Serotonin]] is made by a thin strip of cells, the {{raphe-nuclei}}, running down the middle of the brainstem. Their fibres branch to almost every part of the brain and spinal cord. Its effects are broad and slow, and scientists still argue about exactly what it does for mood.',
@@ -1356,7 +1356,7 @@ export default [
   },
   {
     id: 'noradrenaline-pathways',
-    category: 'chemistry',
+    category: 'systems',
     name: 'Noradrenaline: the alert system',
     tagline: 'How a sudden surprise snaps you to attention.',
     summary: 'The two {{locus-coeruleus}} nuclei contain only tens of thousands of neurons, yet send [[noradrenaline]] to most of the brain. Their activity helps tune alertness, attention and responses to uncertainty.',
@@ -1369,7 +1369,7 @@ export default [
   },
   {
     id: 'acetylcholine-pathways',
-    category: 'chemistry',
+    category: 'systems',
     name: 'Acetylcholine: attention and memory',
     tagline: 'Helping you pay attention and remember what you learned.',
     summary: '[[acetylcholine|Acetylcholine]] carries the signal from motor neurons to skeletal muscles. Inside the brain, cells in the {{basal-forebrain}} send it across the cortex and to the {{hippocampus}} to tune attention and learning. Separate brainstem clusters also release it to regulate arousal and sleep. The forebrain supply degenerates early in Alzheimer\'s disease.',
@@ -1382,7 +1382,7 @@ export default [
   },
   {
     id: 'default-mode-network',
-    category: 'network',
+    category: 'systems',
     name: 'Default mode: the wandering mind',
     tagline: 'What your brain does when you are doing nothing in particular.',
     summary: 'Some brain areas get more active when you stop focusing on the outside world. Together they are called the default mode network. They are busy when you daydream, remember your past, picture the future or think about other people.',

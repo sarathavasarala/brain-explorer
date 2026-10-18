@@ -1,7 +1,6 @@
 // Sections in the pathway library, in display order. Use the id as a pathway's `category`.
 export default [
-  { id: 'function', label: 'How you do things', blurb: 'Everyday acts, followed from start to finish.' },
-  { id: 'chemistry', label: 'Brain chemicals', blurb: 'Where a chemical messenger starts and what it changes.' },
-  { id: 'network', label: 'Brain networks', blurb: 'Areas that switch on together.' },
-  { id: 'labs', label: 'Labs', blurb: 'Interactive experiments with live simulations, circuits, and molecular controls.' },
+  { id: 'function', label: 'Everyday experiences', blurb: 'Sensory, motor, and emotional acts, followed step by step from start to finish.' },
+  { id: 'systems', label: 'Systems & networks', blurb: 'Chemical projection superhighways and large-scale distributed brain networks.' },
+  { id: 'labs', label: 'Interactive labs', blurb: 'Hands-on experiments with live circuit simulations, voltage clamps, and molecular controls.' },
 ];

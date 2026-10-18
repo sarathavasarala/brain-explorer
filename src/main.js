@@ -111,7 +111,7 @@ function renderCellInset(cell) {
 const problems = validate();
 if (problems.length) console.warn(`[brain] ${problems.length} content problem(s):\n` + problems.join('\n'));
 
-const state = { query: '', libQuery: '', dict: 'parts', route: { type: 'home' }, playing: false, flown: '', chat: { turns: [], loading: false, currentQuery: '' } };
+const state = { query: '', libFilter: 'all', dict: 'parts', route: { type: 'home' }, playing: false, flown: '', chat: { turns: [], loading: false, currentQuery: '' } };
 let timer = null;
 let cellFireActive = false;
 
@@ -570,7 +570,13 @@ function apply() {
   } else if (r.type === 'library') {
     clearScene('library');
     if (prev.type !== 'library') {
-      libraryEl.querySelector('#lib-body').innerHTML = renderLibraryBody(state.libQuery);
+      const f = state.libFilter || 'all';
+      libraryEl.querySelectorAll('.lib-filter-btn').forEach((b) => {
+        const on = b.dataset.filter === f;
+        b.classList.toggle('is-active', on);
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+      libraryEl.querySelector('#lib-body').innerHTML = renderLibraryBody(f);
       libraryEl.scrollTop = 0;
     }
   } else if (r.type === 'p') {
@@ -772,19 +778,19 @@ $('#search').addEventListener('keydown', (e) => {
   }
 });
 
-libraryEl.innerHTML = renderLibraryShell();
-libraryEl.querySelector('.lib-search-icon').innerHTML = icon('search', 16);
-$('#lib-search').addEventListener('input', (e) => {
-  state.libQuery = e.target.value;
-  $('#lib-body').innerHTML = renderLibraryBody(state.libQuery);
-});
-$('#lib-search').addEventListener('keydown', (e) => {
-  if (e.key !== 'Enter') return;
-  const first = libraryEl.querySelector('.lib-item');
-  if (first) {
-    telemetry.event('search_pathways', { query: state.libQuery, destination: first.getAttribute('href') });
-    location.hash = first.getAttribute('href');
-  }
+libraryEl.innerHTML = renderLibraryShell(state.libFilter || 'all');
+libraryEl.addEventListener('click', (e) => {
+  const btn = e.target.closest('.lib-filter-btn');
+  if (!btn) return;
+  const filter = btn.dataset.filter || 'all';
+  state.libFilter = filter;
+  libraryEl.querySelectorAll('.lib-filter-btn').forEach((b) => {
+    const on = b.dataset.filter === filter;
+    b.classList.toggle('is-active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+  const bodyEl = libraryEl.querySelector('#lib-body');
+  if (bodyEl) bodyEl.innerHTML = renderLibraryBody(filter);
 });
 
 explainerEl.addEventListener('submit', (e) => {
