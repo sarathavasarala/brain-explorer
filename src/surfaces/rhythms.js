@@ -49,6 +49,8 @@ export default {
       smoothI: 0.5,
     };
 
+    let unsubClock = null;
+
     // Recompute simulation and power spectrum whenever preset or E/I ratio changes
     function recompute() {
       state.sim = world.simulate({
@@ -627,6 +629,7 @@ export default {
         { key: 'theta', label: 'Theta (6 Hz)' },
         { key: 'alpha', label: 'Alpha (10 Hz)' },
         { key: 'beta', label: 'Beta (20 Hz)' },
+        { key: 'delta', label: 'Delta (2 Hz)' },
         { key: 'sedated', label: 'Sedated' },
         { key: 'seizure', label: 'Seizure' },
       ];
@@ -686,6 +689,7 @@ export default {
 
       eiSlider.addEventListener('input', (e) => {
         state.eiRatio = parseFloat(e.target.value);
+        if (state.preset === 'sedated' || state.preset === 'seizure') state.preset = 'gamma';
         updateSliderLabel();
         for (const b of btns) {
           b.setAttribute('aria-pressed', 'false');
@@ -700,16 +704,26 @@ export default {
       const playBtn = document.createElement('button');
       playBtn.type = 'button';
       playBtn.className = 'dock-btn';
-      playBtn.textContent = 'Pause';
+      playBtn.textContent = clock && clock.playing ? 'Pause' : 'Play';
+      playBtn.setAttribute('aria-pressed', clock && clock.playing ? 'true' : 'false');
       playBtn.addEventListener('click', () => {
         state.playing = !state.playing;
         playBtn.textContent = state.playing ? 'Pause' : 'Play';
+        playBtn.setAttribute('aria-pressed', state.playing ? 'true' : 'false');
         if (clock) {
           if (state.playing) clock.play();
           else clock.pause();
         }
       });
       ctrls.appendChild(playBtn);
+
+      if (clock) {
+        unsubClock = clock.subscribe((_t, clk) => {
+          state.playing = clk.playing;
+          playBtn.textContent = clk.playing ? 'Pause' : 'Play';
+          playBtn.setAttribute('aria-pressed', clk.playing ? 'true' : 'false');
+        });
+      }
 
       setControls(ctrls);
       setControlsNodes = ctrls;
@@ -805,6 +819,7 @@ export default {
       },
 
       destroy() {
+        if (unsubClock) unsubClock();
         if (svg && svg.parentElement) {
           svg.parentElement.removeChild(svg);
         }

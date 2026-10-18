@@ -33,7 +33,21 @@ export function mountPlasticity(container, props = {}, ctx = {}) {
   let useManualVoltage = false;
   let currentWeight = 1.0;
   let baseWeight = 1.0;
+  let persistentWeight = 1.0;
   let isPlaying = clock ? clock.playing : true;
+
+  if (props.step === 'coincidence') {
+    useManualVoltage = true;
+    manualVoltage = -15;
+  } else if (props.step === 'structural') {
+    baseWeight = 1.0;
+    currentWeight = 1.0;
+    persistentWeight = 1.0;
+  } else if (props.step === 'interactive') {
+    baseWeight = 1.0;
+    currentWeight = 1.8;
+    persistentWeight = 1.8;
+  }
 
   // Run simulation for current protocol
   let simData = world.protocolSimulation({
@@ -668,8 +682,10 @@ export function mountPlasticity(container, props = {}, ctx = {}) {
   }
 
   // Initial draw
-  updateSpineShape(1.0);
-  updateEpspDisplay(currentWeight);
+  let lastRenderedWeight = currentWeight;
+  let lastRenderedVol = 1.0;
+  updateSpineShape(lastRenderedVol);
+  updateEpspDisplay(lastRenderedWeight);
 
   // =========================================================================
   // 5. INTERACTIVE CONTROLS DOCK
@@ -712,12 +728,15 @@ export function mountPlasticity(container, props = {}, ctx = {}) {
     btnBaseline.addEventListener('click', () => {
       useManualVoltage = false;
       setBtnStates('baseline');
+      currentWeight = persistentWeight;
       applyProtocol('baseline');
     });
 
     btnLtp.addEventListener('click', () => {
       useManualVoltage = false;
       setBtnStates('ltp');
+      currentWeight = 1.0;
+      baseWeight = 1.0;
       applyProtocol('ltp');
       if (scene) scene.firePulse('entorhinal-cortex', 'hippocampus', { color: '#ffcf6b' });
     });
@@ -725,6 +744,8 @@ export function mountPlasticity(container, props = {}, ctx = {}) {
     btnLtd.addEventListener('click', () => {
       useManualVoltage = false;
       setBtnStates('ltd');
+      currentWeight = 1.0;
+      baseWeight = 1.0;
       applyProtocol('ltd');
     });
 
@@ -736,11 +757,14 @@ export function mountPlasticity(container, props = {}, ctx = {}) {
     resetBtn.addEventListener('click', () => {
       currentWeight = 1.0;
       baseWeight = 1.0;
+      persistentWeight = 1.0;
       useManualVoltage = false;
       setBtnStates('baseline');
       applyProtocol('baseline');
       updateEpspDisplay(1.0);
       updateSpineShape(1.0);
+      lastRenderedWeight = 1.0;
+      lastRenderedVol = 1.0;
     });
 
     // Play / Pause button
@@ -773,7 +797,7 @@ export function mountPlasticity(container, props = {}, ctx = {}) {
     const vLabel = document.createElement('span');
     vLabel.className = 'dock-label';
     vLabel.style.fontSize = '11px';
-    vLabel.textContent = 'Clamp V: -65 mV';
+    vLabel.textContent = `Clamp V: ${manualVoltage > 0 ? '+' : ''}${manualVoltage.toFixed(0)} mV`;
 
     const vSlider = document.createElement('input');
     vSlider.type = 'range';
@@ -781,7 +805,7 @@ export function mountPlasticity(container, props = {}, ctx = {}) {
     vSlider.min = '-80';
     vSlider.max = '10';
     vSlider.step = '1';
-    vSlider.value = '-65';
+    vSlider.value = String(manualVoltage);
     vSlider.style.width = '90px';
 
     vSlider.addEventListener('input', (e) => {
@@ -830,9 +854,10 @@ export function mountPlasticity(container, props = {}, ctx = {}) {
       const calcineurin = simData.calcineurinTrace[idx];
       const w = simData.weightTrace[idx];
       const vol = simData.spineVolTrace[idx];
-      const ampaCount = simData.ampaPsdTrace[idx];
-
-      currentWeight = w;
+      if (activeProtocol !== 'baseline') {
+        currentWeight = w;
+        persistentWeight = simData.weightTrace[simData.weightTrace.length - 1];
+      }
 
       // 1. Update Glutamate Cloud in Cleft
       const gluOpacity = Math.max(0.08, Math.min(0.95, glu * 0.95));
@@ -932,12 +957,18 @@ export function mountPlasticity(container, props = {}, ctx = {}) {
       }
 
       // 8. Spine Volume & Badges
-      updateSpineShape(vol);
+      if (Math.abs(vol - lastRenderedVol) > 0.002) {
+        updateSpineShape(vol);
+        lastRenderedVol = vol;
+      }
       spineVolBadge.textContent = `Spine head volume: ${Math.round(vol * 100)}% (${vol > 1.15 ? 'expanded' : vol < 0.85 ? 'shrunken' : 'baseline'})`;
       spineCaBadge.textContent = `[Ca²⁺]i: ${ca.toFixed(2)} µM | PSD AMPA: ${ampaCount}`;
 
       // 9. EPSP Scope update
-      updateEpspDisplay(w);
+      if (Math.abs(w - lastRenderedWeight) > 0.002) {
+        updateEpspDisplay(w);
+        lastRenderedWeight = w;
+      }
     },
 
     destroy() {

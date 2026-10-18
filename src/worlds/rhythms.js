@@ -267,7 +267,7 @@ export function getEiParams(presetKey = 'gamma', eiRatio = 1.0) {
 
 // Classify network state into clinical and biophysical regimes
 export function classifyDynamics(eiRatio, presetKey = 'gamma') {
-  if (presetKey === 'sedated' || eiRatio < 0.55) {
+  if (eiRatio < 0.55 || (presetKey === 'sedated' && eiRatio < 0.85)) {
     return {
       status: 'sedated',
       badge: 'Deep sedation (excess GABA)',
@@ -370,6 +370,13 @@ export function calculatePowerSpectrum(signal, fs = 1000) {
   for (let i = 0; i < N; i++) mean += signal[i];
   mean /= N;
 
+  const windowed = new Float32Array(N);
+  const factor = (2 * Math.PI) / (N - 1);
+  for (let n = 0; n < N; n++) {
+    const w = 0.5 * (1 - Math.cos(factor * n));
+    windowed[n] = (signal[n] - mean) * w;
+  }
+
   const freqs = [];
   const powers = [];
 
@@ -391,9 +398,7 @@ export function calculatePowerSpectrum(signal, fs = 1000) {
     const omega = (2 * Math.PI * f) / fs;
 
     for (let n = 0; n < N; n++) {
-      // Hanning window
-      const w = 0.5 * (1 - Math.cos((2 * Math.PI * n) / (N - 1)));
-      const val = (signal[n] - mean) * w;
+      const val = windowed[n];
       const angle = omega * n;
       re += val * Math.cos(angle);
       im -= val * Math.sin(angle);

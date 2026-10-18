@@ -237,6 +237,8 @@ export default {
     txt(layerGraph, { x: (gLeft + gRight) / 2, y: gBottom + 20, 'text-anchor': 'middle', fill: C.muted, 'font-size': 10 }, 'time (seconds)');
 
     // Traces
+    const localE1Path = el('path', { fill: 'none', stroke: '#ffcf6b', 'stroke-width': 1.6, 'stroke-dasharray': '3 3', opacity: 0 }, layerTraces);
+    const localE1Label = txt(layerGraph, { x: gLeft + 8, y: gTop + 14, fill: '#ffcf6b', 'font-size': 9, 'font-weight': 600, opacity: 0 }, 'Local spine E1');
     const voltagePath = el('path', { fill: 'none', stroke: '#ffcf6b', 'stroke-width': 2.4, 'stroke-linecap': 'round' }, layerTraces);
     glow(voltagePath);
 
@@ -298,6 +300,13 @@ export default {
     }
 
     // ------------------------------------------------ Synapse Pin Elements
+    let vetoBtn = null;
+    const getVetoLabel = () => {
+      if (activeIds.has('i_soma')) return 'Inhibition: Soma/AIS (Veto ON)';
+      if (activeIds.has('i_distal')) return 'Inhibition: Distal Tip (Branch only)';
+      return 'Inhibition: None';
+    };
+
     const pinElements = new Map();
 
     DEFAULT_SYNAPSES.forEach((syn) => {
@@ -350,6 +359,10 @@ export default {
           activeIds.delete(syn.id);
         } else {
           activeIds.add(syn.id);
+        }
+        if (vetoBtn) {
+          vetoBtn.textContent = getVetoLabel();
+          vetoBtn.setAttribute('aria-pressed', activeIds.has('i_soma') ? 'true' : 'false');
         }
         rebuild();
         if (clock) clock.seek(W0);
@@ -419,7 +432,7 @@ export default {
         synapses: DEFAULT_SYNAPSES,
         activeIds: Array.from(activeIds),
         pulseTimes,
-        vetoLocation,
+        vetoLocation: 'custom',
         tMin: W0,
         tMax: W1,
         dt: 0.004,
@@ -435,6 +448,23 @@ export default {
         dStr += `${i === 0 ? 'M' : 'L'}${x} ${y} `;
       }
       voltagePath.setAttribute('d', dStr.trim());
+
+      // If in cable-decay mode and e1 is active, draw local spine E1 trace
+      if (mode === 'cable-decay' && activeIds.has('e1') && simData.vDendriteE1) {
+        const vD = simData.vDendriteE1;
+        let dE1 = '';
+        for (let i = 0; i < pts.length; i++) {
+          const x = xToPx(pts[i]).toFixed(1);
+          const y = yToPx(vD[i]).toFixed(1);
+          dE1 += `${i === 0 ? 'M' : 'L'}${x} ${y} `;
+        }
+        localE1Path.setAttribute('d', dE1.trim());
+        localE1Path.setAttribute('opacity', '0.75');
+        localE1Label.setAttribute('opacity', '0.9');
+      } else {
+        localE1Path.setAttribute('opacity', '0');
+        localE1Label.setAttribute('opacity', '0');
+      }
 
       // Update trace color depending on outcome
       if (simData.reachedThreshold) {
@@ -501,14 +531,9 @@ export default {
       ctrls.appendChild(pulseBtn);
 
       // 3. Inhibitory Veto cycle toggle
-      const vetoBtn = document.createElement('button');
+      vetoBtn = document.createElement('button');
       vetoBtn.type = 'button';
       vetoBtn.className = 'dock-btn';
-      const getVetoLabel = () => {
-        if (activeIds.has('i_soma')) return 'Inhibition: Soma/AIS (Veto ON)';
-        if (activeIds.has('i_distal')) return 'Inhibition: Distal Tip (Branch only)';
-        return 'Inhibition: None';
-      };
       vetoBtn.textContent = getVetoLabel();
       vetoBtn.setAttribute('aria-pressed', activeIds.has('i_soma') ? 'true' : 'false');
       vetoBtn.addEventListener('click', () => {
@@ -518,9 +543,11 @@ export default {
           vetoLocation = 'distal';
         } else if (activeIds.has('i_distal')) {
           activeIds.delete('i_distal');
+          activeIds.delete('i_soma');
           vetoLocation = 'none';
         } else {
           activeIds.add('i_soma');
+          activeIds.delete('i_distal');
           vetoLocation = 'soma';
         }
         vetoBtn.textContent = getVetoLabel();

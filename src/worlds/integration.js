@@ -137,7 +137,7 @@ export const DEFAULT_SYNAPSES = [
     type: 'excite',
     branch: 'apical-distal',
     distance: 0.85,
-    pos: { x: 200, y: 38 },
+    pos: { x: 195, y: 38 },
     color: '#ffcf6b',
     amplitude: 30.0,
   },
@@ -147,7 +147,7 @@ export const DEFAULT_SYNAPSES = [
     type: 'excite',
     branch: 'apical-trunk',
     distance: 0.45,
-    pos: { x: 200, y: 104 },
+    pos: { x: 195, y: 115 },
     color: '#ffcf6b',
     amplitude: 18.0,
   },
@@ -157,7 +157,7 @@ export const DEFAULT_SYNAPSES = [
     type: 'excite',
     branch: 'basal-left',
     distance: 0.15,
-    pos: { x: 140, y: 185 },
+    pos: { x: 135, y: 224 },
     color: '#ffcf6b',
     amplitude: 11.0,
   },
@@ -167,7 +167,7 @@ export const DEFAULT_SYNAPSES = [
     type: 'inhibit',
     branch: 'apical-distal',
     distance: 0.80,
-    pos: { x: 245, y: 48 },
+    pos: { x: 235, y: 45 },
     color: '#ff6b7d',
     gPeak: 3.5,
   },
@@ -177,7 +177,7 @@ export const DEFAULT_SYNAPSES = [
     type: 'inhibit',
     branch: 'soma-ais',
     distance: 0.02,
-    pos: { x: 220, y: 208 },
+    pos: { x: 212, y: 228 },
     color: '#ff6b7d',
     gPeak: 6.0,
   },
@@ -207,8 +207,8 @@ export function simulateIntegration({
   const activeSet = new Set(activeIds);
 
   // Determine active inhibitory conductances
-  const hasDistalInhibition = vetoLocation === 'distal' || (vetoLocation === 'custom' && activeSet.has('i_distal'));
-  const hasSomaInhibition = vetoLocation === 'soma' || (vetoLocation === 'custom' && activeSet.has('i_soma'));
+  const hasDistalInhibition = activeSet.has('i_distal') || vetoLocation === 'distal';
+  const hasSomaInhibition = activeSet.has('i_soma') || vetoLocation === 'soma';
 
   let inSpike = false;
   let spikeTimer = 0;

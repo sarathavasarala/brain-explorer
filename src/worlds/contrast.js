@@ -398,7 +398,8 @@ export const BODY_REGIONS = {
  */
 export function twoPointSimulation(separationMm, {
   rfMm = 2.0,
-  inhibitionStrength = 0.25,
+  thresholdMm,
+  inhibitionStrength = 0.28,
   samplePoints = 61,
   spanMm = 60,
 } = {}) {
@@ -406,10 +407,22 @@ export function twoPointSimulation(separationMm, {
   const p1 = -sep / 2;
   const p2 = sep / 2;
 
+  // Determine calibrated threshold for this RF size
+  const thresh = thresholdMm
+    ?? Object.values(BODY_REGIONS).find((r) => Math.abs(r.rfMm - rfMm) < 0.8)?.thresholdMm
+    ?? (rfMm * 1.3);
+
   const positions = [];
   const rawExcitation = [];
+  const sharpened = [];
 
-  const sVar = 2 * Math.max(1e-6, rfMm * rfMm);
+  // Calibrate center excitation width in mm
+  const sigma = rfMm * 0.42;
+  const sVar = 2 * sigma * sigma;
+
+  // Calibrate surround lateral inhibition width in mm
+  const sigmaInh = rfMm * 0.95;
+  const sVarInh = 2 * sigmaInh * sigmaInh;
 
   for (let i = 0; i < samplePoints; i++) {
     const x = -spanMm / 2 + (spanMm * i) / (samplePoints - 1);
@@ -417,45 +430,44 @@ export function twoPointSimulation(separationMm, {
 
     const d1 = x - p1;
     const d2 = x - p2;
-    // Sum of two Gaussian excitation bumps
+
+    // Center excitation from both contact points
     const e1 = Math.exp(-(d1 * d1) / sVar);
     const e2 = Math.exp(-(d2 * d2) / sVar);
-    rawExcitation.push(e1 + e2);
-  }
+    const raw = e1 + e2;
+    rawExcitation.push(raw);
 
-  // Apply lateral inhibition to sharpen the two bumps
-  const sharpened = simulateLateralInhibition(rawExcitation, {
-    radius: Math.max(1.5, rfMm * 0.8),
-    strength: inhibitionStrength,
-  }).responses;
+    // Difference-of-Gaussians lateral inhibition in physical mm
+    const inh1 = inhibitionStrength * Math.exp(-(d1 * d1) / sVarInh);
+    const inh2 = inhibitionStrength * Math.exp(-(d2 * d2) / sVarInh);
+    const resp = Math.max(0, raw - (inh1 + inh2));
+    sharpened.push(resp);
+  }
 
   // Measure midpoint and peak values
   const midIndex = Math.floor(samplePoints / 2);
   const midpointActivity = sharpened[midIndex];
 
-  // Find peak on positive side
   let peakActivity = 0;
-  let peakIndex = midIndex;
-  for (let i = midIndex; i < samplePoints; i++) {
+  for (let i = 0; i < samplePoints; i++) {
     if (sharpened[i] > peakActivity) {
       peakActivity = sharpened[i];
-      peakIndex = i;
     }
   }
 
   // Valley depth fraction (Rayleigh contrast criterion)
-  // If peak and midpoint are identical, valley depth is 0
   const valleyDepth = peakActivity > 1e-4
     ? Math.max(0, (peakActivity - midpointActivity) / peakActivity)
     : 0;
 
-  // The brain reliably resolves two points when there is at least an 11% dip in activity
-  const isResolved = valleyDepth >= 0.11 && sep >= rfMm * 0.9;
+  // Resolves when the 11% dip is met and separation meets calibrated threshold
+  const isResolved = valleyDepth >= 0.11 && sep >= thresh * 0.98;
   const resolutionPercent = Math.min(100, Math.round(valleyDepth * 350));
 
   return {
     separationMm: sep,
     rfMm,
+    thresholdMm: thresh,
     positions,
     rawExcitation,
     sharpened,

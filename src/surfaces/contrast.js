@@ -70,7 +70,7 @@ export default {
     // Edge / Mach band state
     const edgeState = {
       stepFrac: 0.5, // 0 to 1 position along the 1D array
-      rampWidth: 4,
+      rampWidth: props.rampWidth ?? 4,
       inhibitionStrength: 0.18,
       inhibitionRadius: 2.2,
       low: 28,
@@ -468,22 +468,22 @@ export default {
       x: plotX + 120, y: plotY + 148, fill: C.inhibit, 'font-size': 8.5, 'font-weight': 700, 'text-anchor': 'middle',
     }, 'DARK MACH BAND');
 
-    // Graph Legend
+    // Graph Legend in header area above the plot (y = 52)
     el('line', {
-      x1: plotX + 12, y1: plotY + plotH - 12, x2: plotX + 32, y2: plotY + plotH - 12,
-      stroke: '#6be4ff', 'stroke-width': 1.8, 'stroke-dasharray': '4 3',
+      x1: plotX + 175, y1: 49, x2: plotX + 193, y2: 49,
+      stroke: '#6be4ff', 'stroke-width': 1.8, 'stroke-dasharray': '3 2',
     }, edgeGroup);
     txt(edgeGroup, {
-      x: plotX + 36, y: plotY + plotH - 9, fill: '#6be4ff', 'font-size': 8,
+      x: plotX + 197, y: 52, fill: '#6be4ff', 'font-size': 8,
     }, 'Physical light');
 
     el('line', {
-      x1: plotX + 104, y1: plotY + plotH - 12, x2: plotX + 124, y2: plotY + plotH - 12,
+      x1: plotX + 260, y1: 49, x2: plotX + 278, y2: 49,
       stroke: C.excite, 'stroke-width': 2,
     }, edgeGroup);
     txt(edgeGroup, {
-      x: plotX + 128, y: plotY + plotH - 9, fill: C.excite, 'font-size': 8,
-    }, 'Perceived firing (Mach bands)');
+      x: plotX + 282, y: 52, fill: C.excite, 'font-size': 8,
+    }, 'Perceived firing');
 
     // Bottom Summary Card in edge mode
     const edgeSummaryCard = el('rect', {
@@ -762,12 +762,12 @@ export default {
       for (let i = 0; i < sim.length; i++) {
         const px = plotX + (i / (sim.length - 1)) * plotW;
 
-        // Map physical (20..100) to py
-        const pyPhys = plotY + plotH - ((sim.stimulus[i] - 15) / 85) * (plotH - 24) - 12;
+        // Map physical (20..100) to py with raised floor
+        const pyPhys = plotY + plotH - 26 - ((sim.stimulus[i] - 15) / 85) * (plotH - 44);
         physD += `${i === 0 ? 'M' : 'L'}${px.toFixed(1)} ${pyPhys.toFixed(1)} `;
 
-        // Map neural response (0..60) to py
-        const pyNeural = plotY + plotH - ((sim.response[i]) / 55) * (plotH - 24) - 12;
+        // Map neural response (0..60) to py with raised floor
+        const pyNeural = plotY + plotH - 26 - (sim.response[i] / 55) * (plotH - 44);
         neuralD += `${i === 0 ? 'M' : 'L'}${px.toFixed(1)} ${pyNeural.toFixed(1)} `;
       }
 
@@ -777,7 +777,7 @@ export default {
       // Position Mach band peak & trough callout markers
       if (sim.maxIdx >= 0) {
         const peakX = plotX + (sim.maxIdx / (sim.length - 1)) * plotW;
-        const peakY = plotY + plotH - (sim.maxVal / 55) * (plotH - 24) - 12;
+        const peakY = plotY + plotH - 26 - (sim.maxVal / 55) * (plotH - 44);
         brightPeakMarker.setAttribute('cx', peakX.toFixed(1));
         brightPeakMarker.setAttribute('cy', peakY.toFixed(1));
         brightPeakLabel.setAttribute('x', peakX.toFixed(1));
@@ -786,11 +786,11 @@ export default {
 
       if (sim.minIdx >= 0) {
         const troughX = plotX + (sim.minIdx / (sim.length - 1)) * plotW;
-        const troughY = plotY + plotH - (sim.minVal / 55) * (plotH - 24) - 12;
+        const troughY = plotY + plotH - 26 - (sim.minVal / 55) * (plotH - 44);
         darkTroughMarker.setAttribute('cx', troughX.toFixed(1));
         darkTroughMarker.setAttribute('cy', troughY.toFixed(1));
         darkTroughLabel.setAttribute('x', troughX.toFixed(1));
-        darkTroughLabel.setAttribute('y', (troughY + 14).toFixed(1));
+        darkTroughLabel.setAttribute('y', Math.min(plotY + plotH - 8, troughY + 14).toFixed(1));
       }
 
       // Update statistics
@@ -864,13 +864,33 @@ export default {
       let resD = '';
       const pts = sim.positions;
       const act = sim.sharpened;
+      const maxPlotVal = Math.max(0.5, sim.peakActivity * 1.15);
 
       for (let i = 0; i < pts.length; i++) {
         const px = resPlotX + (i / (pts.length - 1)) * resPlotW;
-        const py = resPlotY + resPlotH - (act[i] / 0.55) * (resPlotH - 24) - 12;
+        const py = resPlotY + resPlotH - (act[i] / maxPlotVal) * (resPlotH - 24) - 12;
         resD += `${i === 0 ? 'M' : 'L'}${px.toFixed(1)} ${py.toFixed(1)} `;
       }
       resCurvePath.setAttribute('d', resD);
+
+      // Position valley threshold line and text inside plot
+      if (sim.peakActivity >= 0.05) {
+        const threshVal = sim.peakActivity * (1 - 0.11);
+        const threshY = resPlotY + resPlotH - (threshVal / maxPlotVal) * (resPlotH - 24) - 12;
+        threshLine.setAttribute('x1', String(resPlotX + 8));
+        threshLine.setAttribute('y1', threshY.toFixed(1));
+        threshLine.setAttribute('x2', String(resPlotX + resPlotW - 8));
+        threshLine.setAttribute('y2', threshY.toFixed(1));
+        threshLine.setAttribute('opacity', '0.85');
+
+        threshText.setAttribute('x', String(resPlotX + resPlotW - 12));
+        threshText.setAttribute('y', (threshY - 4).toFixed(1));
+        threshText.setAttribute('text-anchor', 'end');
+        threshText.setAttribute('opacity', '0.9');
+      } else {
+        threshLine.setAttribute('opacity', '0');
+        threshText.setAttribute('opacity', '0');
+      }
 
       // Update Decision Badge
       if (sim.isResolved) {

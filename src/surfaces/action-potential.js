@@ -39,6 +39,7 @@ export default {
 
     // Simulation cache
     let simPoints = null;
+    let didSpike = false;
 
     function runSimulation() {
       const lidocaineFrac = world?.lidocaineBlockFraction
@@ -54,6 +55,7 @@ export default {
             tEnd: W1,
           })
         : [];
+      didSpike = Boolean(simPoints && simPoints.some((p) => p.V > 20));
     }
 
     runSimulation();
@@ -210,9 +212,9 @@ export default {
     const yToPx = lin(-90, 45, plotBottom, plotTop);
 
     // Reference horizontal dashed lines
-    // +30 mV Peak
-    el('line', { x1: plotLeft, y1: yToPx(30), x2: plotRight, y2: yToPx(30), stroke: 'rgba(255,107,125,0.3)', 'stroke-width': 1, 'stroke-dasharray': '3 3' }, traceGroup);
-    txt(traceGroup, { x: plotLeft - 6, y: yToPx(30) + 3, 'text-anchor': 'end', fill: '#ff8a98', 'font-size': 8.5 }, '+30 mV (Peak)');
+    // +35 mV Peak
+    el('line', { x1: plotLeft, y1: yToPx(35), x2: plotRight, y2: yToPx(35), stroke: 'rgba(255,107,125,0.3)', 'stroke-width': 1, 'stroke-dasharray': '3 3' }, traceGroup);
+    txt(traceGroup, { x: plotLeft - 6, y: yToPx(35) + 3, 'text-anchor': 'end', fill: '#ff8a98', 'font-size': 8.5 }, '+35 mV (Peak)');
 
     // 0 mV
     el('line', { x1: plotLeft, y1: yToPx(0), x2: plotRight, y2: yToPx(0), stroke: 'rgba(233,235,245,0.15)', 'stroke-width': 1 }, traceGroup);
@@ -351,7 +353,7 @@ export default {
     glow(waveRect);
     const waveFrontLine = el('line', { x1: 40, y1: 250, x2: 40, y2: 288, stroke: '#ffffff', 'stroke-width': 2 }, waveGroup);
     glow(waveFrontLine);
-    txt(waveGroup, { x: 40, y: 298, 'text-anchor': 'middle', fill: '#ff8a98', 'font-size': 8, 'font-weight': 600 }, 'Wavefront');
+    const waveLabel = txt(waveGroup, { x: 40, y: 298, 'text-anchor': 'middle', fill: '#ff8a98', 'font-size': 8, 'font-weight': 600 }, 'Wavefront');
 
     // ------------------------------------------------ Path rebuilding
     function rebuildTrace() {
@@ -605,7 +607,7 @@ export default {
 
           // Action potential leaps between nodes 0..4
           // Node 0 fires at t ~ 1.2 ms, Node 1 at 1.4, Node 2 at 1.6, Node 3 at 1.8, Node 4 at 2.0
-          const spikeFired = st.V > 0;
+          const spikeFired = didSpike && clampedT >= 0.8;
           for (let i = 0; i < nodeXCoords.length; i++) {
             const nodeArrivalT = 1.0 + i * 0.25;
             const timeSinceNode = clampedT - nodeArrivalT;
@@ -648,15 +650,20 @@ export default {
           axonSpeedBadge.setAttribute('fill', '#ff8a98');
 
           // Wavefront advances continuously from x = 40 to 760 over t = 1.0 to 5.5 ms
-          const spikeFired = st.V > -20;
+          const spikeFired = didSpike && clampedT >= 0.8;
           if (spikeFired && clampedT >= 1.0) {
             const prog = Math.min(1.0, (clampedT - 1.0) / 4.0);
             const waveX = 40 + prog * 680;
             waveRect.setAttribute('x', Math.max(40, waveX - 35).toFixed(1));
             waveFrontLine.setAttribute('x1', waveX.toFixed(1));
             waveFrontLine.setAttribute('x2', waveX.toFixed(1));
+            waveLabel.setAttribute('x', waveX.toFixed(1));
             waveGroup.setAttribute('opacity', '1');
           } else {
+            waveRect.setAttribute('x', '40');
+            waveFrontLine.setAttribute('x1', '40');
+            waveFrontLine.setAttribute('x2', '40');
+            waveLabel.setAttribute('x', '40');
             waveGroup.setAttribute('opacity', '0.2');
           }
         }
