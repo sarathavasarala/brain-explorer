@@ -7,24 +7,24 @@ const REDUCED_MOTION = typeof window !== 'undefined' && typeof window.matchMedia
   && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 export const STAGES = [
-  { id: 0, key: 'made', short: '1. Made', label: 'Synthesis', title: 'Transmitter Synthesis from Chemical Precursors' },
-  { id: 1, key: 'packed', short: '2. Packed', label: 'Vesicle Loading', title: 'Packaging Transmitters into Synaptic Vesicles' },
-  { id: 2, key: 'released', short: '3. Released', label: 'Vesicle Fusion', title: 'Action Potential Influx and Vesicle Fusion' },
-  { id: 3, key: 'binds', short: '4. Binds', label: 'Receptor Binding', title: 'Diffusion Across the Cleft and Receptor Binding' },
-  { id: 4, key: 'cleared', short: '5. Cleared', label: 'Signal Clearance', title: 'Signal Termination and Transmitter Clearance' },
+  { id: 0, key: 'made', label: 'Synthesis', title: 'Cells build the messenger' },
+  { id: 1, key: 'packed', label: 'Vesicle Loading', title: 'Packed into protective vesicles' },
+  { id: 2, key: 'released', label: 'Vesicle Fusion', title: 'Released into the cleft' },
+  { id: 3, key: 'binds', label: 'Receptor Binding', title: 'Docking onto receptors' },
+  { id: 4, key: 'cleared', label: 'Signal Clearance', title: 'Cleared for the next signal' },
 ];
 
 export function stageForDrug(drug) {
   if (!drug || !drug.acts) return 0;
   switch (drug.acts) {
-    case 'precursor': return 0;      // 1. Made
+    case 'precursor': return 0;      // Cells build the messenger
     case 'release':
-    case 'release-block': return 2;  // 3. Released
+    case 'release-block': return 2;  // Released into the cleft
     case 'receptor-block':
     case 'receptor-mimic':
-    case 'boost-receptor': return 3; // 4. Binds
+    case 'boost-receptor': return 3; // Docking onto receptors
     case 'reuptake-block':
-    case 'enzyme-block': return 4;   // 5. Cleared
+    case 'enzyme-block': return 4;   // Cleared for the next signal
     default: return 3;
   }
 }
@@ -51,6 +51,76 @@ export function getDrugStageNote(drug) {
     default:
       return `${drug.name} targets this stage: ${drug.text}`;
   }
+}
+
+// What a receptor lets through once the messenger docks on it.
+const ION_COLORS = { 'Na⁺': '#6be4ff', 'Ca²⁺': '#ffcf6b', 'Cl⁻': '#7dffb2', 'K⁺': '#b98cff' };
+
+export const RECEPTOR_MODES = [
+  {
+    id: 'excite',
+    word: 'Excites',
+    analogy: 'Gas pedal',
+    timescale: 'Milliseconds',
+    summary: 'Lets positive ions rush in, pushing membrane voltage up toward the firing threshold.',
+  },
+  {
+    id: 'inhibit',
+    word: 'Quiets',
+    analogy: 'Brake pedal',
+    timescale: 'Milliseconds to seconds',
+    summary: 'Lets negative ions in (or positive ions out), pulling voltage down so the cell resists firing.',
+  },
+  {
+    id: 'modulate',
+    word: 'Tunes',
+    analogy: 'Volume knob',
+    timescale: 'Seconds to hours',
+    summary: 'Doesn\'t trigger a spike on its own. Launches internal messengers that shift how strongly the cell reacts to future signals.',
+  },
+];
+
+export function parseFlux(flux) {
+  if (!flux) return null;
+  if (/g-protein/i.test(flux)) return { kind: 'gprotein', label: flux };
+  if (/gene/i.test(flux)) return { kind: 'gene', label: flux };
+  const m = /^(.*?)\s+(in|out)$/.exec(flux);
+  if (!m) return null;
+  const ions = m[1].split(/\s+and\s+|\s*,\s*/).map((s) => s.trim()).filter((s) => ION_COLORS[s]);
+  if (!ions.length) return null;
+  return { kind: 'ion', dir: m[2], ions, label: flux };
+}
+
+export function describeReceptorMechanism(r) {
+  if (!r) return '';
+  const fluxInfo = parseFlux(r.flux);
+  if (fluxInfo?.kind === 'ion') {
+    if (r.flux === 'Na⁺ in') {
+      return 'Fast ion gate (milliseconds): opens a direct pore for positive sodium (Na⁺), driving a sharp upward voltage spike toward threshold.';
+    }
+    if (r.flux === 'Ca²⁺ in') {
+      return 'Calcium gate (milliseconds): lets Ca²⁺ flow in to depolarize the cell and activate intracellular memory-building enzymes.';
+    }
+    if (r.flux === 'Cl⁻ in') {
+      return 'Fast chloride gate (milliseconds): lets negative chloride (Cl⁻) rush in, clamping voltage down away from the firing point.';
+    }
+    if (r.flux === 'K⁺ out') {
+      return 'Slow potassium channel (hundreds of ms): lets positive potassium (K⁺) leak out, holding the membrane below resting voltage.';
+    }
+  }
+  if (fluxInfo?.kind === 'gprotein') {
+    if (r.effect === 'excite') {
+      return 'G-protein cascade (seconds): triggers internal chemical messengers that raise baseline voltage and prime the cell to fire.';
+    }
+    if (r.effect === 'inhibit') {
+      return 'G-protein brake (seconds): quiets internal messengers and opens potassium channels to hold firing back.';
+    }
+    return 'G-protein tuner (seconds to minutes): adjusts internal second messengers, turning the volume knob up or down on future inputs.';
+  }
+  if (fluxInfo?.kind === 'gene') {
+    return 'Gene-level signal (minutes to hours): acts through nuclear receptors or transcription cascades to reshape how the cell is built and wired.';
+  }
+  return '';
 }
 
 let activeStage = 0;
@@ -107,7 +177,8 @@ export function toggleStepperPlay(onStep) {
   return true;
 }
 
-function getPostsynapticLabel(effect, stage, acts) {
+function getPostsynapticLabel(effect, stage, acts, recId = null) {
+  const via = recId ? ` (${recId})` : '';
   if (stage === 0 || stage === 1) return 'Receiving cell: Baseline resting';
   if (stage === 2) {
     if (acts === 'release-block') return 'Receiving cell: Silent (release blocked)';
@@ -115,14 +186,14 @@ function getPostsynapticLabel(effect, stage, acts) {
     return 'Receiving cell: Signal arriving';
   }
   if (stage === 3) {
-    if (acts === 'receptor-block') return 'Receiving cell: Blocked (quiet)';
-    if (acts === 'boost-receptor') return 'Receiving cell: Amplified response';
+    if (acts === 'receptor-block') return `Receiving cell${via}: Blocked (quiet)`;
+    if (acts === 'boost-receptor') return `Receiving cell${via}: Amplified response`;
     if (acts === 'receptor-mimic') {
-      return effect === 'inhibit' ? 'Receiving cell: Deep inhibition' : 'Receiving cell: Strong activation';
+      return effect === 'inhibit' ? `Receiving cell${via}: Deep inhibition` : `Receiving cell${via}: Strong activation`;
     }
-    if (effect === 'excite') return 'Receiving cell: Strong excitation';
-    if (effect === 'inhibit') return 'Receiving cell: Quieted (inhibition)';
-    return 'Receiving cell: Tuned (modulation)';
+    if (effect === 'excite') return `Receiving cell${via}: Pushed toward firing`;
+    if (effect === 'inhibit') return `Receiving cell${via}: Pulled away from firing`;
+    return `Receiving cell${via}: Sensitivity retuned`;
   }
   if (stage === 4) {
     if (acts === 'reuptake-block') return 'Receiving cell: Extended firing (prolonged signal)';
@@ -146,7 +217,10 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
   const drug = drugId ? (chem.drugs || []).find((d) => d.id === drugId) : null;
   const isDrugActive = !!(drug && drugModeEnabled);
   const acts = isDrugActive ? drug.acts : null;
-  const primaryEffect = receptors[0]?.effect || 'modulate';
+  const selectedReceptor = highlightedReceptor ? receptors.find((r) => r.id === highlightedReceptor) : null;
+  const activeReceptor = selectedReceptor || receptors[0] || null;
+  const primaryEffect = activeReceptor?.effect || 'modulate';
+  const signalPersist = currentStage === 4 && (acts === 'reuptake-block' || acts === 'enzyme-block');
 
   // Live molecule counter in synaptic gap
   let gapCount = 0;
@@ -166,39 +240,15 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
     else gapCount = 0;
   }
 
-  // Caption for active stage
-  let stageCaption = '';
-  if (currentStage === 0) {
-    stageCaption = life.made || 'Molecules are synthesized from chemical precursors inside the sending terminal.';
-  } else if (currentStage === 1) {
-    stageCaption = life.packed || 'Transporter proteins pump neurotransmitter molecules into protective vesicles.';
-  } else if (currentStage === 2) {
-    stageCaption = life.released || 'An incoming action potential opens voltage-gated calcium channels, prompting vesicles to fuse and release molecules into the cleft.';
-  } else if (currentStage === 3) {
-    stageCaption = life.binds || 'Molecules diffuse across the 20 nm synaptic cleft and bind to receptor proteins on the receiving cell membrane.';
-  } else if (currentStage === 4) {
-    stageCaption = life.cleared || 'Molecules are cleared from the cleft by reuptake transporters, enzymes, astrocytes, or capillary blood to reset the synapse.';
-  }
-  const drugNote = (isDrugActive && stageForDrug(drug) === currentStage) ? getDrugStageNote(drug) : '';
-  const st = STAGES[currentStage];
-
-  // Drug overlay message with toggle
-  let drugBanner = '';
-  if (drug) {
-    drugBanner = `<div class="stepper-drug-banner">
-      <div class="drug-banner-main">
-        <span class="drug-tag">Drug active: <strong>${esc(drug.name)}</strong> (Target: ${esc(drug.target)})</span>
-        <span class="drug-note">${fmt(drug.text)}</span>
-      </div>
-      <div class="drug-mode-row">
-        <div class="drug-mode-toggle" role="group" aria-label="Drug condition">
-          <button class="drug-toggle-btn ${!isDrugActive ? 'is-on' : ''}" data-drug-mode="normal" aria-pressed="${!isDrugActive ? 'true' : 'false'}">Normal</button>
-          <button class="drug-toggle-btn ${isDrugActive ? 'is-on' : ''}" data-drug-mode="active" aria-pressed="${isDrugActive ? 'true' : 'false'}">With ${esc(drug.name)}</button>
-        </div>
-        <a class="drug-clear" href="#/chem/${esc(chem.id)}/${tab || 'synapse'}" title="Remove drug simulation">Clear drug</a>
-      </div>
-    </div>`;
-  }
+  // Caption for each stage
+  const captions = [
+    life.made || 'Molecules are synthesized from chemical precursors inside the sending terminal.',
+    life.packed || 'Transporter proteins pump neurotransmitter molecules into protective vesicles.',
+    life.released || 'An incoming action potential opens voltage-gated calcium channels, prompting vesicles to fuse and release molecules into the cleft.',
+    life.binds || 'Molecules diffuse across the 20 nm synaptic cleft and bind to receptor proteins on the receiving cell membrane.',
+    life.cleared || 'Molecules are cleared from the cleft by reuptake transporters, enzymes, astrocytes, or capillary blood to reset the synapse.',
+  ];
+  const drugStepIdx = drug ? stageForDrug(drug) : -1;
 
   // ---------------------------------------------------------------- SVG Visuals (760x440)
   // Stage 0: Precursor synthesis
@@ -563,11 +613,42 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
         <text x="${rx + 39}" y="291" text-anchor="middle" font-size="9" font-weight="700" fill="#ffcf6b">+ALLO</text>
       </g>` : '';
 
-    const downstreamCascade = (currentStage === 3 && !isBlocked) ? `
+    const fluxInfo = parseFlux(r.flux);
+    const fluxOn = fluxInfo && ((currentStage === 3 && !isBlocked) || signalPersist);
+    let fluxVisual = '';
+    if (fluxOn && !REDUCED_MOTION) {
+      if (fluxInfo.kind === 'ion') {
+        const strong = acts === 'boost-receptor' || acts === 'receptor-mimic';
+        const particles = strong ? 5 : 3;
+        const dur = strong ? 0.9 : 1.5;
+        const fromY = fluxInfo.dir === 'in' ? 248 : 306;
+        const toY = fluxInfo.dir === 'in' ? 306 : 248;
+        fluxVisual = Array.from({ length: particles }, (_, p) => {
+          const ionColor = ION_COLORS[fluxInfo.ions[p % fluxInfo.ions.length]];
+          const xOff = (p % 3) * 7 - 7;
+          const begin = ((p * dur) / particles).toFixed(2);
+          return `<circle cx="${rx + xOff}" cy="${fromY}" r="3.6" fill="${ionColor}" opacity="0" filter="url(#syn-glow)">
+            <animate attributeName="cy" values="${fromY};${toY}" dur="${dur}s" begin="${begin}s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.8;1" dur="${dur}s" begin="${begin}s" repeatCount="indefinite"/>
+          </circle>`;
+        }).join('');
+      } else {
+        const gene = fluxInfo.kind === 'gene';
+        const dur = gene ? 3.2 : 1.6;
+        fluxVisual = `<circle cx="${rx}" cy="297" r="3.2" fill="${gene ? '#9fb8ff' : color}" opacity="0" filter="url(#syn-glow)">
+          <animate attributeName="cy" values="297;343" dur="${dur}s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0;1;1;0" keyTimes="0;0.15;0.75;1" dur="${dur}s" repeatCount="indefinite"/>
+        </circle>`;
+      }
+    }
+    const effectWord = { excite: 'Excites', inhibit: 'Quiets', modulate: 'Tunes' }[r.effect] || r.effect;
+    const familyText = r.flux ? `${effectWord} · ${r.flux}` : effectWord;
+    const downstreamCascade = fluxOn ? `
       <g class="downstream-cascade" opacity="0.85">
         <path d="M${rx} 297 v46" stroke="${color}" stroke-width="2.2" stroke-dasharray="5 4" filter="url(#syn-glow)">
           <animate attributeName="stroke-dashoffset" values="0;-18" dur="0.8s" repeatCount="indefinite"/>
         </path>
+        ${fluxVisual}
       </g>` : '';
 
     return `<g class="syn-receptor ${isHi ? 'is-hi' : ''} ${glowClass}" data-receptor="${esc(r.id)}" role="button" tabindex="0" aria-label="Receptor ${esc(r.id)}" style="cursor: pointer;">
@@ -577,53 +658,99 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
       ${alloBadge}
       ${downstreamCascade}
       <text x="${rx}" y="322" text-anchor="middle" class="dg-label syn-rec-name" font-size="14" font-weight="600" fill="${color}">${esc(r.id)}</text>
-      <text x="${rx}" y="337" text-anchor="middle" class="dg-label dim syn-rec-family" font-size="10.5" fill="var(--ink-3)">${esc({ excite: 'Excites', inhibit: 'Quiets', modulate: 'Tunes' }[r.effect] || r.effect)}</text>
+      <text x="${rx}" y="337" text-anchor="middle" class="dg-label dim syn-rec-family" font-size="10.5" fill="var(--ink-3)">${esc(familyText)}</text>
     </g>`;
   }).join('');
 
   // ---------------------------------------------------------------- Postsynaptic Signal Waveform
-  let waveD = 'M220 402 H540';
-  let waveColor = '#8890aa';
-  if (currentStage === 0 || currentStage === 1) {
-    waveD = 'M220 402 Q300 401 380 402 Q460 403 540 402';
-    waveColor = 'rgba(190, 200, 255, 0.4)';
-  } else if (currentStage === 2) {
+  // All shapes share the same command structure (M + 4 Q) so the browser can morph
+  // between them with SMIL, letting the trace visibly charge up and settle back.
+  const REST_D = 'M220 402 Q275 402 330 402 Q355 402 380 402 Q405 402 430 402 Q485 402 540 402';
+  const PRE_D = 'M220 402 Q275 402 330 402 Q355 400 380 396 Q405 400 430 402 Q485 402 540 402';
+  const EXCITE_D = 'M220 402 Q275 402 330 402 Q355 402 380 368 Q405 402 430 402 Q485 402 540 402';
+  const INHIBIT_D = 'M220 402 Q275 402 330 402 Q355 402 380 420 Q405 402 430 402 Q485 402 540 402';
+  const MOD_D = 'M220 402 Q275 392 330 402 Q355 412 380 402 Q405 392 430 402 Q485 402 540 402';
+  const BOOST_D = 'M220 402 Q275 402 330 402 Q355 402 380 344 Q405 402 430 402 Q485 402 540 402';
+  const SUSTAIN_D = 'M220 390 Q275 386 330 390 Q355 394 380 390 Q405 386 430 390 Q485 390 540 390';
+
+  let waveFrom = REST_D;
+  let waveTo = REST_D;
+  let waveColor = 'rgba(190, 200, 255, 0.4)';
+  let waveCaption = ['Baseline', 'resting potential'];
+  let waveDur = 1.1;
+  const recTag = activeReceptor ? ` (${activeReceptor.id})` : '';
+  if (currentStage === 2) {
     if (acts === 'release-block') {
-      waveD = 'M220 402 H540';
-      waveColor = 'rgba(190, 200, 255, 0.3)';
+      waveCaption = ['No release', 'receiving cell stays silent'];
     } else {
-      waveD = 'M220 402 Q310 402 350 398 Q380 393 410 398 Q450 402 540 402';
+      waveTo = PRE_D;
       waveColor = color;
+      waveCaption = ['Signal crossing', 'not bound yet, still at rest'];
     }
   } else if (currentStage === 3) {
     if (acts === 'receptor-block') {
-      waveD = 'M220 402 H540';
       waveColor = '#ff4d6d';
-    } else if (acts === 'boost-receptor' || (acts === 'receptor-mimic' && primaryEffect === 'excite')) {
-      waveD = 'M220 402 Q310 402 345 372 Q380 342 415 372 Q450 402 540 402';
+      waveCaption = [`Blocked${recTag}`, 'no potential change'];
+    } else if (acts === 'boost-receptor') {
+      waveTo = BOOST_D;
       waveColor = '#ffcf6b';
+      waveCaption = [`Amplified${recTag}`, 'much stronger response'];
     } else if (primaryEffect === 'inhibit') {
-      waveD = 'M220 402 Q310 402 345 418 Q380 424 415 418 Q450 402 540 402';
+      waveTo = INHIBIT_D;
       waveColor = '#ff6b7d';
+      waveCaption = acts === 'receptor-mimic'
+        ? [`Direct activation${recTag}`, 'forced quieting']
+        : [`Quiets${recTag}`, 'pulled away from threshold'];
     } else if (primaryEffect === 'excite') {
-      waveD = 'M220 402 Q310 402 345 380 Q380 366 415 380 Q450 402 540 402';
+      waveTo = EXCITE_D;
       waveColor = '#ffcf6b';
+      waveCaption = acts === 'receptor-mimic'
+        ? [`Direct activation${recTag}`, 'forced firing drive']
+        : [`Excites${recTag}`, 'pushed toward threshold'];
     } else {
-      // modulate
-      waveD = 'M220 402 Q270 388 320 402 Q380 416 440 402 Q490 390 540 402';
+      waveTo = MOD_D;
       waveColor = color;
+      waveCaption = acts === 'receptor-mimic'
+        ? [`Direct activation${recTag}`, 'sensitivity overridden']
+        : [`Tunes${recTag}`, 'shifts future sensitivity'];
     }
   } else if (currentStage === 4) {
-    if (acts === 'reuptake-block' || acts === 'enzyme-block') {
-      waveD = 'M220 388 Q300 384 380 388 Q460 386 540 388';
+    const peakD = acts === 'boost-receptor' ? BOOST_D
+      : primaryEffect === 'inhibit' ? INHIBIT_D
+        : primaryEffect === 'excite' ? EXCITE_D : MOD_D;
+    waveDur = 1.4;
+    if (signalPersist) {
+      waveFrom = peakD;
+      waveTo = SUSTAIN_D;
       waveColor = color;
+      waveCaption = ['Signal sustained', 'clearance blocked'];
     } else {
-      waveD = 'M220 402 Q320 402 380 402 Q440 402 540 402';
-      waveColor = 'rgba(190, 200, 255, 0.4)';
+      waveFrom = peakD;
+      waveTo = REST_D;
+      waveCaption = ['Returning to rest', 'signal cleared'];
     }
   }
 
-  const postLabel = getPostsynapticLabel(primaryEffect, currentStage, acts);
+  const waveMorph = !REDUCED_MOTION && waveFrom !== waveTo;
+  const waveAnim = waveMorph
+    ? `<animate attributeName="d" values="${waveFrom};${waveTo}" dur="${waveDur}s" fill="freeze" calcMode="spline" keyTimes="0;1" keySplines="0.35 0 0.25 1"/>`
+    : '';
+  let chargeDot = '';
+  if (waveMorph) {
+    if (currentStage === 3) {
+      chargeDot = `<circle r="4" fill="#ffffff" opacity="0.9" filter="url(#syn-glow)">
+        <animateMotion dur="2.4s" repeatCount="indefinite"><mpath href="#syn-wave" xlink:href="#syn-wave"/></animateMotion>
+        <animate attributeName="opacity" values="0.55;1;0.55" dur="1.6s" repeatCount="indefinite"/>
+      </circle>`;
+    } else {
+      chargeDot = `<circle r="4" fill="#ffffff" opacity="0" filter="url(#syn-glow)">
+        <animateMotion dur="${waveDur}s" fill="freeze"><mpath href="#syn-wave" xlink:href="#syn-wave"/></animateMotion>
+        <animate attributeName="opacity" values="0;0.9;0.9;0" keyTimes="0;0.1;0.6;1" dur="${waveDur}s" fill="freeze"/>
+      </circle>`;
+    }
+  }
+
+  const postLabel = getPostsynapticLabel(primaryEffect, currentStage, acts, selectedReceptor?.id || null);
   const playing = playTimer !== null;
 
   let svgMarkup = `
@@ -682,9 +809,15 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
 
     <!-- Postsynaptic response waveform trace -->
     <g class="post-trace syn-in" style="animation-delay:0.24s">
+      <line x1="220" y1="368" x2="540" y2="368" stroke="rgba(255,207,107,0.22)" stroke-width="1.1" stroke-dasharray="4 4"/>
+      <text x="212" y="371" text-anchor="end" class="dg-label dim" font-size="9.5" fill="rgba(255,207,107,0.68)">Threshold</text>
       <line x1="220" y1="402" x2="540" y2="402" stroke="rgba(190,200,255,0.14)" stroke-width="1.2" stroke-dasharray="3 3"/>
-      <path d="${waveD}" pathLength="100" fill="none" stroke="${waveColor}" stroke-width="2.8" stroke-linecap="round" filter="url(#syn-glow)"/>
-      <text x="380" y="426" text-anchor="middle" class="dg-label dim" font-size="11">Postsynaptic membrane potential</text>
+      <text x="212" y="405" text-anchor="end" class="dg-label dim" font-size="9.5">Resting</text>
+      <path id="syn-wave" d="${waveTo}" pathLength="100" fill="none" stroke="${waveColor}" stroke-width="2.8" stroke-linecap="round" filter="url(#syn-glow)">${waveAnim}</path>
+      ${chargeDot}
+      <text x="380" y="426" text-anchor="middle" class="dg-label dim" font-size="11">Postsynaptic membrane potential${(currentStage === 3 && activeReceptor) ? ` · via ${esc(activeReceptor.id)}` : ''}</text>
+      <text x="548" y="390" text-anchor="start" class="dg-label" font-size="11" font-weight="700" fill="${waveColor}">${esc(waveCaption[0])}</text>
+      <text x="548" y="404" text-anchor="start" class="dg-label dim" font-size="10" fill="var(--ink-3)">${esc(waveCaption[1])}</text>
     </g>
   `;
   if (REDUCED_MOTION) svgMarkup = stripAnimation(svgMarkup);
@@ -704,9 +837,16 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
       </div>
     </header>
 
-    ${drugBanner}
+    <!-- Stage player (pathway tour pattern) -->
+    <div class="player syn-player" role="group" aria-label="Synapse stage player">
+      <button class="pl-btn" data-act="prev-stage" ${currentStage === 0 ? 'disabled' : ''} aria-label="Previous stage">${icon('prev', 18)}</button>
+      <button class="pl-btn pl-play" data-play-stepper aria-pressed="${playing ? 'true' : 'false'}">${icon(playing ? 'pause' : 'play', 16)}<span>${playing ? 'Pause' : 'Play cycle'}</span></button>
+      <button class="pl-btn" data-act="next-stage" ${currentStage === 4 ? 'disabled' : ''} aria-label="Next stage">${icon('next', 18)}</button>
+      <div class="pl-track">${STAGES.map((st, i) => `<button type="button" class="pl-track-dot ${i < currentStage ? 'done' : i === currentStage ? 'on' : ''}${playing && i === currentStage ? ' is-ticking' : ''}" data-stage="${i}" title="Step ${i + 1}: ${esc(st.title)}" aria-label="Step ${i + 1}: ${esc(st.title)}"${i === currentStage ? ' aria-current="step"' : ''}>${drug && i === drugStepIdx ? '<i class="drug-stage-dot" title="Drug target step"></i>' : ''}</button>`).join('')}</div>
+    </div>
 
-    <!-- Center Widescreen SVG (760x440) -->
+    <div class="syn-theater-body">
+      <!-- Center Widescreen SVG (760x440) -->
     <svg class="synapse-svg" viewBox="0 0 760 440" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Synapse stage: ${STAGES[currentStage].label}">
       <defs>
         <filter id="syn-glow" x="-25%" y="-25%" width="150%" height="150%">
@@ -734,33 +874,51 @@ export function renderSynapseStepper(chem, { stage = activeStage, drugId = null,
       ${svgMarkup}
     </svg>
 
-    <!-- Bottom HUD zone -->
-    <footer class="syn-hud-bottom">
-      <div class="syn-caption" data-active-stage="${st.id}" aria-live="polite">
-        <p class="syn-caption-kicker"><i class="syn-stage-dot"></i>Stage ${st.id + 1} of 5 &middot; ${esc(st.label)}</p>
-        <h3 class="syn-caption-title">${esc(st.title)}</h3>
-        <p class="syn-caption-text">${fmt(stageCaption)}</p>
-        ${drugNote ? `<p class="syn-life-drug-note"><i class="drug-stage-dot"></i><strong>${esc(drug.name)}:</strong> ${esc(drugNote)}</p>` : ''}
-      </div>
-
-      <div class="stepper-controls ${playing ? 'is-playing' : ''}" role="group" aria-label="Synapse stages">
-        <button class="stepper-nav-btn" data-act="prev-stage" ${currentStage === 0 ? 'disabled' : ''} aria-label="Previous stage">${icon('prev', 14)}</button>
-        <div class="stepper-buttons">
-          ${STAGES.map((st) => {
-            const hasDrugDot = isDrugActive && stageForDrug(drug) === st.id;
-            return `
-              <button class="step-btn ${st.id === currentStage ? 'is-on' : ''}" data-stage="${st.id}" ${st.id === currentStage ? 'aria-current="step"' : ''}>
-                ${st.short}
-                ${hasDrugDot ? '<i class="drug-stage-dot" title="Drug target stage"></i>' : ''}
-              </button>
-            `;
-          }).join('')}
-        </div>
-        <button class="stepper-nav-btn" data-act="next-stage" ${currentStage === 4 ? 'disabled' : ''} aria-label="Next stage">${icon('next', 14)}</button>
-        <button class="stepper-play-btn ${playing ? 'is-playing' : ''}" data-play-stepper aria-pressed="${playing ? 'true' : 'false'}">
-          ${icon(playing ? 'pause' : 'play', 12)} ${playing ? 'Pause' : 'Play cycle'}
-        </button>
-      </div>
-    </footer>
+      <!-- Stage list (pathway tour pattern) -->
+      <ol class="steps syn-steps" aria-label="Stages of one signal">
+        ${STAGES.map((st, i) => {
+          const isOn = i === currentStage;
+          const isDrugStep = drug && i === drugStepIdx;
+          const drugCard = isDrugStep ? `<div class="syn-drug-card">
+            <div class="syn-drug-head">
+              <span class="syn-drug-name"><i class="drug-stage-dot"></i>${esc(drug.name)} acts here</span>
+              <span class="syn-drug-target">Target: ${esc(drug.target)}</span>
+            </div>
+            <p class="syn-drug-note">${esc(getDrugStageNote(drug))}</p>
+            <div class="syn-drug-controls">
+              <div class="drug-mode-toggle" role="group" aria-label="Drug condition">
+                <button class="drug-toggle-btn ${!isDrugActive ? 'is-on' : ''}" data-drug-mode="normal" aria-pressed="${!isDrugActive ? 'true' : 'false'}">Normal</button>
+                <button class="drug-toggle-btn ${isDrugActive ? 'is-on' : ''}" data-drug-mode="active" aria-pressed="${isDrugActive ? 'true' : 'false'}">With ${esc(drug.name)}</button>
+              </div>
+              <a class="drug-clear" href="#/chem/${esc(chem.id)}/${tab || 'synapse'}" title="Remove drug simulation">Clear drug</a>
+            </div>
+          </div>` : '';
+          const recChips = (i === 3 && receptors.length) ? `<div class="chips syn-step-chips">
+            ${receptors.map((r) => {
+              const effWord = { excite: 'Excites', inhibit: 'Quiets', modulate: 'Tunes' }[r.effect] || r.effect;
+              return `<button type="button" class="chip ${highlightedReceptor === r.id ? 'is-on' : ''}" data-receptor-chip="${esc(r.id)}" aria-pressed="${highlightedReceptor === r.id ? 'true' : 'false'}" style="--c:${color}"><i class="dot"></i>${esc(r.id)} <span class="chip-sub">${esc(effWord)}</span></button>`;
+            }).join('')}
+          </div>
+          ${selectedReceptor ? `<div class="syn-rec-readout">
+            <div class="syn-rec-readout-head">
+              <span class="syn-rec-readout-name">${esc(selectedReceptor.id)} <span class="receptor-family">(${esc(selectedReceptor.family)})</span></span>
+              <span class="badge badge-${selectedReceptor.effect}">${esc(({ excite: 'Excites', inhibit: 'Quiets', modulate: 'Tunes' }[selectedReceptor.effect] || selectedReceptor.effect) + (selectedReceptor.flux ? ` · ${selectedReceptor.flux}` : ''))}</span>
+            </div>
+            <p class="syn-rec-readout-mech">${esc(describeReceptorMechanism(selectedReceptor))}</p>
+          </div>` : ''}` : '';
+          return `<li class="step ${isOn ? 'is-on' : ''} ${i < currentStage ? 'is-done' : ''}">
+            <button type="button" class="step-head" data-stage="${i}"${isOn ? ' aria-current="step"' : ''}>
+              <span class="step-n">${i + 1}</span>
+              <span class="step-title">${esc(st.title)}${isDrugStep ? '<i class="drug-stage-dot" title="Drug acts here"></i>' : ''}</span>
+            </button>
+            ${isOn ? `<div class="step-body syn-step-body" aria-live="polite">
+              <p class="syn-step-text">${fmt(captions[i])}</p>
+              ${drugCard}
+              ${recChips}
+            </div>` : ''}
+          </li>`;
+        }).join('')}
+      </ol>
+    </div>
   </div>`;
 }

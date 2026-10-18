@@ -1317,7 +1317,7 @@ kbd {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px 32px;
+  padding: 16px 20px;
   pointer-events: auto;
 }
 .synapse-stage[hidden] {
@@ -1325,7 +1325,7 @@ kbd {
 }
 
 .synapse-theater {
-  width: min(1180px, 100%);
+  width: min(1400px, 100%);
   max-height: 100%;
   overflow-y: auto;
   display: flex;
@@ -1394,18 +1394,29 @@ kbd {
   border: 1px solid color-mix(in oklab, var(--accent, #b98cff) 25%, transparent);
 }
 
-.stepper-drug-banner {
-  display: flex; flex-direction: column; gap: 8px;
-  padding: 10px 14px; border-radius: 10px;
-  background: rgba(185, 140, 255, 0.1); border: 1px solid rgba(185, 140, 255, 0.28);
-  font-size: 12.5px; color: var(--ink);
+.syn-drug-card {
+  margin-top: 10px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: rgba(255, 207, 107, 0.08);
+  border: 1px solid rgba(255, 207, 107, 0.3);
 }
-.drug-banner-main {
-  display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap;
+.syn-drug-head {
+  display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;
 }
-.drug-tag { color: var(--accent); font-weight: 600; }
-.drug-note { color: var(--ink-2); flex: 1; }
-.drug-mode-row {
+.syn-drug-name {
+  display: inline-flex; align-items: center; gap: 7px;
+  font-size: 12.5px; font-weight: 700; color: #ffcf6b;
+}
+.syn-drug-name .drug-stage-dot { margin-left: 0; }
+.syn-drug-target {
+  font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 999px;
+  background: rgba(255, 207, 107, 0.14); border: 1px solid rgba(255, 207, 107, 0.35); color: #ffd98f;
+}
+.syn-drug-note {
+  margin: 0 0 10px; font-size: 12.5px; line-height: 1.5; color: var(--ink);
+}
+.syn-drug-controls {
   display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
 }
 .drug-mode-toggle {
@@ -1426,7 +1437,7 @@ kbd {
 .synapse-svg {
   width: 100%;
   height: auto;
-  max-height: min(58vh, 620px);
+  max-height: min(64vh, 680px);
   display: block;
   border-radius: 14px;
   background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(18, 22, 38, 0.6) 0%, rgba(8, 10, 18, 0.8) 100%);
@@ -1472,42 +1483,27 @@ kbd {
   to { stroke-dashoffset: 0; }
 }
 
-.syn-hud-bottom {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 2px;
+.syn-player { margin: 0; }
+.syn-theater-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 1fr);
+  gap: 18px;
+  align-items: start;
 }
 
-.stepper-controls {
-  display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+.pl-track-dot.is-ticking { background: rgba(190, 200, 255, 0.14); box-shadow: none; }
+.pl-track-dot .drug-stage-dot {
+  position: absolute;
+  top: -8px;
+  left: calc(50% - 3px);
+  margin: 0;
+  z-index: 1;
 }
-.stepper-nav-btn {
-  display: inline-grid; place-items: center;
-  width: 30px; height: 30px; border-radius: 7px;
-  color: var(--ink-2); background: transparent;
-  border: 1px solid var(--line); transition: background 0.2s, color 0.2s, opacity 0.2s;
-}
-.stepper-nav-btn:hover:not(:disabled) { background: rgba(190, 200, 255, 0.12); color: var(--ink); }
-.stepper-nav-btn:disabled { opacity: 0.3; cursor: default; }
-.stepper-buttons { display: flex; gap: 5px; flex-wrap: wrap; }
-.step-btn {
-  position: relative;
-  padding: 6px 12px 8px; border-radius: 8px; font-size: 12.5px; font-weight: 500;
-  background: rgba(190, 200, 255, 0.06); color: var(--ink-2);
-  border: 1px solid var(--line); transition: background 0.2s, color 0.2s, border-color 0.2s;
-}
-.step-btn:hover { background: rgba(190, 200, 255, 0.12); color: var(--ink); }
-.step-btn.is-on {
-  background: color-mix(in oklab, var(--accent, #b98cff) 16%, rgba(190, 200, 255, 0.1));
-  color: #fff; font-weight: 600;
-  border-color: color-mix(in oklab, var(--accent, #b98cff) 45%, var(--line-2));
-}
-.stepper-controls.is-playing .step-btn.is-on::after {
+.pl-track-dot.is-ticking::after {
   content: '';
-  position: absolute; left: 10%; right: 10%; bottom: 3px; height: 2px;
-  border-radius: 2px; background: var(--accent, #b98cff);
-  box-shadow: 0 0 6px var(--accent, #b98cff);
+  position: absolute; inset: 0; border-radius: 3px;
+  background: var(--accent, #b98cff);
+  box-shadow: 0 0 8px var(--accent, #b98cff);
   transform-origin: left center;
   animation: syn-progress 2.6s linear infinite;
 }
@@ -1532,19 +1528,6 @@ kbd {
   50% { opacity: 1; transform: scale(1.25); }
 }
 
-.stepper-play-btn {
-  display: inline-flex; align-items: center; gap: 6px; margin-left: auto;
-  padding: 5px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 500;
-  background: rgba(190, 200, 255, 0.08); color: var(--ink-2);
-  border: 1px solid var(--line); transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-}
-.stepper-play-btn:hover { background: rgba(190, 200, 255, 0.14); color: var(--ink); }
-.stepper-play-btn.is-playing {
-  background: color-mix(in oklab, var(--accent) 30%, transparent);
-  color: #fff;
-  box-shadow: 0 0 14px color-mix(in oklab, var(--accent) 40%, transparent);
-}
-
 .gap-meter {
   display: inline-flex; align-items: center; gap: 6px;
   font-size: 12.5px; font-weight: 500; color: var(--ink-2);
@@ -1566,55 +1549,67 @@ kbd {
   100% { transform: scale(1); opacity: 1; }
 }
 
-.syn-caption {
-  min-height: 96px;
-  padding: 2px 4px 0;
-  animation: syn-rise 0.45s 0.12s var(--ease) both;
-}
-.syn-caption-kicker {
-  display: flex; align-items: center; gap: 7px;
-  margin: 0 0 4px;
-  font-size: 11.5px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
-  color: var(--accent);
-}
-.syn-stage-dot {
-  width: 7px; height: 7px; border-radius: 50%;
-  background: var(--accent); box-shadow: 0 0 7px var(--accent);
-}
-.syn-caption-title {
-  margin: 0 0 5px;
-  font-family: var(--display); font-size: 18px; font-weight: 600; letter-spacing: -0.01em;
-  color: #fff;
-}
-.syn-caption-text {
-  margin: 0;
-  max-width: 68ch;
-  font-family: var(--read); font-size: 15px; line-height: 1.5;
-  color: var(--ink);
-}
-.syn-caption .syn-life-drug-note { display: inline-block; margin: 8px 0 0; }
 .syn-intro {
   margin: 4px 0 18px;
   font-size: 13.5px; line-height: 1.55;
   color: var(--ink-2);
 }
 
-/* Sidebar Synapse Lifecycle List */
-/* Sidebar Synapse Lifecycle Stepper Accordion (aligned with Pathways .steps) */
-.syn-life-section {
-  margin-top: 20px;
-}
+/* Synapse theater stage list (aligned with Pathways .steps) */
 .syn-steps {
-  margin-top: 10px;
+  margin: 0;
 }
-.syn-steps .step-head {
-  padding: 10px 0;
-}
-.syn-steps .step-text {
-  font-size: 13px;
-  line-height: 1.5;
-  color: var(--ink-2);
+.syn-steps .step:last-child { border-bottom: 0; }
+.syn-steps .step-head { padding: 9px 0; }
+.syn-steps .step-title { font-size: 13.5px; }
+.syn-step-body { padding: 0 0 12px 36px; }
+.syn-step-text {
   margin: 0 0 8px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--ink-2);
+}
+.syn-step-chips { margin-top: 10px; }
+.syn-step-chips .chip { cursor: pointer; }
+.syn-step-chips .chip:hover { background: color-mix(in oklab, var(--c, var(--accent)) 20%, transparent); }
+.syn-step-chips .chip.is-on {
+  border-color: color-mix(in oklab, var(--c, var(--accent)) 70%, white);
+  background: color-mix(in oklab, var(--c, var(--accent)) 22%, transparent);
+}
+.syn-step-chips .chip-sub {
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--ink-3);
+  margin-left: 2px;
+}
+.syn-step-chips .chip.is-on .chip-sub {
+  color: var(--ink-2);
+}
+.syn-rec-readout {
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: color-mix(in oklab, var(--accent, #b98cff) 8%, rgba(190, 200, 255, 0.04));
+  border: 1px solid color-mix(in oklab, var(--accent, #b98cff) 38%, var(--line));
+}
+.syn-rec-readout-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.syn-rec-readout-name {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--ink);
+}
+.syn-rec-readout-mech {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.48;
+  color: var(--ink-2);
 }
 
 .speed-widget { margin-top: 20px; }
@@ -1671,7 +1666,70 @@ kbd {
 .tract-note-fails { border-left-color: rgba(255, 207, 107, 0.35); }
 .tract-note-blocked { border-left-color: var(--line-2); }
 
-.receptors-section, .drugs-section, .breaks-section { margin-top: 32px; }
+.receptor-modes-key {
+  margin: 18px 0 24px;
+  padding: 13px 15px;
+  border-radius: 12px;
+  background: rgba(190, 200, 255, 0.03);
+  border: 1px solid var(--line);
+}
+.receptor-modes-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  margin-bottom: 10px;
+}
+.receptor-modes-list {
+  display: grid;
+  gap: 8px;
+}
+.receptor-mode-item {
+  padding: 8px 10px;
+  border-radius: 9px;
+  background: rgba(190, 200, 255, 0.025);
+  border: 1px solid transparent;
+  transition: border-color 0.2s, background 0.2s, opacity 0.2s;
+}
+.receptor-mode-item.is-muted {
+  opacity: 0.58;
+}
+.receptor-mode-item.is-active {
+  opacity: 1;
+  border-color: color-mix(in oklab, var(--accent, #b98cff) 55%, var(--line-2));
+  background: color-mix(in oklab, var(--accent, #b98cff) 9%, rgba(190, 200, 255, 0.04));
+}
+.receptor-mode-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+.receptor-mode-meta {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+}
+.receptor-mode-desc {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+
+.receptors-section, .drugs-section, .breaks-section { margin-top: 28px; }
+.receptor-mech {
+  margin: 4px 0 8px;
+  padding: 6px 9px;
+  border-radius: 7px;
+  background: rgba(190, 200, 255, 0.04);
+  border-left: 2px solid color-mix(in oklab, var(--accent, #b98cff) 55%, transparent);
+  font-size: 11.8px;
+  line-height: 1.45;
+  color: var(--ink);
+}
 .drugs-list, .receptors-list {
   display: flex;
   flex-direction: column;
@@ -1698,20 +1756,6 @@ kbd {
   border-color: color-mix(in oklab, var(--accent) 75%, white);
   background: color-mix(in oklab, var(--accent) 8%, rgba(190, 200, 255, 0.03));
   box-shadow: 0 0 16px color-mix(in oklab, var(--accent) 18%, transparent);
-}
-.syn-life-drug-note {
-  margin-top: 8px;
-  padding: 6px 10px;
-  border-radius: 6px;
-  background: rgba(255, 207, 107, 0.1);
-  border: 1px solid rgba(255, 207, 107, 0.28);
-  font-size: 11.5px;
-  line-height: 1.45;
-  color: var(--ink);
-}
-.syn-life-drug-note .drug-stage-dot {
-  margin-left: 0;
-  margin-right: 5px;
 }
 .receptor-head, .drug-head {
   display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 4px;
@@ -2036,11 +2080,10 @@ kbd {
   .ex, .library, .ask-part { animation: none; }
   .ask-wait i b { animation: none; opacity: 0.7; }
   .synapse-svg .syn-in,
-  .syn-caption,
   .gap-count,
   .drug-stage-dot,
   .rec-halo,
-  .stepper-controls.is-playing .step-btn.is-on::after { animation: none; }
+  .pl-track-dot.is-ticking::after { animation: none; }
   .post-trace path { stroke-dasharray: none; stroke-dashoffset: 0; animation: none; }
 }
 
@@ -2878,32 +2921,21 @@ kbd {
     font-size: 10.5px;
     padding: 2px 7px;
   }
-  .stepper-drug-banner {
-    padding: 6px 8px;
-    gap: 4px;
-    font-size: 11.5px;
+  .syn-drug-card {
+    padding: 10px 12px;
   }
-  .drug-note {
-    font-size: 11px;
-    line-height: 1.35;
+  .syn-drug-note {
+    font-size: 12px;
+    line-height: 1.45;
   }
-  .stepper-controls {
-    gap: 6px;
-  }
-  .step-btn {
-    padding: 3px 7px;
-    font-size: 10.5px;
-  }
-  .stepper-nav-btn {
-    width: 24px; height: 24px;
-  }
-  .stepper-play-btn {
-    padding: 3px 8px;
-    font-size: 10.5px;
-  }
-  .syn-caption { min-height: 0; }
-  .syn-caption-title { font-size: 14px; }
-  .syn-caption-text { font-size: 13.5px; line-height: 1.45; }
+  .syn-player { gap: 4px; padding: 4px; border-radius: 11px; }
+  .syn-player .pl-btn { height: 30px; padding: 0 7px; }
+  .syn-player .pl-play { padding: 0 11px 0 9px; font-size: 11.5px; }
+  .syn-theater-body { grid-template-columns: 1fr; gap: 10px; }
+  .syn-steps .step { display: none; }
+  .syn-steps .step.is-on { display: block; border-bottom: 0; }
+  .syn-steps .step-title { font-size: 13.5px; }
+  .syn-step-text { font-size: 13px; line-height: 1.45; }
 
   /* Smooth transition when bottom sheet snaps between half and peek */
   .synapse-theater {
@@ -2946,48 +2978,16 @@ kbd {
     flex: 0 0 auto;
   }
 
-  .app[data-sheet-state="peek"] .syn-hud-bottom,
-  .app:has(#explainer-sheet[data-sheet-state="peek"]) .syn-hud-bottom {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    flex: 1 1 auto;
-    margin-top: 4px;
-    gap: 10px;
-    min-height: 0;
-  }
-
-  .app[data-sheet-state="peek"] .syn-caption-title {
-    font-size: 16.5px;
+  .app[data-sheet-state="peek"] .syn-steps .step-title,
+  .app:has(#explainer-sheet[data-sheet-state="peek"]) .syn-steps .step-title {
+    font-size: 15px;
     line-height: 1.25;
   }
 
-  .app[data-sheet-state="peek"] .syn-caption-text {
+  .app[data-sheet-state="peek"] .syn-step-text,
+  .app:has(#explainer-sheet[data-sheet-state="peek"]) .syn-step-text {
     font-size: 13.5px;
     line-height: 1.48;
-  }
-
-  .app[data-sheet-state="peek"] .stepper-controls {
-    margin-top: auto;
-    padding-top: 4px;
-    gap: 6px;
-  }
-
-  .app[data-sheet-state="peek"] .step-btn {
-    min-height: 36px;
-    padding: 6px 9px;
-    font-size: 11.5px;
-  }
-
-  .app[data-sheet-state="peek"] .stepper-nav-btn {
-    width: 30px;
-    height: 36px;
-  }
-
-  .app[data-sheet-state="peek"] .stepper-play-btn {
-    min-height: 36px;
-    padding: 6px 12px;
-    font-size: 11.5px;
   }
 
   .dock { display: none !important; }

@@ -5,7 +5,7 @@ import { fmt, paragraphs, esc } from './format.js';
 import { renderSegmentedTabs } from './tabs.js';
 import { renderBullets, renderPartChips, renderPager } from './components.js';
 import { renderSpeedWidget } from './speed.js';
-import { STAGES, getHighlightedReceptor, stageForDrug } from './synapse-stepper.js';
+import { STAGES, RECEPTOR_MODES, describeReceptorMechanism, getHighlightedReceptor, stageForDrug } from './synapse-stepper.js';
 import { icon } from './icons.js';
 
 export function renderChemHome() {
@@ -197,23 +197,46 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
     levelScale = '20 nm Cleft';
     const receptors = chem.receptors || [];
     const hiRec = getHighlightedReceptor();
+    const hiRecObj = hiRec ? receptors.find((r) => r.id === hiRec) : null;
+    const presentEffects = new Set(receptors.map((r) => r.effect));
 
     body = `
-      <p class="syn-intro">Step through one signal in the theater: made, packed, released, bound, then cleared. Click a receptor there or below to see what it does.</p>
+      <p class="syn-intro">Follow one signal through the theater, from the moment the cell builds it to the moment the cleft is cleared. A chemical does not have a single fixed effect on its own: what happens next depends on which receptor it docks onto.</p>
+
+      <div class="receptor-modes-key" aria-label="How receptors respond">
+        <div class="receptor-modes-title">Three ways a receptor can respond</div>
+        <div class="receptor-modes-list">
+          ${RECEPTOR_MODES.map((m) => {
+            const isSelectedMode = hiRecObj?.effect === m.id;
+            const isPresent = presentEffects.has(m.id);
+            return `<div class="receptor-mode-item ${isSelectedMode ? 'is-active' : ''} ${!isPresent ? 'is-muted' : ''}" data-effect-mode="${esc(m.id)}">
+              <div class="receptor-mode-head">
+                <span class="badge badge-${esc(m.id)}">${esc(m.word)}</span>
+                <span class="receptor-mode-meta">${esc(m.analogy)} &middot; ${esc(m.timescale)}</span>
+              </div>
+              <p class="receptor-mode-desc">${esc(m.summary)}</p>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
 
       <div class="receptors-section">
-        <h3 class="fig-title">Receptors</h3>
+        <h3 class="fig-title">Receptors for ${esc(chem.name)}</h3>
         <div class="receptors-list">
           ${receptors.map((r) => {
             const isHi = hiRec === r.id;
+            const effectWord = { excite: 'Excites', inhibit: 'Quiets', modulate: 'Tunes' }[r.effect] || r.effect;
+            const badgeText = r.flux ? `${effectWord} · ${r.flux}` : effectWord;
+            const mech = describeReceptorMechanism(r);
             return `
-              <button type="button" class="fig receptor-card ${isHi ? 'is-on' : ''}" data-receptor-card="${esc(r.id)}" aria-pressed="${isHi ? 'true' : 'false'}">
+              <button type="button" class="fig receptor-card ${isHi ? 'is-on' : ''}" data-receptor-card="${esc(r.id)}" data-receptor-effect="${esc(r.effect)}" aria-pressed="${isHi ? 'true' : 'false'}">
                 <div class="receptor-head">
                   <span class="receptor-name">${esc(r.id)} <span class="receptor-family">(${esc(r.family)})</span></span>
                   <span class="badge badge-${r.effect}">
-                    ${{ excite: 'Excites', inhibit: 'Quiets', modulate: 'Tunes' }[r.effect] || r.effect}
+                    ${esc(badgeText)}
                   </span>
                 </div>
+                ${mech ? `<p class="receptor-mech">${esc(mech)}</p>` : ''}
                 <div class="receptor-where">${renderPartChips(r.where)}</div>
                 <p class="receptor-desc">${fmt(r.text)}</p>
               </button>
@@ -235,14 +258,13 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
           const isOn = d.id === activeDrugId;
           const stageNum = stageForDrug(d);
           const stageObj = STAGES[stageNum] || STAGES[0];
-          const cleanShort = stageObj.short.replace(/^\d+\.\s*/, '');
           return `
             <div class="fig drug-card ${isOn ? 'is-on' : ''}" data-drug-card="${esc(d.id)}">
               <div class="drug-head">
                 <span class="drug-name">${esc(d.name)}</span>
                 <div class="drug-meta">
-                  <span class="drug-stage-pill" title="Acts on Stage ${stageNum + 1}: ${esc(stageObj.label)}">
-                    <span class="step-n-mini">${stageNum + 1}</span> ${esc(cleanShort)}
+                  <span class="drug-stage-pill" title="Acts on Step ${stageNum + 1}: ${esc(stageObj.title)}">
+                    <span class="step-n-mini">${stageNum + 1}</span> ${esc(stageObj.label)}
                   </span>
                   <span class="drug-target">Target: ${esc(d.target)}</span>
                 </div>
@@ -250,7 +272,7 @@ export function renderChem(chem, tabId = 'overview', sub = null) {
               <p class="drug-desc">${fmt(d.text)}</p>
               <div class="drug-card-actions">
                 ${isOn ? `
-                  <span class="chip drug-link is-active"><i class="dot" style="--c:${chem.color}"></i> Simulating on stage</span>
+                  <span class="chip drug-link is-active"><i class="dot" style="--c:#ffcf6b"></i> Simulating on step ${stageNum + 1}: ${esc(stageObj.title)}</span>
                   <a class="drug-reset-link" href="#/chem/${esc(chem.id)}/medicine">Clear simulation</a>
                 ` : `
                   <a class="chip drug-link" href="#/chem/${esc(chem.id)}/medicine/${esc(d.id)}">

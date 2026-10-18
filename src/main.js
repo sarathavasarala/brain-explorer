@@ -289,10 +289,15 @@ function syncSynapseStage() {
 
   // Sync active receptor highlight in sidebar if on synapse tab
   const hiRec = getHighlightedReceptor();
+  let activeEffect = null;
   explainerEl.querySelectorAll('.receptor-card[data-receptor-card]').forEach((card) => {
     const on = card.dataset.receptorCard === hiRec;
     card.classList.toggle('is-on', on);
     card.setAttribute('aria-pressed', on ? 'true' : 'false');
+    if (on) activeEffect = card.dataset.receptorEffect || null;
+  });
+  explainerEl.querySelectorAll('.receptor-mode-item[data-effect-mode]').forEach((item) => {
+    item.classList.toggle('is-active', item.dataset.effectMode === activeEffect);
   });
 }
 
@@ -849,6 +854,19 @@ function handleSynapseInteraction(e) {
   if (synRec) {
     setStepperStage(3);
     const recId = synRec.dataset.receptor;
+    const isAlreadyHi = getHighlightedReceptor() === recId;
+    setHighlightedReceptor(isAlreadyHi ? null : recId);
+    syncSynapseStage();
+    if (!isAlreadyHi) {
+      const targetCard = explainerEl.querySelector(`.receptor-card[data-receptor-card="${recId}"]`);
+      if (targetCard) targetCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+    return true;
+  }
+
+  const recChip = e.target.closest('[data-receptor-chip]');
+  if (recChip) {
+    const recId = recChip.dataset.receptorChip;
     const isAlreadyHi = getHighlightedReceptor() === recId;
     setHighlightedReceptor(isAlreadyHi ? null : recId);
     syncSynapseStage();
