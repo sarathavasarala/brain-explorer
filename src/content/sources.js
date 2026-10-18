@@ -107,4 +107,32 @@ export default {
     url: 'https://doi.org/10.1037/amp0000059',
     kind: 'review',
   },
+  'christopoulos2002-allosteric': {
+    title: 'G Protein-Coupled Receptor Allosterism and Complexing',
+    authors: 'Christopoulos A, Kenakin T',
+    year: 2002,
+    url: 'https://doi.org/10.1124/pr.54.2.323',
+    kind: 'review',
+  },
+  'kenakin2004-inverse': {
+    title: 'Efficacy as a Vector: the Relative Prevalence and Paucity of Inverse Agonism',
+    authors: 'Kenakin T',
+    year: 2004,
+    url: 'https://doi.org/10.1124/mol.65.1.2',
+    kind: 'review',
+  },
+  'mangelsdorf1995-nuclear': {
+    title: 'The nuclear receptor superfamily: the second decade',
+    authors: 'Mangelsdorf DJ, et al.',
+    year: 1995,
+    url: 'https://doi.org/10.1016/0092-8674(95)90199-x',
+    kind: 'review',
+  },
+  'lemmon2010-rtk': {
+    title: 'Cell Signaling by Receptor Tyrosine Kinases',
+    authors: 'Lemmon MA, Schlessinger J',
+    year: 2010,
+    url: 'https://doi.org/10.1016/j.cell.2010.06.011',
+    kind: 'review',
+  },
 };

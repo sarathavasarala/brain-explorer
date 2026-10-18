@@ -1473,6 +1473,9 @@ kbd {
 .syn-receptor.is-hi .rec-halo {
   opacity: 0.85;
 }
+.syn-receptor.is-active .rec-halo {
+  opacity: 0.5;
+}
 
 .post-trace path {
   stroke-dasharray: 100;
@@ -1596,6 +1599,10 @@ kbd {
 }
 .syn-step-chips .chip.is-on .chip-sub {
   color: var(--ink-2);
+}
+.syn-step-chips .chip.is-target {
+  border-color: rgba(255, 207, 107, 0.75);
+  box-shadow: 0 0 10px rgba(255, 207, 107, 0.25);
 }
 .syn-rec-readout {
   margin-top: 10px;
@@ -3058,6 +3065,14 @@ kbd {
 .dock-btn[aria-pressed="true"] { background: rgba(190,200,255,.14); border-color: rgba(190,200,255,.28); }
 .dock-range { width: 120px; accent-color: #b98cff; cursor: pointer; }
 .dock-label { font: 500 11px/1 var(--display); color: rgba(233,235,245,.6); }
+
+/* Receptor lab surfaces */
+.rec-fam { transition: opacity .35s var(--ease); }
+.rec-ligand-row { transition: transform .15s var(--ease); }
+.rec-ligand-row:hover { transform: translateX(-2px); }
+.rec-ligand-row:hover rect { stroke: rgba(190,200,255,.32); }
+.rec-ligand-row:focus-visible { outline: none; }
+.rec-ligand-row:focus-visible rect { stroke: rgba(190,200,255,.55); }
 
 /* Model surface */
 .model-surface {

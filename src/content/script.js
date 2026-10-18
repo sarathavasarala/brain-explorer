@@ -116,7 +116,7 @@ export function checkScript(script, { prefix = 'script' } = {}) {
       problems.push(`${w}: unknown layout "${st.layout}"`);
     }
 
-    if (st.world && !['rpe'].includes(st.world)) {
+    if (st.world && !['rpe', 'receptor'].includes(st.world)) {
       problems.push(`${w}: unknown world "${st.world}"`);
     }
 
@@ -124,7 +124,7 @@ export function checkScript(script, { prefix = 'script' } = {}) {
       if (typeof st.surface !== 'object') {
         problems.push(`${w}: surface must be an object`);
       } else {
-        if (!['activity', 'quantity', 'wiring', 'machinery', 'model'].includes(st.surface.type)) {
+        if (!['activity', 'quantity', 'wiring', 'machinery', 'model', 'receptor'].includes(st.surface.type)) {
           problems.push(`${w}: unknown surface type "${st.surface.type}"`);
         }
         if (typeof st.surface.title === 'string' && st.surface.title.includes('\u2014')) {
