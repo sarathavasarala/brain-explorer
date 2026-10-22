@@ -1651,12 +1651,13 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
   let activeUntil = 0;
   let labelsDirty = true;
   let hidden = typeof document !== 'undefined' && document.hidden;
+  let offscreen = false;
   const reducedMotion = typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const IDLE_MS = 1000 / 30;
 
   let ticking = false;
   function wakeNextFrame() {
-    if (hidden || ticking || rafId) return;
+    if (hidden || offscreen || ticking || rafId) return;
     if (idleTimer) { clearTimeout(idleTimer); idleTimer = 0; }
     rafId = requestAnimationFrame(tick);
   }
@@ -1670,7 +1671,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
     if (idleTimer) { clearTimeout(idleTimer); idleTimer = 0; }
   }
   function start() {
-    if (hidden || rafId || idleTimer) return;
+    if (hidden || offscreen || rafId || idleTimer) return;
     rafId = requestAnimationFrame(tick);
   }
 
@@ -1792,7 +1793,7 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
 
   function tick() {
     rafId = 0;
-    if (hidden) return;
+    if (hidden || offscreen) return;
     ticking = true;
     renderFrame();
     const busy = isBusy();
@@ -1881,6 +1882,18 @@ export function createBrainScene(canvas, { structures, anchors = [], chemicals =
       if (hidden) cancelScheduled();
       else requestRender(200);
     });
+  }
+
+  if (typeof IntersectionObserver !== 'undefined') {
+    const observer = new IntersectionObserver((entries) => {
+      const entry = entries[entries.length - 1];
+      const nextOffscreen = !entry.isIntersecting;
+      if (nextOffscreen === offscreen) return;
+      offscreen = nextOffscreen;
+      if (offscreen) cancelScheduled();
+      else requestRender(200);
+    });
+    observer.observe(canvas.parentElement || canvas);
   }
 
   start();

@@ -1,6 +1,16 @@
 // Lightweight, provider-decoupled client telemetry service for Brain Explorer.
 // Zero external dependencies. Tracks unique visits, active dwell time, and location context.
 
+let transportFailures = 0;
+let warnedTransport = false;
+
+function noteTransportFailure(error) {
+  transportFailures = Math.min(transportFailures + 1, 9999);
+  if (warnedTransport || typeof console === 'undefined' || typeof console.warn !== 'function') return;
+  warnedTransport = true;
+  console.warn('[brain] Telemetry transport failed; further transport errors are suppressed this session.', error?.message || error || '');
+}
+
 function generateId(len = 16) {
   if (typeof crypto !== 'undefined' && crypto.randomUUID) {
     return crypto.randomUUID();
@@ -50,9 +60,7 @@ export class HttpBeaconProvider {
         headers: { 'Content-Type': 'application/json' },
         body,
         keepalive: true,
-      }).catch(() => {
-        // Silently ignore telemetry transmission errors
-      });
+      }).catch(noteTransportFailure);
     }
   }
 }
@@ -119,7 +127,7 @@ export class UmamiProvider {
           headers: { 'Content-Type': 'application/json' },
           body,
           keepalive: true,
-        }).catch(() => {});
+        }).catch(noteTransportFailure);
       }
     }
   }

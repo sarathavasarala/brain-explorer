@@ -55,12 +55,11 @@ Procedurally generated 3D cells spanning excitatory neurons, inhibitory interneu
 - **Glia**: Astrocytes (blood-brain barrier, glutamate clearance), oligodendrocytes (saltatory myelin), and microglia (synaptic pruning, immune surveillance).
 - **Firing Sequencer**: An interactive step-through showing ion channel openings, voltage thresholds, and transmitter release.
 
-### 4. Guided Pathways & Interactive Labs (14 Tours)
-Narrative multi-step tours through brain systems:
-- **Actions**: How you see an object, pick up a scent, reach for a cup, process pain and quiet the hurt, react to fear, or form a lasting memory.
-- **Chemicals**: The dopamine reward loop, serotonin mood regulation, and noradrenaline alert broadcasting.
-- **Networks**: Default mode wandering, executive attention control, and salience switching.
-- **Labs**: Interactive multi-scale experiments (such as *Learning from surprise*) pairing the 3D brain with live spike rasters, Rescorla-Wagner learning curves, microcircuit wiring, and NMDA receptor kinetics.
+### 4. Guided Pathways & Interactive Labs (20 Tours)
+Narrative multi-step tours and hands-on lab experiments through brain systems, moving between 43 structures and 10 sensory, motor, and body anchors:
+- **Everyday experiences (8)**: Seeing, smelling, moving, remembering, fear, hearing and speech, pain, and stress and fear.
+- **Systems and networks (5)**: Dopamine, serotonin, noradrenaline, and acetylcholine pathways, plus the default mode network.
+- **Interactive labs (7)**: Learning from surprise, receptor pharmacology, synaptic integration, action potentials, synaptic plasticity, neural rhythms, and sensory contrast.
 
 ### 5. Ask Mode ("Ask the Brain" Chat)
 Ask natural questions about how your brain works, such as *"what happens when I fall asleep?"*, *"why does coffee wake me up?"*, or *"what happens in a panic attack?"*.
@@ -84,6 +83,10 @@ npm start
 
 Open `http://localhost:5173` in your browser (falls back to `5174` if busy). Set `PORT=5199 npm start` to pick another port.
 
+The server binds to `127.0.0.1` by default. To reach it from another device on your private LAN or Tailscale network, set `ALLOW_LAN=1`. With LAN access enabled the server binds to `0.0.0.0` and prints a warning. Set `HOST` explicitly to override the bind address.
+
+The local API endpoints are rate limited per client address. Defaults are 30 ask requests per minute and 1,000 per day, plus 8 chat requests per minute and 200 per day, with at most 4 concurrent chats. Override these with `ASK_RATE_PER_MIN`, `ASK_RATE_PER_DAY`, `CHAT_RATE_PER_MIN`, `CHAT_RATE_PER_DAY`, and `CHAT_MAX_CONCURRENT`.
+
 ### Ask Mode and Chat Setup
 
 Brain Explorer provides hand-verified preset queries that work completely offline without API keys or a local server.
@@ -103,8 +106,16 @@ TYPESAFE_API_KEY=your-typesafe-key
 
 `server.py` securely proxies chat requests to `/api/chat` using only Python standard library modules, enforcing schema validation and keeping API keys safe on your machine.
 
+On the static GitHub Pages build, you can connect your own Azure OpenAI or OpenAI key in the Ask dialog. By default the key lives in `sessionStorage` and disappears when the tab closes. Tick "Remember this key on this device" to opt into `localStorage` persistence across visits. The key is sent directly from the browser to the AI provider and is never sent to any proxy.
+
+The service worker caches the app shell and the exact Three.js CDN modules after an online visit, so a reload can work offline. Same-origin app modules are refreshed in the background, and all other cross-origin requests are left alone.
+
+`index.html` declares the content security policy, and `server.py` sends it with additional security headers (`Referrer-Policy`, `X-Content-Type-Options`, and `Permissions-Policy`). Client errors are reported to telemetry only after secrets and request bodies are removed.
+
 ### Content Validation
-Run the built-in integrity checker to verify all cross-references, glossary terms, pathways, and diagrams:
+`npm run catalog` regenerates both `src/content/catalog.json` and `src/content/ai-contract.json`. The AI contract holds the shared system prompt and JSON schema used by the browser and `server.py`.
+
+Run the built-in integrity checker to verify all cross-references, glossary terms, pathways, and diagrams, and to confirm both generated files are current:
 
 ```sh
 npm run validate
@@ -140,10 +151,11 @@ npm run validate
 brain-explorer/
 ├── index.html                  # Layout shell, Three.js CDN importmap, typography
 ├── styles.css                  # Single stylesheet: dark holographic theme, micro-animations
-├── server.py                   # Python standard library static server and /api/ask proxy
-├── package.json                # npm start & npm run validate scripts
+├── server.py                   # Python standard library static server and /api/ask and /api/chat proxy
+├── package.json                # npm start, catalog, and validate scripts
 ├── tools/
-│   └── validate.mjs            # Integrity and completeness validator
+│   ├── build-catalog.mjs       # Generates catalog.json and ai-contract.json
+│   └── validate.mjs            # Integrity, completeness, and generated-file validator
 └── src/
     ├── main.js                 # Hash router, state store, keyboard navigation
     ├── scene/
@@ -153,6 +165,9 @@ brain-explorer/
     │   └── noise.js            # Seeded random and 3D Perlin noise
     ├── content/
     │   ├── index.js            # Unified export & reference validation
+    │   ├── catalog.json        # Generated catalog for the server prompt
+    │   ├── ai-contract.js      # Shared system prompt and JSON schema builder
+    │   ├── ai-contract.json    # Generated contract consumed by server.py
     │   ├── structures/         # Cortical lobes, deep nuclei, hindbrain structures
     │   ├── chemicals/          # Fast transmitters, neuromodulators, hormones
     │   ├── cells/              # Excitatory, inhibitory, modulatory, and glial types
@@ -161,6 +176,11 @@ brain-explorer/
     │   ├── synapses.js         # Synaptic vesicle and receptor mechanism schemas
     │   ├── anchors.js          # Sensory endpoints and body organ anchors
     │   └── glossary/           # Definitions for [[term]] hover markup
+    ├── services/
+    │   ├── ask.js              # Preset and /api/ask client
+    │   ├── chat.js             # BYOK and /api/chat client
+    │   ├── errors.js           # Redacted client error reporter and global handlers
+    │   └── telemetry.js        # Privacy-preserving page and event telemetry
     └── ui/
         ├── explainer.js        # Right card: 3-level zoom ladder, try-it, breaks
         ├── sidebar.js          # Unified search and Parts/Chemicals/Cells lists

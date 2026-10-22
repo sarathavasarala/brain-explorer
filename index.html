@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>Brain Explorer</title>
   <meta name="theme-color" content="#06070b" />
+  <meta name="referrer" content="no-referrer" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cloud.umami.is; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data:; connect-src 'self' https://api.openai.com https://*.openai.azure.com https://*.services.ai.azure.com https://cloud.umami.is https://gateway.umami.is; worker-src 'self'; manifest-src 'self'; base-uri 'self'; object-src 'none'; form-action 'self'" />
   <meta name="mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -16,7 +18,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,600;12..96,700&family=Spectral:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css?v=12" />
+  <link rel="stylesheet" href="styles.css?v=9" />
   <script defer src="https://cloud.umami.is/script.js" data-website-id="a064ca02-054e-4769-9f6e-69ad4e6b65a2"></script>
   <script type="importmap">
     {
@@ -199,8 +201,12 @@
             <input id="byok-model" type="text" placeholder="gpt-4o-mini or gpt-4o" autocomplete="off" spellcheck="false" />
           </div>
 
+          <div class="byok-field byok-remember">
+            <label for="byok-remember"><input id="byok-remember" type="checkbox" /> Remember this key on this device</label>
+          </div>
+
           <div class="byok-privacy-note">
-            <span>🔒 Your key is saved only in this browser's <code>localStorage</code>. It is sent directly to the AI provider and never touches any proxy or server.</span>
+            <span>Your key is kept in this tab's <code>sessionStorage</code> and clears when the tab closes. Check "Remember this key on this device" to keep it in <code>localStorage</code> across visits. It is sent directly to your AI provider and never touches any proxy or server.</span>
           </div>
 
           <div class="byok-btn-row">
@@ -212,6 +218,6 @@
     </div>
   </dialog>
   <div id="tip" class="tip" role="tooltip"></div>
-  <script type="module" src="src/main.js?v=7"></script>
+  <script type="module" src="src/main.js?v=9"></script>
 </body>
 </html>

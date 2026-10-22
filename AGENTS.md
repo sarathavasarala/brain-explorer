@@ -11,7 +11,7 @@ Brain Explorer is an interactive 3D atlas of the human brain built for curious a
 
 ### Non-Negotiable Architectural Rules
 1. **Zero-build, Vanilla ES Modules**: No Vite, Webpack, Rollup, Babel, or TypeScript. All browser code runs directly as native ES modules.
-2. **CDN Import Maps**: Three.js (0.160) and addons (`OrbitControls`, `EffectComposer`, `RenderPass`, `UnrealBloomPass`, `ShaderPass`) are loaded via `<script type="importmap">` from `esm.sh` / `unpkg`. Keep external runtime dependencies strictly to Three.js.
+2. **CDN Import Maps**: Three.js (0.160) and addons (`OrbitControls`, `EffectComposer`, `RenderPass`, `UnrealBloomPass`, `ShaderPass`) are loaded via `<script type="importmap">` from jsDelivr. Keep external runtime dependencies strictly to Three.js.
 3. **Vanilla CSS**: All styles reside in `styles.css`. No Tailwind, Sass, or CSS-in-JS. Follow the curated dark holographic theme (`#06070b` background with glowing colored point clouds).
 4. **Standard Library Python Server**: `server.py` uses only Python's standard library (`http.server`, `urllib.request`, `json`, `os`). It serves static assets locally and securely proxies `/api/ask` and `/api/chat` to keep API keys safe.
 5. **No Em Dashes (—)**: In all user-facing content, documentation, and prompt strings, do not use em dashes. Use commas, periods, or parentheses.
@@ -25,8 +25,8 @@ Brain Explorer is an interactive 3D atlas of the human brain built for curious a
 |---|---|
 | `npm start` | Runs `python3 server.py`. Serves app at `http://localhost:5173` (falls back to 5174 if busy). |
 | `PORT=5199 npm start` | Runs server on a custom port. |
-| `npm run catalog` | Runs `node tools/build-catalog.mjs`. Rebuilds `src/content/catalog.json`. |
-| `npm run validate` | Runs `node tools/validate.mjs`. Validates content, references, glossary terms, diagrams, pathways, scripts, and catalog freshness. |
+| `npm run catalog` | Runs `node tools/build-catalog.mjs`. Rebuilds `src/content/catalog.json` and `src/content/ai-contract.json`. |
+| `npm run validate` | Runs `node tools/validate.mjs`. Validates content, references, glossary terms, diagrams, pathways, and scripts, and checks both generated files for freshness. |
 
 ### Environment Variables
 - `AZURE_OPENAI_ENDPOINT`: Azure OpenAI resource endpoint URL.
@@ -34,6 +34,15 @@ Brain Explorer is an interactive 3D atlas of the human brain built for curious a
 - `AZURE_OPENAI_DEPLOYMENT`: Deployment name (e.g. `gpt-4o`).
 - `AZURE_OPENAI_API_VERSION`: API version (default `2024-10-21`).
 - `TYPESAFE_API_KEY`: Legacy TypeSafe Jev API key for `/api/ask`. (Preset questions work without a key).
+- `ALLOW_LAN`: Set to `1` to accept requests from private network and Tailscale hosts. The server then binds to `0.0.0.0` by default and prints a warning.
+- `HOST`: Optional bind address override. Defaults to `127.0.0.1`, or `0.0.0.0` when `ALLOW_LAN=1`.
+- `ASK_RATE_PER_MIN` / `ASK_RATE_PER_DAY`: Ask rate limits per client address. Defaults are 30 per minute and 1,000 per day.
+- `CHAT_RATE_PER_MIN` / `CHAT_RATE_PER_DAY`: Chat rate limits per client address. Defaults are 8 per minute and 200 per day.
+- `CHAT_MAX_CONCURRENT`: Maximum concurrent chat requests. Default is 4.
+
+The browser keeps BYOK provider keys in `sessionStorage` by default, so they clear when the tab closes. The "Remember this key on this device" opt-in stores the key in `localStorage` instead. The app sends the key directly to the chosen provider and never to the local proxy. `index.html` declares the content security policy, and `server.py` sends it with additional security headers (`Referrer-Policy`, `X-Content-Type-Options`, and `Permissions-Policy`).
+
+Client failures flow through `src/services/errors.js`, which redacts credentials and request bodies, deduplicates repeats, caps reports per minute, and forwards to telemetry without throwing. `installGlobalErrorHandlers()` captures uncaught errors and unhandled promise rejections.
 
 ---
 
@@ -59,10 +68,12 @@ brain-explorer/
     ├── content/                # Declarative neuroscience data & text
     │   ├── index.js            # Unified export & validation engine (validate())
     │   ├── catalog.json        # Compiled machine-readable catalog of structures, anchors, chemicals, and glossary
+    │   ├── ai-contract.js      # Shared system prompt and JSON schema builder for browser and server
+    │   ├── ai-contract.json    # Generated AI contract consumed by server.py
     │   ├── script.js           # Scene script validation (checkScript) and runtime sanitization (sanitizeScript)
     │   ├── groups.js           # Structural groupings (Cortex, Deep, Hindbrain)
     │   ├── levels.js           # 3 zoom levels (overview, connects, cells)
-    │   ├── anchors.js          # Sensory/motor and body organ endpoints for pathways and hormones
+    │   ├── anchors.js          # 10 sensory/motor and body organ endpoints for pathways and hormones
     │   ├── synapses.js         # Synapse types (glutamate, gaba, dopamine, etc.)
     │   ├── ask-presets.js      # Hand-verified fallback answers for Ask mode
     │   ├── structures/
@@ -79,7 +90,7 @@ brain-explorer/
     │   │   ├── groups.js       # Cell groups (Excitatory, Inhibitory, Modulatory, Glia)
     │   │   └── index.js        # Cell definitions with morphology recipes and firing steps
     │   ├── pathways/
-    │   │   ├── groups.js       # Pathway categories (function, chemistry, network, labs)
+    │   │   ├── groups.js       # Pathway categories (function, systems, labs)
     │   │   └── index.js        # Step-by-step guided tours and neural routes
     │   ├── diagrams/
     │   │   └── index.js        # Neural circuit nodes & connections for "Down to cells"
@@ -87,7 +98,9 @@ brain-explorer/
     │       └── index.js        # Neuroscience definitions for [[term]] markup
     ├── services/
     │   ├── ask.js              # Client-side Ask query service (presets -> /api/ask)
-    │   └── chat.js             # Client-side Ask chat service (sendChat -> /api/chat)
+    │   ├── chat.js             # Client-side Ask chat service (sendChat -> /api/chat)
+    │   ├── errors.js           # Redacted client error reporter and global error handlers
+    │   └── telemetry.js        # Privacy-preserving page and event telemetry
     └── ui/
         ├── explainer.js        # Right-side card: 3 zoom levels, try-it, breaks with states, cross-links
         ├── sidebar.js          # Left-side Parts/Chemicals/Cells tabs with global search
@@ -125,6 +138,8 @@ The app is a single-page application driven by hash navigation in [src/main.js](
 | **Pathways** | `#/p/<pathway-id>/<step>` | Enters guided tour at 0-indexed step number (hides sidebar). |
 | **Ask** | `#/ask` | Opens the search / question interface with preset chips. |
 | **Ask** | `#/ask/<query>` | Executes query, highlights involved brain parts in 3D. |
+
+Ask chat sends one request and receives one complete JSON scene script. There is no token streaming; the answer card appears when the full response arrives.
 
 ### Global Search & Keyboard Shortcuts
 - Unified search in the sidebar filters across all structures, chemicals, and cells simultaneously. Pressing Enter opens the top match.
@@ -496,7 +511,7 @@ Scene scripts are declarative instructions for painting the 3D brain canvas. Gui
 ## 8. How to Extend Brain Explorer
 
 ### Hierarchy & Curation Rules (Parts vs. Sub-parts)
-Clinical atlases contain 500 to 1,000+ named structures. To keep Brain Explorer approachable for beginner and intermediate learners (~40 to 45 total parts), adhere to these four curation rules when deciding what to include and how to nest it:
+Clinical atlases contain 500 to 1,000+ named structures. To keep Brain Explorer approachable for beginner and intermediate learners (currently 43 total parts), adhere to these four curation rules when deciding what to include and how to nest it:
 1. **Three Spatial Groups (`group`)**:
    - `cortex`: The 4 classic lobes (`frontal-lobe`, `parietal-lobe`, `temporal-lobe`, `occipital-lobe`) plus the 2 internal/hidden cortical structures (`cingulate-cortex`, `insula`).
    - `deep`: Forebrain subcortical structures ordered by functional family: Diencephalon (`thalamus`, `hypothalamus`), Limbic (`hippocampus`, `amygdala`, `olfactory-bulb`, `basal-forebrain`), Basal Ganglia (`striatum`, `globus-pallidus`), and White Matter (`corpus-callosum`).
@@ -538,7 +553,7 @@ Clinical atlases contain 500 to 1,000+ named structures. To keep Brain Explorer 
 
 ### Adding a New Pathway
 1. Open `src/content/pathways/index.js`.
-2. Choose a valid `category` from `src/content/pathways/groups.js` (`function`, `chemistry`, `network`, `labs`).
+2. Choose a valid `category` from `src/content/pathways/groups.js` (`function`, `systems`, `labs`).
 3. Write steps sequentially, forming a cohesive narrative.
 4. For each step, supply `focus` (structures to highlight) and `route` (pairs of IDs or body anchors for 3D arcs).
 5. Run `npm run catalog` and `npm run validate`.
@@ -560,7 +575,7 @@ Whenever you add or update structures, anchors, chemicals, or glossary terms, re
 ```sh
 npm run catalog
 ```
-This updates `src/content/catalog.json`, which is consumed by `server.py` to build the Azure OpenAI system prompt and JSON schema. `npm run validate` enforces that `catalog.json` remains in sync with the source content.
+This updates `src/content/catalog.json` and `src/content/ai-contract.json`. The catalog is the machine-readable content index, and the AI contract holds the shared system prompt and JSON schema consumed by the browser and `server.py`. `npm run validate` enforces that both generated files remain in sync with the source content.
 
 ---
 
@@ -628,7 +643,7 @@ export default {
    - Add verified primary literature citations to `src/content/sources.js`.
    - Add a claim audit entry and route notes to `src/content/pathways/evidence.js`.
 6. **Rebuild & Validate**:
-   - Run `npm run catalog` to sync `catalog.json`.
+   - Run `npm run catalog` to sync `catalog.json` and `ai-contract.json`.
    - Run `npm run validate` to ensure zero broken references. Verify with `git diff | grep '\u2014'` that no em dashes exist.
 
 ---
@@ -661,7 +676,7 @@ Before submitting any code or content changes, execute this verification sequenc
    - `#/s/hippocampus/connects`: 3D connection arcs animate between structures.
    - `#/s/cerebellum/cells`: Circuit diagram renders SVG nodes, links, and animated pulse dots.
    - `#/pathways`: Library cards load correctly.
-   - `#/p/visual-stream/0`: Pathway tour steps through 3D routes cleanly.
+   - `#/p/seeing/0`: Pathway tour steps through 3D routes cleanly.
    - `#/ask`: Preset chips load; clicking a preset spotlights involved parts and plays scene script.
-   - Free-form Ask chat: Ask a question (e.g. "what happens when I fall asleep?"), verify streaming answer card, mini-tour step navigation, 3D camera/slice changes, and follow-up chips.
+   - Free-form Ask chat: Ask a question (e.g. "what happens when I fall asleep?"), verify the complete answer card, mini-tour step navigation, 3D camera/slice changes, and follow-up chips.
    - Browser developer console has zero errors or 404s.

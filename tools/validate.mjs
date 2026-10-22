@@ -2,10 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { validate, structures, pathways, chemicals, cells } from '../src/content/index.js';
-import { generateCatalog } from './build-catalog.mjs';
+import { generateCatalog, generateAiContract } from './build-catalog.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
-const catalogPath = path.resolve(path.dirname(__filename), '../src/content/catalog.json');
+const rootDir = path.resolve(path.dirname(__filename), '..');
+const catalogPath = path.join(rootDir, 'src/content/catalog.json');
 const expectedCatalog = JSON.stringify(generateCatalog(), null, 2) + '\n';
 
 let currentCatalog = '';
@@ -18,6 +19,38 @@ try {
 
 if (currentCatalog !== expectedCatalog) {
   console.error('catalog.json is out of date: run npm run catalog');
+  process.exit(1);
+}
+
+const contractPath = path.join(rootDir, 'src/content/ai-contract.json');
+const expectedContract = JSON.stringify(generateAiContract(), null, 2) + '\n';
+
+let currentContract = '';
+try {
+  currentContract = fs.readFileSync(contractPath, 'utf8');
+} catch {
+  console.error('ai-contract.json is missing: run npm run catalog');
+  process.exit(1);
+}
+
+if (currentContract !== expectedContract) {
+  console.error('ai-contract.json is out of date: run npm run catalog');
+  process.exit(1);
+}
+
+const indexHtml = fs.readFileSync(path.join(rootDir, 'index.html'), 'utf8');
+const swSource = fs.readFileSync(path.join(rootDir, 'sw.js'), 'utf8');
+const cacheMatch = swSource.match(/const CACHE_NAME = 'brain-explorer-v(\d+)'/);
+if (!cacheMatch) {
+  console.error('sw.js: CACHE_NAME must be brain-explorer-v<number>');
+  process.exit(1);
+}
+const cacheVersion = cacheMatch[1];
+const indexVersions = [...indexHtml.matchAll(/\b(?:href|src)="[^"]+\?v=(\d+)"/g)].map((m) => m[1]);
+const swVersions = [...swSource.matchAll(/\?v=(\d+)/g)].map((m) => m[1]);
+const mismatched = [...indexVersions, ...swVersions].filter((v) => v !== cacheVersion);
+if (mismatched.length) {
+  console.error(`Asset versions do not match sw.js CACHE_NAME v${cacheVersion}: ${mismatched.join(', ')}`);
   process.exit(1);
 }
 

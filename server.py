@@ -10,15 +10,39 @@ Standard library only.
 
 import http.server
 import json
+import math
 import os
+import threading
+import time
 import urllib.parse
 import urllib.request
 
-HOST = os.environ.get('HOST', '0.0.0.0')
+ALLOW_LAN = os.environ.get('ALLOW_LAN') == '1'
+HOST = os.environ.get('HOST') or ('0.0.0.0' if ALLOW_LAN else '127.0.0.1')
 PORT = int(os.environ.get('PORT', 5173))
 ROOT = os.path.dirname(os.path.abspath(__file__))
 MAX_QUERY = 120
 CLIENT_HEADER = 'X-Brain-Explorer'
+CSP = (
+    "default-src 'self'; "
+    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cloud.umami.is; "
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+    "font-src 'self' https://fonts.gstatic.com data:; "
+    "img-src 'self' data:; "
+    "connect-src 'self' https://api.openai.com https://*.openai.azure.com https://*.services.ai.azure.com https://cloud.umami.is https://gateway.umami.is; "
+    "worker-src 'self'; "
+    "manifest-src 'self'; "
+    "base-uri 'self'; "
+    "object-src 'none'; "
+    "frame-ancestors 'none'; "
+    "form-action 'self'"
+)
+SECURITY_HEADERS = {
+    'Content-Security-Policy': CSP,
+    'Referrer-Policy': 'no-referrer',
+    'X-Content-Type-Options': 'nosniff',
+    'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=(), display-capture=(), idle-detection=()',
+}
 PUBLIC_FILES = {
     '/',
     '/index.html',
@@ -57,6 +81,67 @@ AZURE_DEPLOYMENT = get_env('AZURE_OPENAI_DEPLOYMENT') or get_env('AZURE_OPENAI_M
 AZURE_VERSION = get_env('AZURE_OPENAI_API_VERSION', '2024-10-21')
 
 CHAT_ENABLED = bool(AZURE_ENDPOINT and AZURE_KEY and AZURE_DEPLOYMENT)
+
+
+def env_int(key, default):
+    try:
+        return max(1, int(get_env(key, str(default))))
+    except (TypeError, ValueError):
+        return default
+
+
+ASK_RATE_PER_MIN = env_int('ASK_RATE_PER_MIN', 30)
+ASK_RATE_PER_DAY = env_int('ASK_RATE_PER_DAY', 1000)
+CHAT_RATE_PER_MIN = env_int('CHAT_RATE_PER_MIN', 8)
+CHAT_RATE_PER_DAY = env_int('CHAT_RATE_PER_DAY', 200)
+CHAT_MAX_CONCURRENT = env_int('CHAT_MAX_CONCURRENT', 4)
+
+RATE_LOCK = threading.Lock()
+RATE_EVENTS = {}
+RATE_STATE = {'last_cleanup': 0.0}
+CHAT_SLOTS = threading.BoundedSemaphore(CHAT_MAX_CONCURRENT)
+
+
+def _cleanup_rate_events(now):
+    if now - RATE_STATE['last_cleanup'] < 300 and len(RATE_EVENTS) < 512:
+        return
+    RATE_STATE['last_cleanup'] = now
+    cutoff = now - 86400
+    stale = []
+    for key, times in RATE_EVENTS.items():
+        if not times or times[-1] < cutoff:
+            stale.append(key)
+            continue
+        drop = 0
+        while drop < len(times) and times[drop] < cutoff:
+            drop += 1
+        if drop:
+            del times[:drop]
+    for key in stale:
+        RATE_EVENTS.pop(key, None)
+
+
+def check_rate(scope, client):
+    now = time.monotonic()
+    per_min = ASK_RATE_PER_MIN if scope == 'ask' else CHAT_RATE_PER_MIN
+    per_day = ASK_RATE_PER_DAY if scope == 'ask' else CHAT_RATE_PER_DAY
+    key = (scope, client)
+    with RATE_LOCK:
+        bucket = RATE_EVENTS.setdefault(key, [])
+        day_cutoff = now - 86400
+        if bucket and bucket[0] < day_cutoff:
+            bucket[:] = [t for t in bucket if t >= day_cutoff]
+        minute_cutoff = now - 60
+        minute_times = [t for t in bucket if t >= minute_cutoff]
+        if len(minute_times) >= per_min:
+            retry = max(1, int(math.ceil(60 - (now - minute_times[0]))))
+            return False, retry
+        if len(bucket) >= per_day:
+            retry = max(1, int(math.ceil(86400 - (now - bucket[0]))))
+            return False, retry
+        bucket.append(now)
+        _cleanup_rate_events(now)
+    return True, 0
 
 # Parts Jev can choose from. Keys must match structure ids in src/content/structures.
 PARTS = {
@@ -241,133 +326,21 @@ ROLES_LIST = CATALOG.get('roles', ['more_active', 'less_active', 'typical', 'inv
 VIEWS_LIST = CATALOG.get('views', ['left', 'left-front', 'left-back', 'medial', 'back', 'below', 'body'])
 
 
-def build_system_prompt():
-    lines = [
-        "You are the narrator of Brain Explorer, an interactive 3D atlas of the human brain.",
-        "The user is viewing a 3D holographic point-cloud model of the brain. Each step in your script dynamically lights up brain regions, animates signals along neural pathways, and changes camera views.",
-        "",
-        "Available brain structures (use these ids in parts, focus, route, or {{id}} links):",
-    ]
-    for s in CATALOG.get('structures', []):
-        lines.append(f"- {s['id']}: {s['name']} ({s.get('tagline', '')})")
-    lines.append("\nAvailable body anchors (use for sensory inputs, motor outputs, or endocrine organs):")
-    for a in CATALOG.get('anchors', []):
-        lines.append(f"- {a['id']}: {a['name']}")
-    lines.append("\nAvailable chemical messengers (use for the chemical field):")
-    for c in CATALOG.get('chemicals', []):
-        lines.append(f"- {c['id']}: {c['name']} [{c.get('group', '')}] ({c.get('tagline', '')})")
-    lines.append("\nAvailable glossary terms (ONLY use [[term]] or [[term|shown text]] for these terms):")
-    lines.append(", ".join(CATALOG.get('glossary', [])))
-    lines.extend([
-        "",
-        "Step structure and fields:",
-        "- title: Short descriptive step title.",
-        "- text: 2 to 4 sentences explaining this step like an unfolding story. Plain, warm, concrete.",
-        "- parts: Array of { id, role } when activity goes up or down. Roles: more_active, less_active, typical, involved, cut_off, losing_cells.",
-        "- route: Array of { from, to } connecting regions when a signal travels from one part to another.",
-        "- chemical: Chemical id when a messenger (e.g. dopamine, melatonin, noradrenaline) is central to this step.",
-        "- view: Camera angle. Options: 'left', 'left-front', 'left-back', 'medial', 'back', 'below', 'body'. Use 'medial' + slice: true for deep midline structures (hippocampus, hypothalamus, etc.). Use 'body' + body: true for hormone steps that reach organs (thyroid, heart, adrenal, etc.).",
-        "- slice: true to slice the brain open to view inner structures. Do not slice when routing to or focusing outer cortical areas (auditory-cortex, visual-cortex, motor-cortex) because slicing cuts away the outer cortex. Use slice: false with lateral views (left, left-front) when showing cortical destinations.",
-        "- body: true to show the body silhouette when endocrine signals travel to visceral organs (thyroid, heart, stomach, adrenal, fat, gonads). Always set body: true when routing to or focusing these organs.",
-        "",
-        "Storytelling and Narrative Rules:",
-        "1. Build a coherent story in order: 2 to 6 steps. Each step handles one clear idea.",
-        "2. In each step, light only a few relevant parts. Do not light the whole brain at once.",
-        "3. Plain, warm, and concrete tone. Use familiar physical analogies (e.g. catching keys, reaching for a mug).",
-        "4. Use 'about' or 'roughly' for figures. Never use false precision.",
-        "5. STRICT PROHIBITION: NO EM DASHES. Never use em dashes. Use commas, periods, or parentheses.",
-        "6. STRICT PROHIBITION: NO HYPE OR FILLER WORDS. Avoid 'fascinating', 'incredible', 'remarkable', 'delve', 'intricate', 'vital', 'complex interplay'.",
-        "7. Mention a part with {{id}} at least once in the step text where it lights up.",
-        "8. Be honest when science is debated (e.g. 'researchers still debate...').",
-        "9. Followups: Provide exactly 3 short, intriguing follow-up questions.",
-        "10. Out of scope / Greetings / Conversational:",
-        "    If the query is a greeting (such as 'hey', 'hello', 'hi'), conversational chit-chat, unrelated to the brain, mind, or body, or asks for personal medical advice:",
-        "    Set status: 'out_of_scope', steps: [], title: 'Ask about how the brain works', and write a warm, friendly summary welcoming them, explaining that Brain Explorer shows what the brain is doing in 3D (like sleep, caffeine, panic, music chills, or memory), and inviting them to ask a brain question.",
-        "11. DO NOT INVENT SOURCES: Never fabricate citations, paper titles, author names, or external URLs. Brain Explorer presents clear educational explanations based on consensus neuroscience, not invented literature citations.",
-        "12. DISTINGUISH DIRECT VS INDIRECT PATHWAYS: Distinguish direct axonal projections from multi-step or indirect circuits. If two regions communicate via relays (such as through the thalamus or brainstem), explain the relay rather than claiming an imaginary direct connection.",
-        "13. QUALIFY SPECIES DIFFERENCES: Clearly distinguish findings established in animal models (such as rodents) from established human brain circuitry. Never present rodent-specific circuit mechanisms as absolute human facts.",
-        "14. QUALIFY RECEPTOR AND CONTEXT DEPENDENCE: Modulators (such as dopamine, serotonin, noradrenaline, and acetylcholine) do not have a single universal effect. Clarify that their action depends on receptor types and target circuits.",
-        "15. NO DETERMINISTIC DISEASE OR TREATMENT CLAIMS: Avoid deterministic or absolute claims about neurological or psychiatric conditions, or clinical treatments. Explain brain mechanisms, risk factors, or correlations, but do not provide medical diagnostic guarantees or absolute causal statements.",
-    ])
-    return "\n".join(lines)
+AI_CONTRACT_PATH = os.path.join(ROOT, 'src', 'content', 'ai-contract.json')
+SYSTEM_PROMPT = ''
+SCRIPT_SCHEMA = {}
 
 
-SYSTEM_PROMPT = build_system_prompt()
+def load_ai_contract():
+    if not os.path.exists(AI_CONTRACT_PATH):
+        raise FileNotFoundError(f'missing {AI_CONTRACT_PATH}')
+    with open(AI_CONTRACT_PATH, 'r', encoding='utf-8') as f:
+        contract = json.load(f)
+    if not isinstance(contract, dict) or not contract.get('systemPrompt') or not isinstance(contract.get('scriptSchema'), dict):
+        raise ValueError(f'invalid {AI_CONTRACT_PATH}')
+    return contract
 
 
-def build_script_schema():
-    step_schema = {
-        'type': 'object',
-        'properties': {
-            'title': {'type': 'string'},
-            'text': {'type': 'string'},
-            'focus': {
-                'type': ['array', 'null'],
-                'items': {'type': 'string', 'enum': REGION_IDS}
-            },
-            'parts': {
-                'type': ['array', 'null'],
-                'items': {
-                    'type': 'object',
-                    'properties': {
-                        'id': {'type': 'string', 'enum': REGION_IDS},
-                        'role': {'type': 'string', 'enum': ROLES_LIST}
-                    },
-                    'required': ['id', 'role'],
-                    'additionalProperties': False
-                }
-            },
-            'route': {
-                'type': ['array', 'null'],
-                'items': {
-                    'type': 'object',
-                    'properties': {
-                        'from': {'type': 'string', 'enum': REGION_IDS},
-                        'to': {'type': 'string', 'enum': REGION_IDS}
-                    },
-                    'required': ['from', 'to'],
-                    'additionalProperties': False
-                }
-            },
-            'view': {
-                'type': ['string', 'null'],
-                'enum': VIEWS_LIST + [None]
-            },
-            'slice': {'type': ['boolean', 'null']},
-            'chemical': {
-                'type': ['string', 'null'],
-                'enum': CHEMICAL_IDS + [None]
-            },
-            'body': {'type': ['boolean', 'null']}
-        },
-        'required': ['title', 'text', 'focus', 'parts', 'route', 'view', 'slice', 'chemical', 'body'],
-        'additionalProperties': False
-    }
-
-    return {
-        'type': 'object',
-        'properties': {
-            'status': {
-                'type': 'string',
-                'enum': ['ok', 'out_of_scope']
-            },
-            'title': {'type': 'string'},
-            'summary': {'type': 'string'},
-            'steps': {
-                'type': 'array',
-                'items': step_schema
-            },
-            'followups': {
-                'type': 'array',
-                'items': {'type': 'string'}
-            }
-        },
-        'required': ['status', 'title', 'summary', 'steps', 'followups'],
-        'additionalProperties': False
-    }
-
-
-SCRIPT_SCHEMA = build_script_schema()
 CHAT_CACHE = {}
 
 
@@ -489,6 +462,8 @@ def handle_chat(messages):
 
 
 class Handler(http.server.SimpleHTTPRequestHandler):
+    protocol_version = 'HTTP/1.1'
+
     extensions_map = {
         **http.server.SimpleHTTPRequestHandler.extensions_map,
         '.webmanifest': 'application/manifest+json',
@@ -498,26 +473,32 @@ class Handler(http.server.SimpleHTTPRequestHandler):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, directory=ROOT, **kwargs)
 
-    def send_json(self, code, payload):
+    def send_json(self, code, payload, extra_headers=None):
         body = json.dumps(payload).encode()
         self.send_response(code)
         self.send_header('Content-Type', 'application/json')
         self.send_header('Cache-Control', 'no-store')
+        for name, value in (extra_headers or {}).items():
+            self.send_header(name, value)
         self.send_header('Content-Length', str(len(body)))
         self.end_headers()
         self.wfile.write(body)
 
     def local_host(self):
-        # Blocks DNS-rebinding while allowing localhost, Tailscale, and LAN devices.
+        # Blocks DNS-rebinding while allowing localhost by default.
         host = (self.headers.get('Host') or '').split(':')[0].lower()
         if host in ('localhost', '127.0.0.1', '0.0.0.0'):
             return True
+        if not ALLOW_LAN:
+            return False
         # Allow Tailscale CGNAT IPs (100.x.y.z), MagicDNS (.ts.net), and private LANs.
         if host.startswith('100.') or host.endswith('.ts.net') or host.startswith(('192.168.', '10.', '172.')):
             return True
         return False
 
     def end_headers(self):
+        for name, value in SECURITY_HEADERS.items():
+            self.send_header(name, value)
         self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
         self.send_header('Pragma', 'no-cache')
         self.send_header('Expires', '0')
@@ -539,6 +520,9 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         # preflight (which this server never approves) for any other origin.
         if not self.local_host() or self.headers.get(CLIENT_HEADER) != '1':
             return self.send_json(403, {'status': 'error', 'error': 'forbidden'})
+        allowed, retry = check_rate('ask', self.client_address[0])
+        if not allowed:
+            return self.send_json(429, {'status': 'error', 'error': 'rate limit exceeded', 'retryAfter': retry}, {'Retry-After': str(retry)})
         q = urllib.parse.parse_qs(parsed.query).get('q', [''])[0]
         try:
             self.send_json(200, ask(q))
@@ -551,16 +535,21 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         if parsed.path == '/api/chat':
             if not self.local_host() or self.headers.get(CLIENT_HEADER) != '1':
                 return self.send_json(403, {'status': 'error', 'error': 'forbidden'})
-            if not CHAT_ENABLED:
-                return self.send_json(501, {'status': 'no_key'})
             length = int(self.headers.get('Content-Length', 0))
             if length > 65536:
+                self.close_connection = True
                 return self.send_json(413, {'status': 'error', 'error': 'payload too large'})
             body = self.rfile.read(length) if length > 0 else b''
             try:
                 data = json.loads(body.decode('utf-8')) if body else {}
             except Exception:
                 return self.send_json(400, {'status': 'error', 'error': 'invalid json'})
+
+            allowed, retry = check_rate('chat', self.client_address[0])
+            if not allowed:
+                return self.send_json(429, {'status': 'error', 'error': 'rate limit exceeded', 'retryAfter': retry}, {'Retry-After': str(retry)})
+            if not CHAT_ENABLED:
+                return self.send_json(501, {'status': 'no_key'})
 
             messages = data.get('messages')
             if not isinstance(messages, list) or len(messages) == 0:
@@ -575,17 +564,34 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                     'content': m['content'][:500]
                 })
 
+            if not CHAT_SLOTS.acquire(blocking=False):
+                return self.send_json(503, {'status': 'error', 'error': 'The chat service is busy. Please try again shortly.'}, {'Retry-After': '2'})
             try:
                 res = handle_chat(cleaned_messages)
                 return self.send_json(200, res)
             except Exception as e:  # noqa: BLE001
                 print(f'[brain-explorer] chat failed: {e}')
                 return self.send_json(502, {'status': 'error', 'error': 'Upstream model error'})
+            finally:
+                CHAT_SLOTS.release()
 
         self.send_error(404)
 
 
 def run():
+    global SYSTEM_PROMPT, SCRIPT_SCHEMA
+    try:
+        contract = load_ai_contract()
+    except Exception as e:  # noqa: BLE001
+        print(f'[brain-explorer] Cannot load AI contract: {e}')
+        print('[brain-explorer] Run npm run catalog to generate src/content/ai-contract.json.')
+        return
+    SYSTEM_PROMPT = contract['systemPrompt']
+    SCRIPT_SCHEMA = contract['scriptSchema']
+
+    if ALLOW_LAN:
+        print('[brain-explorer] WARNING: LAN access is enabled (ALLOW_LAN=1). Other devices on your network can reach this server.')
+
     for port in (PORT, PORT + 1):
         try:
             httpd = http.server.ThreadingHTTPServer((HOST, port), Handler)
@@ -595,6 +601,7 @@ def run():
         print(f'[brain-explorer] http://localhost:{port}')
         print('[brain-explorer] Ask: ' + ('API key loaded from .env' if API_KEY else 'no TYPESAFE_API_KEY, free-text questions are off'))
         print('[brain-explorer] Chat: ' + (f'Azure OpenAI ({AZURE_DEPLOYMENT})' if CHAT_ENABLED else 'no Azure OpenAI keys, free-form chat is off'))
+        print(f'[brain-explorer] Limits: ask {ASK_RATE_PER_MIN}/min {ASK_RATE_PER_DAY}/day, chat {CHAT_RATE_PER_MIN}/min {CHAT_RATE_PER_DAY}/day, {CHAT_MAX_CONCURRENT} concurrent chats')
         httpd.serve_forever()
         return
 

@@ -11,10 +11,13 @@ import { setStepperStage, getStepperStage, setDrugMode, toggleStepperPlay, stopS
 import { ask, cached, normalise } from './services/ask.js';
 import { sendChat, getAiConfig, saveAiConfig, clearAiConfig, hasAiKey } from './services/chat.js';
 import { telemetry } from './services/telemetry.js';
+import { reportError, installGlobalErrorHandlers } from './services/errors.js';
 import { findTerm, esc } from './ui/format.js';
 import { icon } from './ui/icons.js';
 import { initBottomSheet } from './ui/sheet.js';
 import { createRunner } from './stage/run.js';
+
+installGlobalErrorHandlers();
 
 const $ = (sel) => document.querySelector(sel);
 const appEl = $('.app');
@@ -109,7 +112,10 @@ function renderCellInset(cell) {
 }
 
 const problems = validate();
-if (problems.length) console.warn(`[brain] ${problems.length} content problem(s):\n` + problems.join('\n'));
+if (problems.length) {
+  console.warn(`[brain] ${problems.length} content problem(s):\n` + problems.join('\n'));
+  reportError('content.validate', `Content validation found ${problems.length} problem(s)`, { problems: problems.slice(0, 10) });
+}
 
 const state = { query: '', libFilter: 'all', dict: 'parts', route: { type: 'home' }, playing: false, flown: '', chat: { turns: [], loading: false, currentQuery: '' } };
 let timer = null;
@@ -657,7 +663,8 @@ async function submitChatQuestion(query) {
   let result;
   try {
     result = await sendChat(messages);
-  } catch {
+  } catch (e) {
+    reportError('ask.chat_request', e);
     result = { status: 'error' };
   } finally {
     scene.setSpin(prevSpin);
@@ -723,6 +730,10 @@ function applyAsk(r) {
     if (state.route.type !== 'ask' || state.route.query !== r.query) return;
     explainerEl.innerHTML = renderAsk({ query: r.query, result: res });
     if (res.status === 'ok') { state.flown = ''; showSketch(res, key); }
+  }).catch((e) => {
+    reportError('ask.request', e);
+    if (state.route.type !== 'ask' || state.route.query !== r.query) return;
+    explainerEl.innerHTML = renderAsk({ query: r.query, result: { status: 'error', query: r.query } });
   });
 }
 
@@ -951,15 +962,24 @@ explainerEl.addEventListener('click', (e) => {
     const turnIdx = Number(copyBtn.dataset.turn);
     const turn = state.chat.turns[turnIdx];
     if (turn?.script) {
-      navigator.clipboard.writeText(scriptToPathwayJs(turn.script)).then(() => {
-        const span = copyBtn.querySelector('span');
-        if (span) {
-          const orig = span.textContent;
-          span.textContent = 'Copied!';
-          copyBtn.classList.add('is-copied');
-          setTimeout(() => { span.textContent = orig; copyBtn.classList.remove('is-copied'); }, 2000);
-        }
-      });
+      const span = copyBtn.querySelector('span');
+      const orig = span?.textContent || '';
+      const fail = (e) => {
+        reportError('ask.copy_pathway', e);
+        if (span) span.textContent = 'Copy failed';
+        setTimeout(() => { if (span) span.textContent = orig; }, 2000);
+      };
+      if (!navigator.clipboard?.writeText) {
+        fail(new Error('Clipboard API unavailable'));
+      } else {
+        navigator.clipboard.writeText(scriptToPathwayJs(turn.script)).then(() => {
+          if (span) {
+            span.textContent = 'Copied!';
+            copyBtn.classList.add('is-copied');
+            setTimeout(() => { span.textContent = orig; copyBtn.classList.remove('is-copied'); }, 2000);
+          }
+        }).catch(fail);
+      }
     }
     return;
   }
@@ -1350,12 +1370,14 @@ function openByokDialog() {
   const deploymentInput = $('#byok-deployment');
   const versionInput = $('#byok-version');
   const modelInput = $('#byok-model');
+  const rememberInput = $('#byok-remember');
 
   if (endpointInput) endpointInput.value = cfg.endpoint || '';
   if (keyInput) keyInput.value = cfg.apiKey || '';
   if (deploymentInput) deploymentInput.value = cfg.deployment || '';
   if (versionInput) versionInput.value = cfg.apiVersion || '';
   if (modelInput) modelInput.value = cfg.model || '';
+  if (rememberInput) rememberInput.checked = Boolean(cfg.remember);
 
   if (byokClearBtn) {
     byokClearBtn.style.display = cfg.apiKey ? '' : 'none';
@@ -1395,7 +1417,7 @@ if (byokDialog) {
         newCfg.model = $('#byok-model')?.value.trim() || 'gpt-4o-mini';
       }
 
-      saveAiConfig(newCfg);
+      saveAiConfig(newCfg, Boolean($('#byok-remember')?.checked));
       byokDialog.close();
 
       if (state.route.type === 'ask') {
@@ -1493,17 +1515,17 @@ if ('serviceWorker' in navigator && window.location.protocol.startsWith('http'))
       for (const reg of registrations) {
         reg.unregister();
       }
-    });
+    }).catch((e) => reportError('service_worker.cleanup', e));
     if ('caches' in window) {
       caches.keys().then((keys) => {
         for (const k of keys) {
           caches.delete(k);
         }
-      });
+      }).catch((e) => reportError('service_worker.cleanup', e));
     }
   } else {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./sw.js').catch(() => {});
+      navigator.serviceWorker.register('./sw.js').catch((e) => reportError('service_worker.register', e));
     });
   }
 }

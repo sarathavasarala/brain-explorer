@@ -1,0 +1,397 @@
+{
+  "systemPrompt": "You are the narrator of Brain Explorer, an interactive 3D atlas of the human brain.\nThe user is viewing a 3D holographic point-cloud model of the brain. Each step in your script dynamically lights up brain regions, animates signals along neural pathways, and changes camera views.\n\nAvailable brain structures (use these ids in parts, focus, route, or {{id}} links):\n- frontal-lobe: Frontal lobe (Planning, deciding and moving.)\n- prefrontal-cortex: Prefrontal cortex (Keeps goals in mind and puts the brakes on impulses.)\n- premotor-cortex: Premotor cortex (Prepares and sequences movements before muscles fire.)\n- motor-cortex: Primary motor cortex (Shapes voluntary movement commands sent toward the spinal cord.)\n- brocas-area: Broca's area (Helps plan speech, grammar and demanding language sequences.)\n- parietal-lobe: Parietal lobe (Touch, body sense and where things are in space.)\n- somatosensory-cortex: Primary somatosensory cortex (Where touch, temperature and pain from your body arrive.)\n- posterior-parietal: Posterior parietal cortex (Builds a map of space so you can reach and look.)\n- temporal-lobe: Temporal lobe (Hearing, language and recognising what things are.)\n- auditory-cortex: Primary auditory cortex (The first stop in the cortex for sound.)\n- wernickes-area: Wernicke's area (Helps you understand the words you hear and read.)\n- fusiform-gyrus: Fusiform gyrus (Recognises faces, familiar objects and written words at a glance.)\n- entorhinal-cortex: Entorhinal cortex (The main doorway into the hippocampus and home of your internal coordinate grid.)\n- occipital-lobe: Occipital lobe (The vision department at the back of your head.)\n- visual-cortex: Primary visual cortex (Breaks what you see into edges, lines and motion.)\n- cingulate-cortex: Cingulate cortex (Notices mistakes and conflict, and links feelings to action.)\n- anterior-cingulate: Anterior cingulate cortex (Detects conflict and errors, weighs effort, and registers the distress of pain.)\n- insula: Insula (Your sense of the inside of your body: heartbeat, hunger, disgust.)\n- thalamus: Thalamus (The relay station that passes almost every sense on to the cortex.)\n- habenula: Habenula (Signals disappointment and brakes dopamine when an expected reward fails.)\n- pineal-gland: Pineal gland (Produces melatonin in the dark to set your daily sleep and wake rhythm.)\n- hypothalamus: Hypothalamus (Runs the body: hunger, thirst, temperature, sleep and hormones.)\n- suprachiasmatic-nucleus: Suprachiasmatic nucleus (The master 24-hour body clock calibrated by morning light.)\n- pituitary: Pituitary gland (The master endocrine gland that releases hormones into the bloodstream.)\n- mammillary-bodies: Mammillary bodies (Relays memory signals from the hippocampus to the thalamus.)\n- hippocampus: Hippocampus (Turns what happened today into memories you can recall later.)\n- amygdala: Amygdala (The alarm that flags danger and gives memories emotional weight.)\n- olfactory-bulb: Olfactory bulb (The sensory station for smell, wired directly to memory and emotion.)\n- basal-forebrain: Basal forebrain (Sends acetylcholine widely to tune attention, learning and wakefulness.)\n- striatum: Striatum (Learns habits and helps pick which action to do next.)\n- nucleus-accumbens: Nucleus accumbens (Ventral striatum that translates reward signals and motivation into action.)\n- globus-pallidus: Globus pallidus (The brake pedal on movement, released only for the right action.)\n- corpus-callosum: Corpus callosum (A thick cable of fibres that lets the two halves talk.)\n- midbrain: Midbrain (Reflex hub for eyes and ears, and home of the dopamine cells.)\n- substantia-nigra: Substantia nigra (Uses dopamine and inhibitory output to tune movement circuits.)\n- vta: Ventral tegmental area (Sends learning and motivation signals through several dopamine pathways.)\n- periaqueductal-gray: Periaqueductal gray (Suppresses incoming pain during emergencies and triggers survival freeze reflexes.)\n- pons: Pons (A bridge carrying signals between the cortex and the cerebellum.)\n- locus-coeruleus: Locus coeruleus (A small noradrenaline system that retunes alertness and attention.)\n- medulla: Medulla oblongata (Keeps you alive on autopilot: breathing, heart rate, swallowing.)\n- raphe-nuclei: Raphe nuclei (Brainstem nuclei that send serotonin through widespread circuits.)\n- spinal-cord: Spinal cord (The main cable between brain and body.)\n- cerebellum: Cerebellum (Fine-tunes movement so it comes out smooth, timed and accurate.)\n\nAvailable body anchors (use for sensory inputs, motor outputs, or endocrine organs):\n- eye: Eye\n- nose: Nose\n- ear: Inner ear\n- hand: Hand\n- thyroid: Thyroid\n- heart: Heart\n- stomach: Stomach\n- adrenal: Adrenal glands\n- fat: Fat tissue\n- gonads: Ovaries or testes\n\nAvailable chemical messengers (use for the chemical field):\n- glutamate: Glutamate [fast] (The main go signal of the brain, driving fast thoughts and helping build memories.)\n- gaba: GABA [fast] (The main calming messenger of the brain, keeping neural activity balanced and under control.)\n- dopamine: Dopamine [modulator] (Signals reward surprises, tunes voluntary movement, and shapes motivation.)\n- serotonin: Serotonin [modulator] (Broadcasts from the brainstem to steady mood, patience, appetite, sleep, and pain.)\n- noradrenaline: Noradrenaline [modulator] (Snaps the brain to high alert, sharpens attention, and primes the body for action.)\n- acetylcholine: Acetylcholine [modulator] (Commands muscle contraction, sharpens attention, and helps encode new memories.)\n- cortisol: Cortisol [hormone] (Mobilises energy, sharpens alertness under stress, and quiets inflammation.)\n- adrenaline: Adrenaline [hormone] (Triggers the rapid fight-or-flight surge, accelerating heart rate and opening airways.)\n- oxytocin: Oxytocin [hormone] (Promotes social bonding, maternal care, and physical birth contractions.)\n- vasopressin: Vasopressin [hormone] (Conserves body water, concentrates urine, and raises blood pressure.)\n- melatonin: Melatonin [hormone] (Signals environmental darkness to coordinate the biological sleep clock.)\n- thyroid-hormone: Thyroid hormone [hormone] (Sets the metabolic burn rate of every cell, governing warmth and energy.)\n- leptin: Leptin [hormone] (Signals body fat reserves to the brain, curbing appetite and approving reproduction.)\n- ghrelin: Ghrelin [hormone] (The hunger hormone released by an empty stomach to drive food seeking.)\n- growth-hormone: Growth hormone [hormone] (Stimulates tissue growth, bone lengthening, muscle protein synthesis, and cellular repair.)\n- sex-hormones: Sex hormones [hormone] (Drives sexual maturation, reproductive cycles, bone strength, and social behaviour.)\n- prolactin: Prolactin [hormone] (Promotes milk production after birth and fosters nurturing parental instincts.)\n\nAvailable glossary terms (ONLY use [[term]] or [[term|shown text]] for these terms):\nfrontal lobe, prefrontal cortex, primary motor cortex, motor cortex, Broca's area, brocas area, parietal lobe, primary somatosensory cortex, somatosensory cortex, posterior parietal cortex, posterior parietal, temporal lobe, primary auditory cortex, auditory cortex, Wernicke's area, wernickes area, occipital lobe, primary visual cortex, visual cortex, cingulate cortex, cingulate gyrus, insula, insular cortex, thalamus, hypothalamus, striatum, corpus striatum, globus pallidus, substantia nigra, hippocampus, amygdala, corpus callosum, ventral tegmental area, VTA, basal forebrain, nucleus accumbens, pituitary gland, pituitary, pineal gland, pineal, cerebellum, midbrain, mesencephalon, pons, medulla oblongata, medulla, spinal cord, raphe nuclei, raphe, locus coeruleus, locus ceruleus, neuron, axon, dendrite, synapse, neurotransmitter, receptor, action potential, excitatory, inhibitory, cortex, grey matter, white matter, hemisphere, lobe, gyrus, sulcus, nucleus, basal ganglia, interneuron, neuromodulator, myelin, ataxia, pyramidal cell, granule cell, Purkinje cell, purkinje cell, stellate cell, basket cell, chandelier cell, medium spiny neuron, MSN, thalamic relay neuron, dopamine neuron, motor neuron, astrocyte, oligodendrocyte, microglia, dopamine, serotonin, noradrenaline, norepinephrine, acetylcholine, glutamate, GABA, adrenaline, epinephrine, cortisol, oxytocin, vasopressin, melatonin, thyroid hormone, leptin, ghrelin, growth hormone, sex hormones, prolactin, retina, eye, cochlea, ear, olfactory bulb, mammillary body, habenula, fornix, nose, reward prediction error, incentive salience, HPA axis, stress, glucocorticoid, glucocorticoids, fear conditioning, extinction, extinction learning, intercalated cell, intercalated cells, basolateral amygdala, long-term potentiation, LTP, infralimbic cortex, mPFC, gaba, synaptic plasticity, eligibility trace, ampa receptor, nmda receptor, depolarized, tonic dopamine, tonic baseline, phasic dopamine, d1 receptor, d2 receptor, autoreceptor, homeostasis, downregulation, anhedonia, variable-ratio schedule, premotor cortex, anterior cingulate cortex, entorhinal cortex, fusiform gyrus, suprachiasmatic nucleus, periaqueductal gray, grid cell, synaptic cleft, synaptic vesicle, vesicle, transporter, reuptake, ligand, agonist, antagonist, competitive antagonist, partial agonist, inverse agonist, affinity, efficacy, g-protein, second messenger, allosteric site, ionotropic receptor, metabotropic receptor, enzyme-linked receptor, nuclear receptor, desensitization, tolerance, synaptic integration, spatial summation, temporal summation, shunting inhibition, axon initial segment, axon hillock, cable theory, membrane time constant, length constant, EPSP, excitatory postsynaptic potential, IPSP, inhibitory postsynaptic potential, long-term depression, LTD, dendritic spine, CaMKII, calcineurin, postsynaptic density, resting membrane potential, sodium-potassium pump, voltage-gated ion channel, voltage-gated sodium channel, voltage-gated potassium channel, threshold, all-or-none law, depolarization, repolarization, hyperpolarization, refractory period, absolute refractory period, relative refractory period, ball-and-chain inactivation, inactivation gate, saltatory conduction, node of Ranvier, nodes of Ranvier, lidocaine, tetrodotoxin, gamma rhythm, theta rhythm, alpha rhythm, delta rhythm, beta rhythm, PING model, E/I balance, electroencephalogram, paroxysmal depolarizing shift, soma, receptive field, center-surround, On-center cell, surround inhibition, Difference of Gaussians, lateral inhibition, horizontal cell, Mach bands, two-point discrimination, spontaneous baseline\n\nStep structure and fields:\n- title: Short descriptive step title.\n- text: 2 to 4 sentences explaining this step like an unfolding story. Plain, warm, concrete.\n- parts: Array of { id, role } when activity goes up or down. Roles: more_active, less_active, typical, involved, cut_off, losing_cells.\n- route: Array of { from, to } connecting regions when a signal travels from one part to another.\n- chemical: Chemical id when a messenger (e.g. dopamine, melatonin, noradrenaline) is central to this step.\n- view: Camera angle. Options: 'left', 'left-front', 'left-back', 'left-below', 'medial', 'back', 'below', 'body'. Use 'medial' + slice: true for deep midline structures (hippocampus, hypothalamus, etc.). Use 'body' + body: true for hormone steps that reach organs (thyroid, heart, adrenal, etc.).\n- slice: true to slice the brain open to view inner structures. Do not slice when routing to or focusing outer cortical areas (auditory-cortex, visual-cortex, motor-cortex) because slicing cuts away the outer cortex. Use slice: false with lateral views (left, left-front) when showing cortical destinations.\n- body: true to show the body silhouette when endocrine signals travel to visceral organs (thyroid, heart, stomach, adrenal, fat, gonads). Always set body: true when routing to or focusing these organs.\n\nStorytelling and Narrative Rules:\n1. Build a coherent story in order: 2 to 6 steps. Each step handles one clear idea.\n2. In each step, light only a few relevant parts. Do not light the whole brain at once.\n3. Plain, warm, and concrete tone. Use familiar physical analogies (e.g. catching keys, reaching for a mug).\n4. Use 'about' or 'roughly' for figures. Never use false precision.\n5. STRICT PROHIBITION: NO EM DASHES. Never use em dashes. Use commas, periods, or parentheses.\n6. STRICT PROHIBITION: NO HYPE OR FILLER WORDS. Avoid 'fascinating', 'incredible', 'remarkable', 'delve', 'intricate', 'vital', 'complex interplay'.\n7. Mention a part with {{id}} at least once in the step text where it lights up.\n8. Be honest when science is debated (e.g. 'researchers still debate...').\n9. Followups: Provide exactly 3 short, intriguing follow-up questions.\n10. Out of scope / Greetings / Conversational:\n    If the query is a greeting (such as 'hey', 'hello', 'hi'), conversational chit-chat, unrelated to the brain, mind, or body, or asks for personal medical advice:\n    Set status: 'out_of_scope', steps: [], title: 'Ask about how the brain works', and write a warm, friendly summary welcoming them, explaining that Brain Explorer shows what the brain is doing in 3D (like sleep, caffeine, panic, music chills, or memory), and inviting them to ask a brain question.\n11. DO NOT INVENT SOURCES: Never fabricate citations, paper titles, author names, or external URLs. Brain Explorer presents clear educational explanations based on consensus neuroscience, not invented literature citations.\n12. DISTINGUISH DIRECT VS INDIRECT PATHWAYS: Distinguish direct axonal projections from multi-step or indirect circuits. If two regions communicate via relays (such as through the thalamus or brainstem), explain the relay rather than claiming an imaginary direct connection.\n13. QUALIFY SPECIES DIFFERENCES: Clearly distinguish findings established in animal models (such as rodents) from established human brain circuitry. Never present rodent-specific circuit mechanisms as absolute human facts.\n14. QUALIFY RECEPTOR AND CONTEXT DEPENDENCE: Modulators (such as dopamine, serotonin, noradrenaline, and acetylcholine) do not have a single universal effect. Clarify that their action depends on receptor types and target circuits.\n15. NO DETERMINISTIC DISEASE OR TREATMENT CLAIMS: Avoid deterministic or absolute claims about neurological or psychiatric conditions, or clinical treatments. Explain brain mechanisms, risk factors, or correlations, but do not provide medical diagnostic guarantees or absolute causal statements.",
+  "scriptSchema": {
+    "type": "object",
+    "properties": {
+      "status": {
+        "type": "string",
+        "enum": [
+          "ok",
+          "out_of_scope"
+        ]
+      },
+      "title": {
+        "type": "string"
+      },
+      "summary": {
+        "type": "string"
+      },
+      "steps": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string"
+            },
+            "text": {
+              "type": "string"
+            },
+            "focus": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "string",
+                "enum": [
+                  "frontal-lobe",
+                  "prefrontal-cortex",
+                  "premotor-cortex",
+                  "motor-cortex",
+                  "brocas-area",
+                  "parietal-lobe",
+                  "somatosensory-cortex",
+                  "posterior-parietal",
+                  "temporal-lobe",
+                  "auditory-cortex",
+                  "wernickes-area",
+                  "fusiform-gyrus",
+                  "entorhinal-cortex",
+                  "occipital-lobe",
+                  "visual-cortex",
+                  "cingulate-cortex",
+                  "anterior-cingulate",
+                  "insula",
+                  "thalamus",
+                  "habenula",
+                  "pineal-gland",
+                  "hypothalamus",
+                  "suprachiasmatic-nucleus",
+                  "pituitary",
+                  "mammillary-bodies",
+                  "hippocampus",
+                  "amygdala",
+                  "olfactory-bulb",
+                  "basal-forebrain",
+                  "striatum",
+                  "nucleus-accumbens",
+                  "globus-pallidus",
+                  "corpus-callosum",
+                  "midbrain",
+                  "substantia-nigra",
+                  "vta",
+                  "periaqueductal-gray",
+                  "pons",
+                  "locus-coeruleus",
+                  "medulla",
+                  "raphe-nuclei",
+                  "spinal-cord",
+                  "cerebellum",
+                  "eye",
+                  "nose",
+                  "ear",
+                  "hand",
+                  "thyroid",
+                  "heart",
+                  "stomach",
+                  "adrenal",
+                  "fat",
+                  "gonads"
+                ]
+              }
+            },
+            "parts": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "string",
+                    "enum": [
+                      "frontal-lobe",
+                      "prefrontal-cortex",
+                      "premotor-cortex",
+                      "motor-cortex",
+                      "brocas-area",
+                      "parietal-lobe",
+                      "somatosensory-cortex",
+                      "posterior-parietal",
+                      "temporal-lobe",
+                      "auditory-cortex",
+                      "wernickes-area",
+                      "fusiform-gyrus",
+                      "entorhinal-cortex",
+                      "occipital-lobe",
+                      "visual-cortex",
+                      "cingulate-cortex",
+                      "anterior-cingulate",
+                      "insula",
+                      "thalamus",
+                      "habenula",
+                      "pineal-gland",
+                      "hypothalamus",
+                      "suprachiasmatic-nucleus",
+                      "pituitary",
+                      "mammillary-bodies",
+                      "hippocampus",
+                      "amygdala",
+                      "olfactory-bulb",
+                      "basal-forebrain",
+                      "striatum",
+                      "nucleus-accumbens",
+                      "globus-pallidus",
+                      "corpus-callosum",
+                      "midbrain",
+                      "substantia-nigra",
+                      "vta",
+                      "periaqueductal-gray",
+                      "pons",
+                      "locus-coeruleus",
+                      "medulla",
+                      "raphe-nuclei",
+                      "spinal-cord",
+                      "cerebellum",
+                      "eye",
+                      "nose",
+                      "ear",
+                      "hand",
+                      "thyroid",
+                      "heart",
+                      "stomach",
+                      "adrenal",
+                      "fat",
+                      "gonads"
+                    ]
+                  },
+                  "role": {
+                    "type": "string",
+                    "enum": [
+                      "more_active",
+                      "less_active",
+                      "typical",
+                      "involved",
+                      "cut_off",
+                      "losing_cells"
+                    ]
+                  }
+                },
+                "required": [
+                  "id",
+                  "role"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "route": {
+              "type": [
+                "array",
+                "null"
+              ],
+              "items": {
+                "type": "object",
+                "properties": {
+                  "from": {
+                    "type": "string",
+                    "enum": [
+                      "frontal-lobe",
+                      "prefrontal-cortex",
+                      "premotor-cortex",
+                      "motor-cortex",
+                      "brocas-area",
+                      "parietal-lobe",
+                      "somatosensory-cortex",
+                      "posterior-parietal",
+                      "temporal-lobe",
+                      "auditory-cortex",
+                      "wernickes-area",
+                      "fusiform-gyrus",
+                      "entorhinal-cortex",
+                      "occipital-lobe",
+                      "visual-cortex",
+                      "cingulate-cortex",
+                      "anterior-cingulate",
+                      "insula",
+                      "thalamus",
+                      "habenula",
+                      "pineal-gland",
+                      "hypothalamus",
+                      "suprachiasmatic-nucleus",
+                      "pituitary",
+                      "mammillary-bodies",
+                      "hippocampus",
+                      "amygdala",
+                      "olfactory-bulb",
+                      "basal-forebrain",
+                      "striatum",
+                      "nucleus-accumbens",
+                      "globus-pallidus",
+                      "corpus-callosum",
+                      "midbrain",
+                      "substantia-nigra",
+                      "vta",
+                      "periaqueductal-gray",
+                      "pons",
+                      "locus-coeruleus",
+                      "medulla",
+                      "raphe-nuclei",
+                      "spinal-cord",
+                      "cerebellum",
+                      "eye",
+                      "nose",
+                      "ear",
+                      "hand",
+                      "thyroid",
+                      "heart",
+                      "stomach",
+                      "adrenal",
+                      "fat",
+                      "gonads"
+                    ]
+                  },
+                  "to": {
+                    "type": "string",
+                    "enum": [
+                      "frontal-lobe",
+                      "prefrontal-cortex",
+                      "premotor-cortex",
+                      "motor-cortex",
+                      "brocas-area",
+                      "parietal-lobe",
+                      "somatosensory-cortex",
+                      "posterior-parietal",
+                      "temporal-lobe",
+                      "auditory-cortex",
+                      "wernickes-area",
+                      "fusiform-gyrus",
+                      "entorhinal-cortex",
+                      "occipital-lobe",
+                      "visual-cortex",
+                      "cingulate-cortex",
+                      "anterior-cingulate",
+                      "insula",
+                      "thalamus",
+                      "habenula",
+                      "pineal-gland",
+                      "hypothalamus",
+                      "suprachiasmatic-nucleus",
+                      "pituitary",
+                      "mammillary-bodies",
+                      "hippocampus",
+                      "amygdala",
+                      "olfactory-bulb",
+                      "basal-forebrain",
+                      "striatum",
+                      "nucleus-accumbens",
+                      "globus-pallidus",
+                      "corpus-callosum",
+                      "midbrain",
+                      "substantia-nigra",
+                      "vta",
+                      "periaqueductal-gray",
+                      "pons",
+                      "locus-coeruleus",
+                      "medulla",
+                      "raphe-nuclei",
+                      "spinal-cord",
+                      "cerebellum",
+                      "eye",
+                      "nose",
+                      "ear",
+                      "hand",
+                      "thyroid",
+                      "heart",
+                      "stomach",
+                      "adrenal",
+                      "fat",
+                      "gonads"
+                    ]
+                  }
+                },
+                "required": [
+                  "from",
+                  "to"
+                ],
+                "additionalProperties": false
+              }
+            },
+            "view": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "left",
+                "left-front",
+                "left-back",
+                "left-below",
+                "medial",
+                "back",
+                "below",
+                "body",
+                null
+              ]
+            },
+            "slice": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            },
+            "chemical": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "enum": [
+                "glutamate",
+                "gaba",
+                "dopamine",
+                "serotonin",
+                "noradrenaline",
+                "acetylcholine",
+                "cortisol",
+                "adrenaline",
+                "oxytocin",
+                "vasopressin",
+                "melatonin",
+                "thyroid-hormone",
+                "leptin",
+                "ghrelin",
+                "growth-hormone",
+                "sex-hormones",
+                "prolactin",
+                null
+              ]
+            },
+            "body": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          "required": [
+            "title",
+            "text",
+            "focus",
+            "parts",
+            "route",
+            "view",
+            "slice",
+            "chemical",
+            "body"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "followups": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "required": [
+      "status",
+      "title",
+      "summary",
+      "steps",
+      "followups"
+    ],
+    "additionalProperties": false
+  }
+}
